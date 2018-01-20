@@ -38,12 +38,14 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
 	return -1;
 }
 
-
+vScreen_t			vScreen;
 cg_t				cg;
 cgs_t				cgs;
 centity_t			cg_entities[MAX_GENTITIES];
 weaponInfo_t		cg_weapons[MAX_WEAPONS];
 itemInfo_t			cg_items[MAX_ITEMS];
+
+vmCvar_t	cgx_wideScreenFix;
 
 vmCvar_t	cg_railTrailTime;
 vmCvar_t	cg_centertime;
@@ -186,6 +188,10 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_drawTeamOverlay, "cg_drawTeamOverlay", "0", CVAR_ARCHIVE },
 	{ &cg_teamOverlayUserinfo, "teamoverlay", "0", CVAR_ROM | CVAR_USERINFO },
 	{ &cg_stats, "cg_stats", "0", 0 },
+
+	// extended cgx commands
+
+	{ &cgx_wideScreenFix, "cgx_wideScreenFix", "1", CVAR_ARCHIVE },
 
 	// the following variables are created in other parts of the system,
 	// but we also reference them here
@@ -758,7 +764,7 @@ Will perform callbacks to make the loading info screen update.
 =================
 */
 void CG_Init( int serverMessageNum, int serverCommandSequence ) {
-	const char	*s;
+	const char	*s;	
 
 	// clear everything
 	memset( &cgs, 0, sizeof( cgs ) );
@@ -766,6 +772,8 @@ void CG_Init( int serverMessageNum, int serverCommandSequence ) {
 	memset( cg_entities, 0, sizeof(cg_entities) );
 	memset( cg_weapons, 0, sizeof(cg_weapons) );
 	memset( cg_items, 0, sizeof(cg_items) );
+	
+	memset( &vScreen, 0, sizeof( vScreen ) );
 
 	cgs.processedSnapshotNum = serverMessageNum;
 	cgs.serverCommandSequence = serverCommandSequence;
@@ -788,8 +796,24 @@ void CG_Init( int serverMessageNum, int serverCommandSequence ) {
 
 	// get the rendering configuration from the client system
 	trap_GetGlconfig( &cgs.glconfig );
-	cgs.screenXScale = cgs.glconfig.vidWidth / 640.0;
-	cgs.screenYScale = cgs.glconfig.vidHeight / 480.0;
+
+	if ( cgx_wideScreenFix.integer && cgs.glconfig.vidWidth * 480 > cgs.glconfig.vidHeight * 640 ) {
+		 vScreen.width = 854;		 
+		 vScreen.height = 480;		 		
+		 vScreen.ratiox = 854.0 / 640.0;
+		 vScreen.offsetx = 854.0 / 8;
+	} else {
+		 vScreen.width = 640;
+		 vScreen.height = 480;			
+		 vScreen.ratiox = 1;
+		 vScreen.offsetx = 0;
+	}
+		
+	vScreen.hwidth = vScreen.width / 2;
+	vScreen.hheight = vScreen.height / 2;
+	
+	cgs.screenXScale = cgs.glconfig.vidWidth / vScreen.width;
+	cgs.screenYScale = cgs.glconfig.vidHeight / vScreen.height; 
 
 	// get the gamestate from the client system
 	trap_GetGameState( &cgs.gameState );

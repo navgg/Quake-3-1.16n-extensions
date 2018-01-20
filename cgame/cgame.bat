@@ -52,5 +52,15 @@ set cc=lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\
 @if errorlevel 1 goto quit
 
 q3asm -f ../cgame
+
+cd "D:\Games\Quake 3\baseq3"
+del pak2X.pk3
+
+7z a -tzip -mx9 "D:/Games/Quake 3/baseq3/pak2X.pk3" "D:/quake3/baseq3/vm"
+
+rem pause
+
+START /D "D:\Games\Quake 3\" /MAX "" quake3.exe +map q3dm1
+
 :quit
 cd ..

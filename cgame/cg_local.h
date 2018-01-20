@@ -758,7 +758,20 @@ typedef struct {
 	cgMedia_t		media;
 } cgs_t;
 
+typedef struct {
+	float 			width;
+	float 			hwidth;
+	
+	float 			height;
+	float 			hheight;
+	
+	float			ratiox;	
+	float			offsetx;
+} vScreen_t;
+
 //==============================================================================
+
+extern  vScreen_t		vScreen;
 
 extern	cgs_t			cgs;
 extern	cg_t			cg;
@@ -766,6 +779,8 @@ extern	centity_t		cg_entities[MAX_GENTITIES];
 extern	weaponInfo_t	cg_weapons[MAX_WEAPONS];
 extern	itemInfo_t		cg_items[MAX_ITEMS];
 extern	markPoly_t		cg_markPolys[MAX_MARK_POLYS];
+
+extern  vmCvar_t		cgx_wideScreenFix;
 
 extern	vmCvar_t		cg_centertime;
 extern	vmCvar_t		cg_runpitch;

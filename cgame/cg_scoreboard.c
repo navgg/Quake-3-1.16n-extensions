@@ -69,8 +69,8 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 	
 	ci = &cgs.clientinfo[score->client];
 
-	iconx = SB_BOTICON_X;
-	headx = SB_HEAD_X;
+	iconx = SB_BOTICON_X + vScreen.offsetx;
+	headx = SB_HEAD_X + vScreen.offsetx;
 
 	// draw the handicap or bot skill marker (unless player has flag)
 	if ( ci->powerups & ( 1 << PW_REDFLAG ) ) {
@@ -128,6 +128,11 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 		CG_DrawHead( headx, y, 16, 16, score->client, headAngles );
 	}
 
+	// draw player ID
+
+	//Com_sprintf(string, sizeof(string), "%3i", score->client);
+	//CG_DrawBigString(SB_SCORELINE_X + vScreen.offsetx - 64 - 40, y, string, 0.25f);
+
 	// draw the score line
 	if ( score->ping == -1 ) {
 		Com_sprintf(string, sizeof(string),
@@ -172,11 +177,11 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 		}
 
 		hcolor[3] = fade * 0.7;
-		CG_FillRect( SB_SCORELINE_X + BIGCHAR_WIDTH, y, 
+		CG_FillRect( SB_SCORELINE_X + BIGCHAR_WIDTH + vScreen.offsetx, y, 
 			640 - SB_SCORELINE_X - BIGCHAR_WIDTH, BIGCHAR_HEIGHT+1, hcolor );
 	}
 
-	CG_DrawBigString( SB_SCORELINE_X, y, string, fade );
+	CG_DrawBigString( SB_SCORELINE_X + vScreen.offsetx, y, string, fade );
 
 	// add the "ready" marker for intermission exiting
 	if ( cg.snap->ps.stats[ STAT_CLIENTS_READY ] & ( 1 << score->client ) ) {
@@ -270,7 +275,7 @@ qboolean CG_DrawScoreboard( void ) {
 	if ( cg.killerName[0] ) {
 		s = va("Fragged by %s", cg.killerName );
 		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-		x = ( SCREEN_WIDTH - w ) / 2;
+		x = ( vScreen.width - w ) / 2;
 		y = 40;
 		CG_DrawBigString( x, y, s, fade );
 	}
@@ -282,7 +287,7 @@ qboolean CG_DrawScoreboard( void ) {
 				CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
 				cg.snap->ps.persistant[PERS_SCORE] );
 			w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-			x = ( SCREEN_WIDTH - w ) / 2;
+			x = ( vScreen.width - w ) / 2;
 			y = 60;
 			CG_DrawBigString( x, y, s, fade );
 		}
@@ -296,7 +301,7 @@ qboolean CG_DrawScoreboard( void ) {
 		}
 
 		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-		x = ( SCREEN_WIDTH - w ) / 2;
+		x = ( vScreen.width - w ) / 2;
 		y = 60;
 		CG_DrawBigString( x, y, s, fade );
 	}
@@ -304,10 +309,10 @@ qboolean CG_DrawScoreboard( void ) {
 	// scoreboard
 	y = SB_HEADER;
 
-	CG_DrawPic( SB_SCORE_X, y, 64, 32, cgs.media.scoreboardScore );
-	CG_DrawPic( SB_PING_X, y, 64, 32, cgs.media.scoreboardPing );
-	CG_DrawPic( SB_TIME_X, y, 64, 32, cgs.media.scoreboardTime );
-	CG_DrawPic( SB_NAME_X, y, 64, 32, cgs.media.scoreboardName );
+	CG_DrawPic( SB_SCORE_X + vScreen.offsetx, y, 64, 32, cgs.media.scoreboardScore );
+	CG_DrawPic( SB_PING_X  + vScreen.offsetx, y, 64, 32, cgs.media.scoreboardPing );
+	CG_DrawPic( SB_TIME_X  + vScreen.offsetx, y, 64, 32, cgs.media.scoreboardTime );
+	CG_DrawPic( SB_NAME_X  + vScreen.offsetx, y, 64, 32, cgs.media.scoreboardName );
 
 
 	y = SB_TOP;
@@ -335,20 +340,20 @@ qboolean CG_DrawScoreboard( void ) {
 
 		if ( cg.teamScores[0] >= cg.teamScores[1] ) {
 			n1 = CG_TeamScoreboard( y, TEAM_RED, fade, maxClients, lineHeight );
-			CG_DrawTeamBackground( 0, y - topBorderSize, 640, n1 * lineHeight + bottomBorderSize, 0.33, TEAM_RED );
+			CG_DrawTeamBackground( 0+vScreen.offsetx, y - topBorderSize, 640, n1 * lineHeight + bottomBorderSize, 0.33, TEAM_RED );
 			y += (n1 * lineHeight) + BIGCHAR_HEIGHT;
 			maxClients -= n1;
 			n2 = CG_TeamScoreboard( y, TEAM_BLUE, fade, maxClients, lineHeight );
-			CG_DrawTeamBackground( 0, y - topBorderSize, 640, n2 * lineHeight + bottomBorderSize, 0.33, TEAM_BLUE );
+			CG_DrawTeamBackground( 0+vScreen.offsetx, y - topBorderSize, 640, n2 * lineHeight + bottomBorderSize, 0.33, TEAM_BLUE );
 			y += (n2 * lineHeight) + BIGCHAR_HEIGHT;
 			maxClients -= n2;
 		} else {
 			n1 = CG_TeamScoreboard( y, TEAM_BLUE, fade, maxClients, lineHeight );
-			CG_DrawTeamBackground( 0, y - topBorderSize, 640, n1 * lineHeight + bottomBorderSize, 0.33, TEAM_BLUE );
+			CG_DrawTeamBackground( 0+vScreen.offsetx, y - topBorderSize, 640, n1 * lineHeight + bottomBorderSize, 0.33, TEAM_BLUE );
 			y += (n1 * lineHeight) + BIGCHAR_HEIGHT;
 			maxClients -= n1;
 			n2 = CG_TeamScoreboard( y, TEAM_RED, fade, maxClients, lineHeight );
-			CG_DrawTeamBackground( 0, y - topBorderSize, 640, n2 * lineHeight + bottomBorderSize, 0.33, TEAM_RED );
+			CG_DrawTeamBackground( 0+vScreen.offsetx, y - topBorderSize, 640, n2 * lineHeight + bottomBorderSize, 0.33, TEAM_RED );
 			y += (n2 * lineHeight) + BIGCHAR_HEIGHT;
 			maxClients -= n2;
 		}
@@ -399,7 +404,7 @@ static void CG_CenterGiantLine( float y, const char *string ) {
 	color[2] = 1;
 	color[3] = 1;
 
-	x = 0.5 * ( 640 - GIANT_WIDTH * CG_DrawStrlen( string ) );
+	x = 0.5 * ( vScreen.width - GIANT_WIDTH * CG_DrawStrlen( string ) );
 
 	CG_DrawStringExt( x, y, string, color, qtrue, qtrue, GIANT_WIDTH, GIANT_HEIGHT, 0 );
 }
@@ -433,7 +438,7 @@ void CG_DrawTourneyScoreboard( void ) {
 	// draw the dialog background
 	color[0] = color[1] = color[2] = 0;
 	color[3] = 1;
-	CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, color );
+	CG_FillRect( 0 +vScreen.offsetx, 0, SCREEN_WIDTH, SCREEN_HEIGHT, color );
 
 	// print the mesage of the day
 	s = CG_ConfigString( CS_MOTD );

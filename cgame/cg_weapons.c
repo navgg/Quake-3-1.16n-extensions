@@ -1086,7 +1086,7 @@ void CG_DrawWeaponSelect( void ) {
 		}
 	}
 
-	x = 320 - count * 20;
+	x = vScreen.hwidth - count * 20;
 	y = 380;
 
 	for ( i = 1 ; i < 16 ; i++ ) {
@@ -1117,7 +1117,7 @@ void CG_DrawWeaponSelect( void ) {
 		name = cg_weapons[ cg.weaponSelect ].item->pickup_name;
 		if ( name ) {
 			w = CG_DrawStrlen( name ) * BIGCHAR_WIDTH;
-			x = ( SCREEN_WIDTH - w ) / 2;
+			x = ( vScreen.width - w ) / 2;
 			CG_DrawBigStringColor(x, y - 22, name, color);
 		}
 	}
