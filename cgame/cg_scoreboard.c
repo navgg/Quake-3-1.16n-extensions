@@ -130,8 +130,10 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 
 	// draw player ID
 
-	//Com_sprintf(string, sizeof(string), "%3i", score->client);
-	//CG_DrawBigString(SB_SCORELINE_X + vScreen.offsetx - 64 - 40, y, string, 0.25f);
+	if (cgx_drawPlayerIDs.integer) {
+		Com_sprintf(string, sizeof(string), "%3i", score->client);
+		CG_DrawBigString(SB_SCORELINE_X + vScreen.offsetx - 64 - 40, y, string, 0.25f);
+	}
 
 	// draw the score line
 	if ( score->ping == -1 ) {

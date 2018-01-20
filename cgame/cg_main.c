@@ -46,6 +46,7 @@ weaponInfo_t		cg_weapons[MAX_WEAPONS];
 itemInfo_t			cg_items[MAX_ITEMS];
 
 vmCvar_t	cgx_wideScreenFix;
+vmCvar_t	cgx_drawPlayerIDs;
 
 vmCvar_t	cg_railTrailTime;
 vmCvar_t	cg_centertime;
@@ -192,6 +193,7 @@ cvarTable_t		cvarTable[] = {
 	// extended cgx commands
 
 	{ &cgx_wideScreenFix, "cgx_wideScreenFix", "1", CVAR_ARCHIVE },
+	{ &cgx_drawPlayerIDs, "cgx_drawPlayerIDs", "1", CVAR_ARCHIVE },
 
 	// the following variables are created in other parts of the system,
 	// but we also reference them here
