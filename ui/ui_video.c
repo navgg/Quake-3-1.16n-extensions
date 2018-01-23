@@ -280,23 +280,73 @@ static graphicsoptions_t		s_graphicsoptions;
 static InitialVideoOptions_s s_ivo_templates[] =
 {
 	{
-		4, qtrue, 2, 0, 2, 2, 1, 1, 0, qtrue	// JDC: this was tq 3
+		6, qtrue, 3, 0, 0, 0, 2, 1, 0, qtrue	// JDC: this was tq 3
 	},
 	{
-		3, qtrue, 2, 0, 0, 0, 1, 0, 0, qtrue
+		4, qtrue, 2, 0, 0, 0, 1, 0, 0, qtrue
 	},
 	{
-		2, qtrue, 1, 0, 1, 0, 0, 0, 0, qtrue
+		3, qtrue, 1, 0, 1, 0, 0, 0, 0, qtrue
 	},
 	{
-		2, qtrue, 1, 1, 1, 0, 0, 0, 0, qtrue
+		3, qtrue, 1, 1, 1, 0, 0, 0, 0, qtrue
 	},
 	{
-		3, qtrue, 1, 0, 0, 0, 1, 0, 0, qtrue
+		4, qtrue, 1, 0, 0, 0, 1, 0, 0, qtrue
 	}
 };
 
 #define NUM_IVO_TEMPLATES ( sizeof( s_ivo_templates ) / sizeof( s_ivo_templates[0] ) )
+
+// X-MOD: custom vidmodes
+
+typedef struct
+{
+	int         width, height;
+} vidmode_t;
+
+static vidmode_t vidmodes[] = {
+	{ 1280, 720 },
+	{ 1360, 768 },
+	{ 1366, 768 },
+	{ 1600, 900 },
+	{ 1680, 1050 },
+	{ 1920, 1080 },
+	{ 2560, 1440 },
+	{ 3840, 2160 }
+};
+
+#define MAX_CUSTOM_VIDMODES	( sizeof( vidmodes ) / sizeof( vidmodes[0] ) )
+
+void Set_r_mode() {
+	if (s_graphicsoptions.mode.curvalue < 12) {
+		trap_Cvar_SetValue("r_mode", s_graphicsoptions.mode.curvalue);
+	} else {
+		trap_Cvar_SetValue("r_customwidth", vidmodes[s_graphicsoptions.mode.curvalue - 12].width);
+		trap_Cvar_SetValue("r_customheight", vidmodes[s_graphicsoptions.mode.curvalue - 12].height);
+		trap_Cvar_SetValue("r_mode", -1);
+	}
+}
+
+void Get_r_mode() {
+	int i, width, height;
+	
+	s_graphicsoptions.mode.curvalue = trap_Cvar_VariableValue( "r_mode" );	
+
+	if (s_graphicsoptions.mode.curvalue == -1) {
+		width = trap_Cvar_VariableValue( "r_customwidth" );
+		height = trap_Cvar_VariableValue( "r_customheight" );
+
+		for (i = 0; i < MAX_CUSTOM_VIDMODES; i++)
+			if (width == vidmodes[i].width && height == vidmodes[i].height) {
+				s_graphicsoptions.mode.curvalue = i + 12;
+				break;
+			}				
+	} 
+
+	if ( s_graphicsoptions.mode.curvalue < 0 ) 	
+		s_graphicsoptions.mode.curvalue = 3;	
+}
 
 /*
 =================
@@ -458,7 +508,7 @@ static void GraphicsOptions_ApplyChanges( void *unused, int notification )
 	}
 	trap_Cvar_SetValue( "r_picmip", 3 - s_graphicsoptions.tq.curvalue );
 	trap_Cvar_SetValue( "r_allowExtensions", s_graphicsoptions.allow_extensions.curvalue );
-	trap_Cvar_SetValue( "r_mode", s_graphicsoptions.mode.curvalue );
+	Set_r_mode();	
 	trap_Cvar_SetValue( "r_fullscreen", s_graphicsoptions.fs.curvalue );
 	trap_Cvar_Set( "r_glDriver", ( char * ) s_drivers[s_graphicsoptions.driver.curvalue] );
 	switch ( s_graphicsoptions.colordepth.curvalue )
@@ -606,12 +656,8 @@ GraphicsOptions_SetMenuItems
 =================
 */
 static void GraphicsOptions_SetMenuItems( void )
-{
-	s_graphicsoptions.mode.curvalue = trap_Cvar_VariableValue( "r_mode" );
-	if ( s_graphicsoptions.mode.curvalue < 0 )
-	{
-		s_graphicsoptions.mode.curvalue = 3;
-	}
+{		
+	Get_r_mode();
 	s_graphicsoptions.fs.curvalue = trap_Cvar_VariableValue("r_fullscreen");
 	s_graphicsoptions.allow_extensions.curvalue = trap_Cvar_VariableValue("r_allowExtensions");
 	s_graphicsoptions.tq.curvalue = 3-trap_Cvar_VariableValue( "r_picmip");
@@ -749,8 +795,17 @@ void GraphicsOptions_MenuInit( void )
 		"1600x1200",
 		"2048x1536",
 		"856x480 wide screen",
+		"1280x720 HD",
+		"1360x768",
+		"1366x768",
+		"1600x900",
+		"1680x1050",
+		"1920x1080 FullHD",
+		"2560x1440 QHD",
+		"3840x2160 UHD",
 		0
-	};
+	};	
+	
 	static const char *filter_names[] =
 	{
 		"Bilinear",
