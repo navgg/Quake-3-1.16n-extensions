@@ -640,16 +640,20 @@ void ArenaServers_InsertFavorites( void )
 
 	// resync existing results with new or deleted cvars
 	info[0] = '\0';
-	Info_SetValueForKey( info, "hostname", "No Response" );
+	Info_SetValueForKey( info, "hostname", "No Response" );	
 	for (i=0; i<g_arenaservers.numfavoriteaddresses; i++)
-	{
+	{	
+		//X-MOD: domain resolved, use received IPs now and skip domains in list
+		if (g_arenaservers.favoriteaddresses[i][0] < '0' || g_arenaservers.favoriteaddresses[i][0] > '9')
+			continue;		
+
 		// find favorite address in refresh list
 		for (j=0; j<g_numfavoriteservers; j++)
 			if (!Q_stricmp(g_arenaservers.favoriteaddresses[i],g_favoriteserverlist[j].adrstr))
 				break;
 
 		if ( j >= g_numfavoriteservers)
-		{
+		{			
 			// not in list, add it
 			ArenaServers_Insert( g_arenaservers.favoriteaddresses[i], info, ArenaServers_MaxPing() );
 		}
@@ -692,10 +696,11 @@ void ArenaServers_LoadFavorites( void )
 		if (!adrstr[0])
 			continue;
 
+		//X-MOD: commenting out old condition and making domain resolving to work
 		// quick sanity check to avoid slow domain name resolving
 		// first character must be numeric
-		if (adrstr[0] < '0' || adrstr[0] > '9')
-			continue;
+		//if (adrstr[0] < '0' || adrstr[0] > '9')
+		//	 continue;				
 
 		// favorite server addresses must be maintained outside refresh list
 		// this mimics local and global netadr's stored in client
@@ -778,7 +783,7 @@ static void ArenaServers_DoRefresh( void )
 	int		j;
 	int		time;
 	int		maxPing;
-	char	adrstr[MAX_ADDRESSLENGTH];
+	char	adrstr[MAX_ADDRESSLENGTH];	
 	char	info[MAX_INFO_STRING];
 
 	if (uis.realtime < g_arenaservers.refreshtime)
@@ -823,12 +828,16 @@ static void ArenaServers_DoRefresh( void )
 	maxPing = ArenaServers_MaxPing();
 	for (i=0; i<MAX_PINGREQUESTS; i++)
 	{
-		trap_LAN_GetPing( i, adrstr, MAX_ADDRESSLENGTH, &time );
+		trap_LAN_GetPing( i, adrstr, MAX_ADDRESSLENGTH, &time );		
 		if (!adrstr[0])
 		{
 			// ignore empty or pending pings
 			continue;
 		}
+
+		// X-MOD: domain changed to ip, update it's in pinglist (resolving)
+		if (Q_stricmp(g_arenaservers.pinglist[i].adrstr, adrstr) != 0)
+			Q_strncpyz(g_arenaservers.pinglist[i].adrstr, adrstr, MAX_ADDRESSLENGTH);											
 
 		// find ping result in our local list
 		for (j=0; j<MAX_PINGREQUESTS; j++)
@@ -856,9 +865,9 @@ static void ArenaServers_DoRefresh( void )
 			}
 			else
 			{
-				trap_LAN_GetPingInfo( i, info, MAX_INFO_STRING );
+				trap_LAN_GetPingInfo( i, info, MAX_INFO_STRING );				
 			}
-
+			
 			// insert ping results
 			ArenaServers_Insert( adrstr, info, time );
 
