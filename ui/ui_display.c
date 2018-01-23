@@ -23,6 +23,7 @@ DISPLAY OPTIONS MENU
 #define ID_BRIGHTNESS		14
 #define ID_SCREENSIZE		15
 #define ID_BACK				16
+#define ID_OVERBRIGHT_BITS	17
 
 
 typedef struct {
@@ -39,6 +40,7 @@ typedef struct {
 
 	menuslider_s	brightness;
 	menuslider_s	screensize;
+	menuradiobutton_s overbrightbits;
 
 	menubitmap_s	back;
 } displayOptionsInfo_t;
@@ -81,6 +83,11 @@ static void UI_DisplayOptionsMenu_Event( void* ptr, int event ) {
 	
 	case ID_SCREENSIZE:
 		trap_Cvar_SetValue( "cg_viewsize", displayOptionsInfo.screensize.curvalue * 10 );
+		break;
+
+	case ID_OVERBRIGHT_BITS:
+		trap_Cvar_SetValue( "r_overbrightbits", displayOptionsInfo.overbrightbits.curvalue );
+		trap_Cmd_ExecuteText( EXEC_APPEND, "vid_restart\n" );
 		break;
 
 	case ID_BACK:
@@ -193,6 +200,15 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.screensize.minvalue			= 3;
     displayOptionsInfo.screensize.maxvalue			= 10;
 
+	y += BIGCHAR_HEIGHT+2;
+	displayOptionsInfo.overbrightbits.generic.type		= MTYPE_RADIOBUTTON;
+	displayOptionsInfo.overbrightbits.generic.name		= "Over Bright Bits:";
+	displayOptionsInfo.overbrightbits.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	displayOptionsInfo.overbrightbits.generic.callback	= UI_DisplayOptionsMenu_Event;
+	displayOptionsInfo.overbrightbits.generic.id		= ID_OVERBRIGHT_BITS;
+	displayOptionsInfo.overbrightbits.generic.x			= 400;
+	displayOptionsInfo.overbrightbits.generic.y			= y;
+
 	displayOptionsInfo.back.generic.type		= MTYPE_BITMAP;
 	displayOptionsInfo.back.generic.name		= ART_BACK0;
 	displayOptionsInfo.back.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -213,10 +229,12 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.network );
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.brightness );
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.screensize );
+	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.overbrightbits );
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.back );
 
 	displayOptionsInfo.brightness.curvalue  = trap_Cvar_VariableValue("r_gamma") * 10;
 	displayOptionsInfo.screensize.curvalue  = trap_Cvar_VariableValue( "cg_viewsize")/10;
+	displayOptionsInfo.overbrightbits.curvalue  = (int)trap_Cvar_VariableValue("r_overbrightbits") > 0;
 }
 
 
