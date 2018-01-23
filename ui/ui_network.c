@@ -22,14 +22,28 @@ NETWORK OPTIONS MENU
 #define ID_NETWORK			13
 #define ID_RATE				14
 #define ID_BACK				15
+#define ID_PACKETS			16
 
 
-static const char *rate_items[] = {
-	"<= 28.8K",
-	"33.6K",
-	"56K",
-	"ISDN",
-	"LAN/Cable/xDSL",
+static const char *rate_items[] = {	
+	"4000 (56K old modems)",
+	"5000 (ISDN)",
+	"8000",
+	"10000",
+	"16000",
+	"25000 (LAN/Cable/xDSL)",
+	"50000 (Yolo/WTF?/OMG)",
+	0
+};
+
+static const char *packets_items[] = {	
+	"40",
+	"50",
+	"60",
+	"70",
+	"80",
+	"90",
+	"100",
 	0
 };
 
@@ -46,6 +60,7 @@ typedef struct {
 	menutext_s		network;
 
 	menulist_s		rate;
+	menulist_s		packets;
 
 	menubitmap_s	back;
 } networkOptionsInfo_t;
@@ -83,21 +98,26 @@ static void UI_NetworkOptionsMenu_Event( void* ptr, int event ) {
 		break;
 
 	case ID_RATE:
-		if( networkOptionsInfo.rate.curvalue == 0 ) {
-			trap_Cvar_SetValue( "rate", 2500 );
-		}
-		else if( networkOptionsInfo.rate.curvalue == 1 ) {
-			trap_Cvar_SetValue( "rate", 3000 );
-		}
-		else if( networkOptionsInfo.rate.curvalue == 2 ) {
+		if( networkOptionsInfo.rate.curvalue == 0 )
 			trap_Cvar_SetValue( "rate", 4000 );
-		}
-		else if( networkOptionsInfo.rate.curvalue == 3 ) {
+		else if( networkOptionsInfo.rate.curvalue == 1 )
 			trap_Cvar_SetValue( "rate", 5000 );
-		}
-		else if( networkOptionsInfo.rate.curvalue == 4 ) {
-			trap_Cvar_SetValue( "rate", 25000 );
-		}
+		else if( networkOptionsInfo.rate.curvalue == 2 )
+			trap_Cvar_SetValue( "rate", 8000 );			
+		else if( networkOptionsInfo.rate.curvalue == 3 )
+			trap_Cvar_SetValue( "rate", 10000 );			
+		else if( networkOptionsInfo.rate.curvalue == 4 )
+			trap_Cvar_SetValue( "rate", 16000 );			
+		else if( networkOptionsInfo.rate.curvalue == 5 )
+			trap_Cvar_SetValue( "rate", 25000 );			
+		else if( networkOptionsInfo.rate.curvalue == 6 )
+			trap_Cvar_SetValue( "rate", 50000 );			
+		
+		trap_Cvar_SetValue( "snaps", 40 );		
+		break;
+
+	case ID_PACKETS:		
+		trap_Cvar_SetValue( "cl_maxpackets", 40 + networkOptionsInfo.packets.curvalue * 10 );							
 		break;
 
 	case ID_BACK:
@@ -114,7 +134,7 @@ UI_NetworkOptionsMenu_Init
 */
 static void UI_NetworkOptionsMenu_Init( void ) {
 	int		y;
-	int		rate;
+	int		rate, packets;
 
 	memset( &networkOptionsInfo, 0, sizeof(networkOptionsInfo) );
 
@@ -196,6 +216,16 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.rate.generic.y			= y;
 	networkOptionsInfo.rate.itemnames			= rate_items;
 
+	y = 240 - 0 * (BIGCHAR_HEIGHT+2);
+	networkOptionsInfo.packets.generic.type		= MTYPE_SPINCONTROL;
+	networkOptionsInfo.packets.generic.name		= "Packets Rate:";
+	networkOptionsInfo.packets.generic.flags	= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	networkOptionsInfo.packets.generic.callback	= UI_NetworkOptionsMenu_Event;
+	networkOptionsInfo.packets.generic.id		= ID_PACKETS;
+	networkOptionsInfo.packets.generic.x		= 400;
+	networkOptionsInfo.packets.generic.y		= y;
+	networkOptionsInfo.packets.itemnames		= packets_items;
+
 	networkOptionsInfo.back.generic.type		= MTYPE_BITMAP;
 	networkOptionsInfo.back.generic.name		= ART_BACK0;
 	networkOptionsInfo.back.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -215,24 +245,41 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.sound );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.network );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.rate );
+	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.packets );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.back );
 
 	rate = trap_Cvar_VariableValue( "rate" );
-	if( rate <= 2500 ) {
+	if( rate <= 4000 )
 		networkOptionsInfo.rate.curvalue = 0;
-	}
-	else if( rate <= 3000 ) {
+	else if( rate <= 5000 )
 		networkOptionsInfo.rate.curvalue = 1;
-	}
-	else if( rate <= 4000 ) {
+	else if( rate <= 8000 )
 		networkOptionsInfo.rate.curvalue = 2;
-	}
-	else if( rate <= 5000 ) {
+	else if( rate <= 10000 )
 		networkOptionsInfo.rate.curvalue = 3;
-	}
-	else {
+	else if( rate <= 16000 )
 		networkOptionsInfo.rate.curvalue = 4;
-	}
+	else if( rate <= 25000 )
+		networkOptionsInfo.rate.curvalue = 5;
+	else
+		networkOptionsInfo.rate.curvalue = 6;
+
+	packets = trap_Cvar_VariableValue( "cl_maxpackets" );
+	if( packets <= 40 )
+		networkOptionsInfo.packets.curvalue = 0;
+	else if( packets <= 50 )
+		networkOptionsInfo.packets.curvalue = 1;
+	else if( packets <= 60 )
+		networkOptionsInfo.packets.curvalue = 2;
+	else if( packets <= 70 )
+		networkOptionsInfo.packets.curvalue = 3;
+	else if( packets <= 80 )
+		networkOptionsInfo.packets.curvalue = 4;
+	else if( packets <= 90 )
+		networkOptionsInfo.packets.curvalue = 5;
+	else
+		networkOptionsInfo.packets.curvalue = 6;
+	
 }
 
 
