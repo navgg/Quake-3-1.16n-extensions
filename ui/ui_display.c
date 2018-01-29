@@ -24,7 +24,22 @@ DISPLAY OPTIONS MENU
 #define ID_SCREENSIZE		15
 #define ID_BACK				16
 #define ID_OVERBRIGHT_BITS	17
+#define ID_DRAWFPS			18
+#define ID_WIDESCREEN_FIX	19
+#define ID_MAXFPS			20
 
+static const char *fps_items[] = {		
+	"76",
+	"90",
+	"100",
+	"111",
+	"125",
+	"142",
+	"166",
+	"200",
+	"250",
+	0
+};
 
 typedef struct {
 	menuframework_s	menu;
@@ -41,6 +56,9 @@ typedef struct {
 	menuslider_s	brightness;
 	menuslider_s	screensize;
 	menuradiobutton_s overbrightbits;
+	menuradiobutton_s widescreenfix;
+	menuradiobutton_s drawfps;
+	menulist_s		maxfps;
 
 	menubitmap_s	back;
 } displayOptionsInfo_t;
@@ -90,6 +108,18 @@ static void UI_DisplayOptionsMenu_Event( void* ptr, int event ) {
 		trap_Cmd_ExecuteText( EXEC_APPEND, "vid_restart\n" );
 		break;
 
+	case ID_DRAWFPS: 		
+		trap_Cvar_SetValue( "cg_drawFPS", displayOptionsInfo.drawfps.curvalue );
+		break;
+
+	case ID_MAXFPS:
+		trap_Cvar_Set( "com_maxfps", fps_items[displayOptionsInfo.maxfps.curvalue] );		
+		break;
+
+	case ID_WIDESCREEN_FIX:
+		trap_Cvar_SetValue( "cgx_wideScreenFix", displayOptionsInfo.widescreenfix.curvalue );		
+		break;
+
 	case ID_BACK:
 		UI_PopMenu();
 		break;
@@ -104,6 +134,7 @@ UI_DisplayOptionsMenu_Init
 */
 static void UI_DisplayOptionsMenu_Init( void ) {
 	int		y;
+	int		fps;
 
 	memset( &displayOptionsInfo, 0, sizeof(displayOptionsInfo) );
 
@@ -175,7 +206,7 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.network.style				= UI_RIGHT;
 	displayOptionsInfo.network.color				= color_red;
 
-	y = 240 - 1 * (BIGCHAR_HEIGHT+2);
+	y = 240 - 3 * (BIGCHAR_HEIGHT+2);
 	displayOptionsInfo.brightness.generic.type		= MTYPE_SLIDER;
 	displayOptionsInfo.brightness.generic.name		= "Brightness:";
 	displayOptionsInfo.brightness.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
@@ -209,6 +240,34 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.overbrightbits.generic.x			= 400;
 	displayOptionsInfo.overbrightbits.generic.y			= y;
 
+	y += BIGCHAR_HEIGHT+2;
+	displayOptionsInfo.drawfps.generic.type		= MTYPE_RADIOBUTTON;
+	displayOptionsInfo.drawfps.generic.name		= "Show FPS:";
+	displayOptionsInfo.drawfps.generic.flags	= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	displayOptionsInfo.drawfps.generic.callback	= UI_DisplayOptionsMenu_Event;
+	displayOptionsInfo.drawfps.generic.id		= ID_DRAWFPS;
+	displayOptionsInfo.drawfps.generic.x		= 400;
+	displayOptionsInfo.drawfps.generic.y		= y;
+
+	y += BIGCHAR_HEIGHT+2;
+	displayOptionsInfo.maxfps.generic.type		= MTYPE_SPINCONTROL;
+	displayOptionsInfo.maxfps.generic.name		= "Max FPS:";
+	displayOptionsInfo.maxfps.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	displayOptionsInfo.maxfps.generic.callback	= UI_DisplayOptionsMenu_Event;
+	displayOptionsInfo.maxfps.generic.id		= ID_MAXFPS;
+	displayOptionsInfo.maxfps.generic.x			= 400;
+	displayOptionsInfo.maxfps.generic.y			= y;
+	displayOptionsInfo.maxfps.itemnames			= fps_items;
+
+	y += BIGCHAR_HEIGHT+2;
+	displayOptionsInfo.widescreenfix.generic.type		= MTYPE_RADIOBUTTON;
+	displayOptionsInfo.widescreenfix.generic.name		= "Auto aspect ratio:";
+	displayOptionsInfo.widescreenfix.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	displayOptionsInfo.widescreenfix.generic.callback	= UI_DisplayOptionsMenu_Event;
+	displayOptionsInfo.widescreenfix.generic.id			= ID_WIDESCREEN_FIX;
+	displayOptionsInfo.widescreenfix.generic.x			= 400;
+	displayOptionsInfo.widescreenfix.generic.y			= y;
+
 	displayOptionsInfo.back.generic.type		= MTYPE_BITMAP;
 	displayOptionsInfo.back.generic.name		= ART_BACK0;
 	displayOptionsInfo.back.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -230,11 +289,37 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.brightness );
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.screensize );
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.overbrightbits );
+	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.drawfps );
+	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.widescreenfix );
+	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.maxfps );
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.back );
 
 	displayOptionsInfo.brightness.curvalue  = trap_Cvar_VariableValue("r_gamma") * 10;
 	displayOptionsInfo.screensize.curvalue  = trap_Cvar_VariableValue( "cg_viewsize")/10;
-	displayOptionsInfo.overbrightbits.curvalue  = (int)trap_Cvar_VariableValue("r_overbrightbits") > 0;
+	displayOptionsInfo.overbrightbits.curvalue  = trap_Cvar_VariableValue("r_overbrightbits") != 0;
+	displayOptionsInfo.widescreenfix.curvalue  = trap_Cvar_VariableValue("cgx_wideScreenFix") != 0;
+	displayOptionsInfo.drawfps.curvalue  = trap_Cvar_VariableValue("cg_drawFPS") != 0;
+	displayOptionsInfo.maxfps.curvalue  = trap_Cvar_VariableValue("cg_drawFPS") != 0;
+
+	fps = trap_Cvar_VariableValue( "com_maxfps" );
+	if( fps <= 76 )
+		displayOptionsInfo.maxfps.curvalue = 0;
+	else if( fps <= 90 )
+		displayOptionsInfo.maxfps.curvalue = 1;	
+	else if( fps <= 100 )
+		displayOptionsInfo.maxfps.curvalue = 2;
+	else if( fps <= 111 )
+		displayOptionsInfo.maxfps.curvalue = 3;
+	else if( fps <= 125 )
+		displayOptionsInfo.maxfps.curvalue = 4;
+	else if( fps <= 142 )
+		displayOptionsInfo.maxfps.curvalue = 5;
+	else if( fps <= 166 )
+		displayOptionsInfo.maxfps.curvalue = 6;
+	else if( fps <= 200 )
+		displayOptionsInfo.maxfps.curvalue = 7;	
+	else
+		displayOptionsInfo.maxfps.curvalue = 8;		
 }
 
 
