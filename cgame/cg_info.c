@@ -122,7 +122,7 @@ void CG_DrawInformation( void ) {
 	int			value;
 	qhandle_t	levelshot;
 	qhandle_t	detail;
-	char		buf[1024];
+	char		buf[1024];	
 
 	info = CG_ConfigString( CS_SERVERINFO );
 	sysInfo = CG_ConfigString( CS_SYSTEMINFO );
@@ -132,7 +132,15 @@ void CG_DrawInformation( void ) {
 	if ( !levelshot ) {
 		levelshot = trap_R_RegisterShaderNoMip( "menu/art/unknownmap" );
 	}
-	trap_R_SetColor( NULL );
+	trap_R_SetColor( NULL );	
+	
+	//X-MOD: loading effect
+	if (vScreen.width != SCREEN_WIDTH) {
+		vec4_t		color = { 0.05, 0.05, 0.05, 0.80 };	
+		CG_DrawPic(-SCREEN_WIDTH*0.25, -SCREEN_HEIGHT*0.25, SCREEN_WIDTH*1.25, SCREEN_HEIGHT*1.25, levelshot);
+		CG_FillRect(0, 0, vScreen.width, SCREEN_HEIGHT, color);
+	}
+
 	CG_DrawPic( 0 + vScreen.offsetx, 0, SCREEN_WIDTH, SCREEN_HEIGHT, levelshot );
 
 	// blend a detail texture over it
