@@ -23,6 +23,7 @@ MAIN MENU
 #define MAIN_BANNER_MODEL				"models/mapobjects/banner/banner5.md3"
 #define MAIN_MENU_VERTICAL_SPACING		34
 
+#define CGX_VERSION				"0.1a"
 
 typedef struct {
 	menuframework_s	menu;
@@ -40,7 +41,6 @@ typedef struct {
 
 
 static mainmenu_t s_main;
-
 
 /*
 =================
@@ -121,6 +121,7 @@ static void Main_MenuDraw( void ) {
 	float			adjust;
 	float			x, y, w, h;
 	vec4_t			color = {0.5, 0, 0, 1};
+	vec4_t			cgx_color = { 0.15, 0.15, 0.15, 0.25 };
 
 	// setup the refdef
 
@@ -175,10 +176,13 @@ static void Main_MenuDraw( void ) {
 
 	if (uis.demoversion) {
 		UI_DrawProportionalString( 320, 372, "DEMO      FOR MATURE AUDIENCES      DEMO", UI_CENTER|UI_SMALLFONT, color );
-		UI_DrawString( 320, 400, "Quake III Arena(c) 1999-2000, Id Software, Inc.  All Rights Reserved", UI_CENTER|UI_SMALLFONT, color );
-	} else {
+		UI_DrawString( 320, 400, "Quake III Arena(c) 1999-2000, Id Software, Inc.  All Rights Reserved", UI_CENTER|UI_SMALLFONT, color );				
+		UI_DrawString( 320, 428, va("CGX %s (c) 2018 NaViGaToR (322)", CGX_VERSION), UI_CENTER|UI_SMALLFONT, cgx_color );
+	} else {			
+		UI_DrawString( 320, 422, va("CGX %s (c) 2018 NaViGaToR (322)", CGX_VERSION), UI_CENTER|UI_SMALLFONT, cgx_color );
+		
 		UI_DrawString( 320, 450, "Quake III Arena(c) 1999-2000, Id Software, Inc.  All Rights Reserved", UI_CENTER|UI_SMALLFONT, color );
-	}
+	}	
 }
 
 
@@ -195,7 +199,7 @@ void UI_MainMenu( void ) {
 	int		y;
 	int		style = UI_CENTER | UI_DROPSHADOW;
 
-	trap_Cvar_Set( "sv_killserver", "1" );
+	trap_Cvar_Set( "sv_killserver", "1" );	
 
 	if( !uis.demoversion && !ui_cdkeychecked.integer ) {
 		char	key[17];
