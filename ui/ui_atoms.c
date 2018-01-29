@@ -866,6 +866,7 @@ void UI_Cache_f( void ) {
 	Demos_Cache();
 	UI_CinematicsMenu_Cache();
 	Preferences_Cache();
+	Preferences2_Cache();
 	ServerInfo_Cache();
 	SpecifyServer_Cache();
 	ArenaServers_Cache();
@@ -954,6 +955,7 @@ UI_Shutdown
 =================
 */
 void UI_Shutdown( void ) {
+
 }
 
 /*
@@ -984,7 +986,7 @@ void UI_Init( void ) {
 	Menu_Cache();
 
 	uis.activemenu = NULL;
-	uis.menusp     = 0;
+	uis.menusp     = 0;	
 }
 
 /*

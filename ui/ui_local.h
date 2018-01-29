@@ -376,6 +376,13 @@ extern void UI_PreferencesMenu( void );
 extern void Preferences_Cache( void );
 
 //
+// ui_preferences2.c
+//
+
+extern void UI_Preferences2Menu( void );
+extern void Preferences2_Cache( void );
+
+//
 // ui_specifyserver.c
 //
 extern void UI_SpecifyServerMenu( void );

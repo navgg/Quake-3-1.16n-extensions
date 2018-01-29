@@ -175,6 +175,7 @@
     <ClCompile Include="ui_players.c" />
     <ClCompile Include="ui_playersettings.c" />
     <ClCompile Include="ui_preferences.c" />
+    <ClCompile Include="ui_preferences2.c" />
     <ClCompile Include="ui_qmenu.c" />
     <ClCompile Include="ui_removebots.c" />
     <ClCompile Include="ui_saveconfig.c" />

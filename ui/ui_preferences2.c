@@ -1,0 +1,365 @@
+// Copyright (C) 1999-2000 Id Software, Inc.
+//
+/*
+=======================================================================
+
+ADVANCED OPTIONS MENU
+
+=======================================================================
+*/
+
+
+#include "ui_local.h"
+
+
+#define ART_FRAMEL				"menu/art/frame2_l"
+#define ART_FRAMER				"menu/art/frame1_r"
+#define ART_BACK0				"menu/art/back_0"
+#define ART_BACK1				"menu/art/back_1"
+
+#define PREFERENCES_X_POS		360
+
+#define ID_REWARDS				127
+#define ID_BLOOD				128
+#define ID_GIBS					129
+#define ID_CAMERABOB			130
+#define ID_PLAYERIDS			131
+#define ID_FOV					132
+#define ID_TIMER				133
+#define ID_ENEMYMODEL			134
+#define ID_ENEMYCOLORS			135
+#define ID_DRAW3DICONS			136
+#define ID_ZOOMFOV				137
+//#define ID_FORCEMODEL			135
+//#define ID_DRAWTEAMOVERLAY		136
+//#define ID_ALLOWDOWNLOAD			137
+#define ID_BACK					138
+
+
+typedef struct {
+	menuframework_s		menu;
+
+	menutext_s			banner;
+	menubitmap_s		framel;
+	menubitmap_s		framer;
+	
+	menuradiobutton_s	rewards;
+	menuradiobutton_s	timer;
+	menuradiobutton_s	blood;
+	menuradiobutton_s	gibs;
+	menuradiobutton_s	camerabob;
+	menuradiobutton_s	playerids;
+	menuradiobutton_s	draw3dicons;
+	menufield_s			fov;
+	menufield_s			zoomfov;
+	menufield_s			enemymodel;
+	menufield_s			enemycolors;	
+	//menuradiobutton_s	dynamiclights;	
+
+	menubitmap_s		back;	
+} preferences_t;
+
+static preferences_t s_preferences2;
+
+static void Preferences2_SetMenuItems( void ) {
+	s_preferences2.rewards.curvalue		= trap_Cvar_VariableValue( "cg_drawRewards" ) != 0;
+	s_preferences2.timer.curvalue		= trap_Cvar_VariableValue( "cg_drawTimer" ) != 0;
+	s_preferences2.blood.curvalue		= trap_Cvar_VariableValue( "com_blood" ) != 0;
+	s_preferences2.gibs.curvalue		= trap_Cvar_VariableValue( "cg_gibs" ) != 0;
+	s_preferences2.playerids.curvalue	= trap_Cvar_VariableValue( "cgx_drawPlayerIDs" ) != 0;	
+	s_preferences2.draw3dicons.curvalue	= trap_Cvar_VariableValue( "cg_draw3Dicons" ) != 0;
+	s_preferences2.camerabob.curvalue	= trap_Cvar_VariableValue( "cg_bobup" ) != 0 
+										&& trap_Cvar_VariableValue( "cg_bobpitch" ) != 0 
+										&& trap_Cvar_VariableValue( "cg_bobroll" ) != 0;	
+
+	trap_Cvar_VariableStringBuffer("cg_fov", s_preferences2.fov.field.buffer, sizeof(s_preferences2.fov.field.buffer));
+	trap_Cvar_VariableStringBuffer("cg_zoomfov", s_preferences2.zoomfov.field.buffer, sizeof(s_preferences2.zoomfov.field.buffer));
+	trap_Cvar_VariableStringBuffer("cg_enemyModel", s_preferences2.enemymodel.field.buffer, sizeof(s_preferences2.enemymodel.field.buffer));
+	trap_Cvar_VariableStringBuffer("cg_enemyColors", s_preferences2.enemycolors.field.buffer, sizeof(s_preferences2.enemycolors.field.buffer));
+}
+
+
+static void Preferences2_Event( void* ptr, int notification ) {
+	int fov;
+
+	if( notification != QM_ACTIVATED ) {
+		return;
+	}
+
+	switch( ((menucommon_s*)ptr)->id ) {
+	case ID_REWARDS:
+		trap_Cvar_SetValue( "cg_drawRewards", s_preferences2.rewards.curvalue );
+		break;
+
+	case ID_TIMER:
+		trap_Cvar_SetValue( "cg_drawTimer", s_preferences2.timer.curvalue );
+		break;
+
+	case ID_BLOOD:
+		trap_Cvar_SetValue( "com_blood", s_preferences2.blood.curvalue );
+		break;
+
+	case ID_GIBS:
+		trap_Cvar_SetValue( "cg_gibs", s_preferences2.gibs.curvalue );
+		break;
+
+	case ID_CAMERABOB:
+		if (s_preferences2.camerabob.curvalue) {
+			trap_Print("reset bob");
+			trap_Cvar_Reset("cg_bobup");
+			trap_Cvar_Reset("cg_bobpitch");
+			trap_Cvar_Reset("cg_bobroll");
+		} else {
+			trap_Cvar_SetValue("cg_bobup", 0);
+			trap_Cvar_SetValue("cg_bobpitch", 0);
+			trap_Cvar_SetValue("cg_bobroll", 0);
+		}
+		break;	
+
+	case ID_PLAYERIDS:
+		trap_Cvar_SetValue( "cgx_drawPlayerIDs", s_preferences2.gibs.curvalue );
+		break;
+
+	case ID_DRAW3DICONS:
+		trap_Cvar_SetValue( "cg_draw3Dicons", s_preferences2.draw3dicons.curvalue );
+		break;
+
+	case ID_BACK:
+		Preferences2_SaveChanges();
+		UI_PopMenu();
+		break;
+	}
+}
+
+/*
+=================
+PlayerSettings_MenuKey
+=================
+*/
+static sfxHandle_t Preferences2_MenuKey( int key ) {
+	if( key == K_MOUSE2 || key == K_ESCAPE ) {
+		Preferences2_SaveChanges();
+	}
+	return Menu_DefaultKey( &s_preferences2.menu, key );
+}
+
+static void Preferences2_MenuInit( void ) {
+	int				y;
+
+	memset( &s_preferences2, 0 ,sizeof(preferences_t) );	
+
+	Preferences2_Cache();
+
+	s_preferences2.menu.key        = Preferences2_MenuKey;
+	s_preferences2.menu.wrapAround = qtrue;
+	s_preferences2.menu.fullscreen = qtrue;
+
+	s_preferences2.banner.generic.type  = MTYPE_BTEXT;
+	s_preferences2.banner.generic.x		= 320;
+	s_preferences2.banner.generic.y		= 16;
+	s_preferences2.banner.string		= "ADVANCED SETTINGS";
+	s_preferences2.banner.color         = color_white;
+	s_preferences2.banner.style         = UI_CENTER;
+
+	s_preferences2.framel.generic.type  = MTYPE_BITMAP;
+	s_preferences2.framel.generic.name  = ART_FRAMEL;
+	s_preferences2.framel.generic.flags = QMF_INACTIVE;
+	s_preferences2.framel.generic.x	   = 0;
+	s_preferences2.framel.generic.y	   = 78;
+	s_preferences2.framel.width  	   = 256;
+	s_preferences2.framel.height  	   = 329;
+
+	s_preferences2.framer.generic.type  = MTYPE_BITMAP;
+	s_preferences2.framer.generic.name  = ART_FRAMER;
+	s_preferences2.framer.generic.flags = QMF_INACTIVE;
+	s_preferences2.framer.generic.x	   = 376;
+	s_preferences2.framer.generic.y	   = 76;
+	s_preferences2.framer.width  	   = 256;
+	s_preferences2.framer.height  	   = 334;
+
+	y = 144 - BIGCHAR_HEIGHT * 2;
+
+	y += BIGCHAR_HEIGHT+2;
+	s_preferences2.rewards.generic.type       = MTYPE_RADIOBUTTON;
+	s_preferences2.rewards.generic.name	      = "Draw Rewards:";
+	s_preferences2.rewards.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_preferences2.rewards.generic.callback   = Preferences2_Event;
+	s_preferences2.rewards.generic.id         = ID_REWARDS;
+	s_preferences2.rewards.generic.x	      = PREFERENCES_X_POS;
+	s_preferences2.rewards.generic.y	      = y;
+
+	y += BIGCHAR_HEIGHT+2;
+	s_preferences2.timer.generic.type			= MTYPE_RADIOBUTTON;
+	s_preferences2.timer.generic.name			= "Draw Timer:";
+	s_preferences2.timer.generic.flags			= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_preferences2.timer.generic.callback		= Preferences2_Event;
+	s_preferences2.timer.generic.id				= ID_TIMER;
+	s_preferences2.timer.generic.x				= PREFERENCES_X_POS;
+	s_preferences2.timer.generic.y				= y;
+
+	y += BIGCHAR_HEIGHT+2;
+	s_preferences2.draw3dicons.generic.type			= MTYPE_RADIOBUTTON;
+	s_preferences2.draw3dicons.generic.name			= "Draw 3D Icons:";
+	s_preferences2.draw3dicons.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_preferences2.draw3dicons.generic.callback		= Preferences2_Event;
+	s_preferences2.draw3dicons.generic.id			= ID_DRAW3DICONS;
+	s_preferences2.draw3dicons.generic.x			= PREFERENCES_X_POS;
+	s_preferences2.draw3dicons.generic.y			= y;
+
+	y += BIGCHAR_HEIGHT+2;
+	s_preferences2.blood.generic.type         = MTYPE_RADIOBUTTON;
+	s_preferences2.blood.generic.name	      = "Blood:";
+	s_preferences2.blood.generic.flags	      = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_preferences2.blood.generic.callback     = Preferences2_Event;
+	s_preferences2.blood.generic.id           = ID_BLOOD;
+	s_preferences2.blood.generic.x	          = PREFERENCES_X_POS;
+	s_preferences2.blood.generic.y	          = y;
+
+	y += BIGCHAR_HEIGHT+2;
+	s_preferences2.gibs.generic.type         = MTYPE_RADIOBUTTON;
+	s_preferences2.gibs.generic.name	     = "Gibs:";
+	s_preferences2.gibs.generic.flags	     = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_preferences2.gibs.generic.callback     = Preferences2_Event;
+	s_preferences2.gibs.generic.id           = ID_GIBS;
+	s_preferences2.gibs.generic.x	         = PREFERENCES_X_POS;
+	s_preferences2.gibs.generic.y	         = y;
+
+	y += BIGCHAR_HEIGHT+2;
+	s_preferences2.camerabob.generic.type     = MTYPE_RADIOBUTTON;
+	s_preferences2.camerabob.generic.name	  = "Camera Bobbing:";
+	s_preferences2.camerabob.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_preferences2.camerabob.generic.callback = Preferences2_Event;
+	s_preferences2.camerabob.generic.id       = ID_CAMERABOB;
+	s_preferences2.camerabob.generic.x	      = PREFERENCES_X_POS;
+	s_preferences2.camerabob.generic.y	      = y;	
+
+	y += BIGCHAR_HEIGHT+2;
+	s_preferences2.playerids.generic.type     = MTYPE_RADIOBUTTON;
+	s_preferences2.playerids.generic.name	  = "Show Player ID:";
+	s_preferences2.playerids.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_preferences2.playerids.generic.callback = Preferences2_Event;
+	s_preferences2.playerids.generic.id       = ID_PLAYERIDS;
+	s_preferences2.playerids.generic.x	      = PREFERENCES_X_POS;
+	s_preferences2.playerids.generic.y	      = y;
+
+	y += (BIGCHAR_HEIGHT+2) * 2;
+	s_preferences2.fov.generic.type       = MTYPE_FIELD;
+	s_preferences2.fov.generic.name		  = "FOV (90-130):";
+	s_preferences2.fov.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_NUMBERSONLY;
+	s_preferences2.fov.generic.x	      = PREFERENCES_X_POS;
+	s_preferences2.fov.generic.callback	  = Preferences2_Event;
+	s_preferences2.fov.generic.id         = ID_FOV;
+	s_preferences2.fov.generic.y	      = y;
+	s_preferences2.fov.field.widthInChars = 4;
+	s_preferences2.fov.field.maxchars     = 3;
+
+	y += BIGCHAR_HEIGHT+2;
+	s_preferences2.zoomfov.generic.type       = MTYPE_FIELD;
+	s_preferences2.zoomfov.generic.name		  = "Zoom FOV (20-80):";
+	s_preferences2.zoomfov.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_NUMBERSONLY;
+	s_preferences2.zoomfov.generic.x	      = PREFERENCES_X_POS;
+	s_preferences2.zoomfov.generic.callback	  = Preferences2_Event;
+	s_preferences2.zoomfov.generic.id         = ID_ZOOMFOV;
+	s_preferences2.zoomfov.generic.y	      = y;
+	s_preferences2.zoomfov.field.widthInChars = 4;
+	s_preferences2.zoomfov.field.maxchars     = 2;
+
+	y += BIGCHAR_HEIGHT+2;
+	s_preferences2.enemymodel.generic.type       = MTYPE_FIELD;
+	s_preferences2.enemymodel.generic.name		 = "Enemy model:";
+	s_preferences2.enemymodel.generic.flags		 = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_preferences2.enemymodel.generic.x			 = PREFERENCES_X_POS;
+	s_preferences2.enemymodel.generic.callback	 = Preferences2_Event;
+	s_preferences2.enemymodel.generic.id         = ID_ENEMYMODEL;
+	s_preferences2.enemymodel.generic.y			 = y;
+	s_preferences2.enemymodel.field.widthInChars = 20;
+	s_preferences2.enemymodel.field.maxchars     = 19;
+
+	y += BIGCHAR_HEIGHT+2;
+	s_preferences2.enemycolors.generic.type       = MTYPE_FIELD;
+	s_preferences2.enemycolors.generic.name		 = "Enemy colors:";
+	s_preferences2.enemycolors.generic.flags		 = QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_NUMBERSONLY;
+	s_preferences2.enemycolors.generic.x			 = PREFERENCES_X_POS;
+	s_preferences2.enemycolors.generic.callback	 = Preferences2_Event;
+	s_preferences2.enemycolors.generic.id         = ID_ENEMYCOLORS;
+	s_preferences2.enemycolors.generic.y			 = y;
+	s_preferences2.enemycolors.field.widthInChars = 5;
+	s_preferences2.enemycolors.field.maxchars     = 4;
+
+	y += BIGCHAR_HEIGHT+2;
+	s_preferences2.back.generic.type	    = MTYPE_BITMAP;
+	s_preferences2.back.generic.name     = ART_BACK0;
+	s_preferences2.back.generic.flags    = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_preferences2.back.generic.callback = Preferences2_Event;
+	s_preferences2.back.generic.id	    = ID_BACK;
+	s_preferences2.back.generic.x		= 0;
+	s_preferences2.back.generic.y		= 480-64;
+	s_preferences2.back.width  		    = 128;
+	s_preferences2.back.height  		    = 64;
+	s_preferences2.back.focuspic         = ART_BACK1;
+
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.banner );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.framel );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.framer );
+
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.rewards );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.timer );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.blood );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.gibs );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.camerabob );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.playerids );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.draw3dicons );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.fov );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.zoomfov );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.enemymodel );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.enemycolors );
+
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.back );
+
+	Preferences2_SetMenuItems();
+}
+
+/*
+=================
+Preferences2_SaveChanges
+=================
+*/
+static void Preferences2_SaveChanges( void ) {	
+	int fov;
+
+	fov = atoi(s_preferences2.fov.field.buffer);
+	if (fov < 90) fov = 90; else if (fov > 130) fov = 130;
+	Com_sprintf(s_preferences2.fov.field.buffer, 4, "%d", fov);
+
+	fov = atoi(s_preferences2.zoomfov.field.buffer);
+	if (fov < 20) fov = 20; else if (fov > 80) fov = 80;
+	Com_sprintf(s_preferences2.zoomfov.field.buffer, 4, "%d", fov);
+
+	trap_Cvar_Set( "cg_fov", s_preferences2.fov.field.buffer );
+	trap_Cvar_Set( "cg_zoomfov", s_preferences2.zoomfov.field.buffer );
+	trap_Cvar_Set( "cg_enemyModel", s_preferences2.enemymodel.field.buffer );	
+	trap_Cvar_Set( "cg_enemyColors", s_preferences2.enemycolors.field.buffer );	
+}
+
+
+/*
+===============
+Preferences_Cache
+===============
+*/
+void Preferences2_Cache( void ) {
+	trap_R_RegisterShaderNoMip( ART_FRAMEL );
+	trap_R_RegisterShaderNoMip( ART_FRAMER );
+	trap_R_RegisterShaderNoMip( ART_BACK0 );
+	trap_R_RegisterShaderNoMip( ART_BACK1 );
+}
+
+/*
+===============
+UI_PreferencesMenu
+===============
+*/
+void UI_Preferences2Menu( void ) {
+	Preferences2_MenuInit();
+	UI_PushMenu( &s_preferences2.menu );
+}
