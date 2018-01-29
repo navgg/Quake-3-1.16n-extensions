@@ -23,12 +23,12 @@ NETWORK OPTIONS MENU
 #define ID_RATE				14
 #define ID_BACK				15
 #define ID_PACKETS			16
+#define ID_PACKETDUP		17
 
 
 static const char *rate_items[] = {	
 	"4000 (56K old modems)",
 	"5000 (ISDN)",
-	"8000",
 	"10000",
 	"16000",
 	"25000 (LAN/Cable/xDSL)",
@@ -61,6 +61,7 @@ typedef struct {
 
 	menulist_s		rate;
 	menulist_s		packets;
+	menuradiobutton_s	packetdup;
 
 	menubitmap_s	back;
 } networkOptionsInfo_t;
@@ -101,16 +102,14 @@ static void UI_NetworkOptionsMenu_Event( void* ptr, int event ) {
 		if( networkOptionsInfo.rate.curvalue == 0 )
 			trap_Cvar_SetValue( "rate", 4000 );
 		else if( networkOptionsInfo.rate.curvalue == 1 )
-			trap_Cvar_SetValue( "rate", 5000 );
+			trap_Cvar_SetValue( "rate", 5000 );				
 		else if( networkOptionsInfo.rate.curvalue == 2 )
-			trap_Cvar_SetValue( "rate", 8000 );			
-		else if( networkOptionsInfo.rate.curvalue == 3 )
 			trap_Cvar_SetValue( "rate", 10000 );			
-		else if( networkOptionsInfo.rate.curvalue == 4 )
+		else if( networkOptionsInfo.rate.curvalue == 3 )
 			trap_Cvar_SetValue( "rate", 16000 );			
-		else if( networkOptionsInfo.rate.curvalue == 5 )
+		else if( networkOptionsInfo.rate.curvalue == 4 )
 			trap_Cvar_SetValue( "rate", 25000 );			
-		else if( networkOptionsInfo.rate.curvalue == 6 )
+		else if( networkOptionsInfo.rate.curvalue == 5 )
 			trap_Cvar_SetValue( "rate", 50000 );			
 		
 		trap_Cvar_SetValue( "snaps", 40 );		
@@ -118,6 +117,10 @@ static void UI_NetworkOptionsMenu_Event( void* ptr, int event ) {
 
 	case ID_PACKETS:		
 		trap_Cvar_SetValue( "cl_maxpackets", 40 + networkOptionsInfo.packets.curvalue * 10 );							
+		break;
+
+	case ID_PACKETDUP:
+		trap_Cvar_SetValue( "cl_packetdup", networkOptionsInfo.packetdup.curvalue );							
 		break;
 
 	case ID_BACK:
@@ -134,7 +137,7 @@ UI_NetworkOptionsMenu_Init
 */
 static void UI_NetworkOptionsMenu_Init( void ) {
 	int		y;
-	int		rate, packets;
+	int		rate, packets;	
 
 	memset( &networkOptionsInfo, 0, sizeof(networkOptionsInfo) );
 
@@ -226,6 +229,15 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.packets.generic.y		= y;
 	networkOptionsInfo.packets.itemnames		= packets_items;
 
+	y = 240 + 1 * (BIGCHAR_HEIGHT+2);
+	networkOptionsInfo.packetdup.generic.type		= MTYPE_RADIOBUTTON;
+	networkOptionsInfo.packetdup.generic.name		= "Packet Dup:";
+	networkOptionsInfo.packetdup.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	networkOptionsInfo.packetdup.generic.callback	= UI_NetworkOptionsMenu_Event;
+	networkOptionsInfo.packetdup.generic.id			= ID_PACKETDUP;
+	networkOptionsInfo.packetdup.generic.x			= 400;
+	networkOptionsInfo.packetdup.generic.y			= y;
+
 	networkOptionsInfo.back.generic.type		= MTYPE_BITMAP;
 	networkOptionsInfo.back.generic.name		= ART_BACK0;
 	networkOptionsInfo.back.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -246,23 +258,22 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.network );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.rate );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.packets );
+	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.packetdup );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.back );
 
 	rate = trap_Cvar_VariableValue( "rate" );
 	if( rate <= 4000 )
 		networkOptionsInfo.rate.curvalue = 0;
 	else if( rate <= 5000 )
-		networkOptionsInfo.rate.curvalue = 1;
-	else if( rate <= 8000 )
-		networkOptionsInfo.rate.curvalue = 2;
+		networkOptionsInfo.rate.curvalue = 1;	
 	else if( rate <= 10000 )
-		networkOptionsInfo.rate.curvalue = 3;
+		networkOptionsInfo.rate.curvalue = 2;
 	else if( rate <= 16000 )
-		networkOptionsInfo.rate.curvalue = 4;
+		networkOptionsInfo.rate.curvalue = 3;
 	else if( rate <= 25000 )
-		networkOptionsInfo.rate.curvalue = 5;
+		networkOptionsInfo.rate.curvalue = 4;
 	else
-		networkOptionsInfo.rate.curvalue = 6;
+		networkOptionsInfo.rate.curvalue = 5;
 
 	packets = trap_Cvar_VariableValue( "cl_maxpackets" );
 	if( packets <= 40 )
@@ -280,6 +291,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	else
 		networkOptionsInfo.packets.curvalue = 6;
 	
+	networkOptionsInfo.packetdup.curvalue = trap_Cvar_VariableValue("cl_packetdup") != 0;
 }
 
 
