@@ -139,7 +139,7 @@ cvarTable_t		cvarTable[] = {
 	{ &ui_ffa_timelimit, "ui_ffa_timelimit", "0", CVAR_ARCHIVE },
 
 	{ &ui_tourney_fraglimit, "ui_tourney_fraglimit", "0", CVAR_ARCHIVE },
-	{ &ui_tourney_timelimit, "ui_tourney_timelimit", "15", CVAR_ARCHIVE },
+	{ &ui_tourney_timelimit, "ui_tourney_timelimit", "10", CVAR_ARCHIVE },
 
 	{ &ui_team_fraglimit, "ui_team_fraglimit", "0", CVAR_ARCHIVE },
 	{ &ui_team_timelimit, "ui_team_timelimit", "20", CVAR_ARCHIVE },
@@ -173,8 +173,8 @@ cvarTable_t		cvarTable[] = {
 	{ &ui_drawCrosshairNames, "cg_drawCrosshairNames", "1", CVAR_ARCHIVE },
 	{ &ui_marks, "cg_marks", "1", CVAR_ARCHIVE },
 
-	{ &ui_server1, "server1", "", CVAR_ARCHIVE },
-	{ &ui_server2, "server2", "", CVAR_ARCHIVE },
+	{ &ui_server1, "server1", "sodmod.ga:27962", CVAR_ARCHIVE },
+	{ &ui_server2, "server2", "sodmod.ga:27963", CVAR_ARCHIVE },
 	{ &ui_server3, "server3", "", CVAR_ARCHIVE },
 	{ &ui_server4, "server4", "", CVAR_ARCHIVE },
 	{ &ui_server5, "server5", "", CVAR_ARCHIVE },
