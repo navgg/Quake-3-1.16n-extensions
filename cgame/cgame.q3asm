@@ -1,5 +1,6 @@
 -o "\quake3\baseq3\vm\cgame"
 cg_main
+cgx_extensions
 ..\cg_syscalls
 cg_consolecmds
 cg_draw

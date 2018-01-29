@@ -39,6 +39,7 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
 }
 
 vScreen_t			vScreen;
+
 cg_t				cg;
 cgs_t				cgs;
 centity_t			cg_entities[MAX_GENTITIES];
@@ -47,6 +48,7 @@ itemInfo_t			cg_items[MAX_ITEMS];
 
 vmCvar_t	cgx_wideScreenFix;
 vmCvar_t	cgx_drawPlayerIDs;
+vmCvar_t	cgx_enemyModel;
 
 vmCvar_t	cg_railTrailTime;
 vmCvar_t	cg_centertime;
@@ -190,10 +192,11 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_teamOverlayUserinfo, "teamoverlay", "0", CVAR_ROM | CVAR_USERINFO },
 	{ &cg_stats, "cg_stats", "0", 0 },
 
-	// extended cgx commands
+	// X-MOD: extended cgx commands
 
 	{ &cgx_wideScreenFix, "cgx_wideScreenFix", "1", CVAR_ARCHIVE },
-	{ &cgx_drawPlayerIDs, "cgx_drawPlayerIDs", "1", CVAR_ARCHIVE },
+	{ &cgx_drawPlayerIDs, "cgx_drawPlayerIDs", "0", CVAR_ARCHIVE },
+	{ &cgx_enemyModel, "cg_enemyModel", "", CVAR_ARCHIVE },	
 
 	// the following variables are created in other parts of the system,
 	// but we also reference them here
@@ -205,6 +208,10 @@ cvarTable_t		cvarTable[] = {
 };
 
 int		cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
+int		cgx_wideScreenFixmodificationCount = 1;
+int		cgx_enemyModelModificationCount = 1;
+
+
 
 /*
 =================
@@ -233,13 +240,27 @@ CG_UpdateCvars
 */
 void CG_UpdateCvars( void ) {
 	int			i;
-	cvarTable_t	*cv;
+	cvarTable_t	*cv;	
 
 	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
 		trap_Cvar_Update( cv->vmCvar );
 	}
 
 	// check for modications here
+	// X-MOD: reinit vScreen if value changed
+	if (cgx_wideScreenFixmodificationCount != cgx_wideScreenFix.modificationCount) {
+		cgx_wideScreenFixmodificationCount = cgx_wideScreenFix.modificationCount;
+		CGX_Init_vScreen();
+	}
+
+	// X-MOD: reinit enemymodels if value or player's team changed
+	if (cgx_enemyModelModificationCount != cgx_enemyModel.modificationCount) {
+		cgx_enemyModelModificationCount = cgx_enemyModel.modificationCount;
+		
+		CGX_Init_enemyModels();		
+		CGX_EnemyModelCheck();
+		CG_LoadDeferredPlayers();
+	}	
 
 	// If team overlay is on, ask for updates from the server.  If its off,
 	// let the server know so we don't receive it
@@ -791,31 +812,18 @@ void CG_Init( int serverMessageNum, int serverCommandSequence ) {
 
 	CG_InitConsoleCommands();
 
-	cg.weaponSelect = WP_MACHINEGUN;
+	cg.weaponSelect = WP_MACHINEGUN;	
 
 	cgs.redflag = cgs.blueflag = -1; // For compatibily, default to unset for
 	// old servers
 
-	// get the rendering configuration from the client system
-	trap_GetGlconfig( &cgs.glconfig );
+	//X-MOD: reset clientnum and client oldteam, then init enemymodels and vScreen
 
-	if ( cgx_wideScreenFix.integer && cgs.glconfig.vidWidth * 480 > cgs.glconfig.vidHeight * 640 ) {
-		 vScreen.width = 854;		 
-		 vScreen.height = 480;		 		
-		 vScreen.ratiox = 854.0 / 640.0;
-		 vScreen.offsetx = 854.0 / 8;
-	} else {
-		 vScreen.width = 640;
-		 vScreen.height = 480;			
-		 vScreen.ratiox = 1;
-		 vScreen.offsetx = 0;
-	}
-		
-	vScreen.hwidth = vScreen.width / 2;
-	vScreen.hheight = vScreen.height / 2;
-	
-	cgs.screenXScale = cgs.glconfig.vidWidth / vScreen.width;
-	cgs.screenYScale = cgs.glconfig.vidHeight / vScreen.height; 
+	cg.clientNum = -1;	
+	cg.oldTeam = -1;
+
+	CGX_Init_enemyModels();
+	CGX_Init_vScreen();
 
 	// get the gamestate from the client system
 	trap_GetGameState( &cgs.gameState );
@@ -860,7 +868,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence ) {
 
 	CG_StartMusic();
 
-	CG_LoadingString( "" );
+	CG_LoadingString( "" );	
 }
 
 /*
@@ -870,7 +878,7 @@ CG_Shutdown
 Called before every level change or subsystem restart
 =================
 */
-void CG_Shutdown( void ) {
+void CG_Shutdown( void ) {		
 	// some mods may need to do cleanup work here,
 	// like closing files or archiving session data
 }

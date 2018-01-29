@@ -128,11 +128,12 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 		CG_DrawHead( headx, y, 16, 16, score->client, headAngles );
 	}
 
-	// draw player ID
+	// X-MOD: draw player ID
 
 	if (cgx_drawPlayerIDs.integer) {
+		int offx = cgs.gametype == GT_TOURNAMENT ? 32 : 0;
 		Com_sprintf(string, sizeof(string), "%3i", score->client);
-		CG_DrawBigString(SB_SCORELINE_X + vScreen.offsetx - 64 - 40, y, string, 0.25f);
+		CG_DrawBigString(SB_SCORELINE_X + vScreen.offsetx - 64 - 40 - offx, y, string, 0.5f);
 	}
 
 	// draw the score line
@@ -383,7 +384,9 @@ qboolean CG_DrawScoreboard( void ) {
 	}
 
 	// load any models that have been deferred
-	if ( ++cg.deferredPlayerLoading > 10 ) {
+	if ( ++cg.deferredPlayerLoading > 10 ) {		
+		//X-MOD:check enemy models before load
+		CGX_EnemyModelCheck();
 		CG_LoadDeferredPlayers();
 	}
 

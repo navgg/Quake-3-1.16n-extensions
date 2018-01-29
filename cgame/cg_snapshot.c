@@ -65,8 +65,27 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 	int				i;
 	centity_t		*cent;
 	entityState_t	*state;
+	clientInfo_t	*cur;	
 
-	cg.snap = snap;
+	cg.snap = snap;	
+
+	// X-MOD: save player's id in cg.clientNum then restore model and skin
+	if (cg.clientNum == -1) {
+		cg.clientNum = cg.snap->ps.clientNum;		
+
+		cur = &cgs.clientinfo[cg.clientNum];
+
+		cg.oldTeam = cur->team;		
+
+		Q_strncpyz( cur->skinName, cur->skinNameCopy, sizeof( cur->skinName ) );
+		Q_strncpyz( cur->modelName, cur->modelNameCopy, sizeof( cur->modelName ) );	
+
+		trap_DPrint( va("CG_SetInitialSnapshot restore player's models: %s %s\n", cur->skinName, cur->modelName) );
+		
+		cur->infoValid = qtrue;
+
+		CG_LoadClientInfo( cur );		
+	}
 
 	BG_PlayerStateToEntityState( &snap->ps, &cg_entities[ snap->ps.clientNum ].currentState, qfalse );
 

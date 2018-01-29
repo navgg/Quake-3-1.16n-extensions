@@ -290,6 +290,10 @@ typedef struct {
 	animation_t		animations[MAX_ANIMATIONS];
 
 	sfxHandle_t		sounds[MAX_CUSTOM_SOUNDS];
+
+	//X-MOD: enemy model check, save read models to restore if anything	
+	char			modelNameCopy[MAX_QPATH];
+	char			skinNameCopy[MAX_QPATH];	
 } clientInfo_t;
 
 
@@ -509,6 +513,11 @@ typedef struct {
 	char			testModelName[MAX_QPATH];
 	qboolean		testGun;
 
+	// X-MOD: current client num, before init = -1;
+	int			clientNum;
+	team_t		oldTeam;
+	char		enemyModel[MAX_QPATH];
+	char		enemySkin[MAX_QPATH];
 } cg_t;
 
 
@@ -782,6 +791,7 @@ extern	markPoly_t		cg_markPolys[MAX_MARK_POLYS];
 
 extern  vmCvar_t		cgx_wideScreenFix;
 extern  vmCvar_t		cgx_drawPlayerIDs;
+extern	vmCvar_t		cgx_enemyModel;
 
 extern	vmCvar_t		cg_centertime;
 extern	vmCvar_t		cg_runpitch;
@@ -851,6 +861,16 @@ extern	vmCvar_t		cg_paused;
 extern	vmCvar_t		cg_blood;
 extern	vmCvar_t		cg_predictItems;
 extern	vmCvar_t		cg_deferPlayers;
+
+//
+// cgx_extensions.c
+//
+
+void CGX_Init_vScreen(void);
+void CGX_Init_enemyModels(void);
+void CGX_RestoreModelAndSkin(clientInfo_t *ci);
+void CGX_SetModelAndSkin(clientInfo_t *ci);
+void CGX_EnemyModelCheck(void);
 
 //
 // cg_main.c

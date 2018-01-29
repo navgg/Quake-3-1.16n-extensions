@@ -533,7 +533,7 @@ void CG_NewClientInfo( int clientNum ) {
 
 	// team
 	v = Info_ValueForKey( configstring, "t" );
-	newInfo.team = atoi( v );
+	newInfo.team = atoi( v );	
 
 	// model
 	v = Info_ValueForKey( configstring, "model" );
@@ -578,6 +578,20 @@ void CG_NewClientInfo( int clientNum ) {
 		}
 	}
 
+	//X-MOD: cgx enemy model
+	//save original models
+	Q_strncpyz( newInfo.skinNameCopy, newInfo.skinName, sizeof( newInfo.skinName ) );
+	Q_strncpyz( newInfo.modelNameCopy, newInfo.modelName, sizeof( newInfo.modelName ) );	
+	//change models and skins if needed
+	if (cgx_enemyModel.string[0] != '\0' && newInfo.modelName != '\0' && cg.clientNum != clientNum) {
+		trap_DPrint(va("CG_NewClientInfo %s %s - %s %s\n", newInfo.skinName, newInfo.modelName, cg.enemySkin, cg.enemyModel));
+
+		if (cgs.gametype < GT_TEAM) {
+			Q_strncpyz(newInfo.skinName, "red", sizeof(newInfo.skinName));
+			Q_strncpyz(newInfo.modelName, cg.enemyModel, sizeof(newInfo.modelName));
+		} 
+	} 			
+
 	// scan for an existing clientinfo that matches this modelname
 	// so we can avoid loading checks if possible
 	if ( !CG_ScanForExistingClientInfo( &newInfo ) ) {
@@ -611,8 +625,6 @@ void CG_NewClientInfo( int clientNum ) {
 	*ci = newInfo;
 }
 
-
-
 /*
 ======================
 CG_LoadDeferredPlayers
@@ -624,9 +636,10 @@ so deferred players can be loaded
 */
 void CG_LoadDeferredPlayers( void ) {
 	int		i;
-	clientInfo_t	*ci;
+	clientInfo_t	*ci;		
 
-	// scan for a deferred player to load
+	// scan for a deferred player to load		
+
 	for ( i = 0, ci = cgs.clientinfo ; i < cgs.maxclients ; i++, ci++ ) {
 		if ( ci->infoValid && ci->deferred ) {
 			// if we are low on memory, leave it deferred
