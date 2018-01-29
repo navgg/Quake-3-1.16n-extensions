@@ -55,7 +55,7 @@ static int gamecodetoui[] = {4,2,3,0,5,1,6};
 static int uitogamecode[] = {4,6,2,3,1,5,7};
 
 static const char *handicap_items[] = {
-	"None",
+	"None (100)",
 	"95",
 	"90",
 	"85",
@@ -172,7 +172,7 @@ static void PlayerSettings_DrawHandicap( void *self ) {
 		color = text_color_highlight;
 	}
 
-	UI_DrawProportionalString( item->generic.x, item->generic.y, "Handicap", style, color );
+	UI_DrawProportionalString( item->generic.x, item->generic.y, "Handicap (max hp)", style, color );
 	UI_DrawProportionalString( item->generic.x + 64, item->generic.y + PROP_HEIGHT, handicap_items[item->curvalue], style, color );
 }
 
@@ -198,7 +198,7 @@ static void PlayerSettings_DrawEffects( void *self ) {
 		color = text_color_highlight;
 	}
 
-	UI_DrawProportionalString( item->generic.x, item->generic.y, "Effects", style, color );
+	UI_DrawProportionalString( item->generic.x, item->generic.y, "Effects (Rail color)", style, color );
 
 	UI_DrawHandlePic( item->generic.x + 64, item->generic.y + PROP_HEIGHT + 8, 128, 8, s_playersettings.fxBasePic );
 	UI_DrawHandlePic( item->generic.x + 64 + item->curvalue * 16 + 8, item->generic.y + PROP_HEIGHT + 6, 16, 12, s_playersettings.fxPic[item->curvalue] );
