@@ -24,9 +24,11 @@ DISPLAY OPTIONS MENU
 #define ID_SCREENSIZE		15
 #define ID_BACK				16
 #define ID_OVERBRIGHT_BITS	17
+#define ID_IGNORE_HW_GAMMA	21
 #define ID_DRAWFPS			18
 #define ID_WIDESCREEN_FIX	19
 #define ID_MAXFPS			20
+#define ID_PRIMITIVES		22
 
 static const char *fps_items[] = {		
 	"76",
@@ -40,6 +42,13 @@ static const char *fps_items[] = {
 	"250",
 	0
 };
+
+static const char *primitives_items[] = {
+	"Default (0)",
+	"Fast (2)",	
+	0
+};
+
 
 typedef struct {
 	menuframework_s	menu;
@@ -56,9 +65,11 @@ typedef struct {
 	menuslider_s	brightness;
 	menuslider_s	screensize;
 	menuradiobutton_s overbrightbits;
+	menuradiobutton_s ignorehwgamma;
 	menuradiobutton_s widescreenfix;
 	menuradiobutton_s drawfps;
 	menulist_s		maxfps;
+	menulist_s		primitives;
 
 	menubitmap_s	back;
 } displayOptionsInfo_t;
@@ -105,6 +116,13 @@ static void UI_DisplayOptionsMenu_Event( void* ptr, int event ) {
 
 	case ID_OVERBRIGHT_BITS:
 		trap_Cvar_SetValue( "r_overbrightbits", displayOptionsInfo.overbrightbits.curvalue );
+		trap_Cvar_SetValue( "r_gamma", 1.0 );
+		trap_Cmd_ExecuteText( EXEC_APPEND, "vid_restart\n" );
+		break;
+
+	case ID_IGNORE_HW_GAMMA:
+		trap_Cvar_SetValue( "r_ignorehwgamma", displayOptionsInfo.ignorehwgamma.curvalue );
+		trap_Cvar_SetValue( "r_gamma", 1.0 );
 		trap_Cmd_ExecuteText( EXEC_APPEND, "vid_restart\n" );
 		break;
 
@@ -118,6 +136,10 @@ static void UI_DisplayOptionsMenu_Event( void* ptr, int event ) {
 
 	case ID_WIDESCREEN_FIX:
 		trap_Cvar_SetValue( "cgx_wideScreenFix", displayOptionsInfo.widescreenfix.curvalue );		
+		break;
+
+	case ID_PRIMITIVES:
+		trap_Cvar_SetValue("r_primitives", displayOptionsInfo.primitives.curvalue * 2);
 		break;
 
 	case ID_BACK:
@@ -140,7 +162,7 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 
 	UI_DisplayOptionsMenu_Cache();
 	displayOptionsInfo.menu.wrapAround = qtrue;
-	displayOptionsInfo.menu.fullscreen = qtrue;
+	displayOptionsInfo.menu.fullscreen = qtrue;	
 
 	displayOptionsInfo.banner.generic.type		= MTYPE_BTEXT;
 	displayOptionsInfo.banner.generic.flags		= QMF_CENTER_JUSTIFY;
@@ -206,7 +228,25 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.network.style				= UI_RIGHT;
 	displayOptionsInfo.network.color				= color_red;
 
-	y = 240 - 3 * (BIGCHAR_HEIGHT+2);
+	y = 240 - 3 * (BIGCHAR_HEIGHT + 2);	
+	displayOptionsInfo.ignorehwgamma.generic.type = MTYPE_RADIOBUTTON;
+	displayOptionsInfo.ignorehwgamma.generic.name = "Ignore Game Gamma:";
+	displayOptionsInfo.ignorehwgamma.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	displayOptionsInfo.ignorehwgamma.generic.callback = UI_DisplayOptionsMenu_Event;
+	displayOptionsInfo.ignorehwgamma.generic.id = ID_IGNORE_HW_GAMMA;
+	displayOptionsInfo.ignorehwgamma.generic.x = 400;
+	displayOptionsInfo.ignorehwgamma.generic.y = y;
+
+	y += BIGCHAR_HEIGHT + 2;
+	displayOptionsInfo.overbrightbits.generic.type = MTYPE_RADIOBUTTON;
+	displayOptionsInfo.overbrightbits.generic.name = "Over Bright Bits:";
+	displayOptionsInfo.overbrightbits.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	displayOptionsInfo.overbrightbits.generic.callback = UI_DisplayOptionsMenu_Event;
+	displayOptionsInfo.overbrightbits.generic.id = ID_OVERBRIGHT_BITS;
+	displayOptionsInfo.overbrightbits.generic.x = 400;
+	displayOptionsInfo.overbrightbits.generic.y = y;
+
+	y += BIGCHAR_HEIGHT + 2;
 	displayOptionsInfo.brightness.generic.type		= MTYPE_SLIDER;
 	displayOptionsInfo.brightness.generic.name		= "Brightness:";
 	displayOptionsInfo.brightness.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
@@ -216,9 +256,6 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.brightness.generic.y			= y;
 	displayOptionsInfo.brightness.minvalue			= 5;
 	displayOptionsInfo.brightness.maxvalue			= 20;
-	if( !uis.glconfig.deviceSupportsGamma ) {
-		displayOptionsInfo.brightness.generic.flags |= QMF_GRAYED;
-	}
 
 	y += BIGCHAR_HEIGHT+2;
 	displayOptionsInfo.screensize.generic.type		= MTYPE_SLIDER;
@@ -231,14 +268,10 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.screensize.minvalue			= 3;
     displayOptionsInfo.screensize.maxvalue			= 10;
 
-	y += BIGCHAR_HEIGHT+2;
-	displayOptionsInfo.overbrightbits.generic.type		= MTYPE_RADIOBUTTON;
-	displayOptionsInfo.overbrightbits.generic.name		= "Over Bright Bits:";
-	displayOptionsInfo.overbrightbits.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
-	displayOptionsInfo.overbrightbits.generic.callback	= UI_DisplayOptionsMenu_Event;
-	displayOptionsInfo.overbrightbits.generic.id		= ID_OVERBRIGHT_BITS;
-	displayOptionsInfo.overbrightbits.generic.x			= 400;
-	displayOptionsInfo.overbrightbits.generic.y			= y;
+	if (!uis.glconfig.deviceSupportsGamma) {
+		displayOptionsInfo.brightness.generic.flags |= QMF_GRAYED;
+		displayOptionsInfo.overbrightbits.generic.flags |= QMF_GRAYED;
+	}
 
 	y += BIGCHAR_HEIGHT+2;
 	displayOptionsInfo.drawfps.generic.type		= MTYPE_RADIOBUTTON;
@@ -268,6 +301,16 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.widescreenfix.generic.x			= 400;
 	displayOptionsInfo.widescreenfix.generic.y			= y;
 
+	y += BIGCHAR_HEIGHT + 2;
+	displayOptionsInfo.primitives.generic.type = MTYPE_SPINCONTROL;
+	displayOptionsInfo.primitives.generic.name = "Primitives:";
+	displayOptionsInfo.primitives.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	displayOptionsInfo.primitives.generic.callback = UI_DisplayOptionsMenu_Event;
+	displayOptionsInfo.primitives.generic.id = ID_PRIMITIVES;
+	displayOptionsInfo.primitives.generic.x = 400;
+	displayOptionsInfo.primitives.generic.y = y;
+	displayOptionsInfo.primitives.itemnames = primitives_items;
+
 	displayOptionsInfo.back.generic.type		= MTYPE_BITMAP;
 	displayOptionsInfo.back.generic.name		= ART_BACK0;
 	displayOptionsInfo.back.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -289,17 +332,21 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.brightness );
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.screensize );
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.overbrightbits );
+	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.ignorehwgamma );
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.drawfps );
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.widescreenfix );
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.maxfps );
+	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.primitives );
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.back );
 
 	displayOptionsInfo.brightness.curvalue  = trap_Cvar_VariableValue("r_gamma") * 10;
 	displayOptionsInfo.screensize.curvalue  = trap_Cvar_VariableValue( "cg_viewsize")/10;
 	displayOptionsInfo.overbrightbits.curvalue  = trap_Cvar_VariableValue("r_overbrightbits") != 0;
+	displayOptionsInfo.ignorehwgamma.curvalue  = trap_Cvar_VariableValue("r_ignorehwgamma") != 0;
 	displayOptionsInfo.widescreenfix.curvalue  = trap_Cvar_VariableValue("cgx_wideScreenFix") != 0;
 	displayOptionsInfo.drawfps.curvalue  = trap_Cvar_VariableValue("cg_drawFPS") != 0;
 	displayOptionsInfo.maxfps.curvalue  = trap_Cvar_VariableValue("cg_drawFPS") != 0;
+	displayOptionsInfo.primitives.curvalue = trap_Cvar_VariableValue("r_primitives") / 2;
 
 	fps = trap_Cvar_VariableValue( "com_maxfps" );
 	if( fps <= 76 )
