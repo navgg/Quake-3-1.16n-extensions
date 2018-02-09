@@ -29,8 +29,8 @@ NETWORK OPTIONS MENU
 static const char *rate_items[] = {	
 	"4000 (56K old modems)",
 	"5000 (ISDN)",
-	"10000",
-	"16000",
+	"10000 (10Kb/sec)",
+	"16000 (16Kb/sec)",
 	"25000 (LAN/Cable/xDSL)",
 	"50000 (Yolo/WTF?/OMG)",
 	0
@@ -39,7 +39,7 @@ static const char *rate_items[] = {
 static const char *packets_items[] = {	
 	"40",
 	"50",
-	"60",
+	"60",	
 	"70",
 	"80",
 	"90",
@@ -75,6 +75,8 @@ UI_NetworkOptionsMenu_Event
 =================
 */
 static void UI_NetworkOptionsMenu_Event( void* ptr, int event ) {
+	int curPacksVal;
+
 	if( event != QM_ACTIVATED ) {
 		return;
 	}
@@ -116,7 +118,10 @@ static void UI_NetworkOptionsMenu_Event( void* ptr, int event ) {
 		break;
 
 	case ID_PACKETS:		
-		trap_Cvar_SetValue( "cl_maxpackets", 40 + networkOptionsInfo.packets.curvalue * 10 );							
+		curPacksVal = networkOptionsInfo.packets.curvalue;
+		//if (curPacksVal = 3) curPacksVal = 4;
+		//else if (curPacksVal = 4) curPacksVal = 6;
+		trap_Cvar_SetValue( "cl_maxpackets", 40 + curPacksVal * 10 );
 		break;
 
 	case ID_PACKETDUP:
