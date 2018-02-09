@@ -136,8 +136,8 @@ void CG_DrawInformation( void ) {
 	
 	//X-MOD: loading effect
 	if (vScreen.width != SCREEN_WIDTH) {
-		vec4_t		color = { 0.05, 0.05, 0.05, 0.80 };	
-		CG_DrawPic(-SCREEN_WIDTH*0.25, -SCREEN_HEIGHT*0.25, SCREEN_WIDTH*1.25, SCREEN_HEIGHT*1.25, levelshot);
+		vec4_t		color = { 0.1, 0.1, 0.1, 0.1 };	
+		CG_DrawPic(-vScreen.width*2, -SCREEN_HEIGHT*2, vScreen.width*4, SCREEN_HEIGHT*4, levelshot);
 		CG_FillRect(0, 0, vScreen.width, SCREEN_HEIGHT, color);
 	}
 
