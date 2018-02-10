@@ -99,13 +99,19 @@ set cc=lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\
 
 q3asm -f ../ui
 
-cd "D:/Games/Quake 3/baseq3/"
+rem @echo on
+
+set "gamedir=C:/Games/Quake 3 Arena 1.16n/"
+set "baseq3=%gamedir%baseq3/"
+set "baseq3src=C:/quake3/baseq3/"
+
+cd "%baseq3%"
 del "pak2X.pk3"
-7z a -tzip -mx9 "D:/Games/Quake 3/baseq3/pak2X.pk3" "D:/quake3/baseq3/vm"
+7z a -tzip -mx9 "%baseq3%pak2X.pk3" "%baseq3src%*"
 
 pause
 
-START /D "D:\Games\Quake 3\" /MAX "" quake3.exe
+START /D "%gamedir%" /MAX "" quake3.exe
 
 :quit
 cd ..
