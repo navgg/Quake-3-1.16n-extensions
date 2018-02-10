@@ -1,5 +1,11 @@
+@echo off
+
+setlocal
+set "PATH=..\..\bin_nt;%PATH%"
+
 mkdir vm
 cd vm
+
 set cc=lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\ui %1
 
 %cc% ../../game/bg_misc.c
@@ -55,19 +61,10 @@ set cc=lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\
 
 q3asm -f ../cgame
 
-'@echo on
-
-set "gamedir=C:/Games/Quake 3 Arena 1.16n/"
-set "baseq3=%gamedir%baseq3/"
-set "baseq3src=C:/quake3/baseq3/"
-
-cd "%baseq3%"
-del "pak2X.pk3"
-7z a -tzip -mx9 "%baseq3%pak2X.pk3" "%baseq3src%*"
-
-'pause
-
-START /D "%gamedir%" /MAX "" quake3.exe +map q3dm1
+cd ../../baseq3
+mkdir vm
+cd ..
+move cgame\vm\cgame.qvm baseq3\vm\cgame.qvm
 
 :quit
 cd ..
