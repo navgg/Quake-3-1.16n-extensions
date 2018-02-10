@@ -32,6 +32,9 @@ GAME OPTIONS MENU
 #define ID_ALLOWDOWNLOAD			137
 #define ID_BACK					138
 
+#define ID_CROSSHAIR_COLOR		139
+#define ID_CROSSHAIR_SIZE		140
+
 #define	NUM_CROSSHAIRS			10
 
 
@@ -43,6 +46,8 @@ typedef struct {
 	menubitmap_s		framer;
 
 	menulist_s			crosshair;
+	menulist_s			crosshaircolor;
+	menulist_s			crosshairsize;
 	menuradiobutton_s	simpleitems;
 	menuradiobutton_s	brass;
 	menuradiobutton_s	wallmarks;
@@ -60,6 +65,9 @@ typedef struct {
 
 static preferences_t s_preferences;
 
+static int crosshaircolor;
+static float crosshairsize;
+
 static const char *teamoverlay_names[] =
 {
 	"off",
@@ -69,7 +77,32 @@ static const char *teamoverlay_names[] =
 	0
 };
 
+static const char *crosshair_colors[] =
+{
+	"black",	
+	"red",
+	"green",
+	"yellow",
+	"blue",
+	"cyan",
+	"magenta",		
+	"white",
+	0
+};
+
+static const char *crosshairsize_items[] =
+{
+	"small",
+	"smaller",
+	"default",
+	"bigger",
+	"big",
+	0
+};
+
 static void Preferences_SetMenuItems( void ) {
+	char buf[32];
+	
 	s_preferences.crosshair.curvalue		= (int)trap_Cvar_VariableValue( "cg_drawCrosshair" ) % NUM_CROSSHAIRS;
 	s_preferences.simpleitems.curvalue		= trap_Cvar_VariableValue( "cg_simpleItems" ) != 0;
 	s_preferences.brass.curvalue			= trap_Cvar_VariableValue( "cg_brassTime" ) != 0;
@@ -81,8 +114,29 @@ static void Preferences_SetMenuItems( void ) {
 	s_preferences.forcemodel.curvalue		= trap_Cvar_VariableValue( "cg_forcemodel" ) != 0;
 	s_preferences.drawteamoverlay.curvalue	= Com_Clamp( 0, 3, trap_Cvar_VariableValue( "cg_drawTeamOverlay" ) );
 	s_preferences.allowdownload.curvalue	= trap_Cvar_VariableValue( "cl_allowDownload" ) != 0;
-}
 
+	trap_Cvar_VariableStringBuffer("cg_crosshairColor", buf, sizeof(buf));
+
+	if (buf[0] == '\0')
+		crosshaircolor = 7;
+	else 
+		crosshaircolor = atoi(buf) % 8;
+
+	s_preferences.crosshaircolor.curvalue = crosshaircolor;
+
+	crosshairsize = trap_Cvar_VariableValue("cg_crosshairSize");	
+	if (crosshairsize <= 16)
+		s_preferences.crosshairsize.curvalue = 0;
+	else if (crosshairsize <= 20)
+		s_preferences.crosshairsize.curvalue = 1;
+	else if (crosshairsize <= 24)
+		s_preferences.crosshairsize.curvalue = 2;
+	else if (crosshairsize <= 28)
+		s_preferences.crosshairsize.curvalue = 3;
+	else
+		s_preferences.crosshairsize.curvalue = 4;
+	crosshairsize = s_preferences.crosshairsize.curvalue * 4 + 16;
+}
 
 static void Preferences_Event( void* ptr, int notification ) {
 	if( notification != QM_ACTIVATED ) {
@@ -96,6 +150,16 @@ static void Preferences_Event( void* ptr, int notification ) {
 			s_preferences.crosshair.curvalue = 0;
 		}
 		trap_Cvar_SetValue( "cg_drawCrosshair", s_preferences.crosshair.curvalue );
+		break;
+
+	case ID_CROSSHAIR_COLOR:			
+		crosshaircolor = s_preferences.crosshaircolor.curvalue;
+		trap_Cvar_SetValue("cg_crosshairColor", crosshaircolor);
+		break;
+
+	case ID_CROSSHAIR_SIZE:		
+		crosshairsize = s_preferences.crosshairsize.curvalue * 4 + 16;
+		trap_Cvar_SetValue("cg_crosshairSize", crosshairsize);
 		break;
 
 	case ID_SIMPLEITEMS:
@@ -193,7 +257,13 @@ static void Crosshair_Draw( void *self ) {
 	if( !s->curvalue ) {
 		return;
 	}
-	UI_DrawHandlePic( x + SMALLCHAR_WIDTH, y - 4, 24, 24, s_preferences.crosshairShader[s->curvalue] );
+
+	trap_R_SetColor(g_color_table[crosshaircolor]);
+
+	UI_DrawHandlePic( x + SMALLCHAR_WIDTH + (24 - crosshairsize) / 2, y - 4 + (24 - crosshairsize) / 2, 
+		crosshairsize, crosshairsize, s_preferences.crosshairShader[s->curvalue] );
+
+	trap_R_SetColor(NULL);
 }
 
 
@@ -230,7 +300,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.framer.width  	   = 256;
 	s_preferences.framer.height  	   = 334;
 
-	y = 144;
+	y = 144 - BIGCHAR_HEIGHT * 3;
 	s_preferences.crosshair.generic.type		= MTYPE_TEXT;
 	s_preferences.crosshair.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_NODEFAULTINIT|QMF_OWNERDRAW;
 	s_preferences.crosshair.generic.x			= PREFERENCES_X_POS;
@@ -244,7 +314,27 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.crosshair.generic.left		= PREFERENCES_X_POS - ( ( strlen(s_preferences.crosshair.generic.name) + 1 ) * SMALLCHAR_WIDTH );
 	s_preferences.crosshair.generic.right		= PREFERENCES_X_POS + 48;
 
-	y += BIGCHAR_HEIGHT+2+4;
+	y += BIGCHAR_HEIGHT + 2 + 4 + 8;
+	s_preferences.crosshaircolor.generic.type = MTYPE_SPINCONTROL;
+	s_preferences.crosshaircolor.generic.name = "Crosshair color:";
+	s_preferences.crosshaircolor.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	s_preferences.crosshaircolor.generic.callback = Preferences_Event;
+	s_preferences.crosshaircolor.generic.id = ID_CROSSHAIR_COLOR;
+	s_preferences.crosshaircolor.generic.x = PREFERENCES_X_POS;
+	s_preferences.crosshaircolor.generic.y = y;
+	s_preferences.crosshaircolor.itemnames = crosshair_colors;
+
+	y += BIGCHAR_HEIGHT + 2;
+	s_preferences.crosshairsize.generic.type = MTYPE_SPINCONTROL;
+	s_preferences.crosshairsize.generic.name = "Crosshair size:";
+	s_preferences.crosshairsize.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	s_preferences.crosshairsize.generic.callback = Preferences_Event;
+	s_preferences.crosshairsize.generic.id = ID_CROSSHAIR_SIZE;
+	s_preferences.crosshairsize.generic.x = PREFERENCES_X_POS;
+	s_preferences.crosshairsize.generic.y = y;
+	s_preferences.crosshairsize.itemnames = crosshairsize_items;
+
+	y += BIGCHAR_HEIGHT * 2 + 2;
 	s_preferences.simpleitems.generic.type        = MTYPE_RADIOBUTTON;
 	s_preferences.simpleitems.generic.name	      = "Simple Items:";
 	s_preferences.simpleitems.generic.flags	      = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
@@ -362,6 +452,8 @@ static void Preferences_MenuInit( void ) {
 	Menu_AddItem( &s_preferences.menu, &s_preferences.forcemodel );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.drawteamoverlay );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.allowdownload );
+	Menu_AddItem( &s_preferences.menu, &s_preferences.crosshaircolor );
+	Menu_AddItem( &s_preferences.menu, &s_preferences.crosshairsize);
 
 	Menu_AddItem( &s_preferences.menu, &s_preferences.back );
 
@@ -382,7 +474,7 @@ void Preferences_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_BACK0 );
 	trap_R_RegisterShaderNoMip( ART_BACK1 );
 	for( n = 0; n < NUM_CROSSHAIRS; n++ ) {
-		s_preferences.crosshairShader[n] = trap_R_RegisterShaderNoMip( va("gfx/2d/crosshair%c", 'a' + n ) );
+		s_preferences.crosshairShader[n] = trap_R_RegisterShaderNoMip( va("gfx/2d/fixed_crosshair%c", 'a' + n ) );
 	}
 }
 

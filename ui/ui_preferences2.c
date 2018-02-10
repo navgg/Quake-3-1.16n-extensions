@@ -30,6 +30,10 @@ ADVANCED OPTIONS MENU
 #define ID_ENEMYCOLORS			135
 #define ID_DRAW3DICONS			136
 #define ID_ZOOMFOV				137
+#define ID_ENEMYMODEL_ENABLED	139
+#define ID_CHATBEEP				140
+#define ID_ENEMY_TAUNT			141
+#define ID_CENTER_PRINT			142
 //#define ID_FORCEMODEL			135
 //#define ID_DRAWTEAMOVERLAY		136
 //#define ID_ALLOWDOWNLOAD			137
@@ -50,16 +54,28 @@ typedef struct {
 	menuradiobutton_s	camerabob;
 	menuradiobutton_s	playerids;
 	menuradiobutton_s	draw3dicons;
+	menuradiobutton_s	chatbeep;
+	menuradiobutton_s	enemytaunt;
+	menulist_s			centerprint;
 	menufield_s			fov;
 	menufield_s			zoomfov;
+	menuradiobutton_s	enemymodelenabled;
 	menufield_s			enemymodel;
-	menufield_s			enemycolors;	
+	menufield_s			enemycolors;		
 	//menuradiobutton_s	dynamiclights;	
 
 	menubitmap_s		back;	
 } preferences_t;
 
 static preferences_t s_preferences2;
+
+static const char *centerprint_items[] =
+{
+	"off",
+	"transparent",
+	"on",
+	0
+};
 
 static void Preferences2_SetMenuItems( void ) {
 	s_preferences2.rewards.curvalue		= trap_Cvar_VariableValue( "cg_drawRewards" ) != 0;
@@ -71,6 +87,12 @@ static void Preferences2_SetMenuItems( void ) {
 	s_preferences2.camerabob.curvalue	= trap_Cvar_VariableValue( "cg_bobup" ) != 0 
 										&& trap_Cvar_VariableValue( "cg_bobpitch" ) != 0 
 										&& trap_Cvar_VariableValue( "cg_bobroll" ) != 0;	
+
+	s_preferences2.enemymodelenabled.curvalue = trap_Cvar_VariableValue("cg_enemyModel_enabled") != 0;
+	s_preferences2.chatbeep.curvalue = trap_Cvar_VariableValue("cg_chatSound") != 0;
+	s_preferences2.enemytaunt.curvalue = trap_Cvar_VariableValue("cg_noTaunt") == 0;
+
+	s_preferences2.centerprint.curvalue = (int)(trap_Cvar_VariableValue("cg_centerPrintAlpha") * 2) % 3;
 
 	trap_Cvar_VariableStringBuffer("cg_fov", s_preferences2.fov.field.buffer, sizeof(s_preferences2.fov.field.buffer));
 	trap_Cvar_VariableStringBuffer("cg_zoomfov", s_preferences2.zoomfov.field.buffer, sizeof(s_preferences2.zoomfov.field.buffer));
@@ -122,6 +144,22 @@ static void Preferences2_Event( void* ptr, int notification ) {
 
 	case ID_DRAW3DICONS:
 		trap_Cvar_SetValue( "cg_draw3Dicons", s_preferences2.draw3dicons.curvalue );
+		break;
+
+	case ID_ENEMYMODEL_ENABLED:
+		trap_Cvar_SetValue("cg_enemyModel_enabled", s_preferences2.enemymodelenabled.curvalue);
+		break;
+
+	case ID_CHATBEEP:
+		trap_Cvar_SetValue("cg_chatSound", s_preferences2.chatbeep.curvalue);
+		break;
+
+	case ID_ENEMY_TAUNT:
+		trap_Cvar_SetValue("cg_noTaunt", !s_preferences2.enemytaunt.curvalue);
+		break;
+
+	case ID_CENTER_PRINT:
+		trap_Cvar_SetValue("cg_centerPrintAlpha", s_preferences2.centerprint.curvalue / 2.0f);
 		break;
 
 	case ID_BACK:
@@ -177,7 +215,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.framer.width  	   = 256;
 	s_preferences2.framer.height  	   = 334;
 
-	y = 144 - BIGCHAR_HEIGHT * 2;
+	y = 144 - BIGCHAR_HEIGHT * 4;
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences2.rewards.generic.type       = MTYPE_RADIOBUTTON;
@@ -242,9 +280,37 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.playerids.generic.x	      = PREFERENCES_X_POS;
 	s_preferences2.playerids.generic.y	      = y;
 
-	y += (BIGCHAR_HEIGHT+2) * 2;
+	y += BIGCHAR_HEIGHT + 2;
+	s_preferences2.chatbeep.generic.type = MTYPE_RADIOBUTTON;
+	s_preferences2.chatbeep.generic.name = "Chat Beep:";
+	s_preferences2.chatbeep.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	s_preferences2.chatbeep.generic.callback = Preferences2_Event;
+	s_preferences2.chatbeep.generic.id = ID_CHATBEEP;
+	s_preferences2.chatbeep.generic.x = PREFERENCES_X_POS;
+	s_preferences2.chatbeep.generic.y = y;
+
+	y += BIGCHAR_HEIGHT + 2;
+	s_preferences2.enemytaunt.generic.type = MTYPE_RADIOBUTTON;
+	s_preferences2.enemytaunt.generic.name = "Enemy Taunt:";
+	s_preferences2.enemytaunt.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	s_preferences2.enemytaunt.generic.callback = Preferences2_Event;
+	s_preferences2.enemytaunt.generic.id = ID_ENEMY_TAUNT;
+	s_preferences2.enemytaunt.generic.x = PREFERENCES_X_POS;
+	s_preferences2.enemytaunt.generic.y = y;
+
+	y += BIGCHAR_HEIGHT + 2;
+	s_preferences2.centerprint.generic.type = MTYPE_SPINCONTROL;
+	s_preferences2.centerprint.generic.name = "Center Print:";
+	s_preferences2.centerprint.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	s_preferences2.centerprint.generic.callback = Preferences2_Event;
+	s_preferences2.centerprint.generic.id = ID_CENTER_PRINT;
+	s_preferences2.centerprint.generic.x = PREFERENCES_X_POS;
+	s_preferences2.centerprint.generic.y = y;
+	s_preferences2.centerprint.itemnames = centerprint_items;
+	
+	y += (BIGCHAR_HEIGHT+2) * 2;	
 	s_preferences2.fov.generic.type       = MTYPE_FIELD;
-	s_preferences2.fov.generic.name		  = "FOV (90-130):";
+	s_preferences2.fov.generic.name		  = "FOV (80-130):";
 	s_preferences2.fov.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_NUMBERSONLY;
 	s_preferences2.fov.generic.x	      = PREFERENCES_X_POS;
 	s_preferences2.fov.generic.callback	  = Preferences2_Event;
@@ -255,7 +321,7 @@ static void Preferences2_MenuInit( void ) {
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences2.zoomfov.generic.type       = MTYPE_FIELD;
-	s_preferences2.zoomfov.generic.name		  = "Zoom FOV (20-80):";
+	s_preferences2.zoomfov.generic.name		  = "Zoom FOV (10-80):";
 	s_preferences2.zoomfov.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_NUMBERSONLY;
 	s_preferences2.zoomfov.generic.x	      = PREFERENCES_X_POS;
 	s_preferences2.zoomfov.generic.callback	  = Preferences2_Event;
@@ -265,6 +331,15 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.zoomfov.field.maxchars     = 2;
 
 	y += BIGCHAR_HEIGHT+2;
+	s_preferences2.enemymodelenabled.generic.type = MTYPE_RADIOBUTTON;
+	s_preferences2.enemymodelenabled.generic.name = "Enemy model enabled:";
+	s_preferences2.enemymodelenabled.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	s_preferences2.enemymodelenabled.generic.callback = Preferences2_Event;
+	s_preferences2.enemymodelenabled.generic.id = ID_ENEMYMODEL_ENABLED;
+	s_preferences2.enemymodelenabled.generic.x = PREFERENCES_X_POS;
+	s_preferences2.enemymodelenabled.generic.y = y;
+
+	y += BIGCHAR_HEIGHT + 2;
 	s_preferences2.enemymodel.generic.type       = MTYPE_FIELD;
 	s_preferences2.enemymodel.generic.name		 = "Enemy model:";
 	s_preferences2.enemymodel.generic.flags		 = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
@@ -311,8 +386,12 @@ static void Preferences2_MenuInit( void ) {
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.draw3dicons );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.fov );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.zoomfov );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.enemymodelenabled );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.enemymodel );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.enemycolors );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.chatbeep );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.enemytaunt );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.centerprint );
 
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.back );
 
@@ -328,11 +407,11 @@ static void Preferences2_SaveChanges( void ) {
 	int fov;
 
 	fov = atoi(s_preferences2.fov.field.buffer);
-	if (fov < 90) fov = 90; else if (fov > 130) fov = 130;
+	if (fov < 80) fov = 80; else if (fov > 130) fov = 130;
 	Com_sprintf(s_preferences2.fov.field.buffer, 4, "%d", fov);
 
 	fov = atoi(s_preferences2.zoomfov.field.buffer);
-	if (fov < 20) fov = 20; else if (fov > 80) fov = 80;
+	if (fov < 10) fov = 10; else if (fov > 80) fov = 80;
 	Com_sprintf(s_preferences2.zoomfov.field.buffer, 4, "%d", fov);
 
 	trap_Cvar_Set( "cg_fov", s_preferences2.fov.field.buffer );

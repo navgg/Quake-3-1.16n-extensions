@@ -792,6 +792,12 @@ extern	markPoly_t		cg_markPolys[MAX_MARK_POLYS];
 extern  vmCvar_t		cgx_wideScreenFix;
 extern  vmCvar_t		cgx_drawPlayerIDs;
 extern	vmCvar_t		cgx_enemyModel;
+extern	vmCvar_t		cgx_enemyModel_enabled;
+extern	vmCvar_t		cgx_defaultWeapon;
+extern	vmCvar_t		cgx_chatSound;
+extern	vmCvar_t		cgx_noTaunt;
+extern	vmCvar_t		cgx_centerPrintAlpha;
+extern	vmCvar_t		cgx_crosshairColor;
 
 extern	vmCvar_t		cg_centertime;
 extern	vmCvar_t		cg_runpitch;

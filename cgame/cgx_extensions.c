@@ -15,22 +15,24 @@ void CGX_Init_vScreen(void) {
 	// X-MOD: init virtual screen sizes for wide screen fix
 
 	if ( cgx_wideScreenFix.integer && cgs.glconfig.vidWidth * 480 > cgs.glconfig.vidHeight * 640 ) {
-		vScreen.width = 854;		 
-		vScreen.height = 480;		 		
-		vScreen.ratiox = 854.0 / 640.0;
-		vScreen.offsetx = 854.0 / 8;
+		vScreen.width = (float)cgs.glconfig.vidWidth / (float)cgs.glconfig.vidHeight * 480.0;		 
+		vScreen.height = 480;		 				
+		vScreen.offsetx = vScreen.width / 8.0;
 	} else {
 		vScreen.width = 640;
-		vScreen.height = 480;			
-		vScreen.ratiox = 1;
+		vScreen.height = 480;					
 		vScreen.offsetx = 0;
 	}	
+
+	vScreen.ratiox = vScreen.width / 640.0;
 
 	vScreen.hwidth = vScreen.width / 2;
 	vScreen.hheight = vScreen.height / 2;
 
 	cgs.screenXScale = cgs.glconfig.vidWidth / vScreen.width;
 	cgs.screenYScale = cgs.glconfig.vidHeight / vScreen.height; 
+
+	trap_DPrint(va("vScreen: %fx%f\n", vScreen.width, vScreen.height));
 }
 
 void CGX_Init_enemyModels(void) {
@@ -51,6 +53,11 @@ void CGX_Init_enemyModels(void) {
 		*slash = 0;
 	}
 
+	//replace pm skins for now
+	if (Q_stricmp(cg.enemySkin, "pm") == 0) {
+		Q_strncpyz(cg.enemySkin, "default", sizeof(cg.enemySkin));
+	}
+
 	Q_strncpyz(cg.enemyModel, modelStr, sizeof(cg.enemyModel));	
 
 	trap_DPrint(va("cg.enemyModel: %s\ncg.enemySkin: %s\n", cg.enemyModel, cg.enemySkin));
@@ -67,7 +74,7 @@ void CGX_EnemyModelCheck(void) {
 
 	for ( i = 0, ci = cgs.clientinfo ; i < cgs.maxclients ; i++, ci++ ) {
 		if (cg.clientNum != i) {						
-			if (cgx_enemyModel.string[0] == '\0' || 
+			if (cgx_enemyModel_enabled.integer == 0 || cgx_enemyModel.string[0] == '\0' || 
 				(cur->team == ci->team && cur->team != TEAM_FREE) || cur->team == TEAM_SPECTATOR) {
 				CGX_RestoreModelAndSkin(ci);
 			} else if (Q_stricmp(ci->modelName, cg.enemyModel) != 0) {										
@@ -101,6 +108,9 @@ void CGX_RestoreModelAndSkin(clientInfo_t *ci) {
 void CGX_SetModelAndSkin(clientInfo_t *ci) {
 	//trap_DPrint("CGX_SetModelAndSkin ");				
 
+	if (cgx_enemyModel_enabled.integer == 0)
+		return;
+
 	if (ci->modelNameCopy[0] == '\0')
 		Q_strncpyz(ci->modelNameCopy, ci->modelName, sizeof(ci->modelName));
 	if (ci->skinNameCopy[0] == '\0')
@@ -112,7 +122,7 @@ void CGX_SetModelAndSkin(clientInfo_t *ci) {
 		Q_strncpyz(ci->modelName, cg.enemyModel, sizeof(ci->modelName));
 
 		if (cgs.gametype < GT_TEAM)
-			Q_strncpyz(ci->skinName, "red", sizeof(ci->skinName));
+			Q_strncpyz(ci->skinName, cg.enemySkin, sizeof(ci->skinName));		
 
 		ci->infoValid = qtrue;
 		ci->deferred = qtrue;

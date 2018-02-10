@@ -49,6 +49,12 @@ itemInfo_t			cg_items[MAX_ITEMS];
 vmCvar_t	cgx_wideScreenFix;
 vmCvar_t	cgx_drawPlayerIDs;
 vmCvar_t	cgx_enemyModel;
+vmCvar_t	cgx_enemyModel_enabled;
+vmCvar_t	cgx_defaultWeapon;
+vmCvar_t	cgx_chatSound;
+vmCvar_t	cgx_noTaunt;
+vmCvar_t	cgx_centerPrintAlpha;
+vmCvar_t	cgx_crosshairColor;
 
 vmCvar_t	cg_railTrailTime;
 vmCvar_t	cg_centertime;
@@ -158,9 +164,10 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_addMarks, "cg_marks", "1", CVAR_ARCHIVE },
 	{ &cg_lagometer, "cg_lagometer", "1", CVAR_ARCHIVE },
 	{ &cg_railTrailTime, "cg_railTrailTime", "400", CVAR_ARCHIVE  },
-	{ &cg_gun_x, "cg_gunX", "0", CVAR_CHEAT },
-	{ &cg_gun_y, "cg_gunY", "0", CVAR_CHEAT },
-	{ &cg_gun_z, "cg_gunZ", "0", CVAR_CHEAT },
+	// X-MOD: cg_gun no more cheats
+	{ &cg_gun_x, "cg_gunX", "0", CVAR_ARCHIVE },
+	{ &cg_gun_y, "cg_gunY", "0", CVAR_ARCHIVE },
+	{ &cg_gun_z, "cg_gunZ", "0", CVAR_ARCHIVE },
 	{ &cg_centertime, "cg_centertime", "3", CVAR_CHEAT },
 	{ &cg_runpitch, "cg_runpitch", "0.002", CVAR_ARCHIVE},
 	{ &cg_runroll, "cg_runroll", "0.005", CVAR_ARCHIVE },
@@ -195,8 +202,15 @@ cvarTable_t		cvarTable[] = {
 	// X-MOD: extended cgx commands
 
 	{ &cgx_wideScreenFix, "cgx_wideScreenFix", "1", CVAR_ARCHIVE },
+	{ &cgx_defaultWeapon, "cgx_defaultWeapon", "0", CVAR_ARCHIVE },
 	{ &cgx_drawPlayerIDs, "cgx_drawPlayerIDs", "0", CVAR_ARCHIVE },
-	{ &cgx_enemyModel, "cg_enemyModel", "", CVAR_ARCHIVE },	
+	{ &cgx_enemyModel, "cg_enemyModel", "", CVAR_ARCHIVE },		
+	{ &cgx_enemyModel_enabled, "cg_enemyModel_enabled", "0", CVAR_ARCHIVE },
+
+	{ &cgx_chatSound, "cg_chatSound", "1", CVAR_ARCHIVE },
+	{ &cgx_noTaunt, "cg_noTaunt", "0", CVAR_ARCHIVE },
+	{ &cgx_centerPrintAlpha, "cg_centerPrintAlpha", "1.0", CVAR_ARCHIVE },
+	{ &cgx_crosshairColor, "cg_crosshairColor", "7", CVAR_ARCHIVE },
 
 	// the following variables are created in other parts of the system,
 	// but we also reference them here
@@ -608,8 +622,9 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.tracerShader = trap_R_RegisterShader( "gfx/misc/tracer" );
 	cgs.media.selectShader = trap_R_RegisterShader( "gfx/2d/select" );
 
+	//X-MOD: fixed crosshair shaders for crosshair color
 	for ( i = 0 ; i < NUM_CROSSHAIRS ; i++ ) {
-		cgs.media.crosshairShader[i] = trap_R_RegisterShader( va("gfx/2d/crosshair%c", 'a'+i) );
+		cgs.media.crosshairShader[i] = trap_R_RegisterShader( va("gfx/2d/fixed_crosshair%c", 'a'+i) );
 	}
 
 	cgs.media.backTileShader = trap_R_RegisterShader( "gfx/2d/backtile" );

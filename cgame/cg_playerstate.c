@@ -166,14 +166,19 @@ A respawn happened this snapshot
 ================
 */
 void CG_Respawn( void ) {
+	int defaultWeapon;
+
 	// no error decay on player movement
 	cg.thisFrameTeleport = qtrue;
 
 	// display weapons available
 	cg.weaponSelectTime = cg.time;
-
+	
+	// X-MOD: select custom specified weapon or
 	// select the weapon the server says we are using
-	cg.weaponSelect = cg.snap->ps.weapon;
+	defaultWeapon = abs(cgx_defaultWeapon.integer % (WP_NUM_WEAPONS - 1));
+	trap_DPrint(va("CG_Respawn defaultWeapon: %i", defaultWeapon));
+	cg.weaponSelect = cgx_defaultWeapon.integer == 0 ? cg.snap->ps.weapon : defaultWeapon;	
 }
 
 

@@ -1522,10 +1522,14 @@ static void CG_DrawCenterString( void ) {
 		return;
 	}
 
-	color = CG_FadeColor( cg.centerPrintTime, 1000 * cg_centertime.value );
+	color = CG_FadeColor( cg.centerPrintTime, 1000 * cg_centertime.value );	
 	if ( !color ) {
 		return;
 	}
+
+	// X-MOD: cg_centerPrintAlpha
+	if (color[3] >= cgx_centerPrintAlpha.value)
+		color[3] = cgx_centerPrintAlpha.value;
 
 	trap_R_SetColor( color );
 
@@ -1585,7 +1589,7 @@ static void CG_DrawCrosshair(void) {
 	float		w, h;
 	qhandle_t	hShader;
 	float		f;
-	float		x, y;
+	float		x, y;	
 
 	if ( !cg_drawCrosshair.integer ) {
 		return;
@@ -1598,9 +1602,13 @@ static void CG_DrawCrosshair(void) {
 	if ( cg.renderingThirdPerson ) {
 		return;
 	}
-
+	
+	// X-MOD: set crosshair color
+	if (cgx_crosshairColor.integer) {	
+		trap_R_SetColor(g_color_table[cgx_crosshairColor.integer % 8]);
+	}
 	// set color based on health
-	if ( cg_crosshairHealth.integer ) {
+	else if ( cg_crosshairHealth.integer ) {
 		vec4_t		hcolor;
 
 		CG_ColorForHealth( hcolor );
@@ -1623,11 +1631,11 @@ static void CG_DrawCrosshair(void) {
 	y = cg_crosshairY.integer;
 	CG_AdjustFrom640( &x, &y, &w, &h );
 
-	hShader = cgs.media.crosshairShader[ cg_drawCrosshair.integer % NUM_CROSSHAIRS ];
+	hShader = cgs.media.crosshairShader[ cg_drawCrosshair.integer % NUM_CROSSHAIRS ];	
 
 	trap_R_DrawStretchPic( x + cg.refdef.x + 0.5 * (cg.refdef.width - w), 
 		y + cg.refdef.y + 0.5 * (cg.refdef.height - h), 
-		w, h, 0, 0, 1, 1, hShader );
+		w, h, 0, 0, 1, 1, hShader );	
 }
 
 

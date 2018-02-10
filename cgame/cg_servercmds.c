@@ -347,13 +347,15 @@ static void CG_ServerCommand( void ) {
 	}
 
 	if ( !strcmp( cmd, "chat" ) ) {
-		trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
+		if (cgx_chatSound.integer != 0)
+			trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
 		CG_Printf( "%s\n", CG_Argv(1) );
 		return;
 	}
 
 	if ( !strcmp( cmd, "tchat" ) ) {
-		trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
+		if (cgx_chatSound.integer != 0)
+			trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
 		CG_AddToTeamChat( CG_Argv(1) );
 		CG_Printf( "%s\n", CG_Argv(1) );
 		return;

@@ -23,7 +23,7 @@ MAIN MENU
 #define MAIN_BANNER_MODEL				"models/mapobjects/banner/banner5.md3"
 #define MAIN_MENU_VERTICAL_SPACING		34
 
-#define CGX_VERSION				"0.1a"
+#define CGX_VERSION				"0.2a"
 
 typedef struct {
 	menuframework_s	menu;
@@ -121,7 +121,7 @@ static void Main_MenuDraw( void ) {
 	float			adjust;
 	float			x, y, w, h;
 	vec4_t			color = {0.5, 0, 0, 1};
-	vec4_t			cgx_color = { 0.15, 0.15, 0.15, 0.25 };
+	vec4_t			cgx_color = { 0.5, 0.2, 0.2, 0.25 };
 
 	// setup the refdef
 

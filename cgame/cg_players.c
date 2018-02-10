@@ -582,15 +582,21 @@ void CG_NewClientInfo( int clientNum ) {
 	//save original models
 	Q_strncpyz( newInfo.skinNameCopy, newInfo.skinName, sizeof( newInfo.skinName ) );
 	Q_strncpyz( newInfo.modelNameCopy, newInfo.modelName, sizeof( newInfo.modelName ) );	
-	//change models and skins if needed
-	if (cgx_enemyModel.string[0] != '\0' && newInfo.modelName != '\0' && cg.clientNum != clientNum) {
-		trap_DPrint(va("CG_NewClientInfo %s %s - %s %s\n", newInfo.skinName, newInfo.modelName, cg.enemySkin, cg.enemyModel));
+	////change models and skins if needed
+	if (cgx_enemyModel.string[0] != '\0' && cg.clientNum != clientNum)
+		CGX_SetModelAndSkin(&newInfo);	
 
-		if (cgs.gametype < GT_TEAM) {
-			Q_strncpyz(newInfo.skinName, "red", sizeof(newInfo.skinName));
-			Q_strncpyz(newInfo.modelName, cg.enemyModel, sizeof(newInfo.modelName));
-		} 
-	} 			
+	//if (cgx_enemyModel.string[0] != '\0' && newInfo.modelName[0] != '\0' && cg.clientNum != clientNum) {
+	//	trap_DPrint(va("CG_NewClientInfo %s %s - %s %s\n", newInfo.skinName, newInfo.modelName, cg.enemySkin, cg.enemyModel));
+
+	//	if (cgs.gametype < GT_TEAM) {
+	//		Q_strncpyz(newInfo.modelName, cg.enemyModel, sizeof(newInfo.modelName));			
+	//		if (cg.enemySkin[0] == '\0')
+	//			Q_strncpyz(newInfo.skinName, "red", sizeof(newInfo.skinName));
+	//		else 
+	//			Q_strncpyz(newInfo.skinName, cg.enemySkin, sizeof(newInfo.skinName));							
+	//	} 
+	//} 			
 
 	// scan for an existing clientinfo that matches this modelname
 	// so we can avoid loading checks if possible
