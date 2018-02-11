@@ -1505,7 +1505,7 @@ static void CG_DrawLagometer( void ) {
 	}
 	
 	// X-MOD: draw ping in lagometer
-	if (!cg.demoPlayback) {
+	if (cg_lagometer.integer == 2 && !cg.demoPlayback) {
 		CG_DrawStringExt(x + 1, y, va("%ims", cg.meanPing), g_color_table[ColorIndex(COLOR_WHITE)], qfalse, qfalse, 5, 10, 0);
 	}
 
@@ -2065,7 +2065,7 @@ static void CGX_CalculatePing(void) {
 	for (i = 0, count = 0; i < LAG_SAMPLES; i++) {
 
 		v = lagometer.snapshotSamples[i];
-		if (v > 0) {
+		if (v >= 0) {
 			cg.meanPing += v;
 			count++;
 		}
@@ -2094,7 +2094,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	}
 
 	// X-MOD: calculate ping
-	if ( !cg.demoPlayback ) {
+	if ( cg_lagometer.integer == 2 && !cg.demoPlayback ) {
 		CGX_CalculatePing();	
 	}
 

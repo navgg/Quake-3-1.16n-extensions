@@ -24,6 +24,7 @@ NETWORK OPTIONS MENU
 #define ID_BACK				15
 #define ID_PACKETS			16
 #define ID_PACKETDUP		17
+#define ID_LAGOMETER		18
 
 
 static const char *rate_items[] = {	
@@ -47,6 +48,13 @@ static const char *packets_items[] = {
 	0
 };
 
+static const char *lagometer_items[] = {
+	"Off",
+	"Netgraph",
+	"Netgraph + ping",
+	0
+};
+
 typedef struct {
 	menuframework_s	menu;
 
@@ -61,6 +69,7 @@ typedef struct {
 
 	menulist_s		rate;
 	menulist_s		packets;
+	menulist_s		lagometer;
 	menuradiobutton_s	packetdup;
 
 	menubitmap_s	back;
@@ -74,8 +83,7 @@ static networkOptionsInfo_t	networkOptionsInfo;
 UI_NetworkOptionsMenu_Event
 =================
 */
-static void UI_NetworkOptionsMenu_Event( void* ptr, int event ) {
-	int curPacksVal;
+static void UI_NetworkOptionsMenu_Event( void* ptr, int event ) {	
 
 	if( event != QM_ACTIVATED ) {
 		return;
@@ -117,12 +125,12 @@ static void UI_NetworkOptionsMenu_Event( void* ptr, int event ) {
 		trap_Cvar_SetValue( "snaps", 40 );		
 		break;
 
-	case ID_PACKETS:		
-		curPacksVal = networkOptionsInfo.packets.curvalue;
-		//if (curPacksVal = 3) curPacksVal = 4;
-		//else if (curPacksVal = 4) curPacksVal = 6;
-		trap_Cvar_SetValue( "cl_maxpackets", 40 + curPacksVal * 10 );
+	case ID_PACKETS:				
+		trap_Cvar_SetValue( "cl_maxpackets", 40 + networkOptionsInfo.packets.curvalue * 10 );
 		break;
+	
+	case ID_LAGOMETER:
+		trap_Cvar_SetValue( "cg_lagometer", networkOptionsInfo.lagometer.curvalue );
 
 	case ID_PACKETDUP:
 		trap_Cvar_SetValue( "cl_packetdup", networkOptionsInfo.packetdup.curvalue );							
@@ -214,7 +222,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.network.style				= UI_RIGHT;
 	networkOptionsInfo.network.color				= color_red;
 
-	y = 240 - 1 * (BIGCHAR_HEIGHT+2);
+	y = 240 - 2 * (BIGCHAR_HEIGHT+2);
 	networkOptionsInfo.rate.generic.type		= MTYPE_SPINCONTROL;
 	networkOptionsInfo.rate.generic.name		= "Data Rate:";
 	networkOptionsInfo.rate.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
@@ -224,7 +232,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.rate.generic.y			= y;
 	networkOptionsInfo.rate.itemnames			= rate_items;
 
-	y = 240 - 0 * (BIGCHAR_HEIGHT+2);
+	y = 240 - 1 * (BIGCHAR_HEIGHT+2);
 	networkOptionsInfo.packets.generic.type		= MTYPE_SPINCONTROL;
 	networkOptionsInfo.packets.generic.name		= "Packets Rate:";
 	networkOptionsInfo.packets.generic.flags	= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
@@ -234,7 +242,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.packets.generic.y		= y;
 	networkOptionsInfo.packets.itemnames		= packets_items;
 
-	y = 240 + 1 * (BIGCHAR_HEIGHT+2);
+	y = 240 + 0 * (BIGCHAR_HEIGHT+2);
 	networkOptionsInfo.packetdup.generic.type		= MTYPE_RADIOBUTTON;
 	networkOptionsInfo.packetdup.generic.name		= "Packet Dup:";
 	networkOptionsInfo.packetdup.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
@@ -242,6 +250,16 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.packetdup.generic.id			= ID_PACKETDUP;
 	networkOptionsInfo.packetdup.generic.x			= 400;
 	networkOptionsInfo.packetdup.generic.y			= y;
+
+	y = 240 + 1 * (BIGCHAR_HEIGHT + 2);
+	networkOptionsInfo.lagometer.generic.type = MTYPE_SPINCONTROL;
+	networkOptionsInfo.lagometer.generic.name = "Lagometer:";
+	networkOptionsInfo.lagometer.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	networkOptionsInfo.lagometer.generic.callback = UI_NetworkOptionsMenu_Event;
+	networkOptionsInfo.lagometer.generic.id = ID_LAGOMETER;
+	networkOptionsInfo.lagometer.generic.x = 400;
+	networkOptionsInfo.lagometer.generic.y = y;
+	networkOptionsInfo.lagometer.itemnames = lagometer_items;
 
 	networkOptionsInfo.back.generic.type		= MTYPE_BITMAP;
 	networkOptionsInfo.back.generic.name		= ART_BACK0;
@@ -264,6 +282,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.rate );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.packets );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.packetdup );
+	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.lagometer );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.back );
 
 	rate = trap_Cvar_VariableValue( "rate" );
@@ -297,6 +316,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 		networkOptionsInfo.packets.curvalue = 6;
 	
 	networkOptionsInfo.packetdup.curvalue = trap_Cvar_VariableValue("cl_packetdup") != 0;
+	networkOptionsInfo.lagometer.curvalue = abs((int)trap_Cvar_VariableValue("cg_lagometer") % 3);
 }
 
 
