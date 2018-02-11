@@ -769,6 +769,9 @@ static void CG_DrawUpperRight( void ) {
 	if ( cg_drawFPS.integer ) {
 		y = CG_DrawFPS( y );
 	}
+	if ( cgx_drawSpeed.integer ) {
+		y = CG_DrawSpeedMeter(y);		
+	}
 	if ( cg_drawTimer.integer ) {
 		y = CG_DrawTimer( y );
 	}

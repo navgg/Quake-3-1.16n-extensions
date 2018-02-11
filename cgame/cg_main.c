@@ -55,6 +55,7 @@ vmCvar_t	cgx_chatSound;
 vmCvar_t	cgx_noTaunt;
 vmCvar_t	cgx_centerPrintAlpha;
 vmCvar_t	cgx_crosshairColor;
+vmCvar_t	cgx_drawSpeed;
 
 vmCvar_t	cg_railTrailTime;
 vmCvar_t	cg_centertime;
@@ -204,6 +205,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_wideScreenFix, "cgx_wideScreenFix", "1", CVAR_ARCHIVE },
 	{ &cgx_defaultWeapon, "cgx_defaultWeapon", "0", CVAR_ARCHIVE },
 	{ &cgx_drawPlayerIDs, "cgx_drawPlayerIDs", "0", CVAR_ARCHIVE },
+
 	{ &cgx_enemyModel, "cg_enemyModel", "", CVAR_ARCHIVE },		
 	{ &cgx_enemyModel_enabled, "cg_enemyModel_enabled", "0", CVAR_ARCHIVE },
 
@@ -211,6 +213,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_noTaunt, "cg_noTaunt", "0", CVAR_ARCHIVE },
 	{ &cgx_centerPrintAlpha, "cg_centerPrintAlpha", "1.0", CVAR_ARCHIVE },
 	{ &cgx_crosshairColor, "cg_crosshairColor", "7", CVAR_ARCHIVE },
+	{ &cgx_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
 
 	// the following variables are created in other parts of the system,
 	// but we also reference them here

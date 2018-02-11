@@ -798,6 +798,7 @@ extern	vmCvar_t		cgx_chatSound;
 extern	vmCvar_t		cgx_noTaunt;
 extern	vmCvar_t		cgx_centerPrintAlpha;
 extern	vmCvar_t		cgx_crosshairColor;
+extern	vmCvar_t		cgx_drawSpeed;
 
 extern	vmCvar_t		cg_centertime;
 extern	vmCvar_t		cg_runpitch;
