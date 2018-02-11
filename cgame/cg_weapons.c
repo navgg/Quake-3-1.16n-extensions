@@ -613,12 +613,14 @@ static void CG_CalculateWeaponPosition( vec3_t origin, vec3_t angles ) {
 		scale = -cg.xyspeed;
 	} else {
 		scale = cg.xyspeed;
-	}
+	}	
 
 	// gun angles from bobbing
-	angles[ROLL] += scale * cg.bobfracsin * 0.005;
-	angles[YAW] += scale * cg.bobfracsin * 0.01;
-	angles[PITCH] += cg.xyspeed * cg.bobfracsin * 0.005;
+	if (cg_drawGun.integer != 2) {		
+		angles[ROLL] += scale * cg.bobfracsin * 0.005;
+		angles[YAW] += scale * cg.bobfracsin * 0.01;
+		angles[PITCH] += cg.xyspeed * cg.bobfracsin * 0.005;
+	}
 
 	// drop the weapon when landing
 	delta = cg.time - cg.landTime;
@@ -639,12 +641,15 @@ static void CG_CalculateWeaponPosition( vec3_t origin, vec3_t angles ) {
 	}
 #endif
 
-	// idle drift
-	scale = cg.xyspeed + 40;
-	fracsin = sin( cg.time * 0.001 );
-	angles[ROLL] += scale * fracsin * 0.01;
-	angles[YAW] += scale * fracsin * 0.01;
-	angles[PITCH] += scale * fracsin * 0.01;
+	// idle drift	
+	if (cg_drawGun.integer != 2) {
+		scale = cg.xyspeed + 40;
+		fracsin = sin(cg.time * 0.001);
+
+		angles[ROLL] += scale * fracsin * 0.01;
+		angles[YAW] += scale * fracsin * 0.01;
+		angles[PITCH] += scale * fracsin * 0.01;
+	}
 }
 
 
