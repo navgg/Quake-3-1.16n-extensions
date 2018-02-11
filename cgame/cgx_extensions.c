@@ -129,33 +129,3 @@ void CGX_SetModelAndSkin(clientInfo_t *ci) {
 	}		
 }
 
-/*
-================
-CGX_DrawSpeedMeter
-================
-based on code baseq3a: https://github.com/ec-/baseq3a
-*/
-static float CGX_DrawSpeedMeter(float y) {
-	char	*s;
-	int		w;
-
-	/* speed meter can get in the way of the scoreboard */
-	//if (cg.scoreBoardShowing) {
-	//	return y;
-	//}	
-	
-	s = va((cg.xyspeed >= 500 ? "^3%1.0fups": "%1.0fups"), cg.xyspeed);
-
-	w = CG_DrawStrlen(s) * BIGCHAR_WIDTH;
-
-	if (cgx_drawSpeed.integer == 1) {
-		/* top left-hand corner of screen */
-		CG_DrawBigString(vScreen.width - 5 - w, y + 2, s, 1.0f);
-		return y + BIGCHAR_HEIGHT + 4;
-	}
-	else {
-		/* center of screen */
-		CG_DrawBigString(vScreen.hwidth - w / 2, 260, s, 0.5f);
-		return y;
-	}
-}

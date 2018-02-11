@@ -570,11 +570,47 @@ static float CG_DrawTimer( float y ) {
 	s = va( "%i:%i%i", mins, tens, seconds );
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 
-	CG_DrawBigString( vScreen.width - 5 - w, y + 2, s, 1.0F);
+	if (cg_drawTimer.integer == 1) {
+		CG_DrawBigString(vScreen.width - 5 - w, y + 2, s, 1.0F);
 
-	return y + BIGCHAR_HEIGHT + 4;
+		return y + BIGCHAR_HEIGHT + 4;
+	} else {
+		CG_DrawBigString(vScreen.hwidth - w / 2, 0 + 2, s, 1.0f);
+
+		return y;		
+	}
 }
 
+/*
+================
+CGX_DrawSpeedMeter
+================
+based on code baseq3a: https://github.com/ec-/baseq3a
+*/
+static float CGX_DrawSpeedMeter(float y) {
+	char	*s;
+	int		w;
+
+	/* speed meter can get in the way of the scoreboard */
+	//if (cg.scoreBoardShowing) {
+	//	return y;
+	//}	
+
+	s = va((cg.xyspeed >= 500 ? "^3%1.0fups" : "%1.0fups"), cg.xyspeed);
+
+	w = CG_DrawStrlen(s) * BIGCHAR_WIDTH;
+
+	if (cgx_drawSpeed.integer == 1) {
+		/* top left-hand corner of screen */
+		CG_DrawBigString(vScreen.width - 5 - w, y + 2, s, 1.0f);
+		return y + BIGCHAR_HEIGHT + 4;
+	}
+	else {
+		/* center of screen */
+		CG_DrawBigString(vScreen.hwidth - w / 2, 260, s, 0.5f);
+		return y;
+	}
+}
 
 /*
 =================
@@ -769,11 +805,11 @@ static void CG_DrawUpperRight( void ) {
 	if ( cg_drawFPS.integer ) {
 		y = CG_DrawFPS( y );
 	}
-	if ( cgx_drawSpeed.integer ) {
-		y = CGX_DrawSpeedMeter(y);		
-	}
 	if ( cg_drawTimer.integer ) {
 		y = CG_DrawTimer( y );
+	}
+	if (cgx_drawSpeed.integer) {
+		y = CGX_DrawSpeedMeter(y);
 	}
 	if ( cg_drawAttacker.integer ) {
 		y = CG_DrawAttacker( y );
@@ -2015,6 +2051,30 @@ static void CG_Draw2D( void ) {
 	}
 }
 
+/*
+================
+CGX_CalculatePing
+================
+based on code baseq3a: https://github.com/ec-/baseq3a
+*/
+static void CGX_CalculatePing(void) {
+	int count, i, v;
+
+	cg.meanPing = 0;
+
+	for (i = 0, count = 0; i < LAG_SAMPLES; i++) {
+
+		v = lagometer.snapshotSamples[i];
+		if (v > 0) {
+			cg.meanPing += v;
+			count++;
+		}
+	}
+
+	if (count) {
+		cg.meanPing /= count;
+	}
+}
 
 /*
 =====================
@@ -2080,30 +2140,5 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 
 	// draw status bar and other floating elements
 	CG_Draw2D();
-}
-
-/*
-================
-CGX_CalculatePing
-================
-based on code baseq3a: https://github.com/ec-/baseq3a
-*/
-static void CGX_CalculatePing(void) {
-	int count, i, v;
-
-	cg.meanPing = 0;
-
-	for (i = 0, count = 0; i < LAG_SAMPLES; i++) {
-
-		v = lagometer.snapshotSamples[i];
-		if (v >= 0) {
-			cg.meanPing += v;
-			count++;
-		}
-	}
-
-	if (count) {
-		cg.meanPing /= count;
-	}
 }
 
