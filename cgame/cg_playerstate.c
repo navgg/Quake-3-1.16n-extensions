@@ -224,7 +224,24 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 
 	// hit changes
 	if ( ps->persistant[PERS_HITS] > ops->persistant[PERS_HITS] ) {
-		trap_S_StartLocalSound( cgs.media.hitSound, CHAN_LOCAL_SOUND );
+		// X-MOD: pro mode hitsounds, based on baseq3a code
+		if (cgx_hitsounds.integer > 0) {
+			int damage, index;
+			
+			damage = ps->persistant[PERS_HITS] - ops->persistant[PERS_HITS];
+			
+			if (damage > 75) index = 3;
+			else if (damage > 50) index = 2;
+			else if (damage > 25) index = 1;
+			else index = 0;
+
+			if (cgx_hitsounds.integer > 1) // reversed: higher damage - higher tone
+				index = 3 - index;
+
+			trap_S_StartLocalSound(cgs.media.hitSounds[index], CHAN_LOCAL_SOUND);
+		} else {
+			trap_S_StartLocalSound(cgs.media.hitSound, CHAN_LOCAL_SOUND);
+		}
 	} else if ( ps->persistant[PERS_HITS] < ops->persistant[PERS_HITS] ) {
 		trap_S_StartLocalSound( cgs.media.hitTeamSound, CHAN_LOCAL_SOUND );
 	}

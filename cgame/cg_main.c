@@ -56,6 +56,7 @@ vmCvar_t	cgx_noTaunt;
 vmCvar_t	cgx_centerPrintAlpha;
 vmCvar_t	cgx_crosshairColor;
 vmCvar_t	cgx_drawSpeed;
+vmCvar_t	cgx_hitsounds;
 
 vmCvar_t	cg_railTrailTime;
 vmCvar_t	cg_centertime;
@@ -163,7 +164,8 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_brassTime, "cg_brassTime", "1250", CVAR_ARCHIVE },
 	{ &cg_simpleItems, "cg_simpleItems", "0", CVAR_ARCHIVE },
 	{ &cg_addMarks, "cg_marks", "1", CVAR_ARCHIVE },
-	{ &cg_lagometer, "cg_lagometer", "1", CVAR_ARCHIVE },
+	// X-MOD: nethgraph + ping
+	{ &cg_lagometer, "cg_lagometer", "2", CVAR_ARCHIVE },
 	{ &cg_railTrailTime, "cg_railTrailTime", "400", CVAR_ARCHIVE  },
 	// X-MOD: cg_gun no more cheats
 	{ &cg_gun_x, "cg_gunX", "0", CVAR_ARCHIVE },
@@ -211,9 +213,31 @@ cvarTable_t		cvarTable[] = {
 
 	{ &cgx_chatSound, "cg_chatSound", "1", CVAR_ARCHIVE },
 	{ &cgx_noTaunt, "cg_noTaunt", "0", CVAR_ARCHIVE },
+	{ &cgx_hitsounds, "cg_hitsounds", "0", CVAR_ARCHIVE },
 	{ &cgx_centerPrintAlpha, "cg_centerPrintAlpha", "1.0", CVAR_ARCHIVE },
 	{ &cgx_crosshairColor, "cg_crosshairColor", "7", CVAR_ARCHIVE },
 	{ &cgx_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
+
+	// +cgx_wideScreenFix 1|0 - fix perspective for widescreen
+	// +cgx_defaultWeapon 0-9 - default weapon when spawn 0: default 1: gauntlet ...
+	// +cgx_drawPlayerIDs 0|1 - show player id in scoreboard
+	// +cg_enemyModel_enabled 0|1 - enemy model on\off
+	// +cg_centerPrintAlpha 1.0-0 - center print
+	// +cg_crosshairColor 0-7 crosshair color fix
+	// +cg_drawSpeed 0|1|2 - speedmeter 1: top corner 2: center screen
+	// +cg_chatSound 1|0 - chat beep sound
+	// +cg_noTaunt 0|1 - enemy taunt sound
+	// +ping colors
+	// +cg_drawGun 0|1|2 - 1: bobbing gun 2: static gun
+	// +-cg_enemyModel "keel/red" - enemy model (colored skins not supported yet)
+	// +cg_lagometer 0|1|2 - 1: netgraph 2: netgraph + client ping
+	// TODO: 
+	// -cg_enemyModel pm skins	
+	// -cg_adjustFov fov adjust	
+	// -cg_drawAccuracy 0 1 draw acc
+	// -hp hitsounds
+	// -modified hud?
+	// -unlagged?
 
 	// the following variables are created in other parts of the system,
 	// but we also reference them here
@@ -483,6 +507,11 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.landSound = trap_S_RegisterSound( "sound/player/land1.wav");
 
 	cgs.media.hitSound = trap_S_RegisterSound( "sound/feedback/hit.wav" );
+
+	cgs.media.hitSounds[0] = trap_S_RegisterSound("sound/feedback/hit25.wav");
+	cgs.media.hitSounds[1] = trap_S_RegisterSound("sound/feedback/hit50.wav");
+	cgs.media.hitSounds[2] = trap_S_RegisterSound("sound/feedback/hit75.wav");
+	cgs.media.hitSounds[3] = trap_S_RegisterSound("sound/feedback/hit100.wav");
 
 	cgs.media.impressiveSound = trap_S_RegisterSound( "sound/feedback/impressive.wav" );
 	cgs.media.excellentSound = trap_S_RegisterSound( "sound/feedback/excellent.wav" );

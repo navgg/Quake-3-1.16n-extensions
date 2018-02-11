@@ -34,6 +34,7 @@ ADVANCED OPTIONS MENU
 #define ID_CHATBEEP				140
 #define ID_ENEMY_TAUNT			141
 #define ID_CENTER_PRINT			142
+#define ID_SPEED				143
 //#define ID_FORCEMODEL			135
 //#define ID_DRAWTEAMOVERLAY		136
 //#define ID_ALLOWDOWNLOAD			137
@@ -48,7 +49,8 @@ typedef struct {
 	menubitmap_s		framer;
 	
 	menuradiobutton_s	rewards;
-	menuradiobutton_s	timer;
+	menulist_s			timer;
+	menulist_s			speed;
 	menuradiobutton_s	blood;
 	menuradiobutton_s	gibs;
 	menuradiobutton_s	camerabob;
@@ -77,9 +79,26 @@ static const char *centerprint_items[] =
 	0
 };
 
+static const char *timer_items[] =
+{
+	"off",
+	"top right",
+	"top center",
+	0
+};
+
+static const char *speed_items[] =
+{
+	"off",
+	"top right",
+	"under crosshair",
+	0
+};
+
 static void Preferences2_SetMenuItems( void ) {
 	s_preferences2.rewards.curvalue		= trap_Cvar_VariableValue( "cg_drawRewards" ) != 0;
-	s_preferences2.timer.curvalue		= trap_Cvar_VariableValue( "cg_drawTimer" ) != 0;
+	s_preferences2.timer.curvalue		= abs((int)trap_Cvar_VariableValue( "cg_drawTimer" ) % 3);
+	s_preferences2.speed.curvalue		= abs((int)trap_Cvar_VariableValue("cg_drawSpeed") % 3);
 	s_preferences2.blood.curvalue		= trap_Cvar_VariableValue( "com_blood" ) != 0;
 	s_preferences2.gibs.curvalue		= trap_Cvar_VariableValue( "cg_gibs" ) != 0;
 	s_preferences2.playerids.curvalue	= trap_Cvar_VariableValue( "cgx_drawPlayerIDs" ) != 0;	
@@ -115,6 +134,10 @@ static void Preferences2_Event( void* ptr, int notification ) {
 
 	case ID_TIMER:
 		trap_Cvar_SetValue( "cg_drawTimer", s_preferences2.timer.curvalue );
+		break;
+
+	case ID_SPEED:
+		trap_Cvar_SetValue("cg_drawSpeed", s_preferences2.speed.curvalue);
 		break;
 
 	case ID_BLOOD:
@@ -227,13 +250,24 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.rewards.generic.y	      = y;
 
 	y += BIGCHAR_HEIGHT+2;
-	s_preferences2.timer.generic.type			= MTYPE_RADIOBUTTON;
+	s_preferences2.timer.generic.type			= MTYPE_SPINCONTROL;
 	s_preferences2.timer.generic.name			= "Draw Timer:";
 	s_preferences2.timer.generic.flags			= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
 	s_preferences2.timer.generic.callback		= Preferences2_Event;
 	s_preferences2.timer.generic.id				= ID_TIMER;
 	s_preferences2.timer.generic.x				= PREFERENCES_X_POS;
 	s_preferences2.timer.generic.y				= y;
+	s_preferences2.timer.itemnames				= timer_items;
+
+	y += BIGCHAR_HEIGHT + 2;
+	s_preferences2.speed.generic.type = MTYPE_SPINCONTROL;
+	s_preferences2.speed.generic.name = "Draw Speed:";
+	s_preferences2.speed.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	s_preferences2.speed.generic.callback = Preferences2_Event;
+	s_preferences2.speed.generic.id = ID_SPEED;
+	s_preferences2.speed.generic.x = PREFERENCES_X_POS;
+	s_preferences2.speed.generic.y = y;
+	s_preferences2.speed.itemnames = speed_items;
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences2.draw3dicons.generic.type			= MTYPE_RADIOBUTTON;
@@ -379,6 +413,7 @@ static void Preferences2_MenuInit( void ) {
 
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.rewards );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.timer );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.speed );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.blood );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.gibs );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.camerabob );

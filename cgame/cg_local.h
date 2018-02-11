@@ -676,6 +676,8 @@ typedef struct {
 	sfxHandle_t threeFragSound;
 	sfxHandle_t twoFragSound;
 	sfxHandle_t oneFragSound;
+	//X-MOD: pro mode sounds
+	sfxHandle_t hitSounds[4];
 
 	sfxHandle_t hitSound;
 	sfxHandle_t hitTeamSound;
@@ -801,6 +803,7 @@ extern	vmCvar_t		cgx_noTaunt;
 extern	vmCvar_t		cgx_centerPrintAlpha;
 extern	vmCvar_t		cgx_crosshairColor;
 extern	vmCvar_t		cgx_drawSpeed;
+extern	vmCvar_t		cgx_hitsounds;
 
 extern	vmCvar_t		cg_centertime;
 extern	vmCvar_t		cg_runpitch;
