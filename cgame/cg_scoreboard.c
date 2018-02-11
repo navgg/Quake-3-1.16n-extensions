@@ -61,6 +61,7 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 	vec3_t	headAngles;
 	clientInfo_t	*ci;
 	int iconx, headx;
+	int		pingCol;
 
 	if ( score->client < 0 || score->client >= cgs.maxclients ) {
 		Com_Printf( "Bad score->client: %i\n", score->client );
@@ -136,16 +137,30 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 		CG_DrawBigString(SB_SCORELINE_X + vScreen.offsetx - 64 - 40 - offx, y, string, 0.5f);
 	}
 
+	// X-MOD: color ping
+	if (score->ping <= 50)
+		pingCol = ColorIndex(COLOR_WHITE);
+	else if (score->ping <= 100)
+		pingCol = ColorIndex(COLOR_GREEN);
+	else if (score->ping <= 200)
+		pingCol = ColorIndex(COLOR_YELLOW);
+	else if (score->ping <= 350)
+		pingCol = ColorIndex(COLOR_MAGENTA);
+	else if (score->ping == 999)
+		pingCol = ColorIndex(COLOR_WHITE);
+	else
+		pingCol = ColorIndex(COLOR_RED);
+
 	// draw the score line
 	if ( score->ping == -1 ) {
 		Com_sprintf(string, sizeof(string),
 			" connecting    %s", ci->name);
 	} else if ( ci->team == TEAM_SPECTATOR ) {
 		Com_sprintf(string, sizeof(string),
-			" SPECT %3i %4i %s", score->ping, score->time, ci->name);
+			" SPECT ^%d%3i ^7%4i %s", pingCol, score->ping, score->time, ci->name);
 	} else {
 		Com_sprintf(string, sizeof(string),
-			"%5i %4i %4i %s", score->score, score->ping, score->time, ci->name);
+			"%5i ^%i%4i ^7%4i %s", score->score, pingCol, score->ping, score->time, ci->name);
 	}
 
 	// highlight your position
