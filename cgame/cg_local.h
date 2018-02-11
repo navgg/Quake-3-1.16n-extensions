@@ -518,6 +518,8 @@ typedef struct {
 	team_t		oldTeam;
 	char		enemyModel[MAX_QPATH];
 	char		enemySkin[MAX_QPATH];
+
+	int			meanPing;
 } cg_t;
 
 

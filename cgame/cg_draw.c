@@ -770,7 +770,7 @@ static void CG_DrawUpperRight( void ) {
 		y = CG_DrawFPS( y );
 	}
 	if ( cgx_drawSpeed.integer ) {
-		y = CG_DrawSpeedMeter(y);		
+		y = CGX_DrawSpeedMeter(y);		
 	}
 	if ( cg_drawTimer.integer ) {
 		y = CG_DrawTimer( y );
@@ -1467,6 +1467,11 @@ static void CG_DrawLagometer( void ) {
 	if ( cg_nopredict.integer || cg_syncronousClients.integer ) {
 		CG_DrawBigString( ax, ay, "snc", 1.0 );
 	}
+	
+	// X-MOD: draw ping in lagometer
+	if (!cg.demoPlayback) {
+		CG_DrawStringExt(x + 1, y, va("%ims", cg.meanPing), g_color_table[ColorIndex(COLOR_WHITE)], qfalse, qfalse, 5, 10, 0);
+	}
 
 	CG_DrawDisconnect();
 }
@@ -2028,6 +2033,11 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		return;
 	}
 
+	// X-MOD: calculate ping
+	if ( !cg.demoPlayback ) {
+		CGX_CalculatePing();	
+	}
+
 	// optionally draw the tournement scoreboard instead
 	if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR &&
 		( cg.snap->ps.pm_flags & PMF_SCOREBOARD ) ) {
@@ -2072,5 +2082,28 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	CG_Draw2D();
 }
 
+/*
+================
+CGX_CalculatePing
+================
+based on code baseq3a: https://github.com/ec-/baseq3a
+*/
+static void CGX_CalculatePing(void) {
+	int count, i, v;
 
+	cg.meanPing = 0;
+
+	for (i = 0, count = 0; i < LAG_SAMPLES; i++) {
+
+		v = lagometer.snapshotSamples[i];
+		if (v >= 0) {
+			cg.meanPing += v;
+			count++;
+		}
+	}
+
+	if (count) {
+		cg.meanPing /= count;
+	}
+}
 

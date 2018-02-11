@@ -131,11 +131,11 @@ void CGX_SetModelAndSkin(clientInfo_t *ci) {
 
 /*
 ================
-CG_DrawSpeedMeter
+CGX_DrawSpeedMeter
 ================
 based on code baseq3a: https://github.com/ec-/baseq3a
 */
-static float CG_DrawSpeedMeter(float y) {
+static float CGX_DrawSpeedMeter(float y) {
 	char	*s;
 	int		w;
 
