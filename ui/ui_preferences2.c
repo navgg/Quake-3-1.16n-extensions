@@ -369,7 +369,7 @@ static void Preferences2_MenuInit( void ) {
 	
 	y += (BIGCHAR_HEIGHT+2) * 2;	
 	s_preferences2.fov.generic.type       = MTYPE_FIELD;
-	s_preferences2.fov.generic.name		  = "FOV (80-130):";
+	s_preferences2.fov.generic.name		  = "FOV (1-160):";
 	s_preferences2.fov.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_NUMBERSONLY;
 	s_preferences2.fov.generic.x	      = PREFERENCES_X_POS;
 	s_preferences2.fov.generic.callback	  = Preferences2_Event;
@@ -380,7 +380,7 @@ static void Preferences2_MenuInit( void ) {
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences2.zoomfov.generic.type       = MTYPE_FIELD;
-	s_preferences2.zoomfov.generic.name		  = "Zoom FOV (10-80):";
+	s_preferences2.zoomfov.generic.name		  = "Zoom FOV (1-160):";
 	s_preferences2.zoomfov.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_NUMBERSONLY;
 	s_preferences2.zoomfov.generic.x	      = PREFERENCES_X_POS;
 	s_preferences2.zoomfov.generic.callback	  = Preferences2_Event;
@@ -468,11 +468,13 @@ static void Preferences2_SaveChanges( void ) {
 	int fov;
 
 	fov = atoi(s_preferences2.fov.field.buffer);
-	if (fov < 80) fov = 80; else if (fov > 130) fov = 130;
+	if (fov == 0) fov = 100;
+	if (fov < 1) fov = 1; else if (fov > 160) fov = 160;
 	Com_sprintf(s_preferences2.fov.field.buffer, 4, "%d", fov);
 
 	fov = atoi(s_preferences2.zoomfov.field.buffer);
-	if (fov < 10) fov = 10; else if (fov > 80) fov = 80;
+	if (fov == 0) fov = 100;
+	if (fov < 1) fov = 1; else if (fov > 160) fov = 160;
 	Com_sprintf(s_preferences2.zoomfov.field.buffer, 4, "%d", fov);
 
 	trap_Cvar_Set( "cg_fov", s_preferences2.fov.field.buffer );

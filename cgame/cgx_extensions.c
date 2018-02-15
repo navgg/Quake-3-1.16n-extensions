@@ -31,7 +31,7 @@ static char *known_models[] = {
 };
 
 void trap_DPrint(const char *str) {
-#if 1
+#if 0
 	trap_Print(va ("DEBUG: %s", str) );
 #endif
 }
@@ -147,7 +147,7 @@ static void CGX_SetColorInfo(const char *color, clientInfo_t *info) {
 		return;
 
 	if (color[0] == '\0')
-		color = "****";
+		color = "!!!!";
 
 	trap_DPrint(va("CGX_SetColorInfo %s\n", color));
 
