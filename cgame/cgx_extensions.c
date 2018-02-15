@@ -48,7 +48,7 @@ void CGX_Init_vScreen(void) {
 	if ( cgx_wideScreenFix.integer && cgs.glconfig.vidWidth * 480 > cgs.glconfig.vidHeight * 640 ) {
 		vScreen.width = (float)cgs.glconfig.vidWidth / (float)cgs.glconfig.vidHeight * 480.0;		 
 		vScreen.height = 480;		 				
-		vScreen.offsetx = vScreen.width / 8.0;
+		vScreen.offsetx = (vScreen.width - 640) / 2.0;
 	} else {
 		vScreen.width = 640;
 		vScreen.height = 480;					
