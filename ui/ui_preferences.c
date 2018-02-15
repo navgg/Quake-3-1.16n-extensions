@@ -78,8 +78,8 @@ static const char *teamoverlay_names[] =
 };
 
 static const char *crosshair_colors[] =
-{
-	"black",	
+{	
+	"default",	
 	"red",
 	"green",
 	"yellow",
@@ -87,6 +87,34 @@ static const char *crosshair_colors[] =
 	"cyan",
 	"magenta",		
 	"white",
+	"8",
+	"9",
+	"10",
+	"11",
+	"12",
+	"13",
+	"14",
+	"15",
+	"16",
+	"17",
+	"18",
+	"19",
+	"20",
+	"21",
+	"22",
+	"23",
+	"24",
+	"25",
+	"26",
+	"27",
+	"28",
+	"29",
+	"30",
+	"31",
+	"32",
+	"33",
+	"34",
+	"35",	
 	0
 };
 
@@ -120,7 +148,7 @@ static void Preferences_SetMenuItems( void ) {
 	if (buf[0] == '\0')
 		crosshaircolor = 7;
 	else 
-		crosshaircolor = atoi(buf) % 8;
+		crosshaircolor = atoi(buf) % 36;
 
 	s_preferences.crosshaircolor.curvalue = crosshaircolor;
 
@@ -258,7 +286,8 @@ static void Crosshair_Draw( void *self ) {
 		return;
 	}
 
-	trap_R_SetColor(g_color_table[crosshaircolor]);
+	if (crosshaircolor > 0)
+		trap_R_SetColor(g_color_table_ex[crosshaircolor]);
 
 	UI_DrawHandlePic( x + SMALLCHAR_WIDTH + (24 - crosshairsize) / 2, y - 4 + (24 - crosshairsize) / 2, 
 		crosshairsize, crosshairsize, s_preferences.crosshairShader[s->curvalue] );

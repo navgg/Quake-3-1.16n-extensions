@@ -582,9 +582,11 @@ void CG_NewClientInfo( int clientNum ) {
 	//save original models
 	Q_strncpyz( newInfo.skinNameCopy, newInfo.skinName, sizeof( newInfo.skinName ) );
 	Q_strncpyz( newInfo.modelNameCopy, newInfo.modelName, sizeof( newInfo.modelName ) );	
-	////change models and skins if needed
-	if (cgx_enemyModel.string[0] != '\0' && cg.clientNum != clientNum)
-		CGX_SetModelAndSkin(&newInfo);	
+	//change models and skins if needed or restore
+	if (cg.clientNum != clientNum) {
+		trap_DPrint(va("CG_NewClientInfo %i\n", cg.clientNum));		
+		CGX_SetModelAndSkin(&newInfo);
+	}
 
 	//if (cgx_enemyModel.string[0] != '\0' && newInfo.modelName[0] != '\0' && cg.clientNum != clientNum) {
 	//	trap_DPrint(va("CG_NewClientInfo %s %s - %s %s\n", newInfo.skinName, newInfo.modelName, cg.enemySkin, cg.enemyModel));
@@ -1410,6 +1412,7 @@ void CG_Player( centity_t *cent ) {
 	int				renderfx;
 	qboolean		shadow;
 	float			shadowPlane;
+	qboolean		isdead;
 
 	// the client number is stored in clientNum.  It can't be derived
 	// from the entity number, because a single client may have
@@ -1429,6 +1432,9 @@ void CG_Player( centity_t *cent ) {
 	memset( &legs, 0, sizeof(legs) );
 	memset( &torso, 0, sizeof(torso) );
 	memset( &head, 0, sizeof(head) );
+
+	// X-MOD: cg_deadBodyDarken
+	isdead = cent->currentState.eFlags & EF_DEAD;		
 
 	// get the rotation information
 	CG_PlayerAngles( cent, legs.axis, torso.axis, head.axis );
@@ -1472,6 +1478,12 @@ void CG_Player( centity_t *cent ) {
 	legs.renderfx = renderfx;
 	VectorCopy (legs.origin, legs.oldorigin);	// don't positionally lerp at all
 
+	// colored skin
+	if (isdead)
+		ShaderRGBACopy(ci->darkenColors[3], legs.shaderRGBA);
+	else
+		ShaderRGBACopy(ci->colors[3], legs.shaderRGBA);	
+
 	CG_AddRefEntityWithPowerups( &legs, cent->currentState.powerups, ci->team );
 
 	// if the model failed, allow the default nullmodel to be displayed
@@ -1496,6 +1508,12 @@ void CG_Player( centity_t *cent ) {
 	torso.shadowPlane = shadowPlane;
 	torso.renderfx = renderfx;
 
+	// colored skin
+	if (isdead)
+		ShaderRGBACopy(ci->darkenColors[2], torso.shaderRGBA);
+	else 
+		ShaderRGBACopy(ci->colors[2], torso.shaderRGBA);	
+
 	CG_AddRefEntityWithPowerups( &torso, cent->currentState.powerups, ci->team );
 
 	//
@@ -1513,6 +1531,12 @@ void CG_Player( centity_t *cent ) {
 
 	head.shadowPlane = shadowPlane;
 	head.renderfx = renderfx;
+
+	// colored skin
+	if (isdead)
+		ShaderRGBACopy(ci->darkenColors[1], head.shaderRGBA);
+	else 
+		ShaderRGBACopy(ci->colors[1], head.shaderRGBA);
 
 	CG_AddRefEntityWithPowerups( &head, cent->currentState.powerups, ci->team );
 

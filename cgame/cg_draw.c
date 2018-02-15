@@ -78,6 +78,55 @@ CG_Draw3DModel
 
 ================
 */
+static void CG_Draw3DModelColor(float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles, byte *color) {
+	refdef_t		refdef;
+	refEntity_t		ent;
+
+	if (!cg_draw3dIcons.integer || !cg_drawIcons.integer) {
+		return;
+	}
+
+	CG_AdjustFrom640(&x, &y, &w, &h);
+
+	memset(&refdef, 0, sizeof(refdef));
+
+	memset(&ent, 0, sizeof(ent));
+	AnglesToAxis(angles, ent.axis);
+	VectorCopy(origin, ent.origin);
+	ent.hModel = model;
+	ent.customSkin = skin;
+	ent.renderfx = RF_NOSHADOW;		// no stencil shadows
+
+	refdef.rdflags = RDF_NOWORLDMODEL;
+
+	AxisClear(refdef.viewaxis);
+
+	refdef.fov_x = 30;
+	refdef.fov_y = 30;
+
+	refdef.x = x;
+	refdef.y = y;
+	refdef.width = w;
+	refdef.height = h;
+
+	refdef.time = cg.time;	
+
+	ent.shaderRGBA[0] = color[0];
+	ent.shaderRGBA[1] = color[1];
+	ent.shaderRGBA[2] = color[2];
+	ent.shaderRGBA[3] = 255;
+
+	trap_R_ClearScene();
+	trap_R_AddRefEntityToScene(&ent);
+	trap_R_RenderScene(&refdef);
+}
+
+/*
+================
+CG_Draw3DModel
+
+================
+*/
 static void CG_Draw3DModel( float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles ) {
 	refdef_t		refdef;
 	refEntity_t		ent;	
@@ -151,10 +200,13 @@ void CG_DrawHead( float x, float y, float w, float h, int clientNum, vec3_t head
 
 		// allow per-model tweaking
 		VectorAdd( origin, ci->headOffset, origin );
-
-		CG_Draw3DModel( x, y, w, h, ci->headModel, ci->headSkin, origin, headAngles );
-	} else if ( cg_drawIcons.integer ) {
-		CG_DrawPic( x, y, w, h, ci->modelIcon );
+		if (cgx_enemyModel_enabled.integer) {			
+			CG_Draw3DModelColor(x, y, w, h, ci->headModel, ci->headSkin, origin, headAngles, ci->colors[1]);			
+		} else {
+			CG_Draw3DModel(x, y, w, h, ci->headModel, ci->headSkin, origin, headAngles);
+		}
+	} else if ( cg_drawIcons.integer ) {		
+		CG_DrawPic(x, y, w, h, ci->modelIcon);
 	}
 
 	// if they are deferred, draw a cross out
@@ -1649,7 +1701,7 @@ static void CG_DrawCrosshair(void) {
 	
 	// X-MOD: set crosshair color
 	if (cgx_crosshairColor.integer) {	
-		trap_R_SetColor(g_color_table[cgx_crosshairColor.integer % 8]);
+		trap_R_SetColor(g_color_table_ex[cgx_crosshairColor.integer % 35]);
 	}
 	// set color based on health
 	else if ( cg_crosshairHealth.integer ) {

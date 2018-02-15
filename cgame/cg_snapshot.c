@@ -74,7 +74,7 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 		cg.clientNum = cg.snap->ps.clientNum;		
 
 		cur = &cgs.clientinfo[cg.clientNum];
-
+		
 		cg.oldTeam = cur->team;		
 
 		Q_strncpyz( cur->skinName, cur->skinNameCopy, sizeof( cur->skinName ) );
@@ -84,7 +84,11 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 		
 		cur->infoValid = qtrue;
 
-		CG_LoadClientInfo( cur );		
+		CG_LoadClientInfo( cur );	
+		
+		//check and restore other players models if needed, and set proper colors		
+		CGX_EnemyModelCheck();
+		CG_LoadDeferredPlayers();
 	}
 
 	BG_PlayerStateToEntityState( &snap->ps, &cg_entities[ snap->ps.clientNum ].currentState, qfalse );

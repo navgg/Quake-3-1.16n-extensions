@@ -35,6 +35,7 @@ ADVANCED OPTIONS MENU
 #define ID_ENEMY_TAUNT			141
 #define ID_CENTER_PRINT			142
 #define ID_SPEED				143
+#define ID_DRAW_GUN				144
 //#define ID_FORCEMODEL			135
 //#define ID_DRAWTEAMOVERLAY		136
 //#define ID_ALLOWDOWNLOAD			137
@@ -51,6 +52,7 @@ typedef struct {
 	menuradiobutton_s	rewards;
 	menulist_s			timer;
 	menulist_s			speed;
+	menulist_s			drawgun;
 	menuradiobutton_s	blood;
 	menuradiobutton_s	gibs;
 	menuradiobutton_s	camerabob;
@@ -95,6 +97,14 @@ static const char *speed_items[] =
 	0
 };
 
+static const char *drawgun_items[] =
+{
+	"off",
+	"default",
+	"still",
+	0
+};
+
 static void Preferences2_SetMenuItems( void ) {
 	s_preferences2.rewards.curvalue		= trap_Cvar_VariableValue( "cg_drawRewards" ) != 0;
 	s_preferences2.timer.curvalue		= abs((int)trap_Cvar_VariableValue( "cg_drawTimer" ) % 3);
@@ -112,6 +122,7 @@ static void Preferences2_SetMenuItems( void ) {
 	s_preferences2.enemytaunt.curvalue = trap_Cvar_VariableValue("cg_noTaunt") == 0;
 
 	s_preferences2.centerprint.curvalue = (int)(trap_Cvar_VariableValue("cg_centerPrintAlpha") * 2) % 3;
+	s_preferences2.drawgun.curvalue = (int)trap_Cvar_VariableValue("cg_drawGun") % 3;
 
 	trap_Cvar_VariableStringBuffer("cg_fov", s_preferences2.fov.field.buffer, sizeof(s_preferences2.fov.field.buffer));
 	trap_Cvar_VariableStringBuffer("cg_zoomfov", s_preferences2.zoomfov.field.buffer, sizeof(s_preferences2.zoomfov.field.buffer));
@@ -142,6 +153,10 @@ static void Preferences2_Event( void* ptr, int notification ) {
 
 	case ID_BLOOD:
 		trap_Cvar_SetValue( "com_blood", s_preferences2.blood.curvalue );
+		break;
+
+	case ID_DRAW_GUN:
+		trap_Cvar_SetValue( "cg_drawGun", s_preferences2.drawgun.curvalue );
 		break;
 
 	case ID_GIBS:
@@ -238,7 +253,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.framer.width  	   = 256;
 	s_preferences2.framer.height  	   = 334;
 
-	y = 144 - BIGCHAR_HEIGHT * 4;
+	y = 144 - BIGCHAR_HEIGHT * 5;
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences2.rewards.generic.type       = MTYPE_RADIOBUTTON;
@@ -277,6 +292,16 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.draw3dicons.generic.id			= ID_DRAW3DICONS;
 	s_preferences2.draw3dicons.generic.x			= PREFERENCES_X_POS;
 	s_preferences2.draw3dicons.generic.y			= y;
+
+	y += BIGCHAR_HEIGHT+2;
+	s_preferences2.drawgun.generic.type			= MTYPE_SPINCONTROL;
+	s_preferences2.drawgun.generic.name			= "Draw Gun:";
+	s_preferences2.drawgun.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_preferences2.drawgun.generic.callback		= Preferences2_Event;
+	s_preferences2.drawgun.generic.id			= ID_DRAW_GUN;
+	s_preferences2.drawgun.generic.x			= PREFERENCES_X_POS;
+	s_preferences2.drawgun.generic.y			= y;
+	s_preferences2.drawgun.itemnames			= drawgun_items;
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences2.blood.generic.type         = MTYPE_RADIOBUTTON;
@@ -366,7 +391,7 @@ static void Preferences2_MenuInit( void ) {
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences2.enemymodelenabled.generic.type = MTYPE_RADIOBUTTON;
-	s_preferences2.enemymodelenabled.generic.name = "Enemy model enabled:";
+	s_preferences2.enemymodelenabled.generic.name = "Bright enemies enabled:";
 	s_preferences2.enemymodelenabled.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
 	s_preferences2.enemymodelenabled.generic.callback = Preferences2_Event;
 	s_preferences2.enemymodelenabled.generic.id = ID_ENEMYMODEL_ENABLED;
@@ -414,6 +439,7 @@ static void Preferences2_MenuInit( void ) {
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.rewards );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.timer );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.speed );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.drawgun );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.blood );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.gibs );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.camerabob );
@@ -426,7 +452,7 @@ static void Preferences2_MenuInit( void ) {
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.enemycolors );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.chatbeep );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.enemytaunt );
-	Menu_AddItem( &s_preferences2.menu, &s_preferences2.centerprint );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.centerprint );	
 
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.back );
 

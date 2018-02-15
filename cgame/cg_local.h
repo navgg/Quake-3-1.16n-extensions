@@ -58,6 +58,9 @@
 
 #define	DEFAULT_MODEL		"sarge"
 
+//X-MOD: custom color extensions
+#define ShaderRGBACopy(a,b)	((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2],(b)[3]=(255))
+
 typedef enum {
 	FOOTSTEP_NORMAL,
 	FOOTSTEP_BOOT,
@@ -294,6 +297,10 @@ typedef struct {
 	//X-MOD: enemy model check, save read models to restore if anything	
 	char			modelNameCopy[MAX_QPATH];
 	char			skinNameCopy[MAX_QPATH];	
+
+	//X-MOD: model colors for pm skins
+	byte			colors[4][3];
+	byte			darkenColors[4][3];
 } clientInfo_t;
 
 
@@ -514,11 +521,11 @@ typedef struct {
 	qboolean		testGun;
 
 	// X-MOD: current client num, before init = -1;
-	int			clientNum;
+	int			clientNum;	
 	team_t		oldTeam;
 	char		enemyModel[MAX_QPATH];
 	char		enemySkin[MAX_QPATH];
-
+	
 	int			meanPing;
 } cg_t;
 
@@ -797,6 +804,8 @@ extern  vmCvar_t		cgx_wideScreenFix;
 extern  vmCvar_t		cgx_drawPlayerIDs;
 extern	vmCvar_t		cgx_enemyModel;
 extern	vmCvar_t		cgx_enemyModel_enabled;
+extern	vmCvar_t		cgx_enemyColors;
+extern	vmCvar_t		cgx_deadBodyDarken;
 extern	vmCvar_t		cgx_defaultWeapon;
 extern	vmCvar_t		cgx_chatSound;
 extern	vmCvar_t		cgx_noTaunt;
@@ -879,8 +888,8 @@ extern	vmCvar_t		cg_deferPlayers;
 //
 
 void CGX_Init_vScreen(void);
+void CGX_Init_enemyColors(void);
 void CGX_Init_enemyModels(void);
-void CGX_RestoreModelAndSkin(clientInfo_t *ci);
 void CGX_SetModelAndSkin(clientInfo_t *ci);
 void CGX_EnemyModelCheck(void);
 

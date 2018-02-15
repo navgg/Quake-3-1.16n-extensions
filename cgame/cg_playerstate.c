@@ -177,7 +177,8 @@ void CG_Respawn( void ) {
 	// X-MOD: select custom specified weapon or
 	// select the weapon the server says we are using
 	defaultWeapon = abs(cgx_defaultWeapon.integer % (WP_NUM_WEAPONS - 1));
-	trap_DPrint(va("CG_Respawn defaultWeapon: %i", defaultWeapon));
+	trap_DPrint(va("CG_Respawn\n"));
+	trap_DPrint(va("cgx_defaultWeapon: %i\n", defaultWeapon));
 	cg.weaponSelect = cgx_defaultWeapon.integer == 0 ? cg.snap->ps.weapon : defaultWeapon;	
 }
 

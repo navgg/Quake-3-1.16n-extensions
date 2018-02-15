@@ -399,9 +399,7 @@ qboolean CG_DrawScoreboard( void ) {
 	}
 
 	// load any models that have been deferred
-	if ( ++cg.deferredPlayerLoading > 10 ) {		
-		//X-MOD:check enemy models before load
-		CGX_EnemyModelCheck();
+	if ( ++cg.deferredPlayerLoading > 10 ) {				
 		CG_LoadDeferredPlayers();
 	}
 

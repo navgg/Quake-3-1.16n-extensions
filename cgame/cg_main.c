@@ -50,6 +50,8 @@ vmCvar_t	cgx_wideScreenFix;
 vmCvar_t	cgx_drawPlayerIDs;
 vmCvar_t	cgx_enemyModel;
 vmCvar_t	cgx_enemyModel_enabled;
+vmCvar_t	cgx_enemyColors;
+vmCvar_t	cgx_deadBodyDarken;
 vmCvar_t	cgx_defaultWeapon;
 vmCvar_t	cgx_chatSound;
 vmCvar_t	cgx_noTaunt;
@@ -158,7 +160,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_drawCrosshairNames, "cg_drawCrosshairNames", "1", CVAR_ARCHIVE },
 	{ &cg_drawRewards, "cg_drawRewards", "1", CVAR_ARCHIVE },
 	{ &cg_crosshairSize, "cg_crosshairSize", "24", CVAR_ARCHIVE },
-	{ &cg_crosshairHealth, "cg_crosshairHealth", "1", CVAR_ARCHIVE },
+	{ &cg_crosshairHealth, "cg_crosshairHealth", "0", CVAR_ARCHIVE },
 	{ &cg_crosshairX, "cg_crosshairX", "0", CVAR_ARCHIVE },
 	{ &cg_crosshairY, "cg_crosshairY", "0", CVAR_ARCHIVE },
 	{ &cg_brassTime, "cg_brassTime", "1250", CVAR_ARCHIVE },
@@ -209,6 +211,8 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_drawPlayerIDs, "cgx_drawPlayerIDs", "0", CVAR_ARCHIVE },
 
 	{ &cgx_enemyModel, "cg_enemyModel", "", CVAR_ARCHIVE },		
+	{ &cgx_enemyColors, "cg_enemyColors", "", CVAR_ARCHIVE },
+	{ &cgx_deadBodyDarken, "cg_deadBodyDarken", "3", CVAR_ARCHIVE },
 	{ &cgx_enemyModel_enabled, "cg_enemyModel_enabled", "0", CVAR_ARCHIVE },
 
 	{ &cgx_chatSound, "cg_chatSound", "1", CVAR_ARCHIVE },
@@ -218,26 +222,30 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_crosshairColor, "cg_crosshairColor", "7", CVAR_ARCHIVE },
 	{ &cgx_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
 
-	// +cgx_wideScreenFix 1|0 - fix perspective for widescreen
-	// +cgx_defaultWeapon 0-9 - default weapon when spawn 0: default 1: gauntlet ...
-	// +cgx_drawPlayerIDs 0|1 - show player id in scoreboard
-	// +cg_enemyModel_enabled 0|1 - enemy model on\off
-	// +cg_centerPrintAlpha 1.0-0 - center print
-	// +cg_crosshairColor 0-7 crosshair color fix
-	// +cg_drawSpeed 0|1|2 - speedmeter 1: top corner 2: center screen
-	// +cg_chatSound 1|0 - chat beep sound
-	// +cg_noTaunt 0|1 - enemy taunt sound
-	// +ping colors
-	// +cg_drawGun 0|1|2 - 1: bobbing gun 2: static gun
-	// +-cg_enemyModel "keel/red" - enemy model (colored skins not supported yet)
-	// +cg_lagometer 0|1|2 - 1: netgraph 2: netgraph + client ping
-	// TODO: 
-	// -cg_enemyModel pm skins	
-	// -cg_adjustFov fov adjust	
-	// -cg_drawAccuracy 0 1 draw acc
-	// -hp hitsounds
-	// -modified hud?
-	// -unlagged?
+	// cgx_wideScreenFix 1|0 - fix perspective for widescreen
+	// cgx_defaultWeapon 0-9 - default weapon when spawn 0: default 1: gauntlet ...
+	// cgx_drawPlayerIDs 0|1 - show player id in scoreboard	
+	// cg_centerPrintAlpha 1.0-0 - center print transparency
+	// cg_crosshairColor 0-7 - crosshair color 0
+	// cg_drawSpeed 0|1|2 - speedmeter 0: off 1: top corner 2: center screen
+	// cg_deadBodyDarken 0|1|2|3 - pm skins becomes gray after death 0: off 1: Just grey 2: BT709 Greyscale 3: Y-Greyscale (PAL/NTSC)
+	// cg_chatSound 1|0 - chat beep sound
+	// cg_noTaunt 0|1 - enemy taunt sound
+	// cg_drawGun 0|1|2 - 0: no gun 1: bobbing gun 2: static gun
+	// cg_enemyModel_enabled 0|1 - enemy model on\off
+	// cg_enemyModel "" - forcing enemy model "keel/pm", "thankjr" etc.
+	// cg_enemyColors "" - "1234" 1-rail 2-head 3-torso 4-legs (colors from 0 to 7, special symbols ? - color depending on team ! - same as ? but in ffa color is random * - random color)	
+	// cg_lagometer 0|1|2 - 0: off 1: netgraph 2: netgraph + client ping
+	// cg_hitsounds 0|1|2 - 0: default 1: hi-low 2: low-hi hp hitsounds
+	// ping colors, below 50 white, below 100 green, below 200 yellow, below 350 magenta, more than 350 red
+	// TODO: 	
+	// botColors botModels ? separate bots from humans
+	// cg_adjustFov fov adjust	
+	// cg_drawAccuracy 0 1 draw acc	
+	// modified hud?
+	// unlagged?
+	// cl_autoTimeNudge	
+	// g_delag?
 
 	// the following variables are created in other parts of the system,
 	// but we also reference them here
@@ -251,6 +259,9 @@ cvarTable_t		cvarTable[] = {
 int		cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
 int		cgx_wideScreenFixmodificationCount = 1;
 int		cgx_enemyModelModificationCount = 1;
+int		cgx_enemyColorsModificationCount = 1;
+int		cgx_deadBodyDarkenModificationCount = 1;
+int		cgx_enemyModel_enabledModificationCount = 1;
 
 
 
@@ -295,13 +306,37 @@ void CG_UpdateCvars( void ) {
 	}
 
 	// X-MOD: reinit enemymodels if value or player's team changed
-	if (cgx_enemyModelModificationCount != cgx_enemyModel.modificationCount) {
+	if (cgx_enemyModelModificationCount != cgx_enemyModel.modificationCount ||
+		cgx_enemyModel_enabledModificationCount != cgx_enemyModel_enabled.modificationCount) {
 		cgx_enemyModelModificationCount = cgx_enemyModel.modificationCount;
-		
+		cgx_enemyModel_enabledModificationCount = cgx_enemyModel_enabled.modificationCount;	
+
 		CGX_Init_enemyModels();		
 		CGX_EnemyModelCheck();
 		CG_LoadDeferredPlayers();
+		trap_DPrint("REASON: CG_UpdateCvars value changed\n");
 	}	
+
+	// X-MOD: reinit enemycolors if vaue changed
+	if (cgx_enemyColorsModificationCount != cgx_enemyColors.modificationCount ||
+		cgx_deadBodyDarkenModificationCount != cgx_deadBodyDarken.modificationCount) {
+		cgx_enemyColorsModificationCount = cgx_enemyColors.modificationCount;
+		cgx_deadBodyDarkenModificationCount = cgx_deadBodyDarken.modificationCount;		
+
+		CGX_Init_enemyColors();	
+		trap_DPrint("REASON: CG_UpdateCvars value changed\n");
+	}
+
+	//
+	if (cg.clientNum != -1) {
+		if (cg.oldTeam != cgs.clientinfo[cg.clientNum].team) {
+			cg.oldTeam = cgs.clientinfo[cg.clientNum].team;
+		
+			CGX_EnemyModelCheck();
+			CG_LoadDeferredPlayers();
+			trap_DPrint("REASON: TEAM CHANGED!\n");
+		}
+	}
 
 	// If team overlay is on, ask for updates from the server.  If its off,
 	// let the server know so we don't receive it
@@ -868,7 +903,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence ) {
 
 	cg.clientNum = -1;	
 	cg.oldTeam = -1;
-
+	
 	CGX_Init_enemyModels();
 	CGX_Init_vScreen();
 
