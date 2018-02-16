@@ -231,16 +231,18 @@ void CGX_SetPMSkin(clientInfo_t *ci) {
 	if (Q_stricmp(ci->skinName, "pm") == 0) {
 		trap_DPrint(va("PM skin already set %s\n", ci->modelName));	
 	} else if (!CGX_IsKnownModel(ci->modelName)) {	
-		trap_Print(va("WARNING: No PM skin for model %s\n", ci->modelName));		
-	} else {
-		trap_DPrint(va("Setting PM skin %s\n", ci->modelName));
-		Q_strncpyz(ci->skinName, "pm", sizeof(ci->skinName));
+		trap_WPrint(va("No PM skin for model %s\n", ci->modelName));		
+		//set sarge/pm		
+		Q_strncpyz(ci->modelName, DEFAULT_MODEL, sizeof(ci->modelName));
+	} 
 
-		CGX_SetColorInfo(cgx_enemyColors.string, ci);
+	trap_DPrint(va("Setting PM skin %s\n", ci->modelName));
+	Q_strncpyz(ci->skinName, "pm", sizeof(ci->skinName));
 
-		ci->infoValid = qtrue;
-		ci->deferred = qtrue;
-	}	
+	CGX_SetColorInfo(cgx_enemyColors.string, ci);
+
+	ci->infoValid = qtrue;
+	ci->deferred = qtrue;		
 }
 
 void CGX_SetModelAndSkin(clientInfo_t *ci) {						
