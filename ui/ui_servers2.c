@@ -20,7 +20,8 @@ MULTIPLAYER MENU (SERVER BROWSER)
 #define MAX_LISTBOXITEMS		128
 #define MAX_LOCALSERVERS		128
 #define MAX_STATUSLENGTH		64
-#define MAX_LISTBOXWIDTH		59
+//add 2 to fix color name server bug by adding two spaces later
+#define MAX_LISTBOXWIDTH		59+2
 
 #define ART_BACK0				"menu/art/back_0"
 #define ART_BACK1				"menu/art/back_1"
@@ -133,6 +134,7 @@ typedef struct servernode_s {
 	int		nettype;
 	int		minPing;
 	int		maxPing;
+	int		spaces;
 } servernode_t; 
 
 typedef struct {
@@ -315,6 +317,53 @@ static void ArenaServers_UpdatePicture( void ) {
 	g_arenaservers.mappic.shader = 0;
 }
 
+// next methods to fix shifted colored server names in server list
+// modified Q_CleanStr method allows only to use color bug once in server name string
+char *CGX_CleanStrHostnameFix( char *string ) {
+	char*	d;
+	char*	s;
+	int		c;
+	qboolean firstcolor = qfalse;
+
+	s = string;
+	d = string;	
+	while ((c = *s) != 0 ) {
+		if ( Q_IsColorString( s ) ) {
+			s++;
+		} 
+		else if ( c >= 0x20 && c <= 0x7E ) {
+			if (c != Q_COLOR_ESCAPE) {
+				// if for coloring bug used characted it will be dublicated if number then skipped
+				if (*(d - 1) == Q_COLOR_ESCAPE && (c < '0' || c > '9')) 
+					*d++ = c;														
+				*d++ = c;				
+			} else {
+				// allow coloring bug only once
+				if (!firstcolor) {
+					*d++ = c;
+					firstcolor = qtrue;
+				} else {				
+					*d++ = ' ';					
+				}
+			}
+		}
+		s++;
+	}
+	*d = '\0';
+
+	return string;
+}
+
+// adds two spaces if color bug used in server name to string shift right
+char* CGX_GetHostnameSpacesFix(char *string) {		
+	char *s;
+
+	s = string;
+	while (*s != 0)
+		if (*s++ == Q_COLOR_ESCAPE) return "  ";
+
+	return "";	
+}
 
 /*
 =================
@@ -328,7 +377,7 @@ static void ArenaServers_UpdateMenu( void ) {
 	char*			buff;
 	servernode_t*	servernodeptr;
 	table_t*		tableptr;
-	char			*pingColor;
+	char			*pingColor;	
 
 	if( g_arenaservers.numqueriedservers > 0 ) {
 		// servers found
@@ -471,10 +520,12 @@ static void ArenaServers_UpdateMenu( void ) {
 		}
 		else {
 			pingColor = S_COLOR_RED;
-		}
+		}		
 
-		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s %-12.12s %2d/%2d %-8.8s %3s %s%3d", 
-			servernodeptr->hostname, servernodeptr->mapname, servernodeptr->numclients,
+		// copy allinfo to buffer and add two spaces or no if color bug used
+		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s%s %-12.12s %2d/%2d %-8.8s %3s %s%3d", 
+			servernodeptr->hostname, CGX_GetHostnameSpacesFix(servernodeptr->hostname), 
+			servernodeptr->mapname, servernodeptr->numclients,
 	 		servernodeptr->maxclients, servernodeptr->gamename,
 			netnames[servernodeptr->nettype], pingColor, servernodeptr->pingtime );
 		j++;
@@ -548,7 +599,6 @@ static void ArenaServers_Remove( void )
 	g_arenaservers.currentping       = g_arenaservers.numfavoriteaddresses;
 }
 
-
 /*
 =================
 ArenaServers_Insert
@@ -578,7 +628,7 @@ static void ArenaServers_Insert( char* adrstr, char* info, int pingtime )
 	Q_strncpyz( servernodeptr->adrstr, adrstr, MAX_ADDRESSLENGTH );
 
 	Q_strncpyz( servernodeptr->hostname, Info_ValueForKey( info, "hostname"), MAX_HOSTNAMELENGTH );
-	Q_CleanStr( servernodeptr->hostname );
+	CGX_CleanStrHostnameFix( servernodeptr->hostname );
 	Q_strupr( servernodeptr->hostname );
 
 	Q_strncpyz( servernodeptr->mapname, Info_ValueForKey( info, "mapname"), MAX_MAPNAMELENGTH );
