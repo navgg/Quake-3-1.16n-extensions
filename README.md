@@ -18,7 +18,7 @@ Still under development, alpha version
 - `cg_enemyModel_enabled 0|1` - enemy model on\off
 - `cg_enemyModel ""` - forcing enemy model "keel/pm", "thankjr" etc.
 - `cg_enemyColors ""` - "1234" 1-rail 2-head 3-torso 4-legs (colors from 0 to 7, special symbols ? - color depending on team, ! - same as ? but in ffa color is random, * - random color)	
-- `cg_lagometer 0|1|2 - 0: off 1: netgraph 2: netgraph + client ping
+- `cg_lagometer 0|1|2` - 0: off 1: netgraph 2: netgraph + client ping
 - `cg_hitsounds 0|1|2` - 0: default 1: pro mode hi-low 2: low-hi hp hitsounds
 
 ping colors, below 50 white, below 100 green, below 200 yellow, below 350 magenta, more than 350 red
