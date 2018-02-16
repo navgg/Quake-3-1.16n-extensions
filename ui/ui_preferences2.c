@@ -36,6 +36,8 @@ ADVANCED OPTIONS MENU
 #define ID_CENTER_PRINT			142
 #define ID_SPEED				143
 #define ID_DRAW_GUN				144
+#define ID_TEAMMODEL			145
+#define ID_TEAMCOLORS			146
 //#define ID_FORCEMODEL			135
 //#define ID_DRAWTEAMOVERLAY		136
 //#define ID_ALLOWDOWNLOAD			137
@@ -65,7 +67,9 @@ typedef struct {
 	menufield_s			zoomfov;
 	menuradiobutton_s	enemymodelenabled;
 	menufield_s			enemymodel;
-	menufield_s			enemycolors;		
+	menufield_s			enemycolors;	
+	menufield_s			teammodel;
+	menufield_s			teamcolors;		
 	//menuradiobutton_s	dynamiclights;	
 
 	menubitmap_s		back;	
@@ -128,6 +132,8 @@ static void Preferences2_SetMenuItems( void ) {
 	trap_Cvar_VariableStringBuffer("cg_zoomfov", s_preferences2.zoomfov.field.buffer, sizeof(s_preferences2.zoomfov.field.buffer));
 	trap_Cvar_VariableStringBuffer("cg_enemyModel", s_preferences2.enemymodel.field.buffer, sizeof(s_preferences2.enemymodel.field.buffer));
 	trap_Cvar_VariableStringBuffer("cg_enemyColors", s_preferences2.enemycolors.field.buffer, sizeof(s_preferences2.enemycolors.field.buffer));
+	trap_Cvar_VariableStringBuffer("cg_teamModel", s_preferences2.teammodel.field.buffer, sizeof(s_preferences2.teammodel.field.buffer));
+	trap_Cvar_VariableStringBuffer("cg_teamColors", s_preferences2.teamcolors.field.buffer, sizeof(s_preferences2.teamcolors.field.buffer));
 }
 
 
@@ -367,7 +373,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.centerprint.generic.y = y;
 	s_preferences2.centerprint.itemnames = centerprint_items;
 	
-	y += (BIGCHAR_HEIGHT+2) * 2;	
+	y += BIGCHAR_HEIGHT+2;	
 	s_preferences2.fov.generic.type       = MTYPE_FIELD;
 	s_preferences2.fov.generic.name		  = "FOV (1-160):";
 	s_preferences2.fov.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_NUMBERSONLY;
@@ -389,9 +395,9 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.zoomfov.field.widthInChars = 4;
 	s_preferences2.zoomfov.field.maxchars     = 2;
 
-	y += BIGCHAR_HEIGHT+2;
+	y += (BIGCHAR_HEIGHT+2)* 2;
 	s_preferences2.enemymodelenabled.generic.type = MTYPE_RADIOBUTTON;
-	s_preferences2.enemymodelenabled.generic.name = "Bright enemies enabled:";
+	s_preferences2.enemymodelenabled.generic.name = "Bright models enabled:";
 	s_preferences2.enemymodelenabled.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
 	s_preferences2.enemymodelenabled.generic.callback = Preferences2_Event;
 	s_preferences2.enemymodelenabled.generic.id = ID_ENEMYMODEL_ENABLED;
@@ -419,6 +425,28 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.enemycolors.generic.y			 = y;
 	s_preferences2.enemycolors.field.widthInChars = 5;
 	s_preferences2.enemycolors.field.maxchars     = 4;
+
+	y += BIGCHAR_HEIGHT + 2;
+	s_preferences2.teammodel.generic.type       = MTYPE_FIELD;
+	s_preferences2.teammodel.generic.name		 = "Team model:";
+	s_preferences2.teammodel.generic.flags		 = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_preferences2.teammodel.generic.x			 = PREFERENCES_X_POS;
+	s_preferences2.teammodel.generic.callback	 = Preferences2_Event;
+	s_preferences2.teammodel.generic.id         = ID_TEAMMODEL;
+	s_preferences2.teammodel.generic.y			 = y;
+	s_preferences2.teammodel.field.widthInChars = 20;
+	s_preferences2.teammodel.field.maxchars     = 19;
+
+	y += BIGCHAR_HEIGHT+2;
+	s_preferences2.teamcolors.generic.type       = MTYPE_FIELD;
+	s_preferences2.teamcolors.generic.name		 = "Team colors:";
+	s_preferences2.teamcolors.generic.flags		 = QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_NUMBERSONLY;
+	s_preferences2.teamcolors.generic.x			 = PREFERENCES_X_POS;
+	s_preferences2.teamcolors.generic.callback	 = Preferences2_Event;
+	s_preferences2.teamcolors.generic.id         = ID_TEAMCOLORS;
+	s_preferences2.teamcolors.generic.y			 = y;
+	s_preferences2.teamcolors.field.widthInChars = 5;
+	s_preferences2.teamcolors.field.maxchars     = 4;
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences2.back.generic.type	    = MTYPE_BITMAP;
@@ -450,6 +478,8 @@ static void Preferences2_MenuInit( void ) {
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.enemymodelenabled );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.enemymodel );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.enemycolors );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.teammodel );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.teamcolors );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.chatbeep );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.enemytaunt );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.centerprint );	
@@ -481,6 +511,8 @@ static void Preferences2_SaveChanges( void ) {
 	trap_Cvar_Set( "cg_zoomfov", s_preferences2.zoomfov.field.buffer );
 	trap_Cvar_Set( "cg_enemyModel", s_preferences2.enemymodel.field.buffer );	
 	trap_Cvar_Set( "cg_enemyColors", s_preferences2.enemycolors.field.buffer );	
+	trap_Cvar_Set( "cg_teamModel", s_preferences2.teammodel.field.buffer );	
+	trap_Cvar_Set( "cg_teamColors", s_preferences2.teamcolors.field.buffer );	
 }
 
 

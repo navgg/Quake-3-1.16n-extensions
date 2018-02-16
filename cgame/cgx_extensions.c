@@ -1,6 +1,7 @@
 #include "cg_local.h"
 
 #define ShaderRGBAFill(a,c)	((a)[0]=(c),(a)[1]=(c),(a)[2]=(c),(a)[3]=(255))
+#define CGX_IsPMSkin(p) ( p && *(p) == 'p' && *((p)+1) && *((p)+1) == 'm' )
 
 #define DARKEN_COLOR 64
 
@@ -99,6 +100,27 @@ void CGX_Init_enemyModels(void) {
 	trap_DPrint(va("CGX_Init_enemyModels cg.enemyModel: %s cg.enemySkin: %s\n", cg.enemyModel, cg.enemySkin));
 }
 
+void CGX_Init_teamModels(void) {
+	char modelStr[MAX_QPATH];
+	char *slash;	
+
+	Q_strncpyz(modelStr, cgx_teamModel.string, sizeof(modelStr));
+
+	slash = strchr( modelStr, '/' );
+	if ( !slash ) {
+		// modelName didn not include a skin name		
+		Q_strncpyz(cg.teamSkin, "default", sizeof(cg.teamSkin));
+	} else {		
+		Q_strncpyz(cg.teamSkin, slash + 1, sizeof(cg.teamSkin));
+		// truncate modelName
+		*slash = 0;
+	}
+
+	Q_strncpyz(cg.teamModel, modelStr, sizeof(cg.teamModel));	
+
+	trap_DPrint(va("CGX_Init_teamModels cg.teamModel: %s cg.teamSkin: %s\n", cg.teamModel, cg.teamSkin));
+}
+
 void CGX_EnemyModelCheck(void) {
 	int		i;
 	clientInfo_t	*ci;
@@ -175,7 +197,7 @@ static void CGX_SetColorInfo(const char *color, clientInfo_t *info) {
 	}	
 }
 
-void CGX_Init_enemyColors(void) {
+void CGX_Init_enemyAndTeamColors(void) {
 	int i;
 	clientInfo_t *ci;
 
@@ -183,7 +205,10 @@ void CGX_Init_enemyColors(void) {
 		return;
 
 	for (i = 0, ci = cgs.clientinfo; i < cgs.maxclients; i++, ci++)
-		CGX_SetColorInfo(cgx_enemyColors.string, ci);
+		if (ci->team != cgs.clientinfo[cg.clientNum].team)
+			CGX_SetColorInfo(cgx_enemyColors.string, ci);
+		else
+			CGX_SetColorInfo(cgx_teamColors.string, ci);
 }
 
 void CGX_RestoreModelNameFromCopy(clientInfo_t *ci) {
@@ -240,15 +265,14 @@ void CGX_SetPMSkin(clientInfo_t *ci) {
 	} 
 
 	trap_DPrint(va("Setting PM skin %s\n", ci->modelName));
-	Q_strncpyz(ci->skinName, "pm", sizeof(ci->skinName));
-
-	CGX_SetColorInfo(cgx_enemyColors.string, ci);
+	Q_strncpyz(ci->skinName, "pm", sizeof(ci->skinName));	
 
 	ci->infoValid = qtrue;
 	ci->deferred = qtrue;		
 }
 
-void CGX_SetModelAndSkin(clientInfo_t *ci) {						
+void CGX_SetModelAndSkin(clientInfo_t *ci) {	
+	qboolean isSameTeam = qfalse;
 	if (!cgx_enemyModel_enabled.integer) {
 		//if it's disabled maybe we need to restore models
 		CGX_RestoreModelAndSkin(ci);
@@ -261,10 +285,10 @@ void CGX_SetModelAndSkin(clientInfo_t *ci) {
 
 	// some additional checks after config string modified, it calls CG_NewClientInfo again
 	if (cg.clientNum != -1) {
-		qboolean isSpect = cgs.clientinfo[cg.clientNum].team == TEAM_SPECTATOR;
-		qboolean isSameTeam = cgs.gametype >= GT_TEAM && cgs.clientinfo[cg.clientNum].team == ci->team;
+		qboolean isSpect = cgs.clientinfo[cg.clientNum].team == TEAM_SPECTATOR || ci->team == TEAM_SPECTATOR;
+		isSameTeam = cgs.gametype >= GT_TEAM && cgs.clientinfo[cg.clientNum].team == ci->team;
 
-		if (isSpect || isSameTeam) {
+		if (isSpect) {
 			CGX_RestoreModelAndSkin(ci);
 			return;
 		}
@@ -272,37 +296,74 @@ void CGX_SetModelAndSkin(clientInfo_t *ci) {
 
 	trap_DPrint(va("CGX_SetModelAndSkin %i\n", cg.clientNum));
 
-	// if enemymodels enabled and enemy model not specified, load saved real model name and set pm skin
-	if (cg.enemyModel[0] == '\0') {		
-		CGX_RestoreModelNameFromCopy(ci);			
-		CGX_SetPMSkin(ci);
-			
-		return;
+	if (!isSameTeam) {
+		// if enemymodels enabled and enemy model not specified, load saved real model name and set pm skin
+		if (cg.enemyModel[0] == '\0') {
+			CGX_RestoreModelNameFromCopy(ci);
+			CGX_SetPMSkin(ci);
+			CGX_SetColorInfo(cgx_enemyColors.string, ci);
+			return;
+		}
+
+		// save model name and skin copy
+		if (ci->modelNameCopy[0] == '\0')
+			Q_strncpyz(ci->modelNameCopy, ci->modelName, sizeof(ci->modelName));
+		if (ci->skinNameCopy[0] == '\0')
+			Q_strncpyz(ci->skinNameCopy, ci->skinName, sizeof(ci->skinName));
+
+		trap_DPrint(va("%s -> %s\n", ci->modelName, cg.enemyModel));
+
+		Q_strncpyz(ci->modelName, cg.enemyModel, sizeof(ci->modelName));
+
+		// if skin not specified set pm
+		if (cg.enemySkin[0] == '\0')
+			CGX_SetPMSkin(ci);
+
+		// if gametype is not team\ctf or skin pm set it, otherwise red\blue will be used
+		if (cgs.gametype < GT_TEAM || Q_stricmp(cg.enemySkin, "pm") == 0)
+			Q_strncpyz(ci->skinName, cg.enemySkin, sizeof(ci->skinName));
+
+		// if skin is pm set colors
+		if (Q_stricmp(ci->skinName, "pm") == 0)
+			CGX_SetColorInfo(cgx_enemyColors.string, ci);
+
+		ci->infoValid = qtrue;
+		ci->deferred = qtrue;
+	} else {
+		//copy pasteeeee
+
+		// if teammodels enabled and team model not specified, load saved real model name and set pm skin
+		if (cg.teamModel[0] == '\0') {
+			CGX_RestoreModelNameFromCopy(ci);
+			CGX_SetPMSkin(ci);
+			CGX_SetColorInfo(cgx_teamColors.string, ci);
+			return;
+		}
+
+		// save model name and skin copy
+		if (ci->modelNameCopy[0] == '\0')
+			Q_strncpyz(ci->modelNameCopy, ci->modelName, sizeof(ci->modelName));
+		if (ci->skinNameCopy[0] == '\0')
+			Q_strncpyz(ci->skinNameCopy, ci->skinName, sizeof(ci->skinName));
+
+		trap_DPrint(va("%s -> %s\n", ci->modelName, cg.teamModel));
+
+		Q_strncpyz(ci->modelName, cg.teamModel, sizeof(ci->modelName));
+
+		// if skin not specified set pm
+		if (cg.teamSkin[0] == '\0')
+			CGX_SetPMSkin(ci);
+
+		// if gametype is not team\ctf or skin pm set it, otherwise red\blue will be used
+		if (cgs.gametype < GT_TEAM || Q_stricmp(cg.teamSkin, "pm") == 0)
+			Q_strncpyz(ci->skinName, cg.teamSkin, sizeof(ci->skinName));
+
+		// if skin is pm set colors
+		if (Q_stricmp(ci->skinName, "pm") == 0)
+			CGX_SetColorInfo(cgx_teamColors.string, ci);
+
+		ci->infoValid = qtrue;
+		ci->deferred = qtrue;
 	}
-
-	// save model name and skin copy
-	if (ci->modelNameCopy[0] == '\0')
-		Q_strncpyz(ci->modelNameCopy, ci->modelName, sizeof(ci->modelName));
-	if (ci->skinNameCopy[0] == '\0')
-		Q_strncpyz(ci->skinNameCopy , ci->skinName , sizeof(ci->skinName ));
-				
-	trap_DPrint(va("%s -> %s\n", ci->modelName, cg.enemyModel));
-
-	Q_strncpyz(ci->modelName, cg.enemyModel, sizeof(ci->modelName));
-
-	// if skin not specified set pm
-	if (cg.enemySkin[0] == '\0')
-		CGX_SetPMSkin(ci);
-
-	// if gametype is not team\ctf or skin pm set it, otherwise red\blue will be used
-	if (cgs.gametype < GT_TEAM || Q_stricmp(cg.enemySkin, "pm") == 0)
-		Q_strncpyz(ci->skinName, cg.enemySkin, sizeof(ci->skinName));
-
-	// if skin is pm set colors
-	if (Q_stricmp(ci->skinName, "pm") == 0)
-		CGX_SetColorInfo(cgx_enemyColors.string, ci);
-
-	ci->infoValid = qtrue;
-	ci->deferred = qtrue;			
 }
 

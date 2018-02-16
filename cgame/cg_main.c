@@ -46,11 +46,18 @@ centity_t			cg_entities[MAX_GENTITIES];
 weaponInfo_t		cg_weapons[MAX_WEAPONS];
 itemInfo_t			cg_items[MAX_ITEMS];
 
+vmCvar_t	cgx_wideScreenFixO;
+vmCvar_t	cgx_drawPlayerIDsO;
+vmCvar_t	cgx_defaultWeaponO;
+
 vmCvar_t	cgx_wideScreenFix;
 vmCvar_t	cgx_drawPlayerIDs;
 vmCvar_t	cgx_enemyModel;
 vmCvar_t	cgx_enemyModel_enabled;
 vmCvar_t	cgx_enemyColors;
+vmCvar_t	cgx_teamModel;
+vmCvar_t	cgx_teamModel_enabled;
+vmCvar_t	cgx_teamColors;
 vmCvar_t	cgx_deadBodyDarken;
 vmCvar_t	cgx_defaultWeapon;
 vmCvar_t	cgx_chatSound;
@@ -213,10 +220,17 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_defaultWeapon, "cg_defaultWeapon", "0", CVAR_ARCHIVE },
 	{ &cgx_drawPlayerIDs, "cg_drawPlayerIDs", "0", CVAR_ARCHIVE },
 
+	{ &cgx_wideScreenFixO, "cgx_wideScreenFix", "1", CVAR_TEMP|CVAR_ROM },
+	{ &cgx_defaultWeaponO, "cgx_defaultWeapon", "0", CVAR_TEMP|CVAR_ROM },
+	{ &cgx_drawPlayerIDsO, "cgx_drawPlayerIDs", "0", CVAR_TEMP|CVAR_ROM },
+	
+	{ &cgx_enemyModel_enabled, "cg_enemyModel_enabled", "0", CVAR_ARCHIVE },
 	{ &cgx_enemyModel, "cg_enemyModel", "", CVAR_ARCHIVE },		
 	{ &cgx_enemyColors, "cg_enemyColors", "", CVAR_ARCHIVE },
-	{ &cgx_deadBodyDarken, "cg_deadBodyDarken", "3", CVAR_ARCHIVE },
-	{ &cgx_enemyModel_enabled, "cg_enemyModel_enabled", "0", CVAR_ARCHIVE },
+	//{ &cgx_teamModel_enabled, "cg_teamModel_enabled", "0", CVAR_ARCHIVE },
+	{ &cgx_teamModel, "cg_teamModel", "", CVAR_ARCHIVE },		
+	{ &cgx_teamColors, "cg_teamColors", "", CVAR_ARCHIVE },
+	{ &cgx_deadBodyDarken, "cg_deadBodyDarken", "3", CVAR_ARCHIVE },	
 
 	{ &cgx_chatSound, "cg_chatSound", "1", CVAR_ARCHIVE },
 	{ &cgx_noTaunt, "cg_noTaunt", "0", CVAR_ARCHIVE },
@@ -241,14 +255,19 @@ cvarTable_t		cvarTable[] = {
 	// cg_enemyModel_enabled 0|1 - enemy model on\off
 	// cg_enemyModel "" - forcing enemy model "keel/pm", "thankjr" etc.
 	// cg_enemyColors "" - "1234" 1-rail 2-head 3-torso 4-legs (colors from 0 to 7, special symbols ? - color depending on team, ! - same as ? but in ffa color is random, * - random color)	
+	// cg_teamModel "" - same as cg_enemyModel but for team
+	// cg_teamColors "" - same as cg_enemyColors but for team
 	// cg_lagometer 0|1|2 - 0: off 1: netgraph 2: netgraph + client ping
 	// cg_hitsounds 0|1|2 - 0: default 1: pro mode hi-low 2: low-hi hp hitsounds
 	// ping colors, below 50 white, below 100 green, below 200 yellow, below 350 magenta, more than 350 red
+	// resolving favorite servers by domain name
+	// colored server names shifting left bug fixed
+	// other commands
+	// cgx_debug 0|1 - show debug info
+	// cgx_version - show version
 	// TODO: 	
 	// cg_teamModel 
 	// cg_teamColors
-	// cgx_debug
-	// cgx_version
 	// botColors botModels ? separate bots from humans
 	// cg_adjustFov fov adjust	
 	// cg_drawAccuracy 0 1 draw acc	
@@ -271,7 +290,9 @@ cvarTable_t		cvarTable[] = {
 int		cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
 int		cgx_wideScreenFixmodificationCount = 1;
 int		cgx_enemyModelModificationCount = 1;
+int		cgx_teamModelModificationCount = 1;
 int		cgx_enemyColorsModificationCount = 1;
+int		cgx_teamColorsModificationCount = 1;
 int		cgx_deadBodyDarkenModificationCount = 1;
 int		cgx_enemyModel_enabledModificationCount = 1;
 
@@ -320,11 +341,14 @@ void CG_UpdateCvars( void ) {
 
 	// X-MOD: reinit enemymodels if value or player's team changed
 	if (cgx_enemyModelModificationCount != cgx_enemyModel.modificationCount ||
+		cgx_teamModelModificationCount != cgx_teamModel.modificationCount ||
 		cgx_enemyModel_enabledModificationCount != cgx_enemyModel_enabled.modificationCount) {
 		cgx_enemyModelModificationCount = cgx_enemyModel.modificationCount;
+		cgx_teamModelModificationCount = cgx_teamModel.modificationCount;
 		cgx_enemyModel_enabledModificationCount = cgx_enemyModel_enabled.modificationCount;	
 
-		CGX_Init_enemyModels();		
+		CGX_Init_enemyModels();	
+		CGX_Init_teamModels();
 		CGX_EnemyModelCheck();
 		CG_LoadDeferredPlayers();
 		trap_RPrint("CG_UpdateCvars value changed\n");
@@ -332,11 +356,13 @@ void CG_UpdateCvars( void ) {
 
 	// X-MOD: reinit enemycolors if vaue changed
 	if (cgx_enemyColorsModificationCount != cgx_enemyColors.modificationCount ||
+		cgx_teamColorsModificationCount != cgx_teamColors.modificationCount ||
 		cgx_deadBodyDarkenModificationCount != cgx_deadBodyDarken.modificationCount) {
 		cgx_enemyColorsModificationCount = cgx_enemyColors.modificationCount;
+		cgx_teamColorsModificationCount = cgx_teamColors.modificationCount;
 		cgx_deadBodyDarkenModificationCount = cgx_deadBodyDarken.modificationCount;		
 
-		CGX_Init_enemyColors();	
+		CGX_Init_enemyAndTeamColors();	
 		trap_RPrint("CG_UpdateCvars value changed\n");
 	}
 

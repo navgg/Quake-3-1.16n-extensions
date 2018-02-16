@@ -525,6 +525,8 @@ typedef struct {
 	team_t		oldTeam;
 	char		enemyModel[MAX_QPATH];
 	char		enemySkin[MAX_QPATH];
+	char		teamModel[MAX_QPATH];
+	char		teamSkin[MAX_QPATH];
 	
 	int			meanPing;
 } cg_t;
@@ -805,6 +807,9 @@ extern  vmCvar_t		cgx_drawPlayerIDs;
 extern	vmCvar_t		cgx_enemyModel;
 extern	vmCvar_t		cgx_enemyModel_enabled;
 extern	vmCvar_t		cgx_enemyColors;
+extern	vmCvar_t		cgx_teamModel;
+extern	vmCvar_t		cgx_teamModel_enabled;
+extern	vmCvar_t		cgx_teamColors;
 extern	vmCvar_t		cgx_deadBodyDarken;
 extern	vmCvar_t		cgx_defaultWeapon;
 extern	vmCvar_t		cgx_chatSound;
