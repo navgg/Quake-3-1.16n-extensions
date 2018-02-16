@@ -246,6 +246,8 @@ cvarTable_t		cvarTable[] = {
 	// unlagged?
 	// cl_autoTimeNudge	
 	// g_delag?
+	// FIX:
+	// on noghost server, before match end go to advanced menu and podium will not draw? need to check	
 
 	// the following variables are created in other parts of the system,
 	// but we also reference them here

@@ -130,8 +130,8 @@ static void CGX_ColorFromChar(char v, byte *color, clientInfo_t *info) {
 	else if (v == '.')
 		v = '0' + (random() * 35);
 
-	//j = (v - '0') % 35;//  for g_color_table_ex ? not sure yet
-	j = ColorIndex(v);// for g_color_table
+	j = (v - '0') % 36;//  for g_color_table_ex
+	//j = ColorIndex(v);// for g_color_table
 	color[0] = g_color_table_ex[j][0] * 255;
 	color[1] = g_color_table_ex[j][1] * 255;
 	color[2] = g_color_table_ex[j][2] * 255;
