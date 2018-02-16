@@ -31,17 +31,26 @@ static char *known_models[] = {
 };
 
 void trap_DPrint(const char *str) {
-#if 0
-	trap_Print(va ("DEBUG: %s", str) );
+#if 1
+	trap_Print(va ("^5DEBUG: %s", str) );
+#endif
+}
+
+void trap_WPrint(const char *str) {
+#if 1
+	trap_Print(va ("^3WARNING: %s", str) );
+#endif
+}
+
+void trap_RPrint(const char *str) {
+#if 1
+	trap_Print(va ("^6REASON: %s", str) );
 #endif
 }
 
 void CGX_Init_vScreen(void) {	
 	// get the rendering configuration from the client system
 	trap_GetGlconfig( &cgs.glconfig );
-
-	trap_DPrint(va("CGX_Init_vScreen\n"));
-	trap_DPrint(va("cgx_wideScreenFix %d\n", cgx_wideScreenFix.integer));
 
 	// X-MOD: init virtual screen sizes for wide screen fix
 
@@ -63,14 +72,12 @@ void CGX_Init_vScreen(void) {
 	cgs.screenXScale = cgs.glconfig.vidWidth / vScreen.width;
 	cgs.screenYScale = cgs.glconfig.vidHeight / vScreen.height; 
 
-	trap_DPrint(va("vScreen: %fx%f\n", vScreen.width, vScreen.height));
+	trap_DPrint(va("CGX_Init_vScreen %fx%f cgx_wideScreenFix %d\n", vScreen.width, vScreen.height, cgx_wideScreenFix.integer));	
 }
 
 void CGX_Init_enemyModels(void) {
 	char modelStr[MAX_QPATH];
-	char *slash;
-
-	trap_DPrint("CGX_Init_enemyModels\n");
+	char *slash;	
 
 	Q_strncpyz(modelStr, cgx_enemyModel.string, sizeof(modelStr));
 
@@ -86,7 +93,7 @@ void CGX_Init_enemyModels(void) {
 
 	Q_strncpyz(cg.enemyModel, modelStr, sizeof(cg.enemyModel));	
 
-	trap_DPrint(va("cg.enemyModel: %s cg.enemySkin: %s\n", cg.enemyModel, cg.enemySkin));
+	trap_DPrint(va("CGX_Init_enemyModels cg.enemyModel: %s cg.enemySkin: %s\n", cg.enemyModel, cg.enemySkin));
 }
 
 void CGX_EnemyModelCheck(void) {

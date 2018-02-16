@@ -303,6 +303,7 @@ void CG_UpdateCvars( void ) {
 	if (cgx_wideScreenFixmodificationCount != cgx_wideScreenFix.modificationCount) {
 		cgx_wideScreenFixmodificationCount = cgx_wideScreenFix.modificationCount;
 		CGX_Init_vScreen();
+		trap_RPrint("CG_UpdateCvars value changed\n");
 	}
 
 	// X-MOD: reinit enemymodels if value or player's team changed
@@ -314,7 +315,7 @@ void CG_UpdateCvars( void ) {
 		CGX_Init_enemyModels();		
 		CGX_EnemyModelCheck();
 		CG_LoadDeferredPlayers();
-		trap_DPrint("REASON: CG_UpdateCvars value changed\n");
+		trap_RPrint("CG_UpdateCvars value changed\n");
 	}	
 
 	// X-MOD: reinit enemycolors if vaue changed
@@ -324,7 +325,7 @@ void CG_UpdateCvars( void ) {
 		cgx_deadBodyDarkenModificationCount = cgx_deadBodyDarken.modificationCount;		
 
 		CGX_Init_enemyColors();	
-		trap_DPrint("REASON: CG_UpdateCvars value changed\n");
+		trap_RPrint("CG_UpdateCvars value changed\n");
 	}
 
 	//
@@ -334,7 +335,7 @@ void CG_UpdateCvars( void ) {
 		
 			CGX_EnemyModelCheck();
 			CG_LoadDeferredPlayers();
-			trap_DPrint("REASON: TEAM CHANGED!\n");
+			trap_RPrint("TEAM CHANGED!\n");
 		}
 	}
 

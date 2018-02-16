@@ -189,7 +189,7 @@ static void CG_ConfigStringModified( void ) {
 		}
 	} else if ( num >= CS_PLAYERS && num < CS_PLAYERS+MAX_CLIENTS ) {
 		CG_NewClientInfo( num - CS_PLAYERS );	
-		trap_DPrint("CONFIG STRING MODIFIED\n");
+		trap_WPrint("CONFIG STRING MODIFIED\n");
 	} else if ( num == CS_FLAGSTATUS ) {
 		// format is rb where its red/blue, 0 is at base, 1 is taken, 2 is dropped
 		cgs.redflag = str[0] - '0';
