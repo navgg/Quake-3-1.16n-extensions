@@ -814,6 +814,9 @@ extern	vmCvar_t		cgx_crosshairColor;
 extern	vmCvar_t		cgx_drawSpeed;
 extern	vmCvar_t		cgx_hitsounds;
 
+extern	vmCvar_t		cgx_debug;
+extern	vmCvar_t		cgx_version;
+
 extern	vmCvar_t		cg_centertime;
 extern	vmCvar_t		cg_runpitch;
 extern	vmCvar_t		cg_runroll;

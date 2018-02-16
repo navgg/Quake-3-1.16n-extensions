@@ -32,18 +32,21 @@ static char *known_models[] = {
 
 void trap_DPrint(const char *str) {
 #if 1
+	if (cgx_debug.integer)
 	trap_Print(va ("^5DEBUG: %s", str) );
 #endif
 }
 
 void trap_WPrint(const char *str) {
 #if 1
+	if (cgx_debug.integer)
 	trap_Print(va ("^3WARNING: %s", str) );
 #endif
 }
 
 void trap_RPrint(const char *str) {
 #if 1
+	if (cgx_debug.integer)
 	trap_Print(va ("^6REASON: %s", str) );
 #endif
 }

@@ -60,6 +60,9 @@ vmCvar_t	cgx_crosshairColor;
 vmCvar_t	cgx_drawSpeed;
 vmCvar_t	cgx_hitsounds;
 
+vmCvar_t	cgx_debug;
+vmCvar_t	cgx_version;
+
 vmCvar_t	cg_railTrailTime;
 vmCvar_t	cg_centertime;
 vmCvar_t	cg_runpitch;
@@ -206,9 +209,9 @@ cvarTable_t		cvarTable[] = {
 
 	// X-MOD: extended cgx commands
 
-	{ &cgx_wideScreenFix, "cgx_wideScreenFix", "1", CVAR_ARCHIVE },
-	{ &cgx_defaultWeapon, "cgx_defaultWeapon", "0", CVAR_ARCHIVE },
-	{ &cgx_drawPlayerIDs, "cgx_drawPlayerIDs", "0", CVAR_ARCHIVE },
+	{ &cgx_wideScreenFix, "cg_wideScreenFix", "1", CVAR_ARCHIVE },
+	{ &cgx_defaultWeapon, "cg_defaultWeapon", "0", CVAR_ARCHIVE },
+	{ &cgx_drawPlayerIDs, "cg_drawPlayerIDs", "0", CVAR_ARCHIVE },
 
 	{ &cgx_enemyModel, "cg_enemyModel", "", CVAR_ARCHIVE },		
 	{ &cgx_enemyColors, "cg_enemyColors", "", CVAR_ARCHIVE },
@@ -222,9 +225,12 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_crosshairColor, "cg_crosshairColor", "7", CVAR_ARCHIVE },
 	{ &cgx_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
 
-	// cgx_wideScreenFix 1|0 - fix perspective for widescreen
-	// cgx_defaultWeapon 0-9 - default weapon when spawn 0: default 1: gauntlet ...
-	// cgx_drawPlayerIDs 0|1 - show player id in scoreboard	
+	{ &cgx_debug, "cgx_debug", "1", CVAR_TEMP },
+	{ &cgx_version, "cgx_version", "0.3a", CVAR_TEMP },
+
+	// cg_wideScreenFix 1|0 - fix perspective for widescreen
+	// cg_defaultWeapon 0-9 - default weapon when spawn 0: default 1: gauntlet ...
+	// cg_drawPlayerIDs 0|1 - show player id in scoreboard	
 	// cg_centerPrintAlpha 1.0-0 - center print transparency
 	// cg_crosshairColor 0-35 - crosshair color 0
 	// cg_drawSpeed 0|1|2 - speedmeter 0: off 1: top corner 2: center screen
@@ -239,6 +245,10 @@ cvarTable_t		cvarTable[] = {
 	// cg_hitsounds 0|1|2 - 0: default 1: pro mode hi-low 2: low-hi hp hitsounds
 	// ping colors, below 50 white, below 100 green, below 200 yellow, below 350 magenta, more than 350 red
 	// TODO: 	
+	// cg_teamModel 
+	// cg_teamColors
+	// cgx_debug
+	// cgx_version
 	// botColors botModels ? separate bots from humans
 	// cg_adjustFov fov adjust	
 	// cg_drawAccuracy 0 1 draw acc	
