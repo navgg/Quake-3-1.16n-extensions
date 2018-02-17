@@ -37,6 +37,5 @@ Still under development, alpha version
 - `cg_enemyColors ""` - "1234" 1-rail 2-head 3-torso 4-legs (colors from 0 to 7, special symbols ? - color depending on team, ! - same as ? but in ffa color is random, * - random color)	
 - `cg_lagometer 0|1|2` - 0: off 1: netgraph 2: netgraph + client ping
 - `cg_hitsounds 0|1|2` - 0: default 1: pro mode hi-low 2: low-hi hp hitsounds
-
 - `cgx_debug 0|1` - show debug info
 - `cgx_version` - show version
