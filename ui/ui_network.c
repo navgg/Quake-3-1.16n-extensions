@@ -33,6 +33,7 @@ static const char *rate_items[] = {
 	"10000 (10Kb/sec)",
 	"16000 (16Kb/sec)",
 	"25000 (LAN/Cable/xDSL)",
+	"30000 (CPMA)",
 	"50000 (Yolo/WTF?/OMG)",
 	0
 };
@@ -120,6 +121,8 @@ static void UI_NetworkOptionsMenu_Event( void* ptr, int event ) {
 		else if( networkOptionsInfo.rate.curvalue == 4 )
 			trap_Cvar_SetValue( "rate", 25000 );			
 		else if( networkOptionsInfo.rate.curvalue == 5 )
+			trap_Cvar_SetValue( "rate", 30000 );		
+		else if( networkOptionsInfo.rate.curvalue == 6 )
 			trap_Cvar_SetValue( "rate", 50000 );			
 		
 		trap_Cvar_SetValue( "snaps", 40 );		
@@ -296,8 +299,10 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 		networkOptionsInfo.rate.curvalue = 3;
 	else if( rate <= 25000 )
 		networkOptionsInfo.rate.curvalue = 4;
-	else
+	else if( rate <= 30000 )
 		networkOptionsInfo.rate.curvalue = 5;
+	else
+		networkOptionsInfo.rate.curvalue = 6;
 
 	packets = trap_Cvar_VariableValue( "cl_maxpackets" );
 	if( packets <= 40 )
