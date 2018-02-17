@@ -584,7 +584,8 @@ void CG_NewClientInfo( int clientNum ) {
 	Q_strncpyz( newInfo.modelNameCopy, newInfo.modelName, sizeof( newInfo.modelName ) );	
 	//change models and skins if needed or restore
 	if (cg.clientNum != clientNum) {
-		trap_DPrint(va("CG_NewClientInfo %i %s\n", cg.clientNum, configstring));		
+		trap_DPrint(va("CG_NewClientInfo %i\n", cg.clientNum));		
+		trap_DPrint(va("%s\n", configstring));
 		CGX_SetModelAndSkin(&newInfo);
 	}	
 

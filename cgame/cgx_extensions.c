@@ -173,7 +173,12 @@ static byte CGX_RGBToGray(byte *c) {
 }
 
 static void CGX_SetColorInfo(const char *color, clientInfo_t *info) {	
-	int i;
+	int i;	
+
+	if (cg.clientNum == -1) {
+		trap_DPrint("CGX_SetColorInfo skip -1\n");
+		return;
+	}
 
 	if (info->skinName[0] == '\0')
 		return;
@@ -193,8 +198,11 @@ static void CGX_SetColorInfo(const char *color, clientInfo_t *info) {
 		if (cgx_deadBodyDarken.integer)
 			ShaderRGBAFill(info->darkenColors[i], CGX_RGBToGray(info->colors[i]));
 		else
-			ShaderRGBACopy(info->colors[i], info->darkenColors[i]);
+			ShaderRGBACopy(info->colors[i], info->darkenColors[i]);		
 	}	
+
+	for (i = 0; i < 3; i++)
+		info->color[i] = (float)info->colors[0][i] / 255.0f;	
 }
 
 void CGX_Init_enemyAndTeamColors(void) {
@@ -205,7 +213,9 @@ void CGX_Init_enemyAndTeamColors(void) {
 		return;
 
 	for (i = 0, ci = cgs.clientinfo; i < cgs.maxclients; i++, ci++)
-		if (ci->team != cgs.clientinfo[cg.clientNum].team)
+		if (cg.clientNum == i)
+			continue;
+		else if (cgs.gametype < GT_TEAM || ci->team != cgs.clientinfo[cg.clientNum].team)
 			CGX_SetColorInfo(cgx_enemyColors.string, ci);
 		else
 			CGX_SetColorInfo(cgx_teamColors.string, ci);
@@ -256,13 +266,14 @@ static qboolean CGX_IsKnownModel(const char *modelName) {
 }
 
 void CGX_SetPMSkin(clientInfo_t *ci) {
-	if (Q_stricmp(ci->skinName, "pm") == 0) {
-		trap_DPrint(va("PM skin already set %s\n", ci->modelName));	
-	} else if (!CGX_IsKnownModel(ci->modelName)) {	
+	if (!CGX_IsKnownModel(ci->modelName)) {
 		trap_WPrint(va("No PM skin for model %s\n", ci->modelName));		
 		//set sarge/pm		
 		Q_strncpyz(ci->modelName, DEFAULT_MODEL, sizeof(ci->modelName));
-	} 
+	} else if (Q_stricmp(ci->skinName, "pm") == 0) {
+		trap_DPrint(va("PM skin already set %s\n", ci->modelName));	
+		return;
+	}		
 
 	trap_DPrint(va("Setting PM skin %s\n", ci->modelName));
 	Q_strncpyz(ci->skinName, "pm", sizeof(ci->skinName));	
