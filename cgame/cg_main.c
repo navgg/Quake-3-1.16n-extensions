@@ -231,8 +231,8 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_crosshairColor, "cg_crosshairColor", "7", CVAR_ARCHIVE },
 	{ &cgx_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
 
-	{ &cgx_debug, "cgx_debug", "1", CVAR_TEMP },
-	{ &cgx_version, "cgx_version", "0.3a", CVAR_TEMP },
+	{ &cgx_debug, "cgx_debug", "0", CVAR_TEMP },
+	{ &cgx_version, "cgx_version", CGX_VERSION, CVAR_TEMP },
 
 	// cg_wideScreenFix 1|0 - fix perspective for widescreen
 	// cg_defaultWeapon 0-9 - default weapon when spawn 0: default 1: gauntlet ...
@@ -255,11 +255,10 @@ cvarTable_t		cvarTable[] = {
 	// resolving favorite servers by domain name
 	// colored server names shifting left bug fixed
 	// other commands
+	// optimization: removed many debug info in CG_EntityEvent
 	// cgx_debug 0|1 - show debug info
 	// cgx_version - show version
 	// TODO: 	
-	// cg_teamModel 
-	// cg_teamColors
 	// botColors botModels ? separate bots from humans
 	// cg_adjustFov fov adjust	
 	// cg_drawAccuracy 0 1 draw acc	

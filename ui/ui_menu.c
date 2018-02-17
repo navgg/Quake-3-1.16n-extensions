@@ -23,8 +23,6 @@ MAIN MENU
 #define MAIN_BANNER_MODEL				"models/mapobjects/banner/banner5.md3"
 #define MAIN_MENU_VERTICAL_SPACING		34
 
-#define CGX_VERSION				"0.3a"
-
 typedef struct {
 	menuframework_s	menu;
 
