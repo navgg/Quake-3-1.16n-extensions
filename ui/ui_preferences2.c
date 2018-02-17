@@ -381,8 +381,8 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.fov.generic.callback	  = Preferences2_Event;
 	s_preferences2.fov.generic.id         = ID_FOV;
 	s_preferences2.fov.generic.y	      = y;
-	s_preferences2.fov.field.widthInChars = 4;
-	s_preferences2.fov.field.maxchars     = 3;
+	s_preferences2.fov.field.widthInChars = 5;
+	s_preferences2.fov.field.maxchars     = 4;
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences2.zoomfov.generic.type       = MTYPE_FIELD;
@@ -392,8 +392,8 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.zoomfov.generic.callback	  = Preferences2_Event;
 	s_preferences2.zoomfov.generic.id         = ID_ZOOMFOV;
 	s_preferences2.zoomfov.generic.y	      = y;
-	s_preferences2.zoomfov.field.widthInChars = 4;
-	s_preferences2.zoomfov.field.maxchars     = 2;
+	s_preferences2.zoomfov.field.widthInChars = 5;
+	s_preferences2.zoomfov.field.maxchars     = 4;
 
 	y += (BIGCHAR_HEIGHT+2)* 2;
 	s_preferences2.enemymodelenabled.generic.type = MTYPE_RADIOBUTTON;
@@ -495,19 +495,27 @@ Preferences2_SaveChanges
 =================
 */
 static void Preferences2_SaveChanges( void ) {	
-	int fov;
+	float fov, fov2;
 
-	fov = atoi(s_preferences2.fov.field.buffer);
-	if (fov == 0) fov = 100;
-	if (fov < 1) fov = 1; else if (fov > 160) fov = 160;
-	Com_sprintf(s_preferences2.fov.field.buffer, 4, "%d", fov);
+	fov = fov2 = atof(s_preferences2.fov.field.buffer);
 
-	fov = atoi(s_preferences2.zoomfov.field.buffer);
-	if (fov == 0) fov = 100;
-	if (fov < 1) fov = 1; else if (fov > 160) fov = 160;
-	Com_sprintf(s_preferences2.zoomfov.field.buffer, 4, "%d", fov);
+	if (fov == 0) fov = 100; 
+	else if (fov < 1) fov = 1; 
+	else if (fov > 160) fov = 160;
+	
+	if (fov != fov2)
+		Com_sprintf(s_preferences2.fov.field.buffer, 5, "%f", fov);
 
-	trap_Cvar_Set( "cg_fov", s_preferences2.fov.field.buffer );
+	fov = fov2 = atof(s_preferences2.zoomfov.field.buffer);
+
+	if (fov == 0) fov = 22.5f;
+	else if (fov < 1) fov = 1; 
+	else if (fov > 160) fov = 160;
+
+	if (fov != fov2)
+		Com_sprintf(s_preferences2.zoomfov.field.buffer, 5, "%f", fov);	
+
+	trap_Cvar_Set( "cg_fov", s_preferences2.fov.field.buffer );	
 	trap_Cvar_Set( "cg_zoomfov", s_preferences2.zoomfov.field.buffer );
 	trap_Cvar_Set( "cg_enemyModel", s_preferences2.enemymodel.field.buffer );	
 	trap_Cvar_Set( "cg_enemyColors", s_preferences2.enemycolors.field.buffer );	
