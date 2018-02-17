@@ -115,7 +115,7 @@ static void Preferences2_SetMenuItems( void ) {
 	s_preferences2.speed.curvalue		= abs((int)trap_Cvar_VariableValue("cg_drawSpeed") % 3);
 	s_preferences2.blood.curvalue		= trap_Cvar_VariableValue( "com_blood" ) != 0;
 	s_preferences2.gibs.curvalue		= trap_Cvar_VariableValue( "cg_gibs" ) != 0;
-	s_preferences2.playerids.curvalue	= trap_Cvar_VariableValue( "cgx_drawPlayerIDs" ) != 0;	
+	s_preferences2.playerids.curvalue	= trap_Cvar_VariableValue( "cg_drawPlayerIDs" ) != 0;	
 	s_preferences2.draw3dicons.curvalue	= trap_Cvar_VariableValue( "cg_draw3Dicons" ) != 0;
 	s_preferences2.camerabob.curvalue	= trap_Cvar_VariableValue( "cg_bobup" ) != 0 
 										&& trap_Cvar_VariableValue( "cg_bobpitch" ) != 0 
@@ -183,7 +183,7 @@ static void Preferences2_Event( void* ptr, int notification ) {
 		break;	
 
 	case ID_PLAYERIDS:
-		trap_Cvar_SetValue( "cgx_drawPlayerIDs", s_preferences2.gibs.curvalue );
+		trap_Cvar_SetValue( "cg_drawPlayerIDs", s_preferences2.gibs.curvalue );
 		break;
 
 	case ID_DRAW3DICONS:

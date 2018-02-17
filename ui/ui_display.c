@@ -135,7 +135,7 @@ static void UI_DisplayOptionsMenu_Event( void* ptr, int event ) {
 		break;
 
 	case ID_WIDESCREEN_FIX:
-		trap_Cvar_SetValue( "cgx_wideScreenFix", displayOptionsInfo.widescreenfix.curvalue );		
+		trap_Cvar_SetValue( "cg_wideScreenFix", displayOptionsInfo.widescreenfix.curvalue );		
 		break;
 
 	case ID_PRIMITIVES:
@@ -343,7 +343,7 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.screensize.curvalue  = trap_Cvar_VariableValue( "cg_viewsize")/10;
 	displayOptionsInfo.overbrightbits.curvalue  = trap_Cvar_VariableValue("r_overbrightbits") != 0;
 	displayOptionsInfo.ignorehwgamma.curvalue  = trap_Cvar_VariableValue("r_ignorehwgamma") != 0;
-	displayOptionsInfo.widescreenfix.curvalue  = trap_Cvar_VariableValue("cgx_wideScreenFix") != 0;
+	displayOptionsInfo.widescreenfix.curvalue  = trap_Cvar_VariableValue("cg_wideScreenFix") != 0;
 	displayOptionsInfo.drawfps.curvalue  = trap_Cvar_VariableValue("cg_drawFPS") != 0;
 	displayOptionsInfo.maxfps.curvalue  = trap_Cvar_VariableValue("cg_drawFPS") != 0;
 	displayOptionsInfo.primitives.curvalue = trap_Cvar_VariableValue("r_primitives") / 2;

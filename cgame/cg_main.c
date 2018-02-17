@@ -46,10 +46,6 @@ centity_t			cg_entities[MAX_GENTITIES];
 weaponInfo_t		cg_weapons[MAX_WEAPONS];
 itemInfo_t			cg_items[MAX_ITEMS];
 
-vmCvar_t	cgx_wideScreenFixO;
-vmCvar_t	cgx_drawPlayerIDsO;
-vmCvar_t	cgx_defaultWeaponO;
-
 vmCvar_t	cgx_wideScreenFix;
 vmCvar_t	cgx_drawPlayerIDs;
 vmCvar_t	cgx_enemyModel;
@@ -219,10 +215,6 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_wideScreenFix, "cg_wideScreenFix", "1", CVAR_ARCHIVE },
 	{ &cgx_defaultWeapon, "cg_defaultWeapon", "0", CVAR_ARCHIVE },
 	{ &cgx_drawPlayerIDs, "cg_drawPlayerIDs", "0", CVAR_ARCHIVE },
-
-	{ &cgx_wideScreenFixO, "cgx_wideScreenFix", "1", CVAR_TEMP|CVAR_ROM },
-	{ &cgx_defaultWeaponO, "cgx_defaultWeapon", "0", CVAR_TEMP|CVAR_ROM },
-	{ &cgx_drawPlayerIDsO, "cgx_drawPlayerIDs", "0", CVAR_TEMP|CVAR_ROM },
 	
 	{ &cgx_enemyModel_enabled, "cg_enemyModel_enabled", "0", CVAR_ARCHIVE },
 	{ &cgx_enemyModel, "cg_enemyModel", "", CVAR_ARCHIVE },		
