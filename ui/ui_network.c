@@ -21,11 +21,24 @@ NETWORK OPTIONS MENU
 #define ID_SOUND			12
 #define ID_NETWORK			13
 #define ID_RATE				14
-#define ID_BACK				15
-#define ID_PACKETS			16
-#define ID_PACKETDUP		17
-#define ID_LAGOMETER		18
+#define ID_PACKETS			15
+#define ID_PACKETDUP		16
+#define ID_LAGOMETER		17
 
+#define ID_BACK				29
+
+#define MAX_INFO_MESSAGES	4
+
+static void UI_Network_StatusBar( void *self ) {	
+	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
+		{ "Max date rate in bytes per second", "Setting lower than 5000 not recommended" },
+		{ "Max packets rate per second", "Set highter if you have good PC and internet" },
+		{ "Send packet duplicates or no", "If cable internet you can turn this off, Wi-Fi - on" },
+		{ "Draw ingame lagometer", "" }
+	};
+
+	UIX_CommonStatusBar(self, ID_RATE, MAX_INFO_MESSAGES, info_messages);
+}
 
 static const char *rate_items[] = {	
 	"4000 (56K old modems)",
@@ -234,6 +247,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.rate.generic.x			= 400;
 	networkOptionsInfo.rate.generic.y			= y;
 	networkOptionsInfo.rate.itemnames			= rate_items;
+	networkOptionsInfo.rate.generic.statusbar	= UI_Network_StatusBar;
 
 	y = 240 - 1 * (BIGCHAR_HEIGHT+2);
 	networkOptionsInfo.packets.generic.type		= MTYPE_SPINCONTROL;
@@ -244,6 +258,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.packets.generic.x		= 400;
 	networkOptionsInfo.packets.generic.y		= y;
 	networkOptionsInfo.packets.itemnames		= packets_items;
+	networkOptionsInfo.packets.generic.statusbar	= UI_Network_StatusBar;
 
 	y = 240 + 0 * (BIGCHAR_HEIGHT+2);
 	networkOptionsInfo.packetdup.generic.type		= MTYPE_RADIOBUTTON;
@@ -253,6 +268,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.packetdup.generic.id			= ID_PACKETDUP;
 	networkOptionsInfo.packetdup.generic.x			= 400;
 	networkOptionsInfo.packetdup.generic.y			= y;
+	networkOptionsInfo.packetdup.generic.statusbar	= UI_Network_StatusBar;
 
 	y = 240 + 1 * (BIGCHAR_HEIGHT + 2);
 	networkOptionsInfo.lagometer.generic.type = MTYPE_SPINCONTROL;
@@ -263,6 +279,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.lagometer.generic.x = 400;
 	networkOptionsInfo.lagometer.generic.y = y;
 	networkOptionsInfo.lagometer.itemnames = lagometer_items;
+	networkOptionsInfo.lagometer.generic.statusbar	= UI_Network_StatusBar;
 
 	networkOptionsInfo.back.generic.type		= MTYPE_BITMAP;
 	networkOptionsInfo.back.generic.name		= ART_BACK0;

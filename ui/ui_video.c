@@ -223,13 +223,32 @@ static const char *s_drivers[] =
 
 #define ID_BACK2		101
 #define ID_FULLSCREEN	102
-#define ID_LIST			103
-#define ID_MODE			104
-#define ID_DRIVERINFO	105
-#define ID_GRAPHICS		106
-#define ID_DISPLAY		107
-#define ID_SOUND		108
-#define ID_NETWORK		109
+#define ID_DRIVERINFO	103
+#define ID_GRAPHICS		104
+#define ID_DISPLAY		105
+#define ID_SOUND		106
+#define ID_NETWORK		107
+#define ID_LIST			109
+#define ID_MODE			110
+
+#define MAX_INFO_MESSAGES	11
+static void UI_Video_StatusBar( void *self ) {	
+	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
+		{ "Switches graphics settings presets", "" },
+		{ "Specifies GL Driver", "Recommended 'Default' (Voodoo - for PC before 2000)" },
+		{ "Toggles GL Extensions", "Recommended 'On' (Turning off may decrease FPS a lot)" },
+		{ "Sets display resolution", "Lowering may significant increase FPS" },
+		{ "Sets display color depth", "On some old PC 16bit can increase FPS" },
+		{ "Toggles fullscreen or windowed mode", "Shortcut - Alt + Enter" },
+		{ "Switches lightning mode", "Can increase very little FPS on old PC" },
+		{ "Sets detail level of player models and weapons", "Can slightly increase FPS on old PC" },
+		{ "Sets texture detail level", "Lowering may increase little FPS on old PC" },
+		{ "Sets texture quality", "Setting 16bit may help only for old PC" },
+		{ "Sets texture filter", "Trilinear recommended (If PC not before 2000)" },
+	};
+
+	UIX_CommonStatusBar(self, ID_MODE+1, MAX_INFO_MESSAGES, info_messages);
+}
 
 typedef struct {
 	menuframework_s	menu;
@@ -830,7 +849,7 @@ void GraphicsOptions_MenuInit( void )
 		0
 	};
 
-	int y;
+	int y, info_id = ID_MODE;
 
 	// zero set all our globals
 	memset( &s_graphicsoptions, 0 ,sizeof(graphicsoptions_t) );
@@ -913,6 +932,8 @@ void GraphicsOptions_MenuInit( void )
 	s_graphicsoptions.list.generic.callback = GraphicsOptions_Event;
 	s_graphicsoptions.list.generic.id       = ID_LIST;
 	s_graphicsoptions.list.itemnames        = s_graphics_options_names;
+	s_graphicsoptions.list.generic.statusbar = UI_Video_StatusBar;
+	s_graphicsoptions.list.generic.id       = ++info_id;
 	y += 2 * ( BIGCHAR_HEIGHT + 2 );
 
 	s_graphicsoptions.driver.generic.type  = MTYPE_SPINCONTROL;
@@ -922,6 +943,8 @@ void GraphicsOptions_MenuInit( void )
 	s_graphicsoptions.driver.generic.y     = y;
 	s_graphicsoptions.driver.itemnames     = s_driver_names;
 	s_graphicsoptions.driver.curvalue      = (uis.glconfig.driverType == GLDRV_VOODOO);
+	s_graphicsoptions.driver.generic.statusbar = UI_Video_StatusBar;
+	s_graphicsoptions.driver.generic.id       = ++info_id;
 	y += BIGCHAR_HEIGHT+2;
 
 	// references/modifies "r_allowExtensions"
@@ -931,6 +954,8 @@ void GraphicsOptions_MenuInit( void )
 	s_graphicsoptions.allow_extensions.generic.x	    = 400;
 	s_graphicsoptions.allow_extensions.generic.y	    = y;
 	s_graphicsoptions.allow_extensions.itemnames        = enabled_names;
+	s_graphicsoptions.allow_extensions.generic.statusbar = UI_Video_StatusBar;
+	s_graphicsoptions.allow_extensions.generic.id       = ++info_id;
 	y += BIGCHAR_HEIGHT+2;
 
 	// references/modifies "r_mode"
@@ -942,6 +967,8 @@ void GraphicsOptions_MenuInit( void )
 	s_graphicsoptions.mode.itemnames        = resolutions;
 	s_graphicsoptions.mode.generic.callback = GraphicsOptions_Event;
 	s_graphicsoptions.mode.generic.id       = ID_MODE;
+	s_graphicsoptions.mode.generic.statusbar = UI_Video_StatusBar;
+	s_graphicsoptions.mode.generic.id       = ++info_id;
 	y += BIGCHAR_HEIGHT+2;
 
 	// references "r_colorbits"
@@ -951,6 +978,9 @@ void GraphicsOptions_MenuInit( void )
 	s_graphicsoptions.colordepth.generic.x        = 400;
 	s_graphicsoptions.colordepth.generic.y        = y;
 	s_graphicsoptions.colordepth.itemnames        = colordepth_names;
+	s_graphicsoptions.colordepth.generic.statusbar = UI_Video_StatusBar;
+	s_graphicsoptions.colordepth.generic.id       = ++info_id;
+
 	y += BIGCHAR_HEIGHT+2;
 
 	// references/modifies "r_fullscreen"
@@ -960,6 +990,9 @@ void GraphicsOptions_MenuInit( void )
 	s_graphicsoptions.fs.generic.x	      = 400;
 	s_graphicsoptions.fs.generic.y	      = y;
 	s_graphicsoptions.fs.itemnames	      = enabled_names;
+	s_graphicsoptions.fs.generic.statusbar = UI_Video_StatusBar;
+	s_graphicsoptions.fs.generic.id       = ++info_id;
+
 	y += BIGCHAR_HEIGHT+2;
 
 	// references/modifies "r_vertexLight"
@@ -969,6 +1002,8 @@ void GraphicsOptions_MenuInit( void )
 	s_graphicsoptions.lighting.generic.x	 = 400;
 	s_graphicsoptions.lighting.generic.y	 = y;
 	s_graphicsoptions.lighting.itemnames     = lighting_names;
+	s_graphicsoptions.lighting.generic.statusbar = UI_Video_StatusBar;
+	s_graphicsoptions.lighting.generic.id       = ++info_id;
 	y += BIGCHAR_HEIGHT+2;
 
 	// references/modifies "r_lodBias" & "subdivisions"
@@ -978,6 +1013,8 @@ void GraphicsOptions_MenuInit( void )
 	s_graphicsoptions.geometry.generic.x	 = 400;
 	s_graphicsoptions.geometry.generic.y	 = y;
 	s_graphicsoptions.geometry.itemnames     = quality_names;
+	s_graphicsoptions.geometry.generic.statusbar = UI_Video_StatusBar;
+	s_graphicsoptions.geometry.generic.id       = ++info_id;
 	y += BIGCHAR_HEIGHT+2;
 
 	// references/modifies "r_picmip"
@@ -989,6 +1026,8 @@ void GraphicsOptions_MenuInit( void )
 	s_graphicsoptions.tq.minvalue       = 0;
 	s_graphicsoptions.tq.maxvalue       = 3;
 	s_graphicsoptions.tq.generic.callback = GraphicsOptions_TQEvent;
+	s_graphicsoptions.tq.generic.statusbar = UI_Video_StatusBar;
+	s_graphicsoptions.tq.generic.id       = ++info_id;
 	y += BIGCHAR_HEIGHT+2;
 
 	// references/modifies "r_textureBits"
@@ -998,6 +1037,8 @@ void GraphicsOptions_MenuInit( void )
 	s_graphicsoptions.texturebits.generic.x	    = 400;
 	s_graphicsoptions.texturebits.generic.y	    = y;
 	s_graphicsoptions.texturebits.itemnames     = tq_names;
+	s_graphicsoptions.texturebits.generic.statusbar = UI_Video_StatusBar;
+	s_graphicsoptions.texturebits.generic.id       = ++info_id;
 	y += BIGCHAR_HEIGHT+2;
 
 	// references/modifies "r_textureMode"
@@ -1007,6 +1048,8 @@ void GraphicsOptions_MenuInit( void )
 	s_graphicsoptions.filter.generic.x	    = 400;
 	s_graphicsoptions.filter.generic.y	    = y;
 	s_graphicsoptions.filter.itemnames      = filter_names;
+	s_graphicsoptions.filter.generic.statusbar = UI_Video_StatusBar;
+	s_graphicsoptions.filter.generic.id       = ++info_id;
 	y += 2*BIGCHAR_HEIGHT;
 
 	s_graphicsoptions.driverinfo.generic.type     = MTYPE_PTEXT;

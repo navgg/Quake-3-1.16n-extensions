@@ -30,19 +30,43 @@ ADVANCED OPTIONS MENU
 #define ID_ENEMYCOLORS			135
 #define ID_DRAW3DICONS			136
 #define ID_ZOOMFOV				137
-#define ID_ENEMYMODEL_ENABLED	139
-#define ID_CHATBEEP				140
-#define ID_ENEMY_TAUNT			141
-#define ID_CENTER_PRINT			142
-#define ID_SPEED				143
-#define ID_DRAW_GUN				144
-#define ID_TEAMMODEL			145
-#define ID_TEAMCOLORS			146
-//#define ID_FORCEMODEL			135
-//#define ID_DRAWTEAMOVERLAY		136
-//#define ID_ALLOWDOWNLOAD			137
-#define ID_BACK					138
+#define ID_ENEMYMODEL_ENABLED	138
+#define ID_CHATBEEP				139
+#define ID_ENEMY_TAUNT			140
+#define ID_CENTER_PRINT			141
+#define ID_SPEED				142
+#define ID_DRAW_GUN				143
+#define ID_TEAMMODEL			144
+#define ID_TEAMCOLORS			145
 
+#define ID_BACK					190
+
+#define MAX_INFO_MESSAGES		19
+static void Preferences2_StatusBar( void *self ) {	
+	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
+		{ "Toggles display ingame rewards", "On screen center - Excellent, Impressive etc."},
+		{ "Toggles display blood after kill", ""},
+		{ "Toggles display gibs, if blood is on", ""},
+		{ "Toggles camera bobbing when running","Recommended 'Off'"},
+		{ "Toggles player ids display on scoreboard",""},
+		{ "Field of view in degrees",""},
+		{ "Sets ingame timer display position",""},
+		{ "Forces all enemies one model eg. 'keel/pm' 'tankjr' ","Leave emtpy to use pm skin based on model"},
+		{ "Forces all enemies colors eg. '2222' '1234' '2!2!'","'?' and '!' - use team color '*' and '.' - random"},
+		{ "Toggles 3D icons display (ammo, armor etc.)","If it's on icons will be 3D, off - 2D"},
+		{ "Field of view when zoom in degrees",""},
+		{ "Enables forcing enemy and team models",""},
+		{ "Toggles beep when chatting",""},
+		{ "Toggles enemy taunt sound",""},
+		{ "'You fragged...' message transparency level",""},
+		{ "Sets display ingame speedometer",""},
+		{ "Sets draw gun method", "off - no gun, defaul - bobbing, still - promode"},
+		{ "Forces all teammates one model eg. 'bitterman/pm'","Leave emtpy to use pm skin based on model"},
+		{ "Forces all teammates colors eg. '!!!!' '5555' 'xyzw'","'?' and '!' - use team color '*' and '.' - random"}
+	};
+
+	UIX_CommonStatusBar(self, ID_REWARDS, MAX_INFO_MESSAGES, info_messages);
+}
 
 typedef struct {
 	menuframework_s		menu;
@@ -266,6 +290,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.rewards.generic.name	      = "Draw Rewards:";
 	s_preferences2.rewards.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
 	s_preferences2.rewards.generic.callback   = Preferences2_Event;
+	s_preferences2.rewards.generic.statusbar  = Preferences2_StatusBar;
 	s_preferences2.rewards.generic.id         = ID_REWARDS;
 	s_preferences2.rewards.generic.x	      = PREFERENCES_X_POS;
 	s_preferences2.rewards.generic.y	      = y;
@@ -275,6 +300,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.timer.generic.name			= "Draw Timer:";
 	s_preferences2.timer.generic.flags			= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
 	s_preferences2.timer.generic.callback		= Preferences2_Event;
+	s_preferences2.timer.generic.statusbar		= Preferences2_StatusBar;
 	s_preferences2.timer.generic.id				= ID_TIMER;
 	s_preferences2.timer.generic.x				= PREFERENCES_X_POS;
 	s_preferences2.timer.generic.y				= y;
@@ -285,6 +311,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.speed.generic.name = "Draw Speed:";
 	s_preferences2.speed.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
 	s_preferences2.speed.generic.callback = Preferences2_Event;
+	s_preferences2.speed.generic.statusbar = Preferences2_StatusBar;
 	s_preferences2.speed.generic.id = ID_SPEED;
 	s_preferences2.speed.generic.x = PREFERENCES_X_POS;
 	s_preferences2.speed.generic.y = y;
@@ -295,6 +322,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.draw3dicons.generic.name			= "Draw 3D Icons:";
 	s_preferences2.draw3dicons.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
 	s_preferences2.draw3dicons.generic.callback		= Preferences2_Event;
+	s_preferences2.draw3dicons.generic.statusbar	= Preferences2_StatusBar;
 	s_preferences2.draw3dicons.generic.id			= ID_DRAW3DICONS;
 	s_preferences2.draw3dicons.generic.x			= PREFERENCES_X_POS;
 	s_preferences2.draw3dicons.generic.y			= y;
@@ -304,6 +332,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.drawgun.generic.name			= "Draw Gun:";
 	s_preferences2.drawgun.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
 	s_preferences2.drawgun.generic.callback		= Preferences2_Event;
+	s_preferences2.drawgun.generic.statusbar	= Preferences2_StatusBar;
 	s_preferences2.drawgun.generic.id			= ID_DRAW_GUN;
 	s_preferences2.drawgun.generic.x			= PREFERENCES_X_POS;
 	s_preferences2.drawgun.generic.y			= y;
@@ -314,6 +343,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.blood.generic.name	      = "Blood:";
 	s_preferences2.blood.generic.flags	      = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
 	s_preferences2.blood.generic.callback     = Preferences2_Event;
+	s_preferences2.blood.generic.statusbar	= Preferences2_StatusBar;
 	s_preferences2.blood.generic.id           = ID_BLOOD;
 	s_preferences2.blood.generic.x	          = PREFERENCES_X_POS;
 	s_preferences2.blood.generic.y	          = y;
@@ -323,6 +353,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.gibs.generic.name	     = "Gibs:";
 	s_preferences2.gibs.generic.flags	     = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
 	s_preferences2.gibs.generic.callback     = Preferences2_Event;
+	s_preferences2.gibs.generic.statusbar	= Preferences2_StatusBar;
 	s_preferences2.gibs.generic.id           = ID_GIBS;
 	s_preferences2.gibs.generic.x	         = PREFERENCES_X_POS;
 	s_preferences2.gibs.generic.y	         = y;
@@ -332,6 +363,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.camerabob.generic.name	  = "Camera Bobbing:";
 	s_preferences2.camerabob.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
 	s_preferences2.camerabob.generic.callback = Preferences2_Event;
+	s_preferences2.camerabob.generic.statusbar	= Preferences2_StatusBar;
 	s_preferences2.camerabob.generic.id       = ID_CAMERABOB;
 	s_preferences2.camerabob.generic.x	      = PREFERENCES_X_POS;
 	s_preferences2.camerabob.generic.y	      = y;	
@@ -341,6 +373,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.playerids.generic.name	  = "Show Player ID:";
 	s_preferences2.playerids.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
 	s_preferences2.playerids.generic.callback = Preferences2_Event;
+	s_preferences2.playerids.generic.statusbar	= Preferences2_StatusBar;
 	s_preferences2.playerids.generic.id       = ID_PLAYERIDS;
 	s_preferences2.playerids.generic.x	      = PREFERENCES_X_POS;
 	s_preferences2.playerids.generic.y	      = y;
@@ -350,6 +383,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.chatbeep.generic.name = "Chat Beep:";
 	s_preferences2.chatbeep.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
 	s_preferences2.chatbeep.generic.callback = Preferences2_Event;
+	s_preferences2.chatbeep.generic.statusbar	= Preferences2_StatusBar;
 	s_preferences2.chatbeep.generic.id = ID_CHATBEEP;
 	s_preferences2.chatbeep.generic.x = PREFERENCES_X_POS;
 	s_preferences2.chatbeep.generic.y = y;
@@ -359,6 +393,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.enemytaunt.generic.name = "Enemy Taunt:";
 	s_preferences2.enemytaunt.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
 	s_preferences2.enemytaunt.generic.callback = Preferences2_Event;
+	s_preferences2.enemytaunt.generic.statusbar	= Preferences2_StatusBar;
 	s_preferences2.enemytaunt.generic.id = ID_ENEMY_TAUNT;
 	s_preferences2.enemytaunt.generic.x = PREFERENCES_X_POS;
 	s_preferences2.enemytaunt.generic.y = y;
@@ -368,6 +403,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.centerprint.generic.name = "Center Print:";
 	s_preferences2.centerprint.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
 	s_preferences2.centerprint.generic.callback = Preferences2_Event;
+	s_preferences2.centerprint.generic.statusbar	= Preferences2_StatusBar;
 	s_preferences2.centerprint.generic.id = ID_CENTER_PRINT;
 	s_preferences2.centerprint.generic.x = PREFERENCES_X_POS;
 	s_preferences2.centerprint.generic.y = y;
@@ -379,6 +415,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.fov.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_NUMBERSONLY;
 	s_preferences2.fov.generic.x	      = PREFERENCES_X_POS;
 	s_preferences2.fov.generic.callback	  = Preferences2_Event;
+	s_preferences2.fov.generic.statusbar = Preferences2_StatusBar;
 	s_preferences2.fov.generic.id         = ID_FOV;
 	s_preferences2.fov.generic.y	      = y;
 	s_preferences2.fov.field.widthInChars = 5;
@@ -390,6 +427,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.zoomfov.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_NUMBERSONLY;
 	s_preferences2.zoomfov.generic.x	      = PREFERENCES_X_POS;
 	s_preferences2.zoomfov.generic.callback	  = Preferences2_Event;
+	s_preferences2.zoomfov.generic.statusbar = Preferences2_StatusBar;
 	s_preferences2.zoomfov.generic.id         = ID_ZOOMFOV;
 	s_preferences2.zoomfov.generic.y	      = y;
 	s_preferences2.zoomfov.field.widthInChars = 5;
@@ -400,6 +438,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.enemymodelenabled.generic.name = "Bright models enabled:";
 	s_preferences2.enemymodelenabled.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
 	s_preferences2.enemymodelenabled.generic.callback = Preferences2_Event;
+	s_preferences2.enemymodelenabled.generic.statusbar = Preferences2_StatusBar;
 	s_preferences2.enemymodelenabled.generic.id = ID_ENEMYMODEL_ENABLED;
 	s_preferences2.enemymodelenabled.generic.x = PREFERENCES_X_POS;
 	s_preferences2.enemymodelenabled.generic.y = y;
@@ -410,6 +449,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.enemymodel.generic.flags		 = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
 	s_preferences2.enemymodel.generic.x			 = PREFERENCES_X_POS;
 	s_preferences2.enemymodel.generic.callback	 = Preferences2_Event;
+	s_preferences2.enemymodel.generic.statusbar	= Preferences2_StatusBar;
 	s_preferences2.enemymodel.generic.id         = ID_ENEMYMODEL;
 	s_preferences2.enemymodel.generic.y			 = y;
 	s_preferences2.enemymodel.field.widthInChars = 20;
@@ -421,6 +461,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.enemycolors.generic.flags		 = QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_NUMBERSONLY;
 	s_preferences2.enemycolors.generic.x			 = PREFERENCES_X_POS;
 	s_preferences2.enemycolors.generic.callback	 = Preferences2_Event;
+	s_preferences2.enemycolors.generic.statusbar = Preferences2_StatusBar;	
 	s_preferences2.enemycolors.generic.id         = ID_ENEMYCOLORS;
 	s_preferences2.enemycolors.generic.y			 = y;
 	s_preferences2.enemycolors.field.widthInChars = 5;
@@ -432,6 +473,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.teammodel.generic.flags		 = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
 	s_preferences2.teammodel.generic.x			 = PREFERENCES_X_POS;
 	s_preferences2.teammodel.generic.callback	 = Preferences2_Event;
+	s_preferences2.teammodel.generic.statusbar	= Preferences2_StatusBar;
 	s_preferences2.teammodel.generic.id         = ID_TEAMMODEL;
 	s_preferences2.teammodel.generic.y			 = y;
 	s_preferences2.teammodel.field.widthInChars = 20;
@@ -443,6 +485,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.teamcolors.generic.flags		 = QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_NUMBERSONLY;
 	s_preferences2.teamcolors.generic.x			 = PREFERENCES_X_POS;
 	s_preferences2.teamcolors.generic.callback	 = Preferences2_Event;
+	s_preferences2.teamcolors.generic.statusbar	= Preferences2_StatusBar;
 	s_preferences2.teamcolors.generic.id         = ID_TEAMCOLORS;
 	s_preferences2.teamcolors.generic.y			 = y;
 	s_preferences2.teamcolors.field.widthInChars = 5;

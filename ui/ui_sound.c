@@ -26,6 +26,17 @@ SOUND OPTIONS MENU
 #define ID_A3D				17
 #define ID_BACK				18
 
+#define MAX_INFO_MESSAGES	4
+static void UI_Sound_StatusBar( void *self ) {	
+	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
+		{ "Controls sound effects volume", "" },
+		{ "Controls ingame music volume", "" },
+		{ "Sets sound quality, recommended 'High'", "" },
+		{ "This setting removed in latest Quake 3", "Recommended 'Off'" }
+	};
+
+	UIX_CommonStatusBar(self, ID_EFFECTSVOLUME, MAX_INFO_MESSAGES, info_messages);
+}
 
 static const char *quality_items[] = {
 	"Low", "High", 0
@@ -209,6 +220,7 @@ static void UI_SoundOptionsMenu_Init( void ) {
 	soundOptionsInfo.sfxvolume.generic.y		= y;
 	soundOptionsInfo.sfxvolume.minvalue			= 0;
 	soundOptionsInfo.sfxvolume.maxvalue			= 10;
+	soundOptionsInfo.sfxvolume.generic.statusbar = UI_Sound_StatusBar;
 
 	y += BIGCHAR_HEIGHT+2;
 	soundOptionsInfo.musicvolume.generic.type		= MTYPE_SLIDER;
@@ -220,6 +232,7 @@ static void UI_SoundOptionsMenu_Init( void ) {
 	soundOptionsInfo.musicvolume.generic.y			= y;
 	soundOptionsInfo.musicvolume.minvalue			= 0;
 	soundOptionsInfo.musicvolume.maxvalue			= 10;
+	soundOptionsInfo.musicvolume.generic.statusbar = UI_Sound_StatusBar;
 
 	y += BIGCHAR_HEIGHT+2;
 	soundOptionsInfo.quality.generic.type		= MTYPE_SPINCONTROL;
@@ -230,6 +243,7 @@ static void UI_SoundOptionsMenu_Init( void ) {
 	soundOptionsInfo.quality.generic.x			= 400;
 	soundOptionsInfo.quality.generic.y			= y;
 	soundOptionsInfo.quality.itemnames			= quality_items;
+	soundOptionsInfo.quality.generic.statusbar = UI_Sound_StatusBar;
 
 	y += BIGCHAR_HEIGHT+2;
 	soundOptionsInfo.a3d.generic.type			= MTYPE_RADIOBUTTON;
@@ -239,6 +253,7 @@ static void UI_SoundOptionsMenu_Init( void ) {
 	soundOptionsInfo.a3d.generic.id				= ID_A3D;
 	soundOptionsInfo.a3d.generic.x				= 400;
 	soundOptionsInfo.a3d.generic.y				= y;
+	soundOptionsInfo.a3d.generic.statusbar = UI_Sound_StatusBar;
 
 	soundOptionsInfo.back.generic.type			= MTYPE_BITMAP;
 	soundOptionsInfo.back.generic.name			= ART_BACK0;

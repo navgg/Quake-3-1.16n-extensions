@@ -29,14 +29,35 @@ GAME OPTIONS MENU
 #define ID_SYNCEVERYFRAME		134
 #define ID_FORCEMODEL			135
 #define ID_DRAWTEAMOVERLAY		136
-#define ID_ALLOWDOWNLOAD			137
-#define ID_BACK					138
+#define ID_ALLOWDOWNLOAD		137
 
-#define ID_CROSSHAIR_COLOR		139
-#define ID_CROSSHAIR_SIZE		140
+#define ID_CROSSHAIR_COLOR		138
+#define ID_CROSSHAIR_SIZE		139
+
+#define ID_BACK					140
 
 #define	NUM_CROSSHAIRS			10
 
+#define MAX_INFO_MESSAGES	13
+static void UI_Preferences_StatusBar( void *self ) {	
+	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
+		{ "Sets ingame crosshair", "" },
+		{ "Sets display of objects in game", "'On' - all weapons and items will be 2D, 'Off' - 3D" },
+		{ "If it's off sky will not draw", "May increase slightly FPS on old PC" },
+		{ "Toggles ejecting brass", "" },
+		{ "Toggles display of marks on walls", "" },
+		{ "Renders realtime dynamic lights", "Turning off may slightly increase FPS" },
+		{ "Display target name above crosshair", "" },
+		{ "V-Sync (Vertical synchronization)", "Strongly recommended 'Off'" },
+		{ "Forces all player models to be same", "All enemies in game will be using player's model" },
+		{ "Sets team overlay draw position", "" },
+		{ "Allows autodowloading content from pure servers", "" },
+		{ "Sets crosshair color", "" },
+		{ "Sets crosshair size", "" },
+	};
+
+	UIX_CommonStatusBar(self, ID_CROSSHAIR, MAX_INFO_MESSAGES, info_messages);
+}
 
 typedef struct {
 	menuframework_s		menu;
@@ -342,6 +363,8 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.crosshair.generic.bottom		= y + 20;
 	s_preferences.crosshair.generic.left		= PREFERENCES_X_POS - ( ( strlen(s_preferences.crosshair.generic.name) + 1 ) * SMALLCHAR_WIDTH );
 	s_preferences.crosshair.generic.right		= PREFERENCES_X_POS + 48;
+	s_preferences.crosshair.generic.statusbar   = UI_Preferences_StatusBar;
+
 
 	y += BIGCHAR_HEIGHT + 2 + 4 + 8;
 	s_preferences.crosshaircolor.generic.type = MTYPE_SPINCONTROL;
@@ -352,6 +375,8 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.crosshaircolor.generic.x = PREFERENCES_X_POS;
 	s_preferences.crosshaircolor.generic.y = y;
 	s_preferences.crosshaircolor.itemnames = crosshair_colors;
+	s_preferences.crosshaircolor.generic.statusbar   = UI_Preferences_StatusBar;
+
 
 	y += BIGCHAR_HEIGHT + 2;
 	s_preferences.crosshairsize.generic.type = MTYPE_SPINCONTROL;
@@ -362,6 +387,8 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.crosshairsize.generic.x = PREFERENCES_X_POS;
 	s_preferences.crosshairsize.generic.y = y;
 	s_preferences.crosshairsize.itemnames = crosshairsize_items;
+	s_preferences.crosshairsize.generic.statusbar   = UI_Preferences_StatusBar;
+
 
 	y += BIGCHAR_HEIGHT * 2 + 2;
 	s_preferences.simpleitems.generic.type        = MTYPE_RADIOBUTTON;
@@ -371,6 +398,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.simpleitems.generic.id          = ID_SIMPLEITEMS;
 	s_preferences.simpleitems.generic.x	          = PREFERENCES_X_POS;
 	s_preferences.simpleitems.generic.y	          = y;
+	s_preferences.simpleitems.generic.statusbar   = UI_Preferences_StatusBar;
 
 	y += BIGCHAR_HEIGHT;
 	s_preferences.wallmarks.generic.type          = MTYPE_RADIOBUTTON;
@@ -380,6 +408,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.wallmarks.generic.id            = ID_WALLMARKS;
 	s_preferences.wallmarks.generic.x	          = PREFERENCES_X_POS;
 	s_preferences.wallmarks.generic.y	          = y;
+	s_preferences.wallmarks.generic.statusbar   = UI_Preferences_StatusBar;
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.brass.generic.type              = MTYPE_RADIOBUTTON;
@@ -389,6 +418,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.brass.generic.id                = ID_EJECTINGBRASS;
 	s_preferences.brass.generic.x	              = PREFERENCES_X_POS;
 	s_preferences.brass.generic.y	              = y;
+	s_preferences.brass.generic.statusbar   = UI_Preferences_StatusBar;
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.dynamiclights.generic.type      = MTYPE_RADIOBUTTON;
@@ -398,6 +428,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.dynamiclights.generic.id        = ID_DYNAMICLIGHTS;
 	s_preferences.dynamiclights.generic.x	      = PREFERENCES_X_POS;
 	s_preferences.dynamiclights.generic.y	      = y;
+	s_preferences.dynamiclights.generic.statusbar   = UI_Preferences_StatusBar;
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.identifytarget.generic.type     = MTYPE_RADIOBUTTON;
@@ -407,6 +438,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.identifytarget.generic.id       = ID_IDENTIFYTARGET;
 	s_preferences.identifytarget.generic.x	      = PREFERENCES_X_POS;
 	s_preferences.identifytarget.generic.y	      = y;
+	s_preferences.identifytarget.generic.statusbar   = UI_Preferences_StatusBar;
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.highqualitysky.generic.type     = MTYPE_RADIOBUTTON;
@@ -416,6 +448,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.highqualitysky.generic.id       = ID_HIGHQUALITYSKY;
 	s_preferences.highqualitysky.generic.x	      = PREFERENCES_X_POS;
 	s_preferences.highqualitysky.generic.y	      = y;
+	s_preferences.highqualitysky.generic.statusbar   = UI_Preferences_StatusBar;
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.synceveryframe.generic.type     = MTYPE_RADIOBUTTON;
@@ -425,6 +458,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.synceveryframe.generic.id       = ID_SYNCEVERYFRAME;
 	s_preferences.synceveryframe.generic.x	      = PREFERENCES_X_POS;
 	s_preferences.synceveryframe.generic.y	      = y;
+	s_preferences.synceveryframe.generic.statusbar   = UI_Preferences_StatusBar;
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.forcemodel.generic.type     = MTYPE_RADIOBUTTON;
@@ -434,6 +468,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.forcemodel.generic.id       = ID_FORCEMODEL;
 	s_preferences.forcemodel.generic.x	      = PREFERENCES_X_POS;
 	s_preferences.forcemodel.generic.y	      = y;
+	s_preferences.forcemodel.generic.statusbar   = UI_Preferences_StatusBar;
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.drawteamoverlay.generic.type     = MTYPE_SPINCONTROL;
@@ -444,6 +479,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.drawteamoverlay.generic.x	       = PREFERENCES_X_POS;
 	s_preferences.drawteamoverlay.generic.y	       = y;
 	s_preferences.drawteamoverlay.itemnames			= teamoverlay_names;
+	s_preferences.drawteamoverlay.generic.statusbar   = UI_Preferences_StatusBar;
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.allowdownload.generic.type     = MTYPE_RADIOBUTTON;
@@ -453,6 +489,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.allowdownload.generic.id       = ID_ALLOWDOWNLOAD;
 	s_preferences.allowdownload.generic.x	       = PREFERENCES_X_POS;
 	s_preferences.allowdownload.generic.y	       = y;
+	s_preferences.allowdownload.generic.statusbar   = UI_Preferences_StatusBar;
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.back.generic.type	    = MTYPE_BITMAP;

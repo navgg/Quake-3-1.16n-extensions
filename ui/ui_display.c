@@ -22,13 +22,30 @@ DISPLAY OPTIONS MENU
 #define ID_NETWORK			13
 #define ID_BRIGHTNESS		14
 #define ID_SCREENSIZE		15
-#define ID_BACK				16
-#define ID_OVERBRIGHT_BITS	17
-#define ID_IGNORE_HW_GAMMA	21
+#define ID_OVERBRIGHT_BITS	16
+#define ID_IGNORE_HW_GAMMA	17
 #define ID_DRAWFPS			18
 #define ID_WIDESCREEN_FIX	19
 #define ID_MAXFPS			20
-#define ID_PRIMITIVES		22
+#define ID_PRIMITIVES		21
+
+#define ID_BACK				29
+
+#define MAX_INFO_MESSAGES	8
+static void UI_Display_StatusBar( void *self ) {	
+	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
+		{ "Controls display brightness", "Turn off 'Over Bright Bits' to increase even higher" },
+		{ "Decreases screen size (not recommended)", "Adds gray frame around screen" },
+		{ "Ambient lighting of in-game entities or objects", "Turn this off if you have problems with brightness" },
+		{ "If you have problems with brighness", "Or colors after game exit, turn this on" },
+		{ "Shows counter of frapmes per second", "" },
+		{ "Fixes rendering for widescreens", "All icons and fonts are not stretching in game" },
+		{ "Sets max limit for frames per second", "" },
+		{ "Changes the render method", "'Fast (2)' may increase fps in some cases" }	
+	};
+
+	UIX_CommonStatusBar(self, ID_BRIGHTNESS, MAX_INFO_MESSAGES, info_messages);
+}
 
 static const char *fps_items[] = {		
 	"76",
@@ -236,6 +253,7 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.ignorehwgamma.generic.id = ID_IGNORE_HW_GAMMA;
 	displayOptionsInfo.ignorehwgamma.generic.x = 400;
 	displayOptionsInfo.ignorehwgamma.generic.y = y;
+	displayOptionsInfo.ignorehwgamma.generic.statusbar = UI_Display_StatusBar;
 
 	y += BIGCHAR_HEIGHT + 2;
 	displayOptionsInfo.overbrightbits.generic.type = MTYPE_RADIOBUTTON;
@@ -245,6 +263,7 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.overbrightbits.generic.id = ID_OVERBRIGHT_BITS;
 	displayOptionsInfo.overbrightbits.generic.x = 400;
 	displayOptionsInfo.overbrightbits.generic.y = y;
+	displayOptionsInfo.overbrightbits.generic.statusbar = UI_Display_StatusBar;
 
 	y += BIGCHAR_HEIGHT + 2;
 	displayOptionsInfo.brightness.generic.type		= MTYPE_SLIDER;
@@ -256,6 +275,7 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.brightness.generic.y			= y;
 	displayOptionsInfo.brightness.minvalue			= 5;
 	displayOptionsInfo.brightness.maxvalue			= 20;
+	displayOptionsInfo.brightness.generic.statusbar = UI_Display_StatusBar;
 
 	y += BIGCHAR_HEIGHT+2;
 	displayOptionsInfo.screensize.generic.type		= MTYPE_SLIDER;
@@ -267,6 +287,7 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.screensize.generic.y			= y;
 	displayOptionsInfo.screensize.minvalue			= 3;
     displayOptionsInfo.screensize.maxvalue			= 10;
+	displayOptionsInfo.screensize.generic.statusbar = UI_Display_StatusBar;
 
 	if (!uis.glconfig.deviceSupportsGamma) {
 		displayOptionsInfo.brightness.generic.flags |= QMF_GRAYED;
@@ -281,6 +302,7 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.drawfps.generic.id		= ID_DRAWFPS;
 	displayOptionsInfo.drawfps.generic.x		= 400;
 	displayOptionsInfo.drawfps.generic.y		= y;
+	displayOptionsInfo.drawfps.generic.statusbar = UI_Display_StatusBar;
 
 	y += BIGCHAR_HEIGHT+2;
 	displayOptionsInfo.maxfps.generic.type		= MTYPE_SPINCONTROL;
@@ -291,6 +313,7 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.maxfps.generic.x			= 400;
 	displayOptionsInfo.maxfps.generic.y			= y;
 	displayOptionsInfo.maxfps.itemnames			= fps_items;
+	displayOptionsInfo.maxfps.generic.statusbar = UI_Display_StatusBar;
 
 	y += BIGCHAR_HEIGHT+2;
 	displayOptionsInfo.widescreenfix.generic.type		= MTYPE_RADIOBUTTON;
@@ -300,6 +323,7 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.widescreenfix.generic.id			= ID_WIDESCREEN_FIX;
 	displayOptionsInfo.widescreenfix.generic.x			= 400;
 	displayOptionsInfo.widescreenfix.generic.y			= y;
+	displayOptionsInfo.widescreenfix.generic.statusbar = UI_Display_StatusBar;
 
 	y += BIGCHAR_HEIGHT + 2;
 	displayOptionsInfo.primitives.generic.type = MTYPE_SPINCONTROL;
@@ -310,6 +334,7 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.primitives.generic.x = 400;
 	displayOptionsInfo.primitives.generic.y = y;
 	displayOptionsInfo.primitives.itemnames = primitives_items;
+	displayOptionsInfo.primitives.generic.statusbar = UI_Display_StatusBar;
 
 	displayOptionsInfo.back.generic.type		= MTYPE_BITMAP;
 	displayOptionsInfo.back.generic.name		= ART_BACK0;
