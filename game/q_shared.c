@@ -660,6 +660,27 @@ void Q_strcat( char *dest, int size, const char *src ) {
 	Q_strncpyz( dest + l1, src, size - l1 );
 }
 
+#define istrimchar(x) (x == ' ' || x == '\'' || x == '^')
+// trim all characters that not match
+char *QX_trim(char *str)
+{
+	char *end;
+
+	// Trim leading chars
+	while(istrimchar((unsigned char)*str)) str++;
+
+	if(*str == 0)  // All spaces?
+		return str;
+
+	// Trim trailing chars
+	end = str + strlen(str) - 1;
+	while(end > str && istrimchar((unsigned char)*end)) end--;
+
+	// Write new null terminator
+	*(end+1) = 0;
+
+	return str;
+}
 
 int Q_PrintStrlen( const char *string ) {
 	int			len;

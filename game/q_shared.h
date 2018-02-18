@@ -552,6 +552,9 @@ char	*Q_strrchr( const char* string, int c );
 void	Q_strncpyz( char *dest, const char *src, int destsize );
 void	Q_strcat( char *dest, int size, const char *src );
 
+// X-MOD: externsions
+char *QX_trim(char *str);
+
 // strlen that discounts Quake color sequences
 int Q_PrintStrlen( const char *string );
 // removes color sequences from string

@@ -517,9 +517,9 @@ static void Preferences2_SaveChanges( void ) {
 
 	trap_Cvar_Set( "cg_fov", s_preferences2.fov.field.buffer );	
 	trap_Cvar_Set( "cg_zoomfov", s_preferences2.zoomfov.field.buffer );
-	trap_Cvar_Set( "cg_enemyModel", s_preferences2.enemymodel.field.buffer );	
+	trap_Cvar_Set( "cg_enemyModel", QX_trim(s_preferences2.enemymodel.field.buffer) );	
 	trap_Cvar_Set( "cg_enemyColors", s_preferences2.enemycolors.field.buffer );	
-	trap_Cvar_Set( "cg_teamModel", s_preferences2.teammodel.field.buffer );	
+	trap_Cvar_Set( "cg_teamModel", QX_trim(s_preferences2.teammodel.field.buffer) );	
 	trap_Cvar_Set( "cg_teamColors", s_preferences2.teamcolors.field.buffer );	
 }
 
