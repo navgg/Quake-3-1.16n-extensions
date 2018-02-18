@@ -821,6 +821,7 @@ extern	vmCvar_t		cgx_centerPrintAlpha;
 extern	vmCvar_t		cgx_crosshairColor;
 extern	vmCvar_t		cgx_drawSpeed;
 extern	vmCvar_t		cgx_hitsounds;
+extern	vmCvar_t		cgx_coloredPing;
 
 extern	vmCvar_t		cgx_delag;
 

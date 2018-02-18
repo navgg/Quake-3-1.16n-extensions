@@ -138,7 +138,9 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 	}
 
 	// X-MOD: color ping
-	if (score->ping <= 50)
+	if (!cgx_coloredPing.integer)
+		pingCol = ColorIndex(COLOR_WHITE);
+	else if (score->ping <= 50)
 		pingCol = ColorIndex(COLOR_WHITE);
 	else if (score->ping <= 100)
 		pingCol = ColorIndex(COLOR_GREEN);
