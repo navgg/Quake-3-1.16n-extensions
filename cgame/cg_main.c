@@ -63,6 +63,11 @@ vmCvar_t	cgx_crosshairColor;
 vmCvar_t	cgx_drawSpeed;
 vmCvar_t	cgx_hitsounds;
 
+vmCvar_t	cgx_maxfps;
+vmCvar_t	cgx_delag;
+vmCvar_t	cgx_maxpackets;
+vmCvar_t	cgx_timeNudge;
+
 vmCvar_t	cgx_debug;
 vmCvar_t	cgx_version;
 
@@ -233,6 +238,12 @@ cvarTable_t		cvarTable[] = {
 
 	{ &cgx_debug, "cgx_debug", "0", CVAR_TEMP },
 	{ &cgx_version, "cgx_version", CGX_VERSION, CVAR_TEMP },
+	// X-MOD: compability with noghost
+	{ &cgx_maxfps, "com_maxfps", "125", CVAR_ARCHIVE | CVAR_USERINFO },
+	{ &cgx_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CVAR_USERINFO },
+	{ &cgx_maxpackets, "cl_maxpackets", "60", CVAR_ARCHIVE | CVAR_USERINFO },	
+
+	{ &cgx_delag, "cg_delag", "1", CVAR_ARCHIVE },
 
 	// cg_wideScreenFix 1|0 - fix perspective for widescreen
 	// cg_defaultWeapon 0-9 - default weapon when spawn 0: default 1: gauntlet ...
