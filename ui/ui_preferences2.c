@@ -17,7 +17,10 @@ ADVANCED OPTIONS MENU
 #define ART_BACK0				"menu/art/back_0"
 #define ART_BACK1				"menu/art/back_1"
 
-#define PREFERENCES_X_POS		360
+#define PREFERENCES_X_POS		350
+//360
+#define PREFERENCES_X_POS_1		230
+#define PREFERENCES_X_POS_2		450
 
 #define ID_REWARDS				127
 #define ID_BLOOD				128
@@ -38,10 +41,12 @@ ADVANCED OPTIONS MENU
 #define ID_DRAW_GUN				143
 #define ID_TEAMMODEL			144
 #define ID_TEAMCOLORS			145
+#define ID_COLOREDPING			146
+#define ID_DEFAULTWEAPON		147
 
 #define ID_BACK					190
 
-#define MAX_INFO_MESSAGES		19
+#define MAX_INFO_MESSAGES		21
 static void Preferences2_StatusBar( void *self ) {	
 	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
 		{ "Toggles display ingame rewards", "On screen center - Excellent, Impressive etc."},
@@ -49,12 +54,12 @@ static void Preferences2_StatusBar( void *self ) {
 		{ "Toggles display gibs, if blood is on", ""},
 		{ "Toggles camera bobbing when running","Recommended 'Off'"},
 		{ "Toggles player ids display on scoreboard",""},
-		{ "Field of view in degrees",""},
+		{ "Field of view in degrees","Min - 1 Max - 160"},
 		{ "Sets ingame timer display position",""},
 		{ "Forces all enemies one model eg. 'keel/pm' 'tankjr' ","Leave emtpy to use pm skin based on model"},
 		{ "Forces all enemies colors eg. '2222' '1234' '2!2!'","'?' and '!' - use team color '*' and '.' - random"},
 		{ "Toggles 3D icons display (ammo, armor etc.)","If it's on icons will be 3D, off - 2D"},
-		{ "Field of view when zoom in degrees",""},
+		{ "Field of view when zoom in degrees","Min - 1 Max - 160"},
 		{ "Enables forcing enemy and team models",""},
 		{ "Toggles beep when chatting",""},
 		{ "Toggles enemy taunt sound",""},
@@ -62,7 +67,9 @@ static void Preferences2_StatusBar( void *self ) {
 		{ "Sets display ingame speedometer",""},
 		{ "Sets draw gun method", "off - no gun, defaul - bobbing, still - promode"},
 		{ "Forces all teammates one model eg. 'bitterman/pm'","Leave emtpy to use pm skin based on model"},
-		{ "Forces all teammates colors eg. '!!!!' '5555' 'xyzw'","'?' and '!' - use team color '*' and '.' - random"}
+		{ "Forces all teammates colors eg. '!!!!' '5555' 'xyzw'","'?' and '!' - use team color '*' and '.' - random"},
+		{ "Toggles colored ping on scoreboard","" },
+		{ "Sets default weapon switch after respawn","If server sends you BFG but you want shotgun" }
 	};
 
 	UIX_CommonStatusBar(self, ID_REWARDS, MAX_INFO_MESSAGES, info_messages);
@@ -86,7 +93,9 @@ typedef struct {
 	menuradiobutton_s	draw3dicons;
 	menuradiobutton_s	chatbeep;
 	menuradiobutton_s	enemytaunt;
+	menuradiobutton_s	coloredping;
 	menulist_s			centerprint;
+	menulist_s			deafultweapon;
 	menufield_s			fov;
 	menufield_s			zoomfov;
 	menuradiobutton_s	enemymodelenabled;
@@ -133,6 +142,20 @@ static const char *drawgun_items[] =
 	0
 };
 
+static const char *defaultweapon_items[] = {
+	"default",
+	"gauntlet",
+	"machinegun",
+	"shotgun",
+	"grenades",
+	"rocket",
+	"lightning",
+	"rail",
+	"plasma",
+	"BFG",
+	0
+};
+
 static void Preferences2_SetMenuItems( void ) {
 	s_preferences2.rewards.curvalue		= trap_Cvar_VariableValue( "cg_drawRewards" ) != 0;
 	s_preferences2.timer.curvalue		= abs((int)trap_Cvar_VariableValue( "cg_drawTimer" ) % 3);
@@ -148,6 +171,8 @@ static void Preferences2_SetMenuItems( void ) {
 	s_preferences2.enemymodelenabled.curvalue = trap_Cvar_VariableValue("cg_enemyModel_enabled") != 0;
 	s_preferences2.chatbeep.curvalue = trap_Cvar_VariableValue("cg_chatSound") != 0;
 	s_preferences2.enemytaunt.curvalue = trap_Cvar_VariableValue("cg_noTaunt") == 0;
+	s_preferences2.coloredping.curvalue = trap_Cvar_VariableValue("cg_coloredPing") != 0;	
+	s_preferences2.deafultweapon.curvalue = abs((int)trap_Cvar_VariableValue("cg_defaultWeapon") % (WP_NUM_WEAPONS - 1));
 
 	s_preferences2.centerprint.curvalue = (int)(trap_Cvar_VariableValue("cg_centerPrintAlpha") * 2) % 3;
 	s_preferences2.drawgun.curvalue = (int)trap_Cvar_VariableValue("cg_drawGun") % 3;
@@ -226,6 +251,15 @@ static void Preferences2_Event( void* ptr, int notification ) {
 		trap_Cvar_SetValue("cg_noTaunt", !s_preferences2.enemytaunt.curvalue);
 		break;
 
+	case ID_COLOREDPING:
+		trap_Cvar_SetValue("cg_coloredPing", s_preferences2.coloredping.curvalue);
+		break;
+
+	case ID_DEFAULTWEAPON:
+		trap_Cvar_SetValue("cg_defaultWeapon", s_preferences2.deafultweapon.curvalue);
+		break;
+		
+
 	case ID_CENTER_PRINT:
 		trap_Cvar_SetValue("cg_centerPrintAlpha", s_preferences2.centerprint.curvalue / 2.0f);
 		break;
@@ -250,7 +284,7 @@ static sfxHandle_t Preferences2_MenuKey( int key ) {
 }
 
 static void Preferences2_MenuInit( void ) {
-	int				y;
+	int				y, y2;
 
 	memset( &s_preferences2, 0 ,sizeof(preferences_t) );	
 
@@ -283,60 +317,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.framer.width  	   = 256;
 	s_preferences2.framer.height  	   = 334;
 
-	y = 144 - BIGCHAR_HEIGHT * 5;
-
-	y += BIGCHAR_HEIGHT+2;
-	s_preferences2.rewards.generic.type       = MTYPE_RADIOBUTTON;
-	s_preferences2.rewards.generic.name	      = "Draw Rewards:";
-	s_preferences2.rewards.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
-	s_preferences2.rewards.generic.callback   = Preferences2_Event;
-	s_preferences2.rewards.generic.statusbar  = Preferences2_StatusBar;
-	s_preferences2.rewards.generic.id         = ID_REWARDS;
-	s_preferences2.rewards.generic.x	      = PREFERENCES_X_POS;
-	s_preferences2.rewards.generic.y	      = y;
-
-	y += BIGCHAR_HEIGHT+2;
-	s_preferences2.timer.generic.type			= MTYPE_SPINCONTROL;
-	s_preferences2.timer.generic.name			= "Draw Timer:";
-	s_preferences2.timer.generic.flags			= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
-	s_preferences2.timer.generic.callback		= Preferences2_Event;
-	s_preferences2.timer.generic.statusbar		= Preferences2_StatusBar;
-	s_preferences2.timer.generic.id				= ID_TIMER;
-	s_preferences2.timer.generic.x				= PREFERENCES_X_POS;
-	s_preferences2.timer.generic.y				= y;
-	s_preferences2.timer.itemnames				= timer_items;
-
-	y += BIGCHAR_HEIGHT + 2;
-	s_preferences2.speed.generic.type = MTYPE_SPINCONTROL;
-	s_preferences2.speed.generic.name = "Draw Speed:";
-	s_preferences2.speed.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
-	s_preferences2.speed.generic.callback = Preferences2_Event;
-	s_preferences2.speed.generic.statusbar = Preferences2_StatusBar;
-	s_preferences2.speed.generic.id = ID_SPEED;
-	s_preferences2.speed.generic.x = PREFERENCES_X_POS;
-	s_preferences2.speed.generic.y = y;
-	s_preferences2.speed.itemnames = speed_items;
-
-	y += BIGCHAR_HEIGHT+2;
-	s_preferences2.draw3dicons.generic.type			= MTYPE_RADIOBUTTON;
-	s_preferences2.draw3dicons.generic.name			= "Draw 3D Icons:";
-	s_preferences2.draw3dicons.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
-	s_preferences2.draw3dicons.generic.callback		= Preferences2_Event;
-	s_preferences2.draw3dicons.generic.statusbar	= Preferences2_StatusBar;
-	s_preferences2.draw3dicons.generic.id			= ID_DRAW3DICONS;
-	s_preferences2.draw3dicons.generic.x			= PREFERENCES_X_POS;
-	s_preferences2.draw3dicons.generic.y			= y;
-
-	y += BIGCHAR_HEIGHT+2;
-	s_preferences2.drawgun.generic.type			= MTYPE_SPINCONTROL;
-	s_preferences2.drawgun.generic.name			= "Draw Gun:";
-	s_preferences2.drawgun.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
-	s_preferences2.drawgun.generic.callback		= Preferences2_Event;
-	s_preferences2.drawgun.generic.statusbar	= Preferences2_StatusBar;
-	s_preferences2.drawgun.generic.id			= ID_DRAW_GUN;
-	s_preferences2.drawgun.generic.x			= PREFERENCES_X_POS;
-	s_preferences2.drawgun.generic.y			= y;
-	s_preferences2.drawgun.itemnames			= drawgun_items;
+	y = 144 - BIGCHAR_HEIGHT * 3;
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences2.blood.generic.type         = MTYPE_RADIOBUTTON;
@@ -345,9 +326,17 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.blood.generic.callback     = Preferences2_Event;
 	s_preferences2.blood.generic.statusbar	= Preferences2_StatusBar;
 	s_preferences2.blood.generic.id           = ID_BLOOD;
-	s_preferences2.blood.generic.x	          = PREFERENCES_X_POS;
+	s_preferences2.blood.generic.x	          = PREFERENCES_X_POS_1;
 	s_preferences2.blood.generic.y	          = y;
-
+	//y += BIGCHAR_HEIGHT+2;
+	s_preferences2.rewards.generic.type       = MTYPE_RADIOBUTTON;
+	s_preferences2.rewards.generic.name	      = "Draw Rewards:";
+	s_preferences2.rewards.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_preferences2.rewards.generic.callback   = Preferences2_Event;
+	s_preferences2.rewards.generic.statusbar  = Preferences2_StatusBar;
+	s_preferences2.rewards.generic.id         = ID_REWARDS;
+	s_preferences2.rewards.generic.x	      = PREFERENCES_X_POS_2;
+	s_preferences2.rewards.generic.y	      = y;
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences2.gibs.generic.type         = MTYPE_RADIOBUTTON;
 	s_preferences2.gibs.generic.name	     = "Gibs:";
@@ -355,9 +344,18 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.gibs.generic.callback     = Preferences2_Event;
 	s_preferences2.gibs.generic.statusbar	= Preferences2_StatusBar;
 	s_preferences2.gibs.generic.id           = ID_GIBS;
-	s_preferences2.gibs.generic.x	         = PREFERENCES_X_POS;
+	s_preferences2.gibs.generic.x	         = PREFERENCES_X_POS_1;
 	s_preferences2.gibs.generic.y	         = y;
-
+	//y += BIGCHAR_HEIGHT + 2;
+	s_preferences2.drawgun.generic.type			= MTYPE_SPINCONTROL;
+	s_preferences2.drawgun.generic.name			= "Draw Gun:";
+	s_preferences2.drawgun.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_preferences2.drawgun.generic.callback		= Preferences2_Event;
+	s_preferences2.drawgun.generic.statusbar	= Preferences2_StatusBar;
+	s_preferences2.drawgun.generic.id			= ID_DRAW_GUN;
+	s_preferences2.drawgun.generic.x			= PREFERENCES_X_POS_2;
+	s_preferences2.drawgun.generic.y			= y;
+	s_preferences2.drawgun.itemnames			= drawgun_items;
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences2.camerabob.generic.type     = MTYPE_RADIOBUTTON;
 	s_preferences2.camerabob.generic.name	  = "Camera Bobbing:";
@@ -365,9 +363,18 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.camerabob.generic.callback = Preferences2_Event;
 	s_preferences2.camerabob.generic.statusbar	= Preferences2_StatusBar;
 	s_preferences2.camerabob.generic.id       = ID_CAMERABOB;
-	s_preferences2.camerabob.generic.x	      = PREFERENCES_X_POS;
+	s_preferences2.camerabob.generic.x	      = PREFERENCES_X_POS_1;
 	s_preferences2.camerabob.generic.y	      = y;	
-
+	//y += BIGCHAR_HEIGHT+2;
+	s_preferences2.timer.generic.type			= MTYPE_SPINCONTROL;
+	s_preferences2.timer.generic.name			= "Draw Timer:";
+	s_preferences2.timer.generic.flags			= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_preferences2.timer.generic.callback		= Preferences2_Event;
+	s_preferences2.timer.generic.statusbar		= Preferences2_StatusBar;
+	s_preferences2.timer.generic.id				= ID_TIMER;
+	s_preferences2.timer.generic.x				= PREFERENCES_X_POS_2;
+	s_preferences2.timer.generic.y				= y;
+	s_preferences2.timer.itemnames				= timer_items;
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences2.playerids.generic.type     = MTYPE_RADIOBUTTON;
 	s_preferences2.playerids.generic.name	  = "Show Player ID:";
@@ -375,9 +382,18 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.playerids.generic.callback = Preferences2_Event;
 	s_preferences2.playerids.generic.statusbar	= Preferences2_StatusBar;
 	s_preferences2.playerids.generic.id       = ID_PLAYERIDS;
-	s_preferences2.playerids.generic.x	      = PREFERENCES_X_POS;
+	s_preferences2.playerids.generic.x	      = PREFERENCES_X_POS_1;
 	s_preferences2.playerids.generic.y	      = y;
-
+	//y += BIGCHAR_HEIGHT+2;
+	s_preferences2.speed.generic.type = MTYPE_SPINCONTROL;
+	s_preferences2.speed.generic.name = "Draw Speed:";
+	s_preferences2.speed.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	s_preferences2.speed.generic.callback = Preferences2_Event;
+	s_preferences2.speed.generic.statusbar = Preferences2_StatusBar;
+	s_preferences2.speed.generic.id = ID_SPEED;
+	s_preferences2.speed.generic.x = PREFERENCES_X_POS_2;
+	s_preferences2.speed.generic.y = y;
+	s_preferences2.speed.itemnames = speed_items;
 	y += BIGCHAR_HEIGHT + 2;
 	s_preferences2.chatbeep.generic.type = MTYPE_RADIOBUTTON;
 	s_preferences2.chatbeep.generic.name = "Chat Beep:";
@@ -385,9 +401,18 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.chatbeep.generic.callback = Preferences2_Event;
 	s_preferences2.chatbeep.generic.statusbar	= Preferences2_StatusBar;
 	s_preferences2.chatbeep.generic.id = ID_CHATBEEP;
-	s_preferences2.chatbeep.generic.x = PREFERENCES_X_POS;
+	s_preferences2.chatbeep.generic.x = PREFERENCES_X_POS_1;
 	s_preferences2.chatbeep.generic.y = y;
-
+	//y += BIGCHAR_HEIGHT + 2;
+	s_preferences2.centerprint.generic.type = MTYPE_SPINCONTROL;
+	s_preferences2.centerprint.generic.name = "Center Print:";
+	s_preferences2.centerprint.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	s_preferences2.centerprint.generic.callback = Preferences2_Event;
+	s_preferences2.centerprint.generic.statusbar	= Preferences2_StatusBar;
+	s_preferences2.centerprint.generic.id = ID_CENTER_PRINT;
+	s_preferences2.centerprint.generic.x = PREFERENCES_X_POS_2;
+	s_preferences2.centerprint.generic.y = y;
+	s_preferences2.centerprint.itemnames = centerprint_items;
 	y += BIGCHAR_HEIGHT + 2;
 	s_preferences2.enemytaunt.generic.type = MTYPE_RADIOBUTTON;
 	s_preferences2.enemytaunt.generic.name = "Enemy Taunt:";
@@ -395,37 +420,52 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.enemytaunt.generic.callback = Preferences2_Event;
 	s_preferences2.enemytaunt.generic.statusbar	= Preferences2_StatusBar;
 	s_preferences2.enemytaunt.generic.id = ID_ENEMY_TAUNT;
-	s_preferences2.enemytaunt.generic.x = PREFERENCES_X_POS;
+	s_preferences2.enemytaunt.generic.x = PREFERENCES_X_POS_1;
 	s_preferences2.enemytaunt.generic.y = y;
-
+	//y += BIGCHAR_HEIGHT + 2;
+	s_preferences2.deafultweapon.generic.type = MTYPE_SPINCONTROL;
+	s_preferences2.deafultweapon.generic.name = "Default Weapon:";
+	s_preferences2.deafultweapon.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	s_preferences2.deafultweapon.generic.callback = Preferences2_Event;
+	s_preferences2.deafultweapon.generic.statusbar	= Preferences2_StatusBar;
+	s_preferences2.deafultweapon.generic.id = ID_DEFAULTWEAPON;
+	s_preferences2.deafultweapon.generic.x = PREFERENCES_X_POS_2;
+	s_preferences2.deafultweapon.generic.y = y;
+	s_preferences2.deafultweapon.itemnames = defaultweapon_items;
 	y += BIGCHAR_HEIGHT + 2;
-	s_preferences2.centerprint.generic.type = MTYPE_SPINCONTROL;
-	s_preferences2.centerprint.generic.name = "Center Print:";
-	s_preferences2.centerprint.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
-	s_preferences2.centerprint.generic.callback = Preferences2_Event;
-	s_preferences2.centerprint.generic.statusbar	= Preferences2_StatusBar;
-	s_preferences2.centerprint.generic.id = ID_CENTER_PRINT;
-	s_preferences2.centerprint.generic.x = PREFERENCES_X_POS;
-	s_preferences2.centerprint.generic.y = y;
-	s_preferences2.centerprint.itemnames = centerprint_items;
-	
-	y += BIGCHAR_HEIGHT+2;	
+	s_preferences2.coloredping.generic.type = MTYPE_RADIOBUTTON;
+	s_preferences2.coloredping.generic.name = "Colored Ping:";
+	s_preferences2.coloredping.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	s_preferences2.coloredping.generic.callback = Preferences2_Event;
+	s_preferences2.coloredping.generic.statusbar	= Preferences2_StatusBar;
+	s_preferences2.coloredping.generic.id = ID_COLOREDPING;
+	s_preferences2.coloredping.generic.x = PREFERENCES_X_POS_1;
+	s_preferences2.coloredping.generic.y = y;
+	//y += BIGCHAR_HEIGHT+2;
 	s_preferences2.fov.generic.type       = MTYPE_FIELD;
-	s_preferences2.fov.generic.name		  = "FOV (1-160):";
+	s_preferences2.fov.generic.name		  = "FOV:";
 	s_preferences2.fov.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_NUMBERSONLY;
-	s_preferences2.fov.generic.x	      = PREFERENCES_X_POS;
+	s_preferences2.fov.generic.x	      = PREFERENCES_X_POS_2;
 	s_preferences2.fov.generic.callback	  = Preferences2_Event;
 	s_preferences2.fov.generic.statusbar = Preferences2_StatusBar;
 	s_preferences2.fov.generic.id         = ID_FOV;
 	s_preferences2.fov.generic.y	      = y;
 	s_preferences2.fov.field.widthInChars = 5;
 	s_preferences2.fov.field.maxchars     = 4;
-
-	y += BIGCHAR_HEIGHT+2;
+	y += BIGCHAR_HEIGHT+2;		
+	s_preferences2.draw3dicons.generic.type			= MTYPE_RADIOBUTTON;
+	s_preferences2.draw3dicons.generic.name			= "3D Icons:";
+	s_preferences2.draw3dicons.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_preferences2.draw3dicons.generic.callback		= Preferences2_Event;
+	s_preferences2.draw3dicons.generic.statusbar	= Preferences2_StatusBar;
+	s_preferences2.draw3dicons.generic.id			= ID_DRAW3DICONS;
+	s_preferences2.draw3dicons.generic.x			= PREFERENCES_X_POS_1;
+	s_preferences2.draw3dicons.generic.y			= y;
+	//y += BIGCHAR_HEIGHT+2;
 	s_preferences2.zoomfov.generic.type       = MTYPE_FIELD;
-	s_preferences2.zoomfov.generic.name		  = "Zoom FOV (1-160):";
+	s_preferences2.zoomfov.generic.name		  = "Zoom FOV:";
 	s_preferences2.zoomfov.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_NUMBERSONLY;
-	s_preferences2.zoomfov.generic.x	      = PREFERENCES_X_POS;
+	s_preferences2.zoomfov.generic.x	      = PREFERENCES_X_POS_2;
 	s_preferences2.zoomfov.generic.callback	  = Preferences2_Event;
 	s_preferences2.zoomfov.generic.statusbar = Preferences2_StatusBar;
 	s_preferences2.zoomfov.generic.id         = ID_ZOOMFOV;
@@ -435,7 +475,7 @@ static void Preferences2_MenuInit( void ) {
 
 	y += (BIGCHAR_HEIGHT+2)* 2;
 	s_preferences2.enemymodelenabled.generic.type = MTYPE_RADIOBUTTON;
-	s_preferences2.enemymodelenabled.generic.name = "Bright models enabled:";
+	s_preferences2.enemymodelenabled.generic.name = "Bright models:";
 	s_preferences2.enemymodelenabled.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
 	s_preferences2.enemymodelenabled.generic.callback = Preferences2_Event;
 	s_preferences2.enemymodelenabled.generic.statusbar = Preferences2_StatusBar;
@@ -525,6 +565,8 @@ static void Preferences2_MenuInit( void ) {
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.teamcolors );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.chatbeep );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.enemytaunt );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.coloredping );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.deafultweapon );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.centerprint );	
 
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.back );

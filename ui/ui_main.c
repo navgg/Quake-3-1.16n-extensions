@@ -134,6 +134,24 @@ vmCvar_t	ui_server16;
 
 vmCvar_t	ui_cdkeychecked;
 
+// X-MOD: ui params
+vmCvar_t	uix_wideScreenFix;
+vmCvar_t	uix_defaultWeapon;
+vmCvar_t	uix_drawPlayerIDs;
+vmCvar_t	uix_enemyModel_enabled;
+vmCvar_t	uix_enemyModel;
+vmCvar_t	uix_enemyColors;
+vmCvar_t	uix_teamModel;
+vmCvar_t	uix_teamColors;
+vmCvar_t	uix_deadBodyDarken;
+vmCvar_t	uix_chatSound;
+vmCvar_t	uix_noTaunt;
+vmCvar_t	uix_hitsounds;
+vmCvar_t	uix_centerPrintAlpha;
+vmCvar_t	uix_crosshairColor;
+vmCvar_t	uix_drawSpeed;
+vmCvar_t	uix_coloredPing;
+
 cvarTable_t		cvarTable[] = {
 	{ &ui_ffa_fraglimit, "ui_ffa_fraglimit", "20", CVAR_ARCHIVE },
 	{ &ui_ffa_timelimit, "ui_ffa_timelimit", "0", CVAR_ARCHIVE },
@@ -149,8 +167,8 @@ cvarTable_t		cvarTable[] = {
 	{ &ui_ctf_timelimit, "ui_ctf_timelimit", "30", CVAR_ARCHIVE },
 	{ &ui_ctf_friendly, "ui_ctf_friendly",  "0", CVAR_ARCHIVE },
 
-	{ &ui_arenasFile, "g_arenasFile", "", CVAR_INIT|CVAR_ROM },
-	{ &ui_botsFile, "g_botsFile", "", CVAR_INIT|CVAR_ROM },
+	{ &ui_arenasFile, "g_arenasFile", "", CVAR_INIT | CVAR_ROM },
+	{ &ui_botsFile, "g_botsFile", "", CVAR_INIT | CVAR_ROM },
 	{ &ui_spScores1, "g_spScores1", "", CVAR_ARCHIVE | CVAR_ROM },
 	{ &ui_spScores2, "g_spScores2", "", CVAR_ARCHIVE | CVAR_ROM },
 	{ &ui_spScores3, "g_spScores3", "", CVAR_ARCHIVE | CVAR_ROM },
@@ -172,6 +190,27 @@ cvarTable_t		cvarTable[] = {
 	{ &ui_drawCrosshair, "cg_drawCrosshair", "4", CVAR_ARCHIVE },
 	{ &ui_drawCrosshairNames, "cg_drawCrosshairNames", "1", CVAR_ARCHIVE },
 	{ &ui_marks, "cg_marks", "1", CVAR_ARCHIVE },
+
+	// X-MOD: default parameters
+	{ &uix_wideScreenFix, "cg_wideScreenFix", "1", CVAR_ARCHIVE },
+	{ &uix_defaultWeapon, "cg_defaultWeapon", "0", CVAR_ARCHIVE },
+	{ &uix_drawPlayerIDs, "cg_drawPlayerIDs", "0", CVAR_ARCHIVE },
+
+	{ &uix_enemyModel_enabled, "cg_enemyModel_enabled", "0", CVAR_ARCHIVE },
+	{ &uix_enemyModel, "cg_enemyModel", "", CVAR_ARCHIVE },		
+	{ &uix_enemyColors, "cg_enemyColors", "", CVAR_ARCHIVE },
+	//{ &uix_teamModel_enabled, "cg_teamModel_enabled", "0", CVAR_ARCHIVE },
+	{ &uix_teamModel, "cg_teamModel", "", CVAR_ARCHIVE },		
+	{ &uix_teamColors, "cg_teamColors", "", CVAR_ARCHIVE },
+	{ &uix_deadBodyDarken, "cg_deadBodyDarken", "3", CVAR_ARCHIVE },	
+
+	{ &uix_chatSound, "cg_chatSound", "1", CVAR_ARCHIVE },
+	{ &uix_noTaunt, "cg_noTaunt", "0", CVAR_ARCHIVE },
+	{ &uix_hitsounds, "cg_hitsounds", "0", CVAR_ARCHIVE },
+	{ &uix_centerPrintAlpha, "cg_centerPrintAlpha", "1.0", CVAR_ARCHIVE },
+	{ &uix_crosshairColor, "cg_crosshairColor", "7", CVAR_ARCHIVE },
+	{ &uix_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
+	{ &uix_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },
 
 	{ &ui_server1, "server1", "sodmod.ga:27962", CVAR_ARCHIVE },
 	{ &ui_server2, "server2", "sodmod.ga:27963", CVAR_ARCHIVE },

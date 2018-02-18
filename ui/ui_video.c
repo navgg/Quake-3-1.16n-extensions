@@ -241,9 +241,9 @@ static void UI_Video_StatusBar( void *self ) {
 		{ "Sets display color depth", "On some old PC 16bit can increase FPS" },
 		{ "Toggles fullscreen or windowed mode", "Shortcut - Alt + Enter" },
 		{ "Switches lightning mode", "Can increase very little FPS on old PC" },
-		{ "Sets detail level of player models and weapons", "Can slightly increase FPS on old PC" },
+		{ "Sets detail level of player models and weapons", "Can slightly increase FPS" },
 		{ "Sets texture detail level", "Lowering may increase little FPS on old PC" },
-		{ "Sets texture quality", "Setting 16bit may help only for old PC" },
+		{ "Sets texture quality", "Setting 16bit may help for old PC" },
 		{ "Sets texture filter", "Trilinear recommended (If PC not before 2000)" },
 	};
 
