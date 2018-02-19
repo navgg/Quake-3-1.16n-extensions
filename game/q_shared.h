@@ -7,7 +7,8 @@
 // A user mod should never modify this file
 
 #define	Q3_VERSION		"Q3 1.16n"
-#define CGX_VERSION		"0.4a"
+#define CGX_VERSION		"0.5a"
+#define CGX_DEBUG		1
 
 //#define MISSION_PACK
 

@@ -529,6 +529,10 @@ typedef struct {
 	char		teamSkin[MAX_QPATH];
 	
 	int			meanPing;
+	int			packetloss;
+	int			packetlossTotal;
+	int			rateDelayed;
+	int			rateDelayedTotal;
 } cg_t;
 
 
@@ -779,8 +783,10 @@ typedef struct {
 	// media
 	cgMedia_t		media;
 
-	//X-MOD: save delag info
+	//X-MOD: save delag and server info
 	int				delag;
+	int				sv_fps;
+	int				sv_maxrate;
 } cgs_t;
 
 typedef struct {
@@ -822,7 +828,11 @@ extern	vmCvar_t		cgx_crosshairColor;
 extern	vmCvar_t		cgx_drawSpeed;
 extern	vmCvar_t		cgx_hitsounds;
 extern	vmCvar_t		cgx_coloredPing;
+extern	vmCvar_t		cgx_networkAdjustments;
 
+extern	vmCvar_t		cgx_maxfps;
+extern	vmCvar_t		cgx_maxpackets;
+extern	vmCvar_t		cgx_timeNudge;
 extern	vmCvar_t		cgx_delag;
 
 extern	vmCvar_t		cgx_debug;
@@ -902,7 +912,8 @@ extern	vmCvar_t		cg_deferPlayers;
 //
 
 void CGX_Init_vScreen(void);
-void CGX_Init_enemyColors(void);
+void CGX_AutoAdjustNetworkSettings(void);
+
 void CGX_Init_enemyModels(void);
 void CGX_SetModelAndSkin(clientInfo_t *ci);
 void CGX_EnemyModelCheck(void);

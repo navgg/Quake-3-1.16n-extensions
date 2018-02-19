@@ -63,11 +63,13 @@ vmCvar_t	cgx_crosshairColor;
 vmCvar_t	cgx_drawSpeed;
 vmCvar_t	cgx_hitsounds;
 vmCvar_t	cgx_coloredPing;
+vmCvar_t	cgx_networkAdjustments;
 
 vmCvar_t	cgx_maxfps;
-vmCvar_t	cgx_delag;
 vmCvar_t	cgx_maxpackets;
+vmCvar_t	cgx_rate;
 vmCvar_t	cgx_timeNudge;
+vmCvar_t	cgx_delag;
 
 vmCvar_t	cgx_debug;
 vmCvar_t	cgx_version;
@@ -236,18 +238,27 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_centerPrintAlpha, "cg_centerPrintAlpha", "1.0", CVAR_ARCHIVE },
 	{ &cgx_crosshairColor, "cg_crosshairColor", "7", CVAR_ARCHIVE },
 	{ &cgx_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
-
 	{ &cgx_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },
+	{ &cgx_networkAdjustments, "cg_networkAdjustments", "1", CVAR_ARCHIVE },
 
+#if CGX_DEBUG
+	// X-MOD: compability with noghost
+	{ &cgx_maxfps, "com_maxfps", "125", CVAR_ARCHIVE },
+	{ &cgx_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE },
+	{ &cgx_maxpackets, "cl_maxpackets", "60", CVAR_ARCHIVE },	
+#else
 	// X-MOD: compability with noghost
 	{ &cgx_maxfps, "com_maxfps", "125", CVAR_ARCHIVE | CVAR_USERINFO },
 	{ &cgx_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CVAR_USERINFO },
 	{ &cgx_maxpackets, "cl_maxpackets", "60", CVAR_ARCHIVE | CVAR_USERINFO },	
+#endif
 
 	{ &cgx_delag, "cg_delag", "1", CVAR_ARCHIVE },
 
+#if CGX_DEBUG
 	{ &cgx_debug, "cgx_debug", "1", CVAR_TEMP },
-	{ &cgx_version, "cgx_version", "CGX "CGX_VERSION" 18 Feb 2018", CVAR_TEMP },
+#endif
+	{ &cgx_version, "cgx_version", "CGX "CGX_VERSION" 20 Feb 2018", CVAR_TEMP },
 
 	// cg_wideScreenFix 1|0 - fix perspective for widescreen
 	// cg_defaultWeapon 0-9 - default weapon when spawn 0: default 1: gauntlet ...
@@ -267,11 +278,12 @@ cvarTable_t		cvarTable[] = {
 	// cg_lagometer 0|1|2 - 0: off 1: netgraph 2: netgraph + client ping
 	// cg_hitsounds 0|1|2 - 0: default 1: pro mode hi-low 2: low-hi hp hitsounds	
 	// cg_coloredPing 0|1 - toggles ping colors below 50 white, below 100 green, below 200 yellow, below 350 magenta, more than 350 red
+	// cg_lagometer 0|1|2|3 - off, netgraph, netgraph+ping, only when lag
 	// resolving favorite servers by domain name
 	// colored server names shifting left bug fixed
-	// other commands
 	// optimization: removed many debug info in CG_EntityEvent
-	// cgx_debug 0|1 - show debug info
+	// other commands
+	// cgx_debug 0|1|2 - show debug info
 	// cgx_version - show version
 	// TODO: 	
 	// botColors botModels ? separate bots from humans
@@ -282,7 +294,7 @@ cvarTable_t		cvarTable[] = {
 	// cl_autoTimeNudge	
 	// g_delag?
 	// FIX:
-	// on noghost server, before match end go to advanced menu and podium will not draw? need to check	
+	// on noghost server, before match end go to advanced menu and podium will not draw? need to check or no
 
 	// the following variables are created in other parts of the system,
 	// but we also reference them here
@@ -336,6 +348,9 @@ void CG_UpdateCvars( void ) {
 	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
 		trap_Cvar_Update( cv->vmCvar );
 	}
+
+	if (cgx_maxpackets.integer < 40)
+		trap_Cvar_Set("cl_maxpackets", "40");
 
 	// check for modications here
 	// X-MOD: reinit vScreen if value changed

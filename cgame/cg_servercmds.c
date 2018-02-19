@@ -77,6 +77,7 @@ and whenever the server updates any serverinfo flagged cvars
 ================
 */
 void CG_ParseServerinfo( void ) {
+	static int old_sv_fps = -1;
 	const char	*info;
 	char	*mapname;
 
@@ -92,8 +93,15 @@ void CG_ParseServerinfo( void ) {
 	Com_sprintf( cgs.mapname, sizeof( cgs.mapname ), "maps/%s.bsp", mapname );
 
 	cgs.delag = atoi(Info_ValueForKey(info, "g_delag"));
+	cgs.sv_fps = atoi(Info_ValueForKey(info, "sv_fps"));
+	cgs.sv_maxrate = atoi(Info_ValueForKey(info, "sv_maxrate"));
 
-	trap_WPrint(va("g_delag '%i'\n", cgs.delag));
+	trap_WPrint(va("g_delag '%i' sv_fps '%i' sv_maxrate '%i'\n", cgs.delag, cgs.sv_fps, cgs.sv_maxrate));
+
+	if (cgs.sv_fps != old_sv_fps) {
+		CGX_AutoAdjustNetworkSettings();
+		old_sv_fps = cgs.sv_fps;
+	}
 }
 
 /*

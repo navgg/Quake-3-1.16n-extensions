@@ -43,10 +43,11 @@ ADVANCED OPTIONS MENU
 #define ID_TEAMCOLORS			145
 #define ID_COLOREDPING			146
 #define ID_DEFAULTWEAPON		147
+#define ID_LAGOMETER			148
 
 #define ID_BACK					190
 
-#define MAX_INFO_MESSAGES		21
+#define MAX_INFO_MESSAGES		22
 static void Preferences2_StatusBar( void *self ) {	
 	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
 		{ "Toggles display ingame rewards", "On screen center - Excellent, Impressive etc."},
@@ -69,7 +70,8 @@ static void Preferences2_StatusBar( void *self ) {
 		{ "Forces all teammates one model eg. 'bitterman/pm'","Leave emtpy to use pm skin based on model"},
 		{ "Forces all teammates colors eg. '!!!!' '5555' 'xyzw'","'?' and '!' - use team color '*' and '.' - random"},
 		{ "Toggles colored ping on scoreboard","" },
-		{ "Sets default weapon switch after respawn","If server sends you BFG but you want shotgun" }
+		{ "Sets default weapon switch after respawn","If server sends you BFG but you want shotgun" },
+		{ "Draw ingame lagometer", "" }
 	};
 
 	UIX_CommonStatusBar(self, ID_REWARDS, MAX_INFO_MESSAGES, info_messages);
@@ -98,6 +100,7 @@ typedef struct {
 	menulist_s			deafultweapon;
 	menufield_s			fov;
 	menufield_s			zoomfov;
+	menulist_s			lagometer;
 	menuradiobutton_s	enemymodelenabled;
 	menufield_s			enemymodel;
 	menufield_s			enemycolors;	
@@ -156,6 +159,14 @@ static const char *defaultweapon_items[] = {
 	0
 };
 
+static const char *lagometer_items[] = {
+	"Off",
+	"Netgraph",
+	"Netgraph + ping",
+	"Only when lag",
+	0
+};
+
 static void Preferences2_SetMenuItems( void ) {
 	s_preferences2.rewards.curvalue		= trap_Cvar_VariableValue( "cg_drawRewards" ) != 0;
 	s_preferences2.timer.curvalue		= abs((int)trap_Cvar_VariableValue( "cg_drawTimer" ) % 3);
@@ -173,6 +184,7 @@ static void Preferences2_SetMenuItems( void ) {
 	s_preferences2.enemytaunt.curvalue = trap_Cvar_VariableValue("cg_noTaunt") == 0;
 	s_preferences2.coloredping.curvalue = trap_Cvar_VariableValue("cg_coloredPing") != 0;	
 	s_preferences2.deafultweapon.curvalue = abs((int)trap_Cvar_VariableValue("cg_defaultWeapon") % (WP_NUM_WEAPONS - 1));
+	s_preferences2.lagometer.curvalue = abs((int)trap_Cvar_VariableValue("cg_lagometer") % 4);
 
 	s_preferences2.centerprint.curvalue = (int)(trap_Cvar_VariableValue("cg_centerPrintAlpha") * 2) % 3;
 	s_preferences2.drawgun.curvalue = (int)trap_Cvar_VariableValue("cg_drawGun") % 3;
@@ -185,6 +197,39 @@ static void Preferences2_SetMenuItems( void ) {
 	trap_Cvar_VariableStringBuffer("cg_teamColors", s_preferences2.teamcolors.field.buffer, sizeof(s_preferences2.teamcolors.field.buffer));
 }
 
+/*
+=================
+Preferences2_SaveChanges
+=================
+*/
+static void Preferences2_SaveChanges( void ) {	
+	float fov, fov2;
+
+	fov = fov2 = atof(s_preferences2.fov.field.buffer);
+
+	if (fov == 0) fov = 100; 
+	else if (fov < 1) fov = 1; 
+	else if (fov > 160) fov = 160;
+
+	if (fov != fov2)
+		Com_sprintf(s_preferences2.fov.field.buffer, 5, "%f", fov);
+
+	fov = fov2 = atof(s_preferences2.zoomfov.field.buffer);
+
+	if (fov == 0) fov = 22.5f;
+	else if (fov < 1) fov = 1; 
+	else if (fov > 160) fov = 160;
+
+	if (fov != fov2)
+		Com_sprintf(s_preferences2.zoomfov.field.buffer, 5, "%f", fov);	
+
+	trap_Cvar_Set( "cg_fov", s_preferences2.fov.field.buffer );	
+	trap_Cvar_Set( "cg_zoomfov", s_preferences2.zoomfov.field.buffer );
+	trap_Cvar_Set( "cg_enemyModel", QX_trim(s_preferences2.enemymodel.field.buffer) );	
+	trap_Cvar_Set( "cg_enemyColors", s_preferences2.enemycolors.field.buffer );	
+	trap_Cvar_Set( "cg_teamModel", QX_trim(s_preferences2.teammodel.field.buffer) );	
+	trap_Cvar_Set( "cg_teamColors", s_preferences2.teamcolors.field.buffer );	
+}
 
 static void Preferences2_Event( void* ptr, int notification ) {
 	int fov;
@@ -259,6 +304,9 @@ static void Preferences2_Event( void* ptr, int notification ) {
 		trap_Cvar_SetValue("cg_defaultWeapon", s_preferences2.deafultweapon.curvalue);
 		break;
 		
+	case ID_LAGOMETER:
+		trap_Cvar_SetValue( "cg_lagometer", s_preferences2.lagometer.curvalue );
+		break;
 
 	case ID_CENTER_PRINT:
 		trap_Cvar_SetValue("cg_centerPrintAlpha", s_preferences2.centerprint.curvalue / 2.0f);
@@ -473,6 +521,17 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.zoomfov.field.widthInChars = 5;
 	s_preferences2.zoomfov.field.maxchars     = 4;
 
+	y += BIGCHAR_HEIGHT+2;
+	s_preferences2.lagometer.generic.type = MTYPE_SPINCONTROL;
+	s_preferences2.lagometer.generic.name = "Lagometer:";
+	s_preferences2.lagometer.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	s_preferences2.lagometer.generic.x = PREFERENCES_X_POS_2;
+	s_preferences2.lagometer.generic.callback = Preferences2_Event;
+	s_preferences2.lagometer.generic.statusbar	= Preferences2_StatusBar;
+	s_preferences2.lagometer.generic.id = ID_LAGOMETER;
+	s_preferences2.lagometer.generic.y = y;
+	s_preferences2.lagometer.itemnames = lagometer_items;
+
 	y += (BIGCHAR_HEIGHT+2)* 2;
 	s_preferences2.enemymodelenabled.generic.type = MTYPE_RADIOBUTTON;
 	s_preferences2.enemymodelenabled.generic.name = "Bright models:";
@@ -568,46 +627,12 @@ static void Preferences2_MenuInit( void ) {
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.coloredping );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.deafultweapon );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.centerprint );	
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.lagometer );
 
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.back );
 
 	Preferences2_SetMenuItems();
 }
-
-/*
-=================
-Preferences2_SaveChanges
-=================
-*/
-static void Preferences2_SaveChanges( void ) {	
-	float fov, fov2;
-
-	fov = fov2 = atof(s_preferences2.fov.field.buffer);
-
-	if (fov == 0) fov = 100; 
-	else if (fov < 1) fov = 1; 
-	else if (fov > 160) fov = 160;
-	
-	if (fov != fov2)
-		Com_sprintf(s_preferences2.fov.field.buffer, 5, "%f", fov);
-
-	fov = fov2 = atof(s_preferences2.zoomfov.field.buffer);
-
-	if (fov == 0) fov = 22.5f;
-	else if (fov < 1) fov = 1; 
-	else if (fov > 160) fov = 160;
-
-	if (fov != fov2)
-		Com_sprintf(s_preferences2.zoomfov.field.buffer, 5, "%f", fov);	
-
-	trap_Cvar_Set( "cg_fov", s_preferences2.fov.field.buffer );	
-	trap_Cvar_Set( "cg_zoomfov", s_preferences2.zoomfov.field.buffer );
-	trap_Cvar_Set( "cg_enemyModel", QX_trim(s_preferences2.enemymodel.field.buffer) );	
-	trap_Cvar_Set( "cg_enemyColors", s_preferences2.enemycolors.field.buffer );	
-	trap_Cvar_Set( "cg_teamModel", QX_trim(s_preferences2.teammodel.field.buffer) );	
-	trap_Cvar_Set( "cg_teamColors", s_preferences2.teamcolors.field.buffer );	
-}
-
 
 /*
 ===============

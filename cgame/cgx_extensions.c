@@ -32,21 +32,21 @@ static char *known_models[] = {
 };
 
 void trap_DPrint(const char *str) {
-#if 1
+#if CGX_DEBUG
 	if (cgx_debug.integer)
 	trap_Print(va ("^5DEBUG: %s", str) );
 #endif
 }
 
 void trap_WPrint(const char *str) {
-#if 1
+#if CGX_DEBUG
 	if (cgx_debug.integer)
 	trap_Print(va ("^3WARNING: %s", str) );
 #endif
 }
 
 void trap_RPrint(const char *str) {
-#if 1
+#if CGX_DEBUG
 	if (cgx_debug.integer)
 	trap_Print(va ("^6REASON: %s", str) );
 #endif
@@ -378,3 +378,32 @@ void CGX_SetModelAndSkin(clientInfo_t *ci) {
 	}
 }
 
+void CGX_AutoAdjustNetworkSettings(void) {
+	trap_DPrint(va("CGX_AutoAdjustNetworkSettings %i\n", cgx_networkAdjustments.integer));
+
+	if (cgx_networkAdjustments.integer) {
+		int i, minRate, minSnaps;
+		char buf[10];		
+
+		if (cgx_networkAdjustments.integer == 1) {
+			minRate = 8000;
+			minSnaps = 4444;
+		} else {
+			minRate = 30000;
+			minSnaps = 8888;
+		}
+
+		i = cgs.sv_fps > 0 ? cgs.sv_fps : minSnaps;
+		trap_Cvar_Set("snaps", va("%i", i));
+		trap_WPrint(va("Auto: snaps %i\n", i));
+
+		trap_Cvar_VariableStringBuffer("rate", buf, sizeof(buf));
+
+		i = atoi(buf);
+
+		if (i < minRate) {
+			trap_Cvar_Set("rate", va("%i", minRate));
+			trap_WPrint(va("Auto: rate %i\n", minRate));
+		}
+	}		
+}

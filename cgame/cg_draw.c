@@ -836,7 +836,7 @@ static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
 	return ret_y;
 }
 
-
+static float CGX_DrawDebugInfo(float y);
 /*
 =====================
 CG_DrawUpperRight
@@ -862,6 +862,9 @@ static void CG_DrawUpperRight( void ) {
 	}
 	if (cgx_drawSpeed.integer) {
 		y = CGX_DrawSpeedMeter(y);
+	}
+	if (cgx_debug.integer > 1) {
+		y = CGX_DrawDebugInfo(y);
 	}
 	if ( cg_drawAttacker.integer ) {
 		y = CG_DrawAttacker( y );
@@ -1367,9 +1370,89 @@ typedef struct {
 	int		snapshotFlags[LAG_SAMPLES];
 	int		snapshotSamples[LAG_SAMPLES];
 	int		snapshotCount;
+
+	// X-MOD: extend to store lost packets and delayed rate in LAG_SAMPLES interval;
+	int		packetloss;
+	int		rateDelayed;
 } lagometer_t;
 
 lagometer_t		lagometer;
+
+// X-MOD: update network stats for lagometer and other purpose
+static void CGX_UpdateNetworkStats(snapshot_t *snap) {
+	static int pingTotal, pingCount, oldSnapshotCount;
+
+	if (snap->ping != 999) {
+		pingTotal += snap->ping;
+		pingCount++;
+	}		
+
+	if (snap->snapFlags & SNAPFLAG_RATE_DELAYED)
+		lagometer.rateDelayed++;				
+
+	// still collecting stats
+	if (oldSnapshotCount > lagometer.snapshotCount)
+		return;
+
+	trap_DPrint(va("CGX_UpdateNetworkStats %i %i %i\n", cg.meanPing, lagometer.packetloss, lagometer.rateDelayed));
+
+	oldSnapshotCount = lagometer.snapshotCount + LAG_SAMPLES;
+
+	cg.meanPing = pingCount ? pingTotal / pingCount : -1;		
+	cg.packetloss = lagometer.packetloss;
+	cg.rateDelayed = lagometer.rateDelayed;
+	cg.packetlossTotal += lagometer.packetloss;
+	cg.rateDelayedTotal += lagometer.rateDelayed;	
+
+	//reset counters for next time interval
+
+	pingTotal = 0;
+	pingCount = 0;
+	lagometer.packetloss = 0;
+	lagometer.rateDelayed = 0;
+}
+
+// X-MOD: display custom debug info
+static float CGX_DrawDebugInfo( float y ) {	
+	char		*s;
+	int			w;		
+
+	s = va("CI: %i", cg.connectionInterrupteds);
+	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
+	CG_DrawBigString( vScreen.width - 5 - w, y + 2, s, 1.0F);	
+	y += BIGCHAR_HEIGHT + 4;
+
+	s = va("LSN: %i", cg.latestSnapshotNum);
+	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
+	CG_DrawBigString( vScreen.width - 5 - w, y + 2, s, 1.0F);	
+	y += BIGCHAR_HEIGHT + 4;
+
+	s = va("LSC: %i", lagometer.snapshotCount);
+	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
+	CG_DrawBigString( vScreen.width - 5 - w, y + 2, s, 1.0F);	
+	y += BIGCHAR_HEIGHT + 4;
+
+	s = va("PING: %i", cg.meanPing);
+	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
+	CG_DrawBigString( vScreen.width - 5 - w, y + 2, s, 1.0F);
+	y += BIGCHAR_HEIGHT + 4;
+
+	s = va("LOSS: %i %i", cg.packetloss, cg.packetlossTotal);
+	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
+	CG_DrawBigString( vScreen.width - 5 - w, y + 2, s, 1.0F);
+	y += BIGCHAR_HEIGHT + 4;
+
+	s = va("RD: %i %i", cg.rateDelayed, cg.rateDelayedTotal);
+	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
+	CG_DrawBigString( vScreen.width - 5 - w, y + 2, s, 1.0F);	
+	y += BIGCHAR_HEIGHT + 4;
+
+	s = va("T: %i", cg.time);
+	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
+	CG_DrawBigString( vScreen.width - 5 - w, y + 2, s, 1.0F);	
+
+	return y + BIGCHAR_HEIGHT + 4;
+}
 
 /*
 ==============
@@ -1401,6 +1484,8 @@ void CG_AddLagometerSnapshotInfo( snapshot_t *snap ) {
 	if ( !snap ) {
 		lagometer.snapshotSamples[ lagometer.snapshotCount & ( LAG_SAMPLES - 1) ] = -1;
 		lagometer.snapshotCount++;
+		lagometer.packetloss++;	
+
 		return;
 	}
 
@@ -1408,6 +1493,9 @@ void CG_AddLagometerSnapshotInfo( snapshot_t *snap ) {
 	lagometer.snapshotSamples[ lagometer.snapshotCount & ( LAG_SAMPLES - 1) ] = snap->ping;
 	lagometer.snapshotFlags[ lagometer.snapshotCount & ( LAG_SAMPLES - 1) ] = snap->snapFlags;
 	lagometer.snapshotCount++;
+
+	if (cg_lagometer.integer > 1)
+		CGX_UpdateNetworkStats(snap);		
 }
 
 /*
@@ -1465,6 +1553,12 @@ static void CG_DrawLagometer( void ) {
 	float	vscale;
 
 	if ( !cg_lagometer.integer || cgs.localServer ) {
+		CG_DrawDisconnect();
+		return;
+	}
+
+	// X-MOD: show lagometer only if lag, if no lag show disconnect icon
+	if (cg_lagometer.integer > 2 && cg.rateDelayed == 0 && cg.packetloss == 0) {
 		CG_DrawDisconnect();
 		return;
 	}
@@ -1557,14 +1651,21 @@ static void CG_DrawLagometer( void ) {
 	}
 	
 	// X-MOD: draw ping in lagometer
-	if (cg_lagometer.integer == 2 && !cg.demoPlayback) {
-		CG_DrawStringExt(x + 1, y, va("%ims", cg.meanPing), g_color_table[ColorIndex(COLOR_WHITE)], qfalse, qfalse, 5, 10, 0);
+	if (cg_lagometer.integer > 1 && !cg.demoPlayback) {
+		// draw ping packet loss and delayed rate if lag
+		if (cg.meanPing > 0) {
+			if (cg_lagometer.integer > 2)
+				CG_DrawStringExt(x + 1, y, va("%ims %i %i", cg.meanPing, cg.packetloss, cg.ratedelayed), g_color_table[ColorIndex(COLOR_WHITE)], qfalse, qfalse, 5, 10, 0);
+			else
+				CG_DrawStringExt(x + 1, y, va("%ims", cg.meanPing, cg.packetloss, cg.ratedelayed), g_color_table[ColorIndex(COLOR_WHITE)], qfalse, qfalse, 5, 10, 0);
+		} else {			
+			// draw if stats not calculated yet
+			CG_DrawStringExt(x + 1, y, "...", g_color_table[ColorIndex(COLOR_WHITE)], qfalse, qfalse, 5, 10, 0);			
+		}
 	}
-
+	
 	CG_DrawDisconnect();
 }
-
-
 
 /*
 ===============================================================================
@@ -2104,31 +2205,6 @@ static void CG_Draw2D( void ) {
 }
 
 /*
-================
-CGX_CalculatePing
-================
-based on code baseq3a: https://github.com/ec-/baseq3a
-*/
-static void CGX_CalculatePing(void) {
-	int count, i, v;
-
-	cg.meanPing = 0;
-
-	for (i = 0, count = 0; i < LAG_SAMPLES; i++) {
-
-		v = lagometer.snapshotSamples[i];
-		if (v >= 0) {
-			cg.meanPing += v;
-			count++;
-		}
-	}
-
-	if (count) {
-		cg.meanPing /= count;
-	}
-}
-
-/*
 =====================
 CG_DrawActive
 
@@ -2143,11 +2219,6 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	if ( !cg.snap ) {
 		CG_DrawInformation();
 		return;
-	}
-
-	// X-MOD: calculate ping
-	if ( cg_lagometer.integer == 2 && !cg.demoPlayback ) {
-		CGX_CalculatePing();	
 	}
 
 	// optionally draw the tournement scoreboard instead

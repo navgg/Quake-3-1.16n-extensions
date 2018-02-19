@@ -151,6 +151,8 @@ vmCvar_t	uix_centerPrintAlpha;
 vmCvar_t	uix_crosshairColor;
 vmCvar_t	uix_drawSpeed;
 vmCvar_t	uix_coloredPing;
+vmCvar_t	uix_lagometer;
+vmCvar_t	uix_networkAdjustments;
 
 cvarTable_t		cvarTable[] = {
 	{ &ui_ffa_fraglimit, "ui_ffa_fraglimit", "20", CVAR_ARCHIVE },
@@ -211,6 +213,8 @@ cvarTable_t		cvarTable[] = {
 	{ &uix_crosshairColor, "cg_crosshairColor", "7", CVAR_ARCHIVE },
 	{ &uix_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
 	{ &uix_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },
+	{ &uix_lagometer, "cg_lagometer", "3", CVAR_ARCHIVE },
+	{ &uix_networkAdjustments, "cg_networkAdjustments", "1", CVAR_ARCHIVE },
 
 	{ &ui_server1, "server1", "sodmod.ga:27962", CVAR_ARCHIVE },
 	{ &ui_server2, "server2", "sodmod.ga:27963", CVAR_ARCHIVE },

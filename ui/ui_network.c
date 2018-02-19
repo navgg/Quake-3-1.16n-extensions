@@ -23,7 +23,7 @@ NETWORK OPTIONS MENU
 #define ID_RATE				14
 #define ID_PACKETS			15
 #define ID_PACKETDUP		16
-#define ID_LAGOMETER		17
+#define ID_AUTOADJ			17
 
 #define ID_BACK				29
 
@@ -34,7 +34,7 @@ static void UI_Network_StatusBar( void *self ) {
 		{ "Max date rate in bytes per second", "Setting lower than 5000 not recommended" },
 		{ "Max packets rate per second", "Set highter if you have good PC and internet" },
 		{ "Send packet duplicates or no", "If cable internet you can turn this off, Wi-Fi - on" },
-		{ "Draw ingame lagometer", "" }
+		{ "Set off only if you know how to config rate/snaps", "Set max if you have strong PC and cable internet" }
 	};
 
 	UIX_CommonStatusBar(self, ID_RATE, MAX_INFO_MESSAGES, info_messages);
@@ -43,6 +43,7 @@ static void UI_Network_StatusBar( void *self ) {
 static const char *rate_items[] = {	
 	"4000 (56K old modems)",
 	"5000 (ISDN)",
+	"8000 (Min comfort)",
 	"10000 (10Kb/sec)",
 	"16000 (16Kb/sec)",
 	"25000 (LAN/Cable/xDSL)",
@@ -62,10 +63,10 @@ static const char *packets_items[] = {
 	0
 };
 
-static const char *lagometer_items[] = {
+static const char *autoadjustments_items[] = {
 	"Off",
-	"Netgraph",
-	"Netgraph + ping",
+	"Default",
+	"Max settings",
 	0
 };
 
@@ -83,7 +84,7 @@ typedef struct {
 
 	menulist_s		rate;
 	menulist_s		packets;
-	menulist_s		lagometer;
+	menulist_s		adjustments;
 	menuradiobutton_s	packetdup;
 
 	menubitmap_s	back;
@@ -128,14 +129,16 @@ static void UI_NetworkOptionsMenu_Event( void* ptr, int event ) {
 		else if( networkOptionsInfo.rate.curvalue == 1 )
 			trap_Cvar_SetValue( "rate", 5000 );				
 		else if( networkOptionsInfo.rate.curvalue == 2 )
-			trap_Cvar_SetValue( "rate", 10000 );			
+			trap_Cvar_SetValue( "rate", 8000 );			
 		else if( networkOptionsInfo.rate.curvalue == 3 )
-			trap_Cvar_SetValue( "rate", 16000 );			
+			trap_Cvar_SetValue( "rate", 10000 );			
 		else if( networkOptionsInfo.rate.curvalue == 4 )
-			trap_Cvar_SetValue( "rate", 25000 );			
+			trap_Cvar_SetValue( "rate", 16000 );			
 		else if( networkOptionsInfo.rate.curvalue == 5 )
-			trap_Cvar_SetValue( "rate", 30000 );		
+			trap_Cvar_SetValue( "rate", 25000 );			
 		else if( networkOptionsInfo.rate.curvalue == 6 )
+			trap_Cvar_SetValue( "rate", 30000 );		
+		else if( networkOptionsInfo.rate.curvalue == 7 )
 			trap_Cvar_SetValue( "rate", 50000 );			
 		
 		trap_Cvar_SetValue( "snaps", 40 );		
@@ -145,8 +148,8 @@ static void UI_NetworkOptionsMenu_Event( void* ptr, int event ) {
 		trap_Cvar_SetValue( "cl_maxpackets", 40 + networkOptionsInfo.packets.curvalue * 10 );
 		break;
 	
-	case ID_LAGOMETER:
-		trap_Cvar_SetValue( "cg_lagometer", networkOptionsInfo.lagometer.curvalue );
+	case ID_AUTOADJ:
+		trap_Cvar_SetValue( "cg_networkAdjustments", networkOptionsInfo.adjustments.curvalue );
 
 	case ID_PACKETDUP:
 		trap_Cvar_SetValue( "cl_packetdup", networkOptionsInfo.packetdup.curvalue );							
@@ -271,15 +274,15 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.packetdup.generic.statusbar	= UI_Network_StatusBar;
 
 	y = 240 + 1 * (BIGCHAR_HEIGHT + 2);
-	networkOptionsInfo.lagometer.generic.type = MTYPE_SPINCONTROL;
-	networkOptionsInfo.lagometer.generic.name = "Lagometer:";
-	networkOptionsInfo.lagometer.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
-	networkOptionsInfo.lagometer.generic.callback = UI_NetworkOptionsMenu_Event;
-	networkOptionsInfo.lagometer.generic.id = ID_LAGOMETER;
-	networkOptionsInfo.lagometer.generic.x = 400;
-	networkOptionsInfo.lagometer.generic.y = y;
-	networkOptionsInfo.lagometer.itemnames = lagometer_items;
-	networkOptionsInfo.lagometer.generic.statusbar	= UI_Network_StatusBar;
+	networkOptionsInfo.adjustments.generic.type = MTYPE_SPINCONTROL;
+	networkOptionsInfo.adjustments.generic.name = "Auto Adjustments:";
+	networkOptionsInfo.adjustments.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	networkOptionsInfo.adjustments.generic.callback = UI_NetworkOptionsMenu_Event;
+	networkOptionsInfo.adjustments.generic.id = ID_AUTOADJ;
+	networkOptionsInfo.adjustments.generic.x = 400;
+	networkOptionsInfo.adjustments.generic.y = y;
+	networkOptionsInfo.adjustments.itemnames = autoadjustments_items;
+	networkOptionsInfo.adjustments.generic.statusbar	= UI_Network_StatusBar;
 
 	networkOptionsInfo.back.generic.type		= MTYPE_BITMAP;
 	networkOptionsInfo.back.generic.name		= ART_BACK0;
@@ -302,7 +305,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.rate );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.packets );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.packetdup );
-	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.lagometer );
+	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.adjustments );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.back );
 
 	rate = trap_Cvar_VariableValue( "rate" );
@@ -310,16 +313,18 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 		networkOptionsInfo.rate.curvalue = 0;
 	else if( rate <= 5000 )
 		networkOptionsInfo.rate.curvalue = 1;	
-	else if( rate <= 10000 )
+	else if( rate <= 8000 )
 		networkOptionsInfo.rate.curvalue = 2;
-	else if( rate <= 16000 )
+	else if( rate <= 10000 )
 		networkOptionsInfo.rate.curvalue = 3;
-	else if( rate <= 25000 )
+	else if( rate <= 16000 )
 		networkOptionsInfo.rate.curvalue = 4;
-	else if( rate <= 30000 )
+	else if( rate <= 25000 )
 		networkOptionsInfo.rate.curvalue = 5;
-	else
+	else if( rate <= 30000 )
 		networkOptionsInfo.rate.curvalue = 6;
+	else
+		networkOptionsInfo.rate.curvalue = 7;
 
 	packets = trap_Cvar_VariableValue( "cl_maxpackets" );
 	if( packets <= 40 )
@@ -338,7 +343,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 		networkOptionsInfo.packets.curvalue = 6;
 	
 	networkOptionsInfo.packetdup.curvalue = trap_Cvar_VariableValue("cl_packetdup") != 0;
-	networkOptionsInfo.lagometer.curvalue = abs((int)trap_Cvar_VariableValue("cg_lagometer") % 3);
+	networkOptionsInfo.adjustments.curvalue = abs((int)trap_Cvar_VariableValue("cg_networkAdjustments") % 3);
 }
 
 
