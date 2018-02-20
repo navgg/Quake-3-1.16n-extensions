@@ -245,7 +245,7 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.network.style				= UI_RIGHT;
 	displayOptionsInfo.network.color				= color_red;
 
-	y = 240 - 3 * (BIGCHAR_HEIGHT + 2);	
+	y = 240 - 4 * (BIGCHAR_HEIGHT + 2);	
 	displayOptionsInfo.ignorehwgamma.generic.type = MTYPE_RADIOBUTTON;
 	displayOptionsInfo.ignorehwgamma.generic.name = "Ignore Game Gamma:";
 	displayOptionsInfo.ignorehwgamma.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
