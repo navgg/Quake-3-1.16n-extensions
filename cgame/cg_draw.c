@@ -1404,6 +1404,17 @@ static void CGX_UpdateNetworkStats(snapshot_t *snap) {
 	cg.packetlossTotal += lagometer.packetloss;
 	cg.rateDelayedTotal += lagometer.rateDelayed;	
 
+	// FIXME: in intermission sometimes triggers, skip in intermission probably, need to check later
+	//if (cgx_networkAdjustments.integer && cg.meanPing > 150) {		
+	//	if (cg.meanPing > 350 && cgx_maxfps.integer > 125) {
+	//		trap_Cvar_Set("com_maxfps", "125");
+	//		trap_Print("^3WARNING: Fps was set to 125 because of high ping");
+	//	} else if (cgx_maxfps.integer > 200) {
+	//		trap_Cvar_Set("com_maxfps", "200");
+	//		trap_Print("^3WARNING: Fps was set to 200 because of high ping");
+	//	} 
+	//}
+
 	//reset counters for next time interval
 
 	pingTotal = 0;
@@ -1494,7 +1505,7 @@ void CG_AddLagometerSnapshotInfo( snapshot_t *snap ) {
 	lagometer.snapshotFlags[ lagometer.snapshotCount & ( LAG_SAMPLES - 1) ] = snap->snapFlags;
 	lagometer.snapshotCount++;
 
-	if (cg_lagometer.integer > 1)
+	if (cg_lagometer.integer > 1 || cgx_networkAdjustments.integer)
 		CGX_UpdateNetworkStats(snap);		
 }
 
@@ -1519,6 +1530,9 @@ static void CG_DrawDisconnect( void ) {
 		|| cmd.serverTime > cg.time ) {	// special check for map_restart
 		return;
 	}
+
+	// X-MOD: count connection interrupteds	
+	cg.connectionInterrupteds++;	
 
 	// also add text in center of screen
 	s = "Connection Interrupted";
@@ -1655,9 +1669,9 @@ static void CG_DrawLagometer( void ) {
 		// draw ping packet loss and delayed rate if lag
 		if (cg.meanPing > 0) {
 			if (cg_lagometer.integer > 2)
-				CG_DrawStringExt(x + 1, y, va("%ims %i %i", cg.meanPing, cg.packetloss, cg.ratedelayed), g_color_table[ColorIndex(COLOR_WHITE)], qfalse, qfalse, 5, 10, 0);
+				CG_DrawStringExt(x + 1, y, va("%ims %i %i", cg.meanPing, cg.packetloss, cg.rateDelayed), g_color_table[ColorIndex(COLOR_WHITE)], qfalse, qfalse, 5, 10, 0);
 			else
-				CG_DrawStringExt(x + 1, y, va("%ims", cg.meanPing, cg.packetloss, cg.ratedelayed), g_color_table[ColorIndex(COLOR_WHITE)], qfalse, qfalse, 5, 10, 0);
+				CG_DrawStringExt(x + 1, y, va("%ims", cg.meanPing, cg.packetloss, cg.rateDelayed), g_color_table[ColorIndex(COLOR_WHITE)], qfalse, qfalse, 5, 10, 0);
 		} else {			
 			// draw if stats not calculated yet
 			CG_DrawStringExt(x + 1, y, "...", g_color_table[ColorIndex(COLOR_WHITE)], qfalse, qfalse, 5, 10, 0);			

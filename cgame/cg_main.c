@@ -181,7 +181,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_simpleItems, "cg_simpleItems", "0", CVAR_ARCHIVE },
 	{ &cg_addMarks, "cg_marks", "1", CVAR_ARCHIVE },
 	// X-MOD: nethgraph + ping
-	{ &cg_lagometer, "cg_lagometer", "2", CVAR_ARCHIVE },
+	{ &cg_lagometer, "cg_lagometer", "3", CVAR_ARCHIVE },
 	{ &cg_railTrailTime, "cg_railTrailTime", "400", CVAR_ARCHIVE  },
 	// X-MOD: cg_gun no more cheats
 	{ &cg_gun_x, "cg_gunX", "0", CVAR_ARCHIVE },
@@ -241,24 +241,26 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },
 	{ &cgx_networkAdjustments, "cg_networkAdjustments", "1", CVAR_ARCHIVE },
 
-#if CGX_DEBUG
+//#if CGX_DEBUG
 	// X-MOD: compability with noghost
 	{ &cgx_maxfps, "com_maxfps", "125", CVAR_ARCHIVE },
 	{ &cgx_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE },
-	{ &cgx_maxpackets, "cl_maxpackets", "60", CVAR_ARCHIVE },	
-#else
-	// X-MOD: compability with noghost
-	{ &cgx_maxfps, "com_maxfps", "125", CVAR_ARCHIVE | CVAR_USERINFO },
-	{ &cgx_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CVAR_USERINFO },
-	{ &cgx_maxpackets, "cl_maxpackets", "60", CVAR_ARCHIVE | CVAR_USERINFO },	
-#endif
+	{ &cgx_maxpackets, "cl_maxpackets", "40", CVAR_ARCHIVE },	
+//#else
+//	// X-MOD: compability with noghost
+//	{ &cgx_maxfps, "com_maxfps", "125", CVAR_ARCHIVE | CVAR_USERINFO },
+//	{ &cgx_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CVAR_USERINFO },
+//	{ &cgx_maxpackets, "cl_maxpackets", "40", CVAR_ARCHIVE | CVAR_USERINFO },	
+//#endif
 
 	{ &cgx_delag, "cg_delag", "1", CVAR_ARCHIVE },
 
 #if CGX_DEBUG
 	{ &cgx_debug, "cgx_debug", "1", CVAR_TEMP },
+#else
+	{ &cgx_debug, "cgx_debug", "0", CVAR_TEMP },
 #endif
-	{ &cgx_version, "cgx_version", "CGX "CGX_VERSION" 20 Feb 2018", CVAR_TEMP },
+	{ &cgx_version, "cgx_version", "CGX "CGX_VERSION" 20 Feb 2018", CVAR_ROM | CVAR_TEMP },
 
 	// cg_wideScreenFix 1|0 - fix perspective for widescreen
 	// cg_defaultWeapon 0-9 - default weapon when spawn 0: default 1: gauntlet ...
@@ -313,6 +315,7 @@ int		cgx_enemyColorsModificationCount = 1;
 int		cgx_teamColorsModificationCount = 1;
 int		cgx_deadBodyDarkenModificationCount = 1;
 int		cgx_enemyModel_enabledModificationCount = 1;
+int		cgx_fps_modificationCount = 1;
 
 
 
@@ -349,8 +352,11 @@ void CG_UpdateCvars( void ) {
 		trap_Cvar_Update( cv->vmCvar );
 	}
 
-	if (cgx_maxpackets.integer < 40)
-		trap_Cvar_Set("cl_maxpackets", "40");
+	if (cgx_maxpackets.integer < MIN_MAXPACKETS)
+		trap_Cvar_Set("cl_maxpackets", "30");
+
+	if (cgx_maxfps.integer > 333)
+		trap_Cvar_Set("com_maxfps", "333");
 
 	// check for modications here
 	// X-MOD: reinit vScreen if value changed
@@ -396,6 +402,12 @@ void CG_UpdateCvars( void ) {
 			CG_LoadDeferredPlayers();
 			trap_RPrint("TEAM CHANGED!\n");
 		}
+	}
+
+	if (cgx_fps_modificationCount != cgx_maxfps.modificationCount) {
+		cgx_fps_modificationCount = cgx_maxfps.modificationCount;
+
+		CGX_AutoAdjustNetworkSettings();
 	}
 
 	// If team overlay is on, ask for updates from the server.  If its off,

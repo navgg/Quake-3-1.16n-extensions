@@ -60,6 +60,9 @@
 
 //X-MOD: custom color extensions
 #define ShaderRGBACopy(a,b)	((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2],(b)[3]=(255))
+//X-MOD: maxpackets limits
+#define MIN_MAXPACKETS 30
+#define MAX_MAXPACKETS 125
 
 typedef enum {
 	FOOTSTEP_NORMAL,
@@ -532,7 +535,9 @@ typedef struct {
 	int			packetloss;
 	int			packetlossTotal;
 	int			rateDelayed;
-	int			rateDelayedTotal;
+	int			rateDelayedTotal;	
+	
+	int			connectionInterrupteds;
 } cg_t;
 
 

@@ -32,24 +32,18 @@ static char *known_models[] = {
 };
 
 void trap_DPrint(const char *str) {
-#if CGX_DEBUG
 	if (cgx_debug.integer)
 	trap_Print(va ("^5DEBUG: %s", str) );
-#endif
 }
 
 void trap_WPrint(const char *str) {
-#if CGX_DEBUG
 	if (cgx_debug.integer)
 	trap_Print(va ("^3WARNING: %s", str) );
-#endif
 }
 
 void trap_RPrint(const char *str) {
-#if CGX_DEBUG
 	if (cgx_debug.integer)
 	trap_Print(va ("^6REASON: %s", str) );
-#endif
 }
 
 void CGX_Init_vScreen(void) {	
@@ -385,25 +379,44 @@ void CGX_AutoAdjustNetworkSettings(void) {
 		int i, minRate, minSnaps;
 		char buf[10];		
 
+		i = 0;
+
 		if (cgx_networkAdjustments.integer == 1) {
 			minRate = 8000;
-			minSnaps = 4444;
-		} else {
-			minRate = 30000;
-			minSnaps = 8888;
+			//no sense in snaps > 30 for default quake3.exe, magic number for fun
+			minSnaps = 44;			
+			
+			i = cgx_maxfps.integer / 3;				
+		} else if (cgx_networkAdjustments.integer == 2) {
+			int k = 1;
+			minRate = 25000;
+			//no sense in snaps > 30 for default quake3.exe, but let magic numbers warm hearts
+			minSnaps = cgx_maxfps.integer;
+
+			while((i = cgx_maxfps.integer / k++) > MAX_MAXPACKETS);						
 		}
 
+		// set packets first
+		if (i > 0) {
+			if (i < MIN_MAXPACKETS) i = MIN_MAXPACKETS;
+			else if (i > MAX_MAXPACKETS) i = MAX_MAXPACKETS;
+
+			trap_Cvar_Set("cl_maxpackets", va("%i", i));
+			trap_Print(va("Auto: cl_maxpackets %i\n", i));
+		}
+
+		// check and set snaps
 		i = cgs.sv_fps > 0 ? cgs.sv_fps : minSnaps;
 		trap_Cvar_Set("snaps", va("%i", i));
-		trap_WPrint(va("Auto: snaps %i\n", i));
+		trap_Print(va("Auto: snaps %i\n", i));
 
+		// check and set rate
 		trap_Cvar_VariableStringBuffer("rate", buf, sizeof(buf));
-
 		i = atoi(buf);
 
 		if (i < minRate) {
 			trap_Cvar_Set("rate", va("%i", minRate));
-			trap_WPrint(va("Auto: rate %i\n", minRate));
+			trap_Print(va("Auto: rate %i\n", minRate));
 		}
 	}		
 }
