@@ -243,9 +243,9 @@ cvarTable_t		cvarTable[] = {
 
 //#if CGX_DEBUG
 	// X-MOD: compability with noghost
-	{ &cgx_maxfps, "com_maxfps", "125", CVAR_ARCHIVE },
-	{ &cgx_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE },
-	{ &cgx_maxpackets, "cl_maxpackets", "40", CVAR_ARCHIVE },	
+	{ &cgx_maxfps, "com_maxfps", "125", CVAR_ARCHIVE | CVAR_USERINFO },
+	{ &cgx_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CVAR_USERINFO },
+	{ &cgx_maxpackets, "cl_maxpackets", "40", CVAR_ARCHIVE | CVAR_USERINFO },		
 //#else
 //	// X-MOD: compability with noghost
 //	{ &cgx_maxfps, "com_maxfps", "125", CVAR_ARCHIVE | CVAR_USERINFO },
@@ -260,7 +260,7 @@ cvarTable_t		cvarTable[] = {
 #else
 	{ &cgx_debug, "cgx_debug", "0", CVAR_TEMP },
 #endif
-	{ &cgx_version, "cgx_version", "CGX "CGX_VERSION" 20 Feb 2018", CVAR_ROM | CVAR_TEMP },
+	{ &cgx_version, "cgx_version", "CGX "CGX_VERSION" "CGX_DATE, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO},
 
 	// cg_wideScreenFix 1|0 - fix perspective for widescreen
 	// cg_defaultWeapon 0-9 - default weapon when spawn 0: default 1: gauntlet ...
@@ -288,6 +288,7 @@ cvarTable_t		cvarTable[] = {
 	// cgx_debug 0|1|2 - show debug info
 	// cgx_version - show version
 	// TODO: 	
+	// cg_profanityFilter 1|0 ?
 	// botColors botModels ? separate bots from humans
 	// cg_adjustFov fov adjust	
 	// cg_drawAccuracy 0 1 draw acc	

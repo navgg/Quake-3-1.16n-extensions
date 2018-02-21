@@ -384,26 +384,27 @@ void CGX_SetModelAndSkin(clientInfo_t *ci) {
 void CGX_AutoAdjustNetworkSettings(void) {
 	trap_DPrint(va("CGX_AutoAdjustNetworkSettings %i\n", cgx_networkAdjustments.integer));
 
-	if (cgx_networkAdjustments.integer) {
-		int i, minRate, minSnaps;
+	if (cgx_networkAdjustments.integer && !cgs.localServer) {
+		int i, minRate, minSnaps, k;
 		char buf[10];		
-
-		i = 0;
+		
+		i = 0;		
 
 		if (cgx_networkAdjustments.integer == 1) {
-			minRate = 8000;
-			//no sense in snaps > 30 for default quake3.exe, magic number for fun
-			minSnaps = 44;			
-			
-			i = cgx_maxfps.integer / 3;				
-		} else if (cgx_networkAdjustments.integer == 2) {
-			int k = 1;
-			minRate = 25000;
-			//no sense in snaps > 30 for default quake3.exe, but let magic numbers warm hearts
-			minSnaps = cgx_maxfps.integer;
+			k = 2;
+			minRate = 8000;			
 
-			while((i = cgx_maxfps.integer / k++) > MAX_MAXPACKETS);						
-		}
+			// if it's something lower than 60 - adjust
+			if (cgx_maxpackets.integer <= 60)
+				while ((i = cgx_maxfps.integer / k++) > 60);			
+		} else if (cgx_networkAdjustments.integer == 2) {
+			k = 1;
+			minRate = 25000;			
+
+			// if it's already 100 skip, lower - adjust
+			if (cgx_maxpackets.integer < 100)
+				while((i = cgx_maxfps.integer / k++) > MAX_MAXPACKETS);						
+		} 
 
 		// set packets first
 		if (i > 0) {
@@ -414,10 +415,12 @@ void CGX_AutoAdjustNetworkSettings(void) {
 			trap_Print(va("Auto: cl_maxpackets %i\n", i));
 		}
 
-		// check and set snaps
-		i = cgs.sv_fps > 0 ? cgs.sv_fps : minSnaps;
-		trap_Cvar_Set("snaps", va("%i", i));
-		trap_Print(va("Auto: snaps %i\n", i));
+		//no sense in snaps > 30 for default quake3.exe just set it to ~fps/2 
+		minSnaps = cgx_maxfps.integer > 60 ? cgx_maxfps.integer / 20 * 10: 40;
+
+		// set snaps		
+		trap_Cvar_Set("snaps", va("%i", minSnaps));
+		trap_Print(va("Auto: snaps %i\n", minSnaps));
 
 		// check and set rate
 		trap_Cvar_VariableStringBuffer("rate", buf, sizeof(buf));
@@ -427,5 +430,29 @@ void CGX_AutoAdjustNetworkSettings(void) {
 			trap_Cvar_Set("rate", va("%i", minRate));
 			trap_Print(va("Auto: rate %i\n", minRate));
 		}
+
+		if (cgx_networkAdjustments.integer == 2) {
+			// check and off packetdup
+			trap_Cvar_VariableStringBuffer("cl_packetdup", buf, sizeof(buf));
+			i = atoi(buf);
+
+			if (i) {
+				trap_Cvar_Set("cl_packetdup", "0");
+				trap_Print("Auto: cl_packetdup 0\n");
+			}
+		}				
 	}		
+
+	// check time nudge
+	// if server delaged it's better off
+	if (cgs.delag && cgx_timeNudge.integer < 0) {
+		trap_Cvar_Set("cl_timeNudge", "0");
+		trap_Print("Auto: cl_timeNudge 0\n");
+	} else if (cgx_timeNudge.integer > 30) {
+		trap_Cvar_Set("cl_timeNudge", "30");
+		trap_Print("Auto: cl_timeNudge 30\n");
+	} else if (cgx_timeNudge.integer < -30) {
+		trap_Cvar_Set("cl_timeNudge", "-30");
+		trap_Print("Auto: cl_timeNudge -30\n");
+	}
 }
