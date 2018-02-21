@@ -154,6 +154,16 @@ vmCvar_t	uix_coloredPing;
 vmCvar_t	uix_lagometer;
 vmCvar_t	uix_networkAdjustments;
 
+vmCvar_t	uix_fov;
+vmCvar_t	uix_zoomfov;
+vmCvar_t	uix_drawgun;
+vmCvar_t	uix_drawrewards;
+vmCvar_t	uix_draw3dicons;
+vmCvar_t	uix_gibs;
+
+//X-MOD: ui_cinematics playback fix for custom resolutions
+vmCvar_t	uix_cinematicplayed;
+
 cvarTable_t		cvarTable[] = {
 	{ &ui_ffa_fraglimit, "ui_ffa_fraglimit", "20", CVAR_ARCHIVE },
 	{ &ui_ffa_timelimit, "ui_ffa_timelimit", "0", CVAR_ARCHIVE },
@@ -215,6 +225,16 @@ cvarTable_t		cvarTable[] = {
 	{ &uix_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },
 	{ &uix_lagometer, "cg_lagometer", "3", CVAR_ARCHIVE },
 	{ &uix_networkAdjustments, "cg_networkAdjustments", "1", CVAR_ARCHIVE },
+
+	{ &uix_cinematicplayed, "uix_cinematicplayed", "-1", CVAR_TEMP },
+
+	// some quake3 not initialized variables
+	{ &uix_zoomfov, "cg_zoomfov", "22.5", CVAR_ARCHIVE },	
+	{ &uix_fov, "cg_fov", "90", CVAR_ARCHIVE },	
+	{ &uix_drawgun, "cg_drawGun", "1", CVAR_ARCHIVE },	
+	{ &uix_drawrewards, "cg_drawRewards", "1", CVAR_ARCHIVE },	
+	{ &uix_draw3dicons, "cg_draw3dIcons", "1", CVAR_ARCHIVE },	
+	{ &uix_gibs, "cg_gibs", "1", CVAR_ARCHIVE },	
 
 	{ &ui_server1, "server1", "sodmod.ga:27962", CVAR_ARCHIVE },
 	{ &ui_server2, "server2", "sodmod.ga:27963", CVAR_ARCHIVE },

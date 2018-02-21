@@ -43,9 +43,9 @@ static void UI_Preferences_StatusBar( void *self ) {
 	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
 		{ "Sets ingame crosshair", "" },
 		{ "Sets display of objects in game", "'On' - all weapons and items will be 2D, 'Off' - 3D" },
-		{ "If it's off sky will not draw", "May increase slightly FPS on old PC" },
+		{ "If it's off sky will not draw", "May increase slightly FPS on weak PC" },
 		{ "Toggles ejecting brass", "" },
-		{ "Toggles display of marks on walls", "" },
+		{ "Toggles display of marks on walls", "Turning off may increase FPS in some cases" },
 		{ "Renders realtime dynamic lights", "Turning off may slightly increase FPS" },
 		{ "Display target name above crosshair", "" },
 		{ "V-Sync (Vertical synchronization)", "Strongly recommended 'Off'" },

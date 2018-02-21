@@ -186,8 +186,8 @@ static void Preferences2_SetMenuItems( void ) {
 	s_preferences2.playerids.curvalue	= trap_Cvar_VariableValue( "cg_drawPlayerIDs" ) != 0;	
 	s_preferences2.draw3dicons.curvalue	= trap_Cvar_VariableValue( "cg_draw3Dicons" ) != 0;
 	s_preferences2.camerabob.curvalue	= trap_Cvar_VariableValue( "cg_bobup" ) != 0 
-										&& trap_Cvar_VariableValue( "cg_bobpitch" ) != 0 
-										&& trap_Cvar_VariableValue( "cg_bobroll" ) != 0;	
+										|| trap_Cvar_VariableValue( "cg_bobpitch" ) != 0 
+										|| trap_Cvar_VariableValue( "cg_bobroll" ) != 0;	
 
 	s_preferences2.enemymodelenabled.curvalue = trap_Cvar_VariableValue("cg_enemyModel_enabled") != 0;
 	s_preferences2.chatbeep.curvalue = trap_Cvar_VariableValue("cg_chatSound") != 0;
@@ -275,11 +275,10 @@ static void Preferences2_Event( void* ptr, int notification ) {
 		break;
 
 	case ID_CAMERABOB:
-		if (s_preferences2.camerabob.curvalue) {
-			trap_Print("reset bob");
-			trap_Cvar_Reset("cg_bobup");
-			trap_Cvar_Reset("cg_bobpitch");
-			trap_Cvar_Reset("cg_bobroll");
+		if (s_preferences2.camerabob.curvalue) {			
+			trap_Cvar_SetValue("cg_bobup", 0.005);
+			trap_Cvar_SetValue("cg_bobpitch", 0.002);
+			trap_Cvar_SetValue("cg_bobroll", 0.002);
 		} else {
 			trap_Cvar_SetValue("cg_bobup", 0);
 			trap_Cvar_SetValue("cg_bobpitch", 0);

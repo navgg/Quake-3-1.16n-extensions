@@ -24,17 +24,19 @@ NETWORK OPTIONS MENU
 #define ID_PACKETS			15
 #define ID_PACKETDUP		16
 #define ID_AUTOADJ			17
+#define ID_SNAPS			18
 
 #define ID_BACK				29
 
-#define MAX_INFO_MESSAGES	4
+#define MAX_INFO_MESSAGES	5
 
 static void UI_Network_StatusBar( void *self ) {	
 	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
 		{ "Max date rate in bytes per second", "Setting lower than 5000 not recommended" },
 		{ "Max packets rate per second", "Set highter if you have good PC and internet" },
 		{ "Send packet duplicates or no", "If cable internet you can turn this off, Wi-Fi - on" },
-		{ "Set off only if you know how to config rate/snaps", "Set max if you have strong PC and cable internet" }
+		{ "Set off if you know how to config rate/packets", "Set max if you have strong PC and cable internet" },
+		{ "Sets amout of snaps sent from server to client", "Min - 1, Max - 999. Recommended 40" }
 	};
 
 	UIX_CommonStatusBar(self, ID_RATE, MAX_INFO_MESSAGES, info_messages);
@@ -66,7 +68,7 @@ static const char *packets_items[] = {
 static const char *autoadjustments_items[] = {
 	"Off",
 	"Default",
-	"Max settings",
+	"Max",
 	0
 };
 
@@ -86,12 +88,32 @@ typedef struct {
 	menulist_s		packets;
 	menulist_s		adjustments;
 	menuradiobutton_s	packetdup;
+	menufield_s		snaps;
 
 	menubitmap_s	back;
 } networkOptionsInfo_t;
 
 static networkOptionsInfo_t	networkOptionsInfo;
 
+/*
+=================
+Preferences2_SaveChanges
+=================
+*/
+static void UI_NetworkOptionsMenu_SaveChanges( void ) {	
+	if (!networkOptionsInfo.adjustments.curvalue)
+		trap_Cvar_Set( "snaps", networkOptionsInfo.snaps.field.buffer );	
+}
+
+static void UI_NetworkOptionsMenu_CheckGrayed(void) {
+	if (!networkOptionsInfo.adjustments.curvalue) {
+		networkOptionsInfo.snaps.generic.flags ^= QMF_GRAYED;
+		networkOptionsInfo.packets.generic.flags ^= QMF_GRAYED;
+	} else {
+		networkOptionsInfo.snaps.generic.flags |= QMF_GRAYED;
+		networkOptionsInfo.packets.generic.flags |= QMF_GRAYED;
+	}
+}
 
 /*
 =================
@@ -139,9 +161,7 @@ static void UI_NetworkOptionsMenu_Event( void* ptr, int event ) {
 		else if( networkOptionsInfo.rate.curvalue == 6 )
 			trap_Cvar_SetValue( "rate", 30000 );		
 		else if( networkOptionsInfo.rate.curvalue == 7 )
-			trap_Cvar_SetValue( "rate", 50000 );			
-		
-		trap_Cvar_SetValue( "snaps", 40 );		
+			trap_Cvar_SetValue( "rate", 50000 );						
 		break;
 
 	case ID_PACKETS:				
@@ -150,17 +170,31 @@ static void UI_NetworkOptionsMenu_Event( void* ptr, int event ) {
 	
 	case ID_AUTOADJ:
 		trap_Cvar_SetValue( "cg_networkAdjustments", networkOptionsInfo.adjustments.curvalue );
+		UI_NetworkOptionsMenu_CheckGrayed();
+		break;
 
 	case ID_PACKETDUP:
 		trap_Cvar_SetValue( "cl_packetdup", networkOptionsInfo.packetdup.curvalue );							
 		break;
 
 	case ID_BACK:
+		UI_NetworkOptionsMenu_SaveChanges();
 		UI_PopMenu();
 		break;
 	}
 }
 
+/*
+=================
+PlayerSettings_MenuKey
+=================
+*/
+static sfxHandle_t UI_NetworkOptionsMenu_MenuKey( int key ) {
+	if( key == K_MOUSE2 || key == K_ESCAPE ) {
+		UI_NetworkOptionsMenu_SaveChanges();
+	}
+	return Menu_DefaultKey( &networkOptionsInfo.menu, key );
+}
 
 /*
 ===============
@@ -241,7 +275,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.network.style				= UI_RIGHT;
 	networkOptionsInfo.network.color				= color_red;
 
-	y = 240 - 2 * (BIGCHAR_HEIGHT+2);
+	y = 240 - 1 * (BIGCHAR_HEIGHT+2);
 	networkOptionsInfo.rate.generic.type		= MTYPE_SPINCONTROL;
 	networkOptionsInfo.rate.generic.name		= "Data Rate:";
 	networkOptionsInfo.rate.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
@@ -252,10 +286,10 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.rate.itemnames			= rate_items;
 	networkOptionsInfo.rate.generic.statusbar	= UI_Network_StatusBar;
 
-	y = 240 - 1 * (BIGCHAR_HEIGHT+2);
+	y = 240 + 1 * (BIGCHAR_HEIGHT+2);
 	networkOptionsInfo.packets.generic.type		= MTYPE_SPINCONTROL;
 	networkOptionsInfo.packets.generic.name		= "Packets Rate:";
-	networkOptionsInfo.packets.generic.flags	= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	networkOptionsInfo.packets.generic.flags	= QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_GRAYED|QMF_MOUSEONLY;
 	networkOptionsInfo.packets.generic.callback	= UI_NetworkOptionsMenu_Event;
 	networkOptionsInfo.packets.generic.id		= ID_PACKETS;
 	networkOptionsInfo.packets.generic.x		= 400;
@@ -263,7 +297,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.packets.itemnames		= packets_items;
 	networkOptionsInfo.packets.generic.statusbar	= UI_Network_StatusBar;
 
-	y = 240 + 0 * (BIGCHAR_HEIGHT+2);
+	y = 240 + 2 * (BIGCHAR_HEIGHT+2);
 	networkOptionsInfo.packetdup.generic.type		= MTYPE_RADIOBUTTON;
 	networkOptionsInfo.packetdup.generic.name		= "Packet Dup:";
 	networkOptionsInfo.packetdup.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
@@ -273,9 +307,21 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.packetdup.generic.y			= y;
 	networkOptionsInfo.packetdup.generic.statusbar	= UI_Network_StatusBar;
 
-	y = 240 + 1 * (BIGCHAR_HEIGHT + 2);
+	y = 240 + 0 * (BIGCHAR_HEIGHT+2);
+	networkOptionsInfo.snaps.generic.type		= MTYPE_FIELD;
+	networkOptionsInfo.snaps.generic.name		= "Snaps:";
+	networkOptionsInfo.snaps.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_NUMBERSONLY|QMF_GRAYED;
+	networkOptionsInfo.snaps.generic.callback	= UI_NetworkOptionsMenu_Event;
+	networkOptionsInfo.snaps.generic.id			= ID_SNAPS;
+	networkOptionsInfo.snaps.generic.x			= 400;
+	networkOptionsInfo.snaps.generic.y			= y;
+	networkOptionsInfo.snaps.field.widthInChars = 4;
+	networkOptionsInfo.snaps.field.maxchars		= 3;
+	networkOptionsInfo.snaps.generic.statusbar	= UI_Network_StatusBar;
+
+	y = 240 - 2 * (BIGCHAR_HEIGHT + 2);
 	networkOptionsInfo.adjustments.generic.type = MTYPE_SPINCONTROL;
-	networkOptionsInfo.adjustments.generic.name = "Auto Adjustments:";
+	networkOptionsInfo.adjustments.generic.name = "Auto Settings:";
 	networkOptionsInfo.adjustments.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
 	networkOptionsInfo.adjustments.generic.callback = UI_NetworkOptionsMenu_Event;
 	networkOptionsInfo.adjustments.generic.id = ID_AUTOADJ;
@@ -306,6 +352,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.packets );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.packetdup );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.adjustments );
+	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.snaps );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.back );
 
 	rate = trap_Cvar_VariableValue( "rate" );
@@ -342,8 +389,11 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	else
 		networkOptionsInfo.packets.curvalue = 6;
 	
+	trap_Cvar_VariableStringBuffer("snaps", networkOptionsInfo.snaps.field.buffer, sizeof(networkOptionsInfo.snaps.field.buffer));
 	networkOptionsInfo.packetdup.curvalue = trap_Cvar_VariableValue("cl_packetdup") != 0;
 	networkOptionsInfo.adjustments.curvalue = abs((int)trap_Cvar_VariableValue("cg_networkAdjustments") % 3);
+
+	UI_NetworkOptionsMenu_CheckGrayed();
 }
 
 

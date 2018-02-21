@@ -40,7 +40,7 @@ static void UI_Display_StatusBar( void *self ) {
 		{ "If you have problems with brighness", "Or colors after game exit, turn this on" },
 		{ "Shows counter of frapmes per second", "" },
 		{ "Fixes rendering for widescreens", "All icons and fonts are not stretching in game" },
-		{ "Sets max limit for frames per second", "" },
+		{ "Sets max limit for frames per second", "Min - 62, Max - 250" },
 		{ "Changes the render method", "'Fast (2)' may increase fps in some cases" }	
 	};
 
@@ -48,6 +48,7 @@ static void UI_Display_StatusBar( void *self ) {
 }
 
 static const char *fps_items[] = {		
+	"62",
 	"76",
 	"90",
 	"100",
@@ -245,7 +246,7 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.network.style				= UI_RIGHT;
 	displayOptionsInfo.network.color				= color_red;
 
-	y = 240 - 4 * (BIGCHAR_HEIGHT + 2);	
+	y = 240 - 3 * (BIGCHAR_HEIGHT + 2);	
 	displayOptionsInfo.ignorehwgamma.generic.type = MTYPE_RADIOBUTTON;
 	displayOptionsInfo.ignorehwgamma.generic.name = "Ignore Game Gamma:";
 	displayOptionsInfo.ignorehwgamma.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
@@ -374,24 +375,26 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.primitives.curvalue = trap_Cvar_VariableValue("r_primitives") / 2;
 
 	fps = trap_Cvar_VariableValue( "com_maxfps" );
-	if( fps <= 76 )
+	if (fps <= 62)
 		displayOptionsInfo.maxfps.curvalue = 0;
+	else if( fps <= 76 )
+		displayOptionsInfo.maxfps.curvalue = 1;
 	else if( fps <= 90 )
-		displayOptionsInfo.maxfps.curvalue = 1;	
+		displayOptionsInfo.maxfps.curvalue = 2;	
 	else if( fps <= 100 )
-		displayOptionsInfo.maxfps.curvalue = 2;
-	else if( fps <= 111 )
 		displayOptionsInfo.maxfps.curvalue = 3;
-	else if( fps <= 125 )
+	else if( fps <= 111 )
 		displayOptionsInfo.maxfps.curvalue = 4;
-	else if( fps <= 142 )
+	else if( fps <= 125 )
 		displayOptionsInfo.maxfps.curvalue = 5;
-	else if( fps <= 166 )
+	else if( fps <= 142 )
 		displayOptionsInfo.maxfps.curvalue = 6;
+	else if( fps <= 166 )
+		displayOptionsInfo.maxfps.curvalue = 7;
 	else if( fps <= 200 )
-		displayOptionsInfo.maxfps.curvalue = 7;	
+		displayOptionsInfo.maxfps.curvalue = 8;	
 	else
-		displayOptionsInfo.maxfps.curvalue = 8;		
+		displayOptionsInfo.maxfps.curvalue = 9;		
 }
 
 

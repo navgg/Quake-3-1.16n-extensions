@@ -988,6 +988,8 @@ UI_Init
 =================
 */
 void UI_Init( void ) {
+	int i;		
+	
 	UI_RegisterCvars();
 
 	UI_InitGameinfo();
@@ -1011,6 +1013,11 @@ void UI_Init( void ) {
 
 	uis.activemenu = NULL;
 	uis.menusp     = 0;	
+
+	//X-MOD: if we played cinematic in custom resolution then restore resolution	
+	i = trap_Cvar_VariableValue("uix_cinematicplayed");
+	if (i >= 100)
+		trap_Cmd_ExecuteText(EXEC_APPEND, va("uix_cinematicplayed -1; ui_cinematics %i;", i - 100));	
 }
 
 /*
