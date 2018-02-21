@@ -77,6 +77,9 @@ void CGX_Init_enemyModels(void) {
 	char modelStr[MAX_QPATH];
 	char *slash;	
 
+	if (cgs.gametype == GT_SINGLE_PLAYER)
+		return;
+
 	Q_strncpyz(modelStr, cgx_enemyModel.string, sizeof(modelStr));
 
 	slash = strchr( modelStr, '/' );
@@ -98,6 +101,9 @@ void CGX_Init_teamModels(void) {
 	char modelStr[MAX_QPATH];
 	char *slash;	
 
+	if (cgs.gametype == GT_SINGLE_PLAYER)
+		return;
+
 	Q_strncpyz(modelStr, cgx_teamModel.string, sizeof(modelStr));
 
 	slash = strchr( modelStr, '/' );
@@ -118,6 +124,9 @@ void CGX_Init_teamModels(void) {
 void CGX_EnemyModelCheck(void) {
 	int		i;
 	clientInfo_t	*ci;
+
+	if (cgs.gametype == GT_SINGLE_PLAYER)
+		return;
 
 	trap_DPrint("CGX_EnemyModelCheck\n");		
 
@@ -203,7 +212,7 @@ void CGX_Init_enemyAndTeamColors(void) {
 	int i;
 	clientInfo_t *ci;
 
-	if (cg.oldTeam == TEAM_SPECTATOR)
+	if (cg.oldTeam == TEAM_SPECTATOR || cgs.gametype == GT_SINGLE_PLAYER)		
 		return;
 
 	for (i = 0, ci = cgs.clientinfo; i < cgs.maxclients; i++, ci++)

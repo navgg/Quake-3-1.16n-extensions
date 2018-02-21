@@ -583,7 +583,7 @@ void CG_NewClientInfo( int clientNum ) {
 	Q_strncpyz( newInfo.skinNameCopy, newInfo.skinName, sizeof( newInfo.skinName ) );
 	Q_strncpyz( newInfo.modelNameCopy, newInfo.modelName, sizeof( newInfo.modelName ) );	
 	//change models and skins if needed or restore
-	if (cg.clientNum != clientNum) {
+	if (cg.clientNum != clientNum && cgs.gametype != GT_SINGLE_PLAYER) {
 		trap_DPrint(va("CG_NewClientInfo %i\n", cg.clientNum));		
 		trap_DPrint(va("%s\n", configstring));
 		CGX_SetModelAndSkin(&newInfo);
