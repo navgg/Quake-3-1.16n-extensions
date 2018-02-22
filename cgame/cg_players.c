@@ -1533,6 +1533,11 @@ void CG_Player( centity_t *cent ) {
 	// add the gun / barrel / flash
 	//
 	CG_AddPlayerWeapon( &torso, NULL, cent );
+
+	//unlagged - client options
+	// add the bounding box (if cg_drawBBox is 1)
+	CG_AddBoundingBox( cent );
+	//unlagged - client options
 }
 
 

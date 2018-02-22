@@ -376,8 +376,11 @@ An entity has an event value
 also called by CG_CheckPlayerstateEvents
 ==============
 */
-//#define	DEBUGNAME(x) if(cg_debugEvents.integer){CG_Printf(x"\n");}
+#if CGX_DEBUG
+#define	DEBUGNAME(x) if(cg_debugEvents.integer){CG_Printf(x"\n");}
+#else
 #define DEBUGNAME(x)
+#endif
 void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	entityState_t	*es;
 	int				event;
@@ -388,10 +391,11 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	es = &cent->currentState;
 	event = es->event & ~EV_EVENT_BITS;
-
+#if CGX_DEBUG
 	if ( cg_debugEvents.integer ) {
 		CG_Printf( "ent:%3i  event:%3i ", es->number, event );
 	}
+#endif
 
 	if ( !event ) {
 		DEBUGNAME("ZEROEVENT");
@@ -728,34 +732,77 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_RAILTRAIL:
 		DEBUGNAME("EV_RAILTRAIL");
 		cent->currentState.weapon = WP_RAILGUN;
-		// if the end was on a nomark surface, don't make an explosion
-		if ( es->eventParm != 255 ) {
-			ByteToDir( es->eventParm, dir );
-			CG_MissileHitWall( es->weapon, es->clientNum, position, dir );
+
+		//unlagged - attack prediction #2
+		// if the client is us, unlagged is on server-side, and we've got it client-side
+		if ( es->clientNum == cg.predictedPlayerState.clientNum && 
+			cgs.delagHitscan && (cg_delag.integer & 1 || cg_delag.integer & 16) ) {
+			// do nothing, because it was already predicted
+			Com_Printf("Ignoring rail trail event\n");
+		} else {
+			// draw a rail trail, because it wasn't predicted
+			CG_RailTrail( ci, es->origin2, es->pos.trBase );
+
+			// if the end was on a nomark surface, don't make an explosion
+			if ( es->eventParm != 255 ) {
+				ByteToDir( es->eventParm, dir );
+				CG_MissileHitWall( es->weapon, es->clientNum, position, dir );
+			}
+			Com_Printf("Non-predicted rail trail\n");
 		}
-#if 1
-		CG_RailTrail( ci, es->origin2, es->pos.trBase );
-#else
-		// the railtrail temp entity will be spawned when this player is added
-		VectorCopy( es->pos.trBase, cg_entities[clientNum].pe.railgunImpact );
-		cg_entities[clientNum].pe.railgunFlash = qtrue;
-#endif
+		//unlagged - attack prediction #2
 		break;
 
 	case EV_BULLET_HIT_WALL:
 		DEBUGNAME("EV_BULLET_HIT_WALL");
-		ByteToDir( es->eventParm, dir );
-		CG_Bullet( es->pos.trBase, es->otherEntityNum, dir, qfalse, ENTITYNUM_WORLD );
+		//unlagged - attack prediction #2
+		// if the client is us, unlagged is on server-side, and we've got it client-side
+		if ( es->clientNum == cg.predictedPlayerState.clientNum && 
+			cgs.delagHitscan && (cg_delag.integer & 1 || cg_delag.integer & 2) ) {
+			// do nothing, because it was already predicted
+			Com_Printf("Ignoring bullet event\n");
+		}
+		else {
+			// do the bullet, because it wasn't predicted
+			ByteToDir( es->eventParm, dir );
+			CG_Bullet( es->pos.trBase, es->otherEntityNum, dir, qfalse, ENTITYNUM_WORLD );
+			Com_Printf("Non-predicted bullet\n");
+		}
+		//unlagged - attack prediction #2
 		break;
 
 	case EV_BULLET_HIT_FLESH:
 		DEBUGNAME("EV_BULLET_HIT_FLESH");
-		CG_Bullet( es->pos.trBase, es->otherEntityNum, dir, qtrue, es->eventParm );
+		//unlagged - attack prediction #2
+		// if the client is us, unlagged is on server-side, and we've got it client-side
+		if ( es->clientNum == cg.predictedPlayerState.clientNum && 
+			cgs.delagHitscan && (cg_delag.integer & 1 || cg_delag.integer & 2) ) {
+			// do nothing, because it was already predicted
+			Com_Printf("Ignoring bullet event\n");
+		}
+		else {
+			// do the bullet, because it wasn't predicted
+			CG_Bullet( es->pos.trBase, es->otherEntityNum, dir, qtrue, es->eventParm );
+			Com_Printf("Non-predicted bullet\n");
+		}
+		//unlagged - attack prediction #2		
 		break;
 
 	case EV_SHOTGUN:
 		DEBUGNAME("EV_SHOTGUN");
-		CG_ShotgunFire( es );
+		//unlagged - attack prediction #2
+		// if the client is us, unlagged is on server-side, and we've got it client-side
+		if ( es->otherEntityNum == cg.predictedPlayerState.clientNum && 
+			cgs.delagHitscan && (cg_delag.integer & 1 || cg_delag.integer & 4) ) {
+			// do nothing, because it was already predicted
+			Com_Printf("Ignoring shotgun event\n");
+		}
+		else {
+			// do the shotgun pattern, because it wasn't predicted
+			CG_ShotgunFire( es );
+			Com_Printf("Non-predicted shotgun pattern\n");
+		}
+		//unlagged - attack prediction #2
 		break;
 
 	case EV_GENERAL_SOUND:

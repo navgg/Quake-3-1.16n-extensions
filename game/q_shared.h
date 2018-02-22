@@ -8,9 +8,13 @@
 
 #define	Q3_VERSION		"Q3 1.16n"
 #define CGX_VERSION		"0.54b"
-#define CGX_DATE		"21 Feb 2018"
+#define CGX_DATE		"23 Feb 2018"
 #define CGX_DEBUG		0
 #define CGX_NOGHOST_COMPATIBLE 0 //CVAR_USERINFO
+
+//unlagged - lag simulation #2
+#define MAX_LATENT_CMDS 64
+//unlagged - lag simulation #2
 
 //#define MISSION_PACK
 
@@ -426,6 +430,11 @@ typedef struct {
 
 #define	SnapVector(v) {v[0]=(int)v[0];v[1]=(int)v[1];v[2]=(int)v[2];}
 
+//unlagged - attack prediction #3
+// moved from g_weapon.c
+void SnapVectorTowards( vec3_t v, vec3_t to );
+//unlagged - attack prediction #3
+
 // just in case you do't want to use the macros
 vec_t _DotProduct( const vec3_t v1, const vec3_t v2 );
 void _VectorSubtract( const vec3_t veca, const vec3_t vecb, vec3_t out );
@@ -444,6 +453,10 @@ void ClearBounds( vec3_t mins, vec3_t maxs );
 void AddPointToBounds( const vec3_t v, vec3_t mins, vec3_t maxs );
 int VectorCompare( const vec3_t v1, const vec3_t v2 );
 vec_t VectorLength( const vec3_t v );
+//unlagged
+vec_t VectorLengthSquared( const vec3_t v );
+//unlagged
+
 vec_t Distance( const vec3_t p1, const vec3_t p2 );
 vec_t DistanceSquared( const vec3_t p1, const vec3_t p2 );
 void CrossProduct( const vec3_t v1, const vec3_t v2, vec3_t cross );
@@ -866,6 +879,11 @@ typedef struct playerState_s {
 
 	// not communicated over the net at all
 	int			ping;			// server to game info for scoreboard
+
+	//unlagged some stuff
+	//int			generic1;
+	//int			loopSound;
+	//int			jumppad_ent;
 
 #ifdef MISSION_PACK
 	int		generic1;

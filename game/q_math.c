@@ -1156,6 +1156,32 @@ vec_t VectorLength( const vec3_t v ) {
 	return sqrt (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 }
 
+//unlagged
+/*
+======================
+SnapVectorTowards
+Round a vector to integers for more efficient network
+transmission, but make sure that it rounds towards a given point
+rather than blindly truncating.  This prevents it from truncating 
+into a wall.
+======================
+*/
+void SnapVectorTowards( vec3_t v, vec3_t to ) {
+	int		i;
+
+	for ( i = 0 ; i < 3 ; i++ ) {
+		if ( to[i] <= v[i] ) {
+			v[i] = (int)v[i];
+		} else {
+			v[i] = (int)v[i] + 1;
+		}
+	}
+}
+
+vec_t VectorLengthSquared( const vec3_t v ) {
+	return (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
+}
+//unlagged
 
 vec_t Distance( const vec3_t p1, const vec3_t p2 ) {
 	vec3_t	v;

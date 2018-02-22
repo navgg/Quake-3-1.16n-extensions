@@ -367,6 +367,10 @@ typedef struct {
 // all cg.stepTime, cg.duckTime, cg.landTime, etc are set to cg.time when the action
 // occurs, and they will have visible effects for #define STEP_TIME or whatever msec after
  
+//unlagged - optimized prediction
+#define NUM_SAVED_STATES (CMD_BACKUP + 2)
+//unlagged - optimized prediction
+
 typedef struct {
 	int			clientFrame;		// incremented each frame
 	
@@ -538,6 +542,13 @@ typedef struct {
 	int			rateDelayedTotal;	
 	
 	int			connectionInterrupteds;
+
+	//unlagged - optimized prediction
+	int			lastPredictedCommand;
+	int			lastServerTime;
+	playerState_t savedPmoveStates[NUM_SAVED_STATES];
+	int			stateHead, stateTail;
+	//unlagged - optimized prediction
 } cg_t;
 
 
@@ -792,6 +803,11 @@ typedef struct {
 	int				delag;
 	int				sv_fps;
 	int				sv_maxrate;
+
+	//unlagged - client options
+	// this will be set to the server's g_delagHitscan
+	int				delagHitscan;
+	//unlagged - client options
 } cgs_t;
 
 typedef struct {
@@ -920,6 +936,26 @@ extern	vmCvar_t		cg_paused;
 extern	vmCvar_t		cg_blood;
 extern	vmCvar_t		cg_predictItems;
 extern	vmCvar_t		cg_deferPlayers;
+
+//unlagged - client options
+extern	vmCvar_t		cg_delag;
+extern	vmCvar_t		cg_debugDelag;
+extern	vmCvar_t		cg_drawBBox;
+extern	vmCvar_t		cg_cmdTimeNudge;
+extern	vmCvar_t		sv_fps;
+extern	vmCvar_t		cg_projectileNudge;
+extern	vmCvar_t		cg_optimizePrediction;
+extern	vmCvar_t		cl_timeNudge;
+extern	vmCvar_t		cg_latentSnaps;
+extern	vmCvar_t		cg_latentCmds;
+extern	vmCvar_t		cg_plOut;
+//unlagged - client options
+
+//unlagged - cg_unlagged.c
+void CG_PredictWeaponEffects( centity_t *cent );
+void CG_AddBoundingBox( centity_t *cent );
+qboolean CG_Cvar_ClampInt( const char *name, vmCvar_t *vmCvar, int min, int max );
+//unlagged - cg_unlagged.c
 
 //
 // cgx_extensions.c
@@ -1120,6 +1156,9 @@ localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 // cg_snapshot.c
 //
 void CG_ProcessSnapshots( void );
+//unlagged - early transitioning
+void CG_TransitionEntity( centity_t *cent );
+//unlagged - early transitioning
 
 //
 // cg_info.c

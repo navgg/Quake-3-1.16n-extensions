@@ -92,7 +92,13 @@ void CG_ParseServerinfo( void ) {
 	mapname = Info_ValueForKey( info, "mapname" );
 	Com_sprintf( cgs.mapname, sizeof( cgs.mapname ), "maps/%s.bsp", mapname );
 
-	cgs.delag = atoi(Info_ValueForKey(info, "g_delag"));
+	//unlagged - server options
+	// we'll need this for deciding whether or not to predict weapon effects
+	cgs.delagHitscan = atoi( Info_ValueForKey( info, "g_delag" ) );
+	trap_Cvar_Set("g_delag", va("%i", cgs.delagHitscan));
+	//unlagged - server options
+
+	cgs.delag = cgs.delagHitscan;
 	cgs.sv_fps = atoi(Info_ValueForKey(info, "sv_fps"));
 	cgs.sv_maxrate = atoi(Info_ValueForKey(info, "sv_maxrate"));
 

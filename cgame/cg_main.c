@@ -74,6 +74,20 @@ vmCvar_t	cgx_delag;
 vmCvar_t	cgx_debug;
 vmCvar_t	cgx_version;
 
+//unlagged - client options
+vmCvar_t	cg_delag;
+vmCvar_t	cg_debugDelag;
+vmCvar_t	cg_drawBBox;
+vmCvar_t	cg_cmdTimeNudge;
+vmCvar_t	sv_fps;
+vmCvar_t	cg_projectileNudge;
+vmCvar_t	cg_optimizePrediction;
+vmCvar_t	cl_timeNudge;
+vmCvar_t	cg_latentSnaps;
+vmCvar_t	cg_latentCmds;
+vmCvar_t	cg_plOut;
+//unlagged - client options
+
 vmCvar_t	cg_railTrailTime;
 vmCvar_t	cg_centertime;
 vmCvar_t	cg_runpitch;
@@ -241,20 +255,33 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },
 	{ &cgx_networkAdjustments, "cg_networkAdjustments", "1", CVAR_ARCHIVE },
 
+	//unlagged - client options
+	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE  | CGX_NOGHOST_COMPATIBLE},
+	{ &cg_debugDelag, "cg_debugDelag", "0", CVAR_CHEAT },
+	{ &cg_drawBBox, "cg_drawBBox", "0", CVAR_CHEAT },
+	{ &cg_cmdTimeNudge, "cg_delag_cmdTimeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
+	// this will be automagically copied from the server
+	{ &sv_fps, "sv_fps", "20", 0 },
+	{ &cg_projectileNudge, "cg_delag_projectileNudge", "0", CVAR_ARCHIVE },
+	{ &cg_optimizePrediction, "cg_delag_optimizePrediction", "0", CVAR_ARCHIVE },
+	{ &cl_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE },
+	{ &cg_latentSnaps, "cg_latentSnaps", "0", CVAR_CHEAT },
+	{ &cg_latentCmds, "cg_latentCmds", "0", CVAR_CHEAT },
+	{ &cg_plOut, "cg_plOut", "0", CVAR_CHEAT },
+	//unlagged - client options
+
 //#if CGX_DEBUG
 	// X-MOD: compability with noghost
 
 	{ &cgx_maxfps, "com_maxfps", "125", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
-	{ &cgx_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
+	//{ &cgx_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
 	{ &cgx_maxpackets, "cl_maxpackets", "40", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },		
 //#else
 //	// X-MOD: compability with noghost
 //	{ &cgx_maxfps, "com_maxfps", "125", CVAR_ARCHIVE | CVAR_USERINFO },
 //	{ &cgx_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CVAR_USERINFO },
 //	{ &cgx_maxpackets, "cl_maxpackets", "40", CVAR_ARCHIVE | CVAR_USERINFO },	
-//#endif
-
-	{ &cgx_delag, "cg_delag", "1", CVAR_ARCHIVE },
+//#endif	
 
 #if CGX_DEBUG
 	{ &cgx_debug, "cgx_debug", "1", CVAR_TEMP },
@@ -280,8 +307,9 @@ cvarTable_t		cvarTable[] = {
 	// cg_teamColors "" - same as cg_enemyColors but for team
 	// cg_lagometer 0|1|2 - 0: off 1: netgraph 2: netgraph + client ping
 	// cg_hitsounds 0|1|2 - 0: default 1: pro mode hi-low 2: low-hi hp hitsounds	
-	// cg_coloredPing 0|1 - toggles ping colors below 50 white, below 100 green, below 200 yellow, below 350 magenta, more than 350 red
+	// cg_coloredPing 0|1 - toggles ping colors below 50 white, below 100 green, below 250 yellow, below 400 magenta, more than 400 red
 	// cg_lagometer 0|1|2|3 - off, netgraph, netgraph+ping, only when lag
+	// cg_networkAdjustments 0|1|2 - off, 1: packets 40-60 rate min 8000, 2: packets 60+ rate min 25000 packetdup off (snaps = sv_fps or min 40 in both cases)
 	// resolving favorite servers by domain name
 	// colored server names shifting left bug fixed
 	// optimization: removed many debug info in CG_EntityEvent
@@ -351,6 +379,33 @@ void CG_UpdateCvars( void ) {
 	cvarTable_t	*cv;	
 
 	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
+		//unlagged - client options
+		// clamp the value between 0 and 999
+		// negative values would suck - people could conceivably shoot other
+		// players *long* after they had left the area, on purpose
+		if ( cv->vmCvar == &cg_cmdTimeNudge ) {
+			CG_Cvar_ClampInt( cv->cvarName, cv->vmCvar, 0, 999 );
+		}
+		// cl_timenudge less than -50 or greater than 50 doesn't actually
+		// do anything more than -50 or 50 (actually the numbers are probably
+		// closer to -30 and 30, but 50 is nice and round-ish)
+		// might as well not feed the myth, eh?
+		else if ( cv->vmCvar == &cl_timeNudge ) {
+			CG_Cvar_ClampInt( cv->cvarName, cv->vmCvar, -50, 50 );
+		}
+		// don't let this go too high - no point
+		else if ( cv->vmCvar == &cg_latentSnaps ) {
+			CG_Cvar_ClampInt( cv->cvarName, cv->vmCvar, 0, 10 );
+		}
+		// don't let this get too large
+		else if ( cv->vmCvar == &cg_latentCmds ) {
+			CG_Cvar_ClampInt( cv->cvarName, cv->vmCvar, 0, MAX_LATENT_CMDS - 1 );
+		}
+		// no more than 100% packet loss
+		else if ( cv->vmCvar == &cg_plOut ) {
+			CG_Cvar_ClampInt( cv->cvarName, cv->vmCvar, 0, 100 );
+		}
+		//unlagged - client options
 		trap_Cvar_Update( cv->vmCvar );
 	}
 

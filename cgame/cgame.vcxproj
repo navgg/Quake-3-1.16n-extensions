@@ -163,6 +163,7 @@
     <ClCompile Include="cg_servercmds.c" />
     <ClCompile Include="cg_snapshot.c" />
     <ClCompile Include="cg_syscalls.c" />
+    <ClCompile Include="cg_unlagged.c" />
     <ClCompile Include="cg_view.c" />
     <ClCompile Include="cg_weapons.c" />
   </ItemGroup>
