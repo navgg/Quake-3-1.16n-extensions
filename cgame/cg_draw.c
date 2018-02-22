@@ -1341,15 +1341,29 @@ static void CG_DrawReward( void ) {
 	if ( !color ) {
 		return;
 	}
+	
+	trap_R_SetColor(color);
 
-	trap_R_SetColor( color );
-	y = 56;
-	x = vScreen.hwidth - cg.rewardCount * ICON_SIZE/2;
-	for ( i = 0 ; i < cg.rewardCount ; i++ ) {
+	if ( cg_drawRewards.integer > 1 || cg.rewardCount > 10) {
+		char buf[6];		
+		y = 35; // 
+		x = vScreen.hwidth - ICON_SIZE/2;
 		CG_DrawPic( x, y, ICON_SIZE-4, ICON_SIZE-4, cg.rewardShader );
-		x += ICON_SIZE;
+		Com_sprintf( buf, sizeof( buf ), "%d", cg.rewardCount );
+		CG_DrawStringExt( 
+			(vScreen.width - strlen( buf ) * SMALLCHAR_WIDTH) / 2 - 1, 
+			y + ICON_SIZE, 
+			buf, color, qfalse, qtrue, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT, 0);
+	} else {				
+		y = 56;
+		x = vScreen.hwidth - cg.rewardCount * ICON_SIZE / 2;
+		for (i = 0; i < cg.rewardCount; i++) {
+			CG_DrawPic(x, y, ICON_SIZE - 4, ICON_SIZE - 4, cg.rewardShader);
+			x += ICON_SIZE;
+		}		
 	}
-	trap_R_SetColor( NULL );
+
+	trap_R_SetColor(NULL);
 }
 
 
