@@ -557,7 +557,7 @@ static float CG_DrawSnapshot( float y ) {
 		cg.latestSnapshotNum, cgs.serverCommandSequence );
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 
-	CG_DrawBigString( vScreen.width - 5 - w, y + 2, s, 1.0F);
+	CG_DrawBigString( vScreen.width5 - w, y + 2, s, 1.0F);
 
 	return y + BIGCHAR_HEIGHT + 4;
 }
@@ -600,7 +600,7 @@ static float CG_DrawFPS( float y ) {
 		s = va( "%ifps", fps );
 		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 
-		CG_DrawBigString( vScreen.width - 5 - w, y + 2, s, 1.0F);
+		CG_DrawBigString( vScreen.width5 - w, y + 2, s, 1.0F);
 	}
 
 	return y + BIGCHAR_HEIGHT + 4;
@@ -629,7 +629,7 @@ static float CG_DrawTimer( float y ) {
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 
 	if (cg_drawTimer.integer == 1) {
-		CG_DrawBigString(vScreen.width - 5 - w, y + 2, s, 1.0F);
+		CG_DrawBigString(vScreen.width5 - w, y + 2, s, 1.0F);
 
 		return y + BIGCHAR_HEIGHT + 4;
 	} else {
@@ -660,7 +660,7 @@ static float CGX_DrawSpeedMeter(float y) {
 
 	if (cgx_drawSpeed.integer == 1) {
 		/* top left-hand corner of screen */
-		CG_DrawBigString(vScreen.width - 5 - w, y + 2, s, 1.0f);
+		CG_DrawBigString(vScreen.width5 - w, y + 2, s, 1.0f);
 		return y + BIGCHAR_HEIGHT + 4;
 	}
 	else {
@@ -1454,37 +1454,37 @@ static float CGX_DrawDebugInfo( float y ) {
 
 	s = va("CI: %i", cg.connectionInterrupteds);
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-	CG_DrawBigString( vScreen.width - 5 - w, y + 2, s, 1.0F);	
+	CG_DrawBigString( vScreen.width5 - w, y + 2, s, 1.0F);	
 	y += BIGCHAR_HEIGHT + 4;
 
 	s = va("LSN: %i", cg.latestSnapshotNum);
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-	CG_DrawBigString( vScreen.width - 5 - w, y + 2, s, 1.0F);	
+	CG_DrawBigString( vScreen.width5 - w, y + 2, s, 1.0F);	
 	y += BIGCHAR_HEIGHT + 4;
 
 	s = va("LSC: %i", lagometer.snapshotCount);
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-	CG_DrawBigString( vScreen.width - 5 - w, y + 2, s, 1.0F);	
+	CG_DrawBigString( vScreen.width5 - w, y + 2, s, 1.0F);	
 	y += BIGCHAR_HEIGHT + 4;
 
 	s = va("PING: %i", cg.meanPing);
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-	CG_DrawBigString( vScreen.width - 5 - w, y + 2, s, 1.0F);
+	CG_DrawBigString( vScreen.width5 - w, y + 2, s, 1.0F);
 	y += BIGCHAR_HEIGHT + 4;
 
 	s = va("LOSS: %i %i", cg.packetloss, cg.packetlossTotal);
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-	CG_DrawBigString( vScreen.width - 5 - w, y + 2, s, 1.0F);
+	CG_DrawBigString( vScreen.width5 - w, y + 2, s, 1.0F);
 	y += BIGCHAR_HEIGHT + 4;
 
 	s = va("RD: %i %i", cg.rateDelayed, cg.rateDelayedTotal);
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-	CG_DrawBigString( vScreen.width - 5 - w, y + 2, s, 1.0F);	
+	CG_DrawBigString( vScreen.width5 - w, y + 2, s, 1.0F);	
 	y += BIGCHAR_HEIGHT + 4;
 
 	s = va("T: %i", cg.time);
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-	CG_DrawBigString( vScreen.width - 5 - w, y + 2, s, 1.0F);	
+	CG_DrawBigString( vScreen.width5 - w, y + 2, s, 1.0F);	
 
 	return y + BIGCHAR_HEIGHT + 4;
 }
