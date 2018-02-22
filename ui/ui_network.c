@@ -34,7 +34,7 @@ static void UI_Network_StatusBar( void *self ) {
 	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
 		{ "Max date rate in bytes per second", "Setting lower than 5000 not recommended" },
 		{ "Max packets rate per second", "Set highter if you have good PC and internet" },
-		{ "Send packet duplicates or no", "If cable internet you can turn this off, Wi-Fi - on" },
+		{ "Send packet duplicates or no", "If you have good connection you can turn this off" },
 		{ "Set off if you know how to config rate/packets", "Set max if you have strong PC and cable internet" },
 		{ "Sets amout of snaps sent from server to client", "Min - 1, Max - 999. Recommended 40" }
 	};

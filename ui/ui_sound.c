@@ -24,15 +24,17 @@ SOUND OPTIONS MENU
 #define ID_MUSICVOLUME		15
 #define ID_QUALITY			16
 #define ID_A3D				17
-#define ID_BACK				18
+#define ID_COMPRESSION		18
+#define ID_BACK				19
 
-#define MAX_INFO_MESSAGES	4
+#define MAX_INFO_MESSAGES	5
 static void UI_Sound_StatusBar( void *self ) {	
 	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
 		{ "Controls sound effects volume", "" },
 		{ "Controls ingame music volume", "" },
 		{ "Sets sound quality, recommended 'High'", "" },
-		{ "This setting removed in latest Quake 3", "Recommended 'Off'" }
+		{ "This setting removed in latest Quake 3", "Recommended 'Off'" },
+		{ "Sound compression", "Removed in latest Quake 3, Recommended 'Off'" }
 	};
 
 	UIX_CommonStatusBar(self, ID_EFFECTSVOLUME, MAX_INFO_MESSAGES, info_messages);
@@ -57,6 +59,7 @@ typedef struct {
 	menuslider_s		sfxvolume;
 	menuslider_s		musicvolume;
 	menulist_s			quality;
+	menuradiobutton_s	compression;
 	menuradiobutton_s	a3d;
 
 	menubitmap_s		back;
@@ -108,7 +111,7 @@ static void UI_SoundOptionsMenu_Event( void* ptr, int event ) {
 			trap_Cvar_SetValue( "s_compression", 0 );
 		}
 		else {
-			trap_Cvar_SetValue( "s_khz", 11 );
+			trap_Cvar_SetValue( "s_khz", 11 );			
 			trap_Cvar_SetValue( "s_compression", 1 );
 		}
 		UI_ForceMenuOff();
@@ -123,6 +126,11 @@ static void UI_SoundOptionsMenu_Event( void* ptr, int event ) {
 			trap_Cmd_ExecuteText( EXEC_NOW, "s_disable_a3d\n" );
 		}
 		soundOptionsInfo.a3d.curvalue = (int)trap_Cvar_VariableValue( "s_usingA3D" );
+		break;
+
+	case ID_COMPRESSION:
+		trap_Cvar_SetValue( "s_compression", soundOptionsInfo.compression.curvalue );
+		soundOptionsInfo.quality.curvalue = !trap_Cvar_VariableValue( "s_compression" ) && trap_Cvar_VariableValue( "s_khz" ) >= 22;		
 		break;
 
 	case ID_BACK:
@@ -232,7 +240,7 @@ static void UI_SoundOptionsMenu_Init( void ) {
 	soundOptionsInfo.musicvolume.generic.y			= y;
 	soundOptionsInfo.musicvolume.minvalue			= 0;
 	soundOptionsInfo.musicvolume.maxvalue			= 10;
-	soundOptionsInfo.musicvolume.generic.statusbar = UI_Sound_StatusBar;
+	soundOptionsInfo.musicvolume.generic.statusbar	= UI_Sound_StatusBar;
 
 	y += BIGCHAR_HEIGHT+2;
 	soundOptionsInfo.quality.generic.type		= MTYPE_SPINCONTROL;
@@ -243,7 +251,17 @@ static void UI_SoundOptionsMenu_Init( void ) {
 	soundOptionsInfo.quality.generic.x			= 400;
 	soundOptionsInfo.quality.generic.y			= y;
 	soundOptionsInfo.quality.itemnames			= quality_items;
-	soundOptionsInfo.quality.generic.statusbar = UI_Sound_StatusBar;
+	soundOptionsInfo.quality.generic.statusbar	= UI_Sound_StatusBar;
+
+	y += BIGCHAR_HEIGHT+2;
+	soundOptionsInfo.compression.generic.type			= MTYPE_RADIOBUTTON;
+	soundOptionsInfo.compression.generic.name			= "Compression:";
+	soundOptionsInfo.compression.generic.flags			= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	soundOptionsInfo.compression.generic.callback		= UI_SoundOptionsMenu_Event;
+	soundOptionsInfo.compression.generic.id				= ID_COMPRESSION;
+	soundOptionsInfo.compression.generic.x				= 400;
+	soundOptionsInfo.compression.generic.y				= y;
+	soundOptionsInfo.compression.generic.statusbar		= UI_Sound_StatusBar;
 
 	y += BIGCHAR_HEIGHT+2;
 	soundOptionsInfo.a3d.generic.type			= MTYPE_RADIOBUTTON;
@@ -253,7 +271,7 @@ static void UI_SoundOptionsMenu_Init( void ) {
 	soundOptionsInfo.a3d.generic.id				= ID_A3D;
 	soundOptionsInfo.a3d.generic.x				= 400;
 	soundOptionsInfo.a3d.generic.y				= y;
-	soundOptionsInfo.a3d.generic.statusbar = UI_Sound_StatusBar;
+	soundOptionsInfo.a3d.generic.statusbar		= UI_Sound_StatusBar;
 
 	soundOptionsInfo.back.generic.type			= MTYPE_BITMAP;
 	soundOptionsInfo.back.generic.name			= ART_BACK0;
@@ -277,11 +295,13 @@ static void UI_SoundOptionsMenu_Init( void ) {
 	Menu_AddItem( &soundOptionsInfo.menu, ( void * ) &soundOptionsInfo.musicvolume );
 	Menu_AddItem( &soundOptionsInfo.menu, ( void * ) &soundOptionsInfo.quality );
 	Menu_AddItem( &soundOptionsInfo.menu, ( void * ) &soundOptionsInfo.a3d );
+	Menu_AddItem( &soundOptionsInfo.menu, ( void * ) &soundOptionsInfo.compression );
 	Menu_AddItem( &soundOptionsInfo.menu, ( void * ) &soundOptionsInfo.back );
 
 	soundOptionsInfo.sfxvolume.curvalue = trap_Cvar_VariableValue( "s_volume" ) * 10;
 	soundOptionsInfo.musicvolume.curvalue = trap_Cvar_VariableValue( "s_musicvolume" ) * 10;
-	soundOptionsInfo.quality.curvalue = !trap_Cvar_VariableValue( "s_compression" );
+	soundOptionsInfo.quality.curvalue = !trap_Cvar_VariableValue( "s_compression" ) && trap_Cvar_VariableValue( "s_khz" ) >= 22;
+	soundOptionsInfo.compression.curvalue = trap_Cvar_VariableValue( "s_compression" );
 	soundOptionsInfo.a3d.curvalue = (int)trap_Cvar_VariableValue( "s_usingA3D" );
 }
 
