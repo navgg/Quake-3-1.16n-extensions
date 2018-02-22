@@ -53,24 +53,28 @@ void CGX_Init_vScreen(void) {
 	// X-MOD: init virtual screen sizes for wide screen fix
 
 	if ( cgx_wideScreenFix.integer && cgs.glconfig.vidWidth * 480 > cgs.glconfig.vidHeight * 640 ) {
-		vScreen.width = (float)cgs.glconfig.vidWidth / (float)cgs.glconfig.vidHeight * 480.0;		 
-		vScreen.height = 480;		 				
-		vScreen.offsetx = (vScreen.width - 640) / 2.0;
+		vScreen.width = (float)cgs.glconfig.vidWidth / (float)cgs.glconfig.vidHeight * 480.0f;		 				 				
+		vScreen.offsetx = (vScreen.width - 640) / 2.0f;
 	} else {
-		vScreen.width = 640;
-		vScreen.height = 480;					
+		vScreen.width = 640;						
 		vScreen.offsetx = 0;
 	}	
 
-	vScreen.ratiox = vScreen.width / 640.0;
+	vScreen.ratiox = (float)vScreen.width / 640.0f;
 
 	vScreen.hwidth = vScreen.width / 2;
-	vScreen.hheight = vScreen.height / 2;
+	vScreen.hheight = SCREEN_HEIGHT / 2;
 
-	cgs.screenXScale = cgs.glconfig.vidWidth / vScreen.width;
-	cgs.screenYScale = cgs.glconfig.vidHeight / vScreen.height; 
+	cgs.screenXScale = (float)cgs.glconfig.vidWidth / (float)vScreen.width;
+	cgs.screenYScale = (float)cgs.glconfig.vidHeight / (float)SCREEN_HEIGHT; 
 
-	trap_DPrint(va("CGX_Init_vScreen %fx%f cgx_wideScreenFix %d\n", vScreen.width, vScreen.height, cgx_wideScreenFix.integer));	
+	vScreen.sbheadx = 185 + CHAR_WIDTH * 3 + TEXT_ICON_SPACE + vScreen.offsetx;
+	vScreen.sbarmorx = (370 + CHAR_WIDTH * 3 + TEXT_ICON_SPACE) + vScreen.offsetx;
+	vScreen.sbammox = (CHAR_WIDTH * 3 + TEXT_ICON_SPACE) + vScreen.offsetx;
+	vScreen.sbflagx = 185 + CHAR_WIDTH * 3 + TEXT_ICON_SPACE + ICON_SIZE + vScreen.offsetx;
+	vScreen.sbhealth = 185 + vScreen.offsetx;	
+
+	vScreen.width48 = vScreen.width - 48;
 }
 
 void CGX_Init_enemyModels(void) {

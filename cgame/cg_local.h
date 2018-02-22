@@ -795,14 +795,23 @@ typedef struct {
 } cgs_t;
 
 typedef struct {
-	float 			width;
-	float 			hwidth;
+	int 			width;
+	int 			hwidth;
 	
-	float 			height;
-	float 			hheight;
+	int 			height;
+	int 			hheight;
 	
 	float			ratiox;	
-	float			offsetx;
+	int				offsetx;
+
+	int				sbheadx;
+	int				sbarmorx;
+	int				sbammox;
+	int				sbflagx;
+	int				sbhealth;
+
+	int				width48;
+	int				width5;
 } vScreen_t;
 
 //==============================================================================
