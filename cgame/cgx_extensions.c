@@ -75,6 +75,9 @@ void CGX_Init_vScreen(void) {
 	vScreen.sbhealth = 185 + vScreen.offsetx;	
 
 	vScreen.width48 = vScreen.width - 48;
+	vScreen.width5 = vScreen.width - 5;
+
+	trap_DPrint(va("CGX_Init_vScreen %fx%f cgx_wideScreenFix %d\n", vScreen.width, SCREEN_HEIGHT, cgx_wideScreenFix.integer));	
 }
 
 void CGX_Init_enemyModels(void) {
@@ -398,8 +401,8 @@ void CGX_AutoAdjustNetworkSettings(void) {
 			k = 2;
 			minRate = 8000;			
 
-			// if it's something lower than 60 - adjust
-			if (cgx_maxpackets.integer <= 60)
+			// if it's something lower than 100 - adjust
+			if (cgx_maxpackets.integer < 100)
 				while ((i = cgx_maxfps.integer / k++) > 60);			
 		} else if (cgx_networkAdjustments.integer == 2) {
 			k = 1;
@@ -408,6 +411,9 @@ void CGX_AutoAdjustNetworkSettings(void) {
 			// if it's already 100 skip, lower - adjust
 			if (cgx_maxpackets.integer < 100)
 				while((i = cgx_maxfps.integer / k++) > MAX_MAXPACKETS);						
+
+			if (i >= MAX_MAXPACKETS)
+				i--;			
 		} 
 
 		// set packets first
@@ -419,12 +425,17 @@ void CGX_AutoAdjustNetworkSettings(void) {
 			trap_Print(va("Auto: cl_maxpackets %i\n", i));
 		}
 
-		//no sense in snaps > 30 for default quake3.exe just set it to ~fps/2 
-		minSnaps = cgx_maxfps.integer > 60 ? cgx_maxfps.integer / 20 * 10: 40;
+		// no sense in snaps > 30 for default quake3.exe set it to sv_fps if possible, otherwise set it to 40 
+		minSnaps = cgs.sv_fps > 0 ? cgs.sv_fps : 40;
 
-		// set snaps		
-		trap_Cvar_Set("snaps", va("%i", minSnaps));
-		trap_Print(va("Auto: snaps %i\n", minSnaps));
+		// check and set snaps		
+		trap_Cvar_VariableStringBuffer("snaps", buf, sizeof(buf));
+		i = atoi(buf);
+
+		if (i < minSnaps) {
+			trap_Cvar_Set("snaps", va("%i", minSnaps));
+			trap_Print(va("Auto: snaps %i\n", minSnaps));
+		};
 
 		// check and set rate
 		trap_Cvar_VariableStringBuffer("rate", buf, sizeof(buf));

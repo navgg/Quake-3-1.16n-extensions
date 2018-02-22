@@ -7,9 +7,10 @@
 // A user mod should never modify this file
 
 #define	Q3_VERSION		"Q3 1.16n"
-#define CGX_VERSION		"0.53b"
+#define CGX_VERSION		"0.54b"
 #define CGX_DATE		"21 Feb 2018"
-#define CGX_DEBUG		1
+#define CGX_DEBUG		0
+#define CGX_NOGHOST_COMPATIBLE 0 //CVAR_USERINFO
 
 //#define MISSION_PACK
 
@@ -459,7 +460,7 @@ float	Q_random( int *seed );
 float	Q_crandom( int *seed );
 
 #define random()	((rand () & 0x7fff) / ((float)0x7fff))
-#define crandom()	(2.0 * (random() - 0.5))
+#define crandom()	(2.0f * (random() - 0.5f))
 
 void vectoangles( const vec3_t value1, vec3_t angles);
 void AnglesToAxis( const vec3_t angles, vec3_t axis[3] );
