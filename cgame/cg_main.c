@@ -65,6 +65,7 @@ vmCvar_t	cgx_hitsounds;
 vmCvar_t	cgx_coloredPing;
 vmCvar_t	cgx_networkAdjustments;
 vmCvar_t	cgx_drawScoreBox;
+vmCvar_t	cgx_scroreboard;
 
 vmCvar_t	cgx_maxfps;
 vmCvar_t	cgx_maxpackets;
@@ -264,10 +265,10 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_noTaunt, "cg_noTaunt", "0", CVAR_ARCHIVE },
 	{ &cgx_hitsounds, "cg_hitsounds", "0", CVAR_ARCHIVE },
 	{ &cgx_centerPrintAlpha, "cg_centerPrintAlpha", "1.0", CVAR_ARCHIVE },
-	{ &cgx_crosshairColor, "cg_crosshairColor", "7", CVAR_ARCHIVE },
+	{ &cgx_crosshairColor, "cg_crosshairColor", "", CVAR_ARCHIVE },
 	{ &cgx_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
 	{ &cgx_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },
-	{ &cgx_networkAdjustments, "cg_networkAdjustments", "1", CVAR_ARCHIVE },
+	{ &cgx_networkAdjustments, "cg_networkAdjustments", "1", CVAR_ARCHIVE },	
 #if CGX_UNLAGGED
 	//unlagged - client options
 	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},	

@@ -227,7 +227,7 @@ cvarTable_t		cvarTable[] = {
 	{ &uix_noTaunt, "cg_noTaunt", "0", CVAR_ARCHIVE },
 	{ &uix_hitsounds, "cg_hitsounds", "0", CVAR_ARCHIVE },
 	{ &uix_centerPrintAlpha, "cg_centerPrintAlpha", "1.0", CVAR_ARCHIVE },
-	{ &uix_crosshairColor, "cg_crosshairColor", "7", CVAR_ARCHIVE },
+	{ &uix_crosshairColor, "cg_crosshairColor", "", CVAR_ARCHIVE },
 	{ &uix_crosshairSize, "cg_crosshairSize", "24", CVAR_ARCHIVE },
 	{ &uix_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
 	{ &uix_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },
