@@ -52,7 +52,7 @@ void CGX_Init_vScreen(void) {
 
 	// X-MOD: init virtual screen sizes for wide screen fix
 
-	if ( cgx_wideScreenFix.integer && cgs.glconfig.vidWidth * 480 > cgs.glconfig.vidHeight * 640 ) {
+	if ( (cgx_wideScreenFix.integer & CGX_WFIX_SCREEN) && cgs.glconfig.vidWidth * 480 > cgs.glconfig.vidHeight * 640 ) {
 		vScreen.width = (float)cgs.glconfig.vidWidth / (float)cgs.glconfig.vidHeight * 480.0f;		 				 				
 		vScreen.offsetx = (vScreen.width - 640) / 2.0f;
 	} else {
@@ -410,16 +410,16 @@ void CGX_AutoAdjustNetworkSettings(void) {
 
 			// if it's already 100 skip, lower - adjust
 			if (cgx_maxpackets.integer < 100)
-				while((i = cgx_maxfps.integer / k++) > MAX_MAXPACKETS);						
+				while((i = cgx_maxfps.integer / k++) > CGX_MAX_MAXPACKETS);						
 
-			if (i >= MAX_MAXPACKETS)
+			if (i >= CGX_MAX_MAXPACKETS)
 				i--;			
 		} 
 
 		// set packets first
 		if (i > 0) {
-			if (i < MIN_MAXPACKETS) i = MIN_MAXPACKETS;
-			else if (i > MAX_MAXPACKETS) i = MAX_MAXPACKETS;
+			if (i < CGX_MIN_MAXPACKETS) i = CGX_MIN_MAXPACKETS;
+			else if (i > CGX_MAX_MAXPACKETS) i = CGX_MAX_MAXPACKETS;
 
 			trap_Cvar_Set("cl_maxpackets", va("%i", i));
 			trap_Print(va("Auto: cl_maxpackets %i\n", i));

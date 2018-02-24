@@ -28,10 +28,11 @@ DISPLAY OPTIONS MENU
 #define ID_WIDESCREEN_FIX	19
 #define ID_MAXFPS			20
 #define ID_PRIMITIVES		21
+#define ID_WIDESCREEN_FOV	22
 
 #define ID_BACK				29
 
-#define MAX_INFO_MESSAGES	8
+#define MAX_INFO_MESSAGES	9
 static void UI_Display_StatusBar( void *self ) {	
 	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
 		{ "Controls display brightness", "Turn off 'Over Bright Bits' to increase even higher" },
@@ -41,7 +42,8 @@ static void UI_Display_StatusBar( void *self ) {
 		{ "Shows counter of frapmes per second", "" },
 		{ "Fixes rendering for widescreens", "All icons and fonts are not stretching in game" },
 		{ "Sets max limit for frames per second", "Min - 62, Max - 250" },
-		{ "Changes the render method", "'Fast (2)' may increase fps in some cases" }	
+		{ "Changes the render method", "'Fast' may increase fps in some cases" },
+		{ "Adjusts FOV (field of view) for widescreens", ""}
 	};
 
 	UIX_CommonStatusBar(self, ID_BRIGHTNESS, MAX_INFO_MESSAGES, info_messages);
@@ -62,8 +64,8 @@ static const char *fps_items[] = {
 };
 
 static const char *primitives_items[] = {
-	"Default (0)",
-	"Fast (2)",	
+	"Default",
+	"Fast",	
 	0
 };
 
@@ -85,6 +87,7 @@ typedef struct {
 	menuradiobutton_s overbrightbits;
 	menuradiobutton_s ignorehwgamma;
 	menuradiobutton_s widescreenfix;
+	menuradiobutton_s widescreenfov;
 	menuradiobutton_s drawfps;
 	menulist_s		maxfps;
 	menulist_s		primitives;
@@ -101,6 +104,8 @@ UI_DisplayOptionsMenu_Event
 =================
 */
 static void UI_DisplayOptionsMenu_Event( void* ptr, int event ) {
+	int i;
+
 	if( event != QM_ACTIVATED ) {
 		return;
 	}
@@ -152,8 +157,16 @@ static void UI_DisplayOptionsMenu_Event( void* ptr, int event ) {
 		trap_Cvar_Set( "com_maxfps", fps_items[displayOptionsInfo.maxfps.curvalue] );		
 		break;
 
-	case ID_WIDESCREEN_FIX:
-		trap_Cvar_SetValue( "cg_wideScreenFix", displayOptionsInfo.widescreenfix.curvalue );		
+	case ID_WIDESCREEN_FIX:				
+		i = trap_Cvar_VariableValue("cg_wideScreenFix");		
+		i = displayOptionsInfo.widescreenfix.curvalue ? i | CGX_WFIX_SCREEN : i & ~(CGX_WFIX_SCREEN);
+		trap_Cvar_SetValue( "cg_wideScreenFix", i );		
+		break;
+
+	case ID_WIDESCREEN_FOV:				
+		i = trap_Cvar_VariableValue("cg_wideScreenFix");		
+		i = displayOptionsInfo.widescreenfov.curvalue ? i | CGX_WFIX_FOV : i & ~(CGX_WFIX_FOV);
+		trap_Cvar_SetValue( "cg_wideScreenFix", i );		
 		break;
 
 	case ID_PRIMITIVES:
@@ -316,16 +329,6 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.maxfps.itemnames			= fps_items;
 	displayOptionsInfo.maxfps.generic.statusbar = UI_Display_StatusBar;
 
-	y += BIGCHAR_HEIGHT+2;
-	displayOptionsInfo.widescreenfix.generic.type		= MTYPE_RADIOBUTTON;
-	displayOptionsInfo.widescreenfix.generic.name		= "Auto aspect ratio:";
-	displayOptionsInfo.widescreenfix.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
-	displayOptionsInfo.widescreenfix.generic.callback	= UI_DisplayOptionsMenu_Event;
-	displayOptionsInfo.widescreenfix.generic.id			= ID_WIDESCREEN_FIX;
-	displayOptionsInfo.widescreenfix.generic.x			= 400;
-	displayOptionsInfo.widescreenfix.generic.y			= y;
-	displayOptionsInfo.widescreenfix.generic.statusbar = UI_Display_StatusBar;
-
 	y += BIGCHAR_HEIGHT + 2;
 	displayOptionsInfo.primitives.generic.type = MTYPE_SPINCONTROL;
 	displayOptionsInfo.primitives.generic.name = "Primitives:";
@@ -336,6 +339,27 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.primitives.generic.y = y;
 	displayOptionsInfo.primitives.itemnames = primitives_items;
 	displayOptionsInfo.primitives.generic.statusbar = UI_Display_StatusBar;
+
+	y += BIGCHAR_HEIGHT+2;
+	y += BIGCHAR_HEIGHT+2;
+	displayOptionsInfo.widescreenfix.generic.type		= MTYPE_RADIOBUTTON;
+	displayOptionsInfo.widescreenfix.generic.name		= "Widescreen fix:";
+	displayOptionsInfo.widescreenfix.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	displayOptionsInfo.widescreenfix.generic.callback	= UI_DisplayOptionsMenu_Event;
+	displayOptionsInfo.widescreenfix.generic.id			= ID_WIDESCREEN_FIX;
+	displayOptionsInfo.widescreenfix.generic.x			= 400;
+	displayOptionsInfo.widescreenfix.generic.y			= y;
+	displayOptionsInfo.widescreenfix.generic.statusbar = UI_Display_StatusBar;
+
+	y += BIGCHAR_HEIGHT+2;
+	displayOptionsInfo.widescreenfov.generic.type		= MTYPE_RADIOBUTTON;
+	displayOptionsInfo.widescreenfov.generic.name		= "Widescreen fov fix:";
+	displayOptionsInfo.widescreenfov.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	displayOptionsInfo.widescreenfov.generic.callback	= UI_DisplayOptionsMenu_Event;
+	displayOptionsInfo.widescreenfov.generic.id			= ID_WIDESCREEN_FOV;
+	displayOptionsInfo.widescreenfov.generic.x			= 400;
+	displayOptionsInfo.widescreenfov.generic.y			= y;
+	displayOptionsInfo.widescreenfov.generic.statusbar = UI_Display_StatusBar;
 
 	displayOptionsInfo.back.generic.type		= MTYPE_BITMAP;
 	displayOptionsInfo.back.generic.name		= ART_BACK0;
@@ -361,6 +385,7 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.ignorehwgamma );
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.drawfps );
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.widescreenfix );
+	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.widescreenfov );
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.maxfps );
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.primitives );
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.back );
@@ -369,10 +394,13 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.screensize.curvalue  = trap_Cvar_VariableValue( "cg_viewsize")/10;
 	displayOptionsInfo.overbrightbits.curvalue  = trap_Cvar_VariableValue("r_overbrightbits") != 0;
 	displayOptionsInfo.ignorehwgamma.curvalue  = trap_Cvar_VariableValue("r_ignorehwgamma") != 0;
-	displayOptionsInfo.widescreenfix.curvalue  = trap_Cvar_VariableValue("cg_wideScreenFix") != 0;
 	displayOptionsInfo.drawfps.curvalue  = trap_Cvar_VariableValue("cg_drawFPS") != 0;
 	displayOptionsInfo.maxfps.curvalue  = trap_Cvar_VariableValue("cg_drawFPS") != 0;
 	displayOptionsInfo.primitives.curvalue = trap_Cvar_VariableValue("r_primitives") / 2;
+	
+	y = (int)(abs(trap_Cvar_VariableValue("cg_wideScreenFix")) % 4);
+	displayOptionsInfo.widescreenfix.curvalue = y & CGX_WFIX_SCREEN;
+	displayOptionsInfo.widescreenfov.curvalue = y & CGX_WFIX_FOV;
 
 	fps = trap_Cvar_VariableValue( "com_maxfps" );
 	if (fps <= 62)

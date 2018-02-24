@@ -7,11 +7,15 @@
 // A user mod should never modify this file
 
 #define	Q3_VERSION		"Q3 1.16n"
-#define CGX_VERSION		"0.62b"
-#define CGX_DATE		"23 Feb 2018"
+#define CGX_VERSION		"0.63b"
+#define CGX_DATE		"25 Feb 2018"
 #define CGX_DEBUG		0
 #define	CGX_UNLAGGED	1
 #define CGX_NOGHOST_COMPATIBLE CVAR_USERINFO
+
+// widescreen fix flags
+#define CGX_WFIX_SCREEN	0x0001
+#define CGX_WFIX_FOV	0x0002
 
 //unlagged - lag simulation #2
 #define MAX_LATENT_CMDS 64

@@ -65,7 +65,6 @@ vmCvar_t	cgx_hitsounds;
 vmCvar_t	cgx_coloredPing;
 vmCvar_t	cgx_networkAdjustments;
 vmCvar_t	cgx_drawScoreBox;
-vmCvar_t	cgx_scroreboard;
 
 vmCvar_t	cgx_maxfps;
 vmCvar_t	cgx_maxpackets;
@@ -191,7 +190,7 @@ cvarTable_t		cvarTable[] = {
 #if CGX_DEBUG
 	{ &cg_drawSnapshot, "cg_drawSnapshot", "0", CVAR_ARCHIVE  },
 #endif
-	{ &cg_draw3dIcons, "cg_draw3dIcons", "0", CVAR_ARCHIVE  },
+	{ &cg_draw3dIcons, "cg_draw3dIcons", "1", CVAR_ARCHIVE  },
 	{ &cg_drawIcons, "cg_drawIcons", "1", CVAR_ARCHIVE  },
 	{ &cg_drawAmmoWarning, "cg_drawAmmoWarning", "1", CVAR_ARCHIVE  },
 	{ &cg_drawAttacker, "cg_drawAttacker", "1", CVAR_ARCHIVE  },
@@ -268,7 +267,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_crosshairColor, "cg_crosshairColor", "", CVAR_ARCHIVE },
 	{ &cgx_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
 	{ &cgx_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },
-	{ &cgx_networkAdjustments, "cg_networkAdjustments", "1", CVAR_ARCHIVE },	
+	{ &cgx_networkAdjustments, "cg_networkAdjustments", "1", CVAR_ARCHIVE },
 #if CGX_UNLAGGED
 	//unlagged - client options
 	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},	
@@ -431,14 +430,14 @@ void CG_UpdateCvars( void ) {
 		trap_Cvar_Update( cv->vmCvar );
 	}
 
-	if (cgx_maxpackets.integer < MIN_MAXPACKETS) {
-		trap_Print(va("Min cl_maxpackets is %i", MIN_MAXPACKETS));
-		cgx_maxpackets.integer = MIN_MAXPACKETS;
+	if (cgx_maxpackets.integer < CGX_MIN_MAXPACKETS) {
+		trap_Print(va("Min cl_maxpackets is %i\n", CGX_MIN_MAXPACKETS));
+		cgx_maxpackets.integer = CGX_MIN_MAXPACKETS;
 		trap_Cvar_Set("cl_maxpackets", "30");
 	}
 	if (cgx_maxfps.integer > 333) {
 		cgx_maxfps.integer = 333;
-		trap_Print(va("Max com_maxfps is %i", 333));
+		trap_Print(va("Max com_maxfps is %i\n", 333));
 		trap_Cvar_Set("com_maxfps", "333");
 	}
 

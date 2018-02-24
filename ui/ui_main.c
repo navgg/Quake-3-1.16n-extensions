@@ -211,7 +211,7 @@ cvarTable_t		cvarTable[] = {
 	{ &ui_marks, "cg_marks", "1", CVAR_ARCHIVE },
 
 	// X-MOD: default parameters
-	{ &uix_wideScreenFix, "cg_wideScreenFix", "1", CVAR_ARCHIVE },
+	{ &uix_wideScreenFix, "cg_wideScreenFix", "3", CVAR_ARCHIVE },
 	{ &uix_defaultWeapon, "cg_defaultWeapon", "0", CVAR_ARCHIVE },
 	{ &uix_drawPlayerIDs, "cg_drawPlayerIDs", "0", CVAR_ARCHIVE },
 
@@ -247,7 +247,7 @@ cvarTable_t		cvarTable[] = {
 	{ &uix_fov, "cg_fov", "90", CVAR_ARCHIVE },	
 	{ &uix_drawgun, "cg_drawGun", "1", CVAR_ARCHIVE },	
 	{ &uix_drawrewards, "cg_drawRewards", "1", CVAR_ARCHIVE },	
-	{ &uix_draw3dicons, "cg_draw3dIcons", "0", CVAR_ARCHIVE },	
+	{ &uix_draw3dicons, "cg_draw3dIcons", "1", CVAR_ARCHIVE },	
 	{ &uix_gibs, "cg_gibs", "1", CVAR_ARCHIVE },	
 
 	{ &ui_server1, "server1", "sodmod.ga:27962", CVAR_ARCHIVE },

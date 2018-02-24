@@ -126,10 +126,10 @@ static void UI_NetworkOptionsMenu_SaveChanges( void ) {
 
 static void UI_NetworkOptionsMenu_CheckGrayed(void) {
 	if (!networkOptionsInfo.adjustments.curvalue) {
-		networkOptionsInfo.snaps.generic.flags ^= QMF_GRAYED;
-		networkOptionsInfo.packets.generic.flags ^= QMF_GRAYED;
-		networkOptionsInfo.delag.generic.flags ^= QMF_GRAYED;
-		networkOptionsInfo.prediction.generic.flags ^= QMF_GRAYED;
+		networkOptionsInfo.snaps.generic.flags &= ~QMF_GRAYED;
+		networkOptionsInfo.packets.generic.flags &= ~QMF_GRAYED;
+		networkOptionsInfo.delag.generic.flags &= ~QMF_GRAYED;
+		networkOptionsInfo.prediction.generic.flags &= ~QMF_GRAYED;
 	} else {
 		networkOptionsInfo.snaps.generic.flags |= QMF_GRAYED;
 		networkOptionsInfo.packets.generic.flags |= QMF_GRAYED;
