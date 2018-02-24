@@ -414,38 +414,43 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	//
 	case EV_FOOTSTEP:
 		DEBUGNAME("EV_FOOTSTEP");
-		if (cg_footsteps.integer) {
+#if CGX_DEBUG
+		if (cg_footsteps.integer) 
+#endif
 			trap_S_StartSound (NULL, es->number, CHAN_BODY, 
-				cgs.media.footsteps[ ci->footsteps ][rand()&3] );
-		}
+				cgs.media.footsteps[ ci->footsteps ][rand()&3] );		
 		break;
 	case EV_FOOTSTEP_METAL:
 		DEBUGNAME("EV_FOOTSTEP_METAL");
-		if (cg_footsteps.integer) {
+#if CGX_DEBUG
+		if (cg_footsteps.integer) 
+#endif
 			trap_S_StartSound (NULL, es->number, CHAN_BODY, 
-				cgs.media.footsteps[ FOOTSTEP_METAL ][rand()&3] );
-		}
+				cgs.media.footsteps[ FOOTSTEP_METAL ][rand()&3] );		
 		break;
 	case EV_FOOTSPLASH:
 		DEBUGNAME("EV_FOOTSPLASH");
-		if (cg_footsteps.integer) {
+#if CGX_DEBUG
+		if (cg_footsteps.integer) 
+#endif
 			trap_S_StartSound (NULL, es->number, CHAN_BODY, 
-				cgs.media.footsteps[ FOOTSTEP_SPLASH ][rand()&3] );
-		}
+				cgs.media.footsteps[ FOOTSTEP_SPLASH ][rand()&3] );		
 		break;
 	case EV_FOOTWADE:
 		DEBUGNAME("EV_FOOTWADE");
-		if (cg_footsteps.integer) {
+#if CGX_DEBUG
+		if (cg_footsteps.integer) 
+#endif
 			trap_S_StartSound (NULL, es->number, CHAN_BODY, 
-				cgs.media.footsteps[ FOOTSTEP_SPLASH ][rand()&3] );
-		}
+				cgs.media.footsteps[ FOOTSTEP_SPLASH ][rand()&3] );		
 		break;
 	case EV_SWIM:
 		DEBUGNAME("EV_SWIM");
-		if (cg_footsteps.integer) {
+#if CGX_DEBUG
+		if (cg_footsteps.integer) 
+#endif
 			trap_S_StartSound (NULL, es->number, CHAN_BODY, 
-				cgs.media.footsteps[ FOOTSTEP_SPLASH ][rand()&3] );
-		}
+				cgs.media.footsteps[ FOOTSTEP_SPLASH ][rand()&3] );		
 		break;
 
 
@@ -738,7 +743,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		if ( es->clientNum == cg.predictedPlayerState.clientNum && 
 			cgs.delagHitscan && (cg_delag.integer & 1 || cg_delag.integer & 16) ) {
 			// do nothing, because it was already predicted
-			Com_Printf("Ignoring rail trail event\n");
+			//Com_Printf("Ignoring rail trail event\n");
 		} else {
 			// draw a rail trail, because it wasn't predicted
 			CG_RailTrail( ci, es->origin2, es->pos.trBase );
@@ -748,7 +753,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 				ByteToDir( es->eventParm, dir );
 				CG_MissileHitWall( es->weapon, es->clientNum, position, dir );
 			}
-			Com_Printf("Non-predicted rail trail\n");
+			//Com_Printf("Non-predicted rail trail\n");
 		}
 		//unlagged - attack prediction #2
 		break;
@@ -760,13 +765,13 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		if ( es->clientNum == cg.predictedPlayerState.clientNum && 
 			cgs.delagHitscan && (cg_delag.integer & 1 || cg_delag.integer & 2) ) {
 			// do nothing, because it was already predicted
-			Com_Printf("Ignoring bullet event\n");
+			//Com_Printf("Ignoring bullet event\n");
 		}
 		else {
 			// do the bullet, because it wasn't predicted
 			ByteToDir( es->eventParm, dir );
 			CG_Bullet( es->pos.trBase, es->otherEntityNum, dir, qfalse, ENTITYNUM_WORLD );
-			Com_Printf("Non-predicted bullet\n");
+			//Com_Printf("Non-predicted bullet\n");
 		}
 		//unlagged - attack prediction #2
 		break;
@@ -778,12 +783,12 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		if ( es->clientNum == cg.predictedPlayerState.clientNum && 
 			cgs.delagHitscan && (cg_delag.integer & 1 || cg_delag.integer & 2) ) {
 			// do nothing, because it was already predicted
-			Com_Printf("Ignoring bullet event\n");
+			//Com_Printf("Ignoring bullet event\n");
 		}
 		else {
 			// do the bullet, because it wasn't predicted
 			CG_Bullet( es->pos.trBase, es->otherEntityNum, dir, qtrue, es->eventParm );
-			Com_Printf("Non-predicted bullet\n");
+			//Com_Printf("Non-predicted bullet\n");
 		}
 		//unlagged - attack prediction #2		
 		break;
@@ -795,12 +800,12 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		if ( es->otherEntityNum == cg.predictedPlayerState.clientNum && 
 			cgs.delagHitscan && (cg_delag.integer & 1 || cg_delag.integer & 4) ) {
 			// do nothing, because it was already predicted
-			Com_Printf("Ignoring shotgun event\n");
+			//Com_Printf("Ignoring shotgun event\n");
 		}
 		else {
 			// do the shotgun pattern, because it wasn't predicted
 			CG_ShotgunFire( es );
-			Com_Printf("Non-predicted shotgun pattern\n");
+			//Com_Printf("Non-predicted shotgun pattern\n");
 		}
 		//unlagged - attack prediction #2
 		break;

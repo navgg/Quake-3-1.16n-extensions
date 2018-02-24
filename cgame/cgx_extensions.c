@@ -426,7 +426,7 @@ void CGX_AutoAdjustNetworkSettings(void) {
 		}
 
 		// no sense in snaps > 30 for default quake3.exe set it to sv_fps if possible, otherwise set it to 40 
-		minSnaps = cgs.sv_fps > 0 ? cgs.sv_fps : 40;
+		minSnaps = cgs.minSnaps;
 
 		// check and set snaps		
 		trap_Cvar_VariableStringBuffer("snaps", buf, sizeof(buf));
@@ -460,14 +460,14 @@ void CGX_AutoAdjustNetworkSettings(void) {
 
 	// check time nudge
 	// if server delaged it's better off
-	if (cgs.delag && cgx_timeNudge.integer < 0) {
+	if (cgs.delagHitscan && cl_timeNudge.integer < 0) {
 		trap_Cvar_Set("cl_timeNudge", "0");
 		trap_Print("Auto: cl_timeNudge 0\n");
-	} else if (cgx_timeNudge.integer > 30) {
-		trap_Cvar_Set("cl_timeNudge", "30");
-		trap_Print("Auto: cl_timeNudge 30\n");
-	} else if (cgx_timeNudge.integer < -30) {
-		trap_Cvar_Set("cl_timeNudge", "-30");
-		trap_Print("Auto: cl_timeNudge -30\n");
+	} else if (cl_timeNudge.integer > 50) {
+		trap_Cvar_Set("cl_timeNudge", "50");
+		trap_Print("Auto: cl_timeNudge 50\n");
+	} else if (cl_timeNudge.integer < -50) {
+		trap_Cvar_Set("cl_timeNudge", "-50");
+		trap_Print("Auto: cl_timeNudge -50\n");
 	}
 }

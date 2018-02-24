@@ -97,12 +97,20 @@ void CG_ParseServerinfo( void ) {
 	cgs.delagHitscan = atoi( Info_ValueForKey( info, "g_delag" ) );
 	trap_Cvar_Set("g_delag", va("%i", cgs.delagHitscan));
 	//unlagged - server options
-
-	cgs.delag = cgs.delagHitscan;
+	
 	cgs.sv_fps = atoi(Info_ValueForKey(info, "sv_fps"));
 	cgs.sv_maxrate = atoi(Info_ValueForKey(info, "sv_maxrate"));
 
-	trap_WPrint(va("g_delag '%i' sv_fps '%i' sv_maxrate '%i'\n", cgs.delag, cgs.sv_fps, cgs.sv_maxrate));
+	// get sv_fps and save for unlagged
+	// get minsnaps for auto network adjustments
+	if (!cgs.sv_fps) {
+		cgs.minSnaps = 40;
+		cgs.sv_fps = 20;
+	} else {		
+		cgs.minSnaps = cgs.sv_fps;
+	}
+
+	trap_WPrint(va("g_delag '%i' sv_fps '%i' sv_maxrate '%i'\n", cgs.delagHitscan, cgs.sv_fps, cgs.sv_maxrate));
 
 	if (cgs.sv_fps != old_sv_fps) {
 		CGX_AutoAdjustNetworkSettings();
@@ -304,9 +312,11 @@ require a reload of all the media
 ===============
 */
 static void CG_MapRestart( void ) {
+#ifdef CGX_DEUBG
 	if ( cg_showmiss.integer ) {
 		CG_Printf( "CG_MapRestart\n" );
 	}
+#endif
 
 	CG_InitLocalEntities();
 	CG_InitMarkPolys();

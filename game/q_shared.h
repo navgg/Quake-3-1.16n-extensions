@@ -7,10 +7,11 @@
 // A user mod should never modify this file
 
 #define	Q3_VERSION		"Q3 1.16n"
-#define CGX_VERSION		"0.54b"
+#define CGX_VERSION		"0.62b"
 #define CGX_DATE		"23 Feb 2018"
 #define CGX_DEBUG		0
-#define CGX_NOGHOST_COMPATIBLE 0 //CVAR_USERINFO
+#define	CGX_UNLAGGED	1
+#define CGX_NOGHOST_COMPATIBLE CVAR_USERINFO
 
 //unlagged - lag simulation #2
 #define MAX_LATENT_CMDS 64

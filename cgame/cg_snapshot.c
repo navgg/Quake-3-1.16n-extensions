@@ -275,7 +275,7 @@ static snapshot_t *CG_ReadNextSnapshot( void ) {
 		// try to read the snapshot from the client system
 		cgs.processedSnapshotNum++;
 		r = trap_GetSnapshot( cgs.processedSnapshotNum, dest );
-
+#if CGX_DEBUG && CGX_UNLAGGED
 		//unlagged - lag simulation #1
 		// the client wants latent snaps and the just-read snapshot is valid
 		if ( cg_latentSnaps.integer && r ) {
@@ -293,6 +293,7 @@ static snapshot_t *CG_ReadNextSnapshot( void ) {
 			}
 		}
 		//unlagged - lag simulation #1
+#endif
 
 		// if it succeeded, return
 		if ( r ) {
@@ -345,14 +346,15 @@ void CG_ProcessSnapshots( void ) {
 	if ( n != cg.latestSnapshotNum ) {
 		if ( n < cg.latestSnapshotNum ) {
 			// this should never happen
+#if CGX_DEBUG && CGX_UNLAGGED
 			//unlagged - lag simulation #1
 			// this may actually happen with lag simulation going on
-			if ( cg_latentSnaps.integer ) {
-				CG_Printf( "WARNING: CG_ProcessSnapshots: n < cg.latestSnapshotNum\n" );
-			}
-			else {
+			if ( cg_latentSnaps.integer ) 
+				CG_Printf( "WARNING: CG_ProcessSnapshots: n < cg.latestSnapshotNum\n" );			
+			else
+#endif
 				CG_Error( "CG_ProcessSnapshots: n < cg.latestSnapshotNum" );
-			}
+			
 			//unlagged - lag simulation #1
 		}
 		cg.latestSnapshotNum = n;
@@ -392,15 +394,16 @@ void CG_ProcessSnapshots( void ) {
 			CG_SetNextSnap( snap );
 
 			// if time went backwards, we have a level restart
-			if ( cg.nextSnap->serverTime < cg.snap->serverTime ) {
+			if ( cg.nextSnap->serverTime < cg.snap->serverTime ) {				
+#if CGX_DEBUG && CGX_UNLAGGED
 				//unlagged - lag simulation #1
 				// this may actually happen with lag simulation going on
-				if ( cg_latentSnaps.integer ) {
-					CG_Printf( "WARNING: CG_ProcessSnapshots: Server time went backwards\n" );
-				}
-				else {
+				if ( cg_latentSnaps.integer ) 
+					CG_Printf( "WARNING: CG_ProcessSnapshots: Server time went backwards\n" );				
+				else 
+#endif
 					CG_Error( "CG_ProcessSnapshots: Server time went backwards" );
-				}
+				
 				//unlagged - lag simulation #1
 			}
 		}

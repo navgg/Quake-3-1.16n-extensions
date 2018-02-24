@@ -60,7 +60,7 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 	char	string[1024];
 	vec3_t	headAngles;
 	clientInfo_t	*ci;
-	int iconx, headx;
+	int iconx, headx, iconxoffs;
 	int		pingCol;
 
 	if ( score->client < 0 || score->client >= cgs.maxclients ) {
@@ -72,6 +72,7 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 
 	iconx = SB_BOTICON_X + vScreen.offsetx;
 	headx = SB_HEAD_X + vScreen.offsetx;
+	iconxoffs = cgx_drawPlayerIDs.integer ? -16 : 0;
 
 	// draw the handicap or bot skill marker (unless player has flag)
 	if ( ci->powerups & ( 1 << PW_REDFLAG ) ) {
@@ -95,25 +96,26 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 					CG_DrawPic( iconx, y - ( 32 - BIGCHAR_HEIGHT ) / 2, 32, 32, cgs.media.botSkillShaders[ ci->botSkill - 1 ] );
 				}
 				else {
-					CG_DrawPic( iconx, y, 16, 16, cgs.media.botSkillShaders[ ci->botSkill - 1 ] );
+					CG_DrawPic( iconx - iconxoffs / 2, y, 16, 16, cgs.media.botSkillShaders[ ci->botSkill - 1 ] );
 				}
 			}
 		} else if ( ci->handicap < 100 ) {
 			Com_sprintf( string, sizeof( string ), "%i", ci->handicap );
 			if ( cgs.gametype == GT_TOURNAMENT )
-				CG_DrawSmallStringColor( iconx, y - SMALLCHAR_HEIGHT/2, string, color );
+				//CG_DrawSmallString()
+				CG_DrawSmallStringColor( iconx + iconxoffs - 30, y, string, color );
 			else
-				CG_DrawSmallStringColor( iconx, y, string, color );
+				CG_DrawSmallStringColor( iconx + iconxoffs, y, string, color );
 		}
 
 		// draw the wins / losses
 		if ( cgs.gametype == GT_TOURNAMENT ) {
 			Com_sprintf( string, sizeof( string ), "%i/%i", ci->wins, ci->losses );
 			if( ci->handicap < 100 && !ci->botSkill ) {
-				CG_DrawSmallStringColor( iconx, y + SMALLCHAR_HEIGHT/2, string, color );
+				CG_DrawSmallStringColor( iconx + iconxoffs - 12, y, string, color );
 			}
 			else {
-				CG_DrawSmallStringColor( iconx, y, string, color );
+				CG_DrawSmallStringColor( iconx + iconxoffs - 12, y, string, color );
 			}
 		}
 	}
@@ -131,10 +133,9 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 
 	// X-MOD: draw player ID
 
-	if (cgx_drawPlayerIDs.integer) {
-		int offx = cgs.gametype == GT_TOURNAMENT ? 32 : 0;
+	if (cgx_drawPlayerIDs.integer) {		
 		Com_sprintf(string, sizeof(string), "%3i", score->client);
-		CG_DrawBigString(SB_SCORELINE_X + vScreen.offsetx - 64 - 40 - offx, y, string, 0.5f);
+		CG_DrawBigString(SB_SCORELINE_X + vScreen.offsetx - 64 - 40, y, string, 0.5f);
 	}
 
 	// X-MOD: color ping
@@ -338,7 +339,7 @@ qboolean CG_DrawScoreboard( void ) {
 	y = SB_TOP;
 
 	// If there are more than SB_MAXCLIENTS_NORMAL, use the interleaved scores
-	if ( cg.numScores > SB_MAXCLIENTS_NORMAL ) {
+	if ( cg.numScores > SB_MAXCLIENTS_NORMAL /*|| cgx_drawScoreBox.integer*/) {
 		maxClients = SB_MAXCLIENTS_INTER;
 		lineHeight = SB_INTER_HEIGHT;
 		topBorderSize = 8;

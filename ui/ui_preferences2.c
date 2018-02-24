@@ -164,9 +164,9 @@ static const char *defaultweapon_items[] = {
 
 static const char *lagometer_items[] = {
 	"off",
-	"netgraph",
-	"netgraph + ping",
-	"only when lag",
+	"graph",
+	"graph + ping",
+	"when packetloss",
 	0
 };
 

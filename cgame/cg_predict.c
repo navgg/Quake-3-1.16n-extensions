@@ -380,17 +380,21 @@ static int IsUnacceptableError( playerState_t *ps, playerState_t *pps ) {
 
 	VectorSubtract( pps->origin, ps->origin, delta );
 	if ( VectorLengthSquared( delta ) > 0.1f * 0.1f ) {
+#if CGX_DEBUG
 		if ( cg_showmiss.integer ) {
 			CG_Printf("delta: %.2f  ", VectorLength(delta) );
 		}
+#endif
 		return 2;
 	}
 
 	VectorSubtract( pps->velocity, ps->velocity, delta );
 	if ( VectorLengthSquared( delta ) > 0.1f * 0.1f ) {
+#if CGX_DEBUG
 		if ( cg_showmiss.integer ) {
 			CG_Printf("delta: %.2f  ", VectorLength(delta) );
 		}
+#endif
 		return 3;
 	}
 
@@ -582,9 +586,11 @@ void CG_PredictPlayerState( void ) {
 	trap_GetUserCmd( cmdNum, &oldestCmd );
 	if ( oldestCmd.serverTime > cg.snap->ps.commandTime 
 		&& oldestCmd.serverTime < cg.time ) {	// special check for map_restart
+#if CGX_DEBUG
 		if ( cg_showmiss.integer ) {
 			CG_Printf ("exceeded PACKET_BACKUP on commands\n");
 		}
+#endif
 		return;
 	}
 
@@ -625,7 +631,11 @@ void CG_PredictPlayerState( void ) {
 
 	// we check for cg_latentCmds because it'll mess up the optimization
 	// FIXME: make cg_latentCmds work with cg_optimizePrediction?
-	if ( cg_optimizePrediction.integer && !cg_latentCmds.integer ) {
+	if ( cg_optimizePrediction.integer 
+#if CGX_DEBUG
+		&& !cg_latentCmds.integer
+#endif
+		) {
 		if ( cg.nextFrameTeleport || cg.thisFrameTeleport ) {
 			// do a full predict
 			cg.lastPredictedCommand = 0;
@@ -775,13 +785,18 @@ void CG_PredictPlayerState( void ) {
 
 		//unlagged - optimized prediction
 		// we check for cg_latentCmds because it'll mess up the optimization
-		if ( cg_optimizePrediction.integer && !cg_latentCmds.integer ) {
+		if ( cg_optimizePrediction.integer 
+#if CGX_DEBUG
+			&& !cg_latentCmds.integer 
+#endif
+			) {
 			// if we need to predict this command, or we've run out of space in the saved states queue
 			if ( cmdNum >= predictCmd || (stateIndex + 1) % NUM_SAVED_STATES == cg.stateHead ) {
 				// run the Pmove
 				Pmove (&cg_pmove);
-
+#if CGX_DEBUG
 				numPredicted++; // debug code
+#endif
 
 								// record the last predicted command
 				cg.lastPredictedCommand = cmdNum;
@@ -865,13 +880,6 @@ void CG_PredictPlayerState( void ) {
 	// fire events and other transition triggered things
 	CG_TransitionPlayerState( &cg.predictedPlayerState, &oldPlayerState );
 
-
-	//if ( cg_showmiss.integer ) {
-	//	if (cg.eventSequence > cg.predictedPlayerState.eventSequence) {
-	//		CG_Printf("WARNING: double event\n");
-	//		cg.eventSequence = cg.predictedPlayerState.eventSequence;
-	//	}
-	//}
 }
 
 

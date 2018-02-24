@@ -64,11 +64,11 @@ vmCvar_t	cgx_drawSpeed;
 vmCvar_t	cgx_hitsounds;
 vmCvar_t	cgx_coloredPing;
 vmCvar_t	cgx_networkAdjustments;
+vmCvar_t	cgx_drawScoreBox;
 
 vmCvar_t	cgx_maxfps;
 vmCvar_t	cgx_maxpackets;
 vmCvar_t	cgx_rate;
-vmCvar_t	cgx_timeNudge;
 vmCvar_t	cgx_delag;
 
 vmCvar_t	cgx_debug;
@@ -76,16 +76,18 @@ vmCvar_t	cgx_version;
 
 //unlagged - client options
 vmCvar_t	cg_delag;
-vmCvar_t	cg_debugDelag;
-vmCvar_t	cg_drawBBox;
 vmCvar_t	cg_cmdTimeNudge;
-vmCvar_t	sv_fps;
 vmCvar_t	cg_projectileNudge;
 vmCvar_t	cg_optimizePrediction;
 vmCvar_t	cl_timeNudge;
+#if CGX_DEBUG
+vmCvar_t	sv_fps;
+vmCvar_t	cg_debugDelag;
+vmCvar_t	cg_drawBBox;
 vmCvar_t	cg_latentSnaps;
 vmCvar_t	cg_latentCmds;
 vmCvar_t	cg_plOut;
+#endif
 //unlagged - client options
 
 vmCvar_t	cg_railTrailTime;
@@ -100,7 +102,9 @@ vmCvar_t	cg_shadows;
 vmCvar_t	cg_gibs;
 vmCvar_t	cg_drawTimer;
 vmCvar_t	cg_drawFPS;
+#if CGX_DEBUG
 vmCvar_t	cg_drawSnapshot;
+#endif
 vmCvar_t	cg_draw3dIcons;
 vmCvar_t	cg_drawIcons;
 vmCvar_t	cg_drawAmmoWarning;
@@ -114,14 +118,18 @@ vmCvar_t	cg_crosshairHealth;
 vmCvar_t	cg_draw2D;
 vmCvar_t	cg_drawStatus;
 vmCvar_t	cg_animSpeed;
+#if CGX_DEBUG
 vmCvar_t	cg_debugAnim;
 vmCvar_t	cg_debugPosition;
 vmCvar_t	cg_debugEvents;
+#endif
 vmCvar_t	cg_errorDecay;
 vmCvar_t	cg_nopredict;
+#if CGX_DEBUG
 vmCvar_t	cg_noPlayerAnims;
 vmCvar_t	cg_showmiss;
 vmCvar_t	cg_footsteps;
+#endif
 vmCvar_t	cg_addMarks;
 vmCvar_t	cg_brassTime;
 vmCvar_t	cg_viewsize;
@@ -179,8 +187,10 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_drawStatus, "cg_drawStatus", "1", CVAR_ARCHIVE  },
 	{ &cg_drawTimer, "cg_drawTimer", "0", CVAR_ARCHIVE  },
 	{ &cg_drawFPS, "cg_drawFPS", "0", CVAR_ARCHIVE  },
+#if CGX_DEBUG
 	{ &cg_drawSnapshot, "cg_drawSnapshot", "0", CVAR_ARCHIVE  },
-	{ &cg_draw3dIcons, "cg_draw3dIcons", "1", CVAR_ARCHIVE  },
+#endif
+	{ &cg_draw3dIcons, "cg_draw3dIcons", "0", CVAR_ARCHIVE  },
 	{ &cg_drawIcons, "cg_drawIcons", "1", CVAR_ARCHIVE  },
 	{ &cg_drawAmmoWarning, "cg_drawAmmoWarning", "1", CVAR_ARCHIVE  },
 	{ &cg_drawAttacker, "cg_drawAttacker", "1", CVAR_ARCHIVE  },
@@ -209,14 +219,18 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_bobroll, "cg_bobroll", "0.0", CVAR_ARCHIVE },
 	{ &cg_swingSpeed, "cg_swingSpeed", "0.3", CVAR_CHEAT },
 	{ &cg_animSpeed, "cg_animspeed", "1", CVAR_CHEAT },
+#if CGX_DEBUG
 	{ &cg_debugAnim, "cg_debuganim", "0", CVAR_CHEAT },
 	{ &cg_debugPosition, "cg_debugposition", "0", CVAR_CHEAT },
 	{ &cg_debugEvents, "cg_debugevents", "0", CVAR_CHEAT },
+#endif
 	{ &cg_errorDecay, "cg_errordecay", "100", 0 },
 	{ &cg_nopredict, "cg_nopredict", "0", 0 },
+#if CGX_DEBUG
 	{ &cg_noPlayerAnims, "cg_noplayeranims", "0", CVAR_CHEAT },
 	{ &cg_showmiss, "cg_showmiss", "0", 0 },
 	{ &cg_footsteps, "cg_footsteps", "1", CVAR_CHEAT },
+#endif
 	{ &cg_tracerChance, "cg_tracerchance", "0.4", CVAR_CHEAT },
 	{ &cg_tracerWidth, "cg_tracerwidth", "1", CVAR_CHEAT },
 	{ &cg_tracerLength, "cg_tracerlength", "100", CVAR_CHEAT },
@@ -254,21 +268,25 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
 	{ &cgx_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },
 	{ &cgx_networkAdjustments, "cg_networkAdjustments", "1", CVAR_ARCHIVE },
-
+#if CGX_UNLAGGED
 	//unlagged - client options
-	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE  | CGX_NOGHOST_COMPATIBLE},
+	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},	
+	{ &cg_projectileNudge, "cg_delag_projectileNudge", "0", CVAR_ARCHIVE },
+	{ &cg_optimizePrediction, "cg_delag_optimizePrediction", "1", CVAR_ARCHIVE },
+
+	{ &cg_cmdTimeNudge, "cg_delag_cmdTimeNudge", "0", CVAR_ARCHIVE },
+	{ &cl_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},
+	// this will be automagically copied from the server	
+#if CGX_DEBUG
+	{ &sv_fps, "sv_fps", "20", 0 },	
 	{ &cg_debugDelag, "cg_debugDelag", "0", CVAR_CHEAT },
 	{ &cg_drawBBox, "cg_drawBBox", "0", CVAR_CHEAT },
-	{ &cg_cmdTimeNudge, "cg_delag_cmdTimeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
-	// this will be automagically copied from the server
-	{ &sv_fps, "sv_fps", "20", 0 },
-	{ &cg_projectileNudge, "cg_delag_projectileNudge", "0", CVAR_ARCHIVE },
-	{ &cg_optimizePrediction, "cg_delag_optimizePrediction", "0", CVAR_ARCHIVE },
-	{ &cl_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE },
 	{ &cg_latentSnaps, "cg_latentSnaps", "0", CVAR_CHEAT },
 	{ &cg_latentCmds, "cg_latentCmds", "0", CVAR_CHEAT },
 	{ &cg_plOut, "cg_plOut", "0", CVAR_CHEAT },
+#endif
 	//unlagged - client options
+#endif
 
 //#if CGX_DEBUG
 	// X-MOD: compability with noghost
@@ -393,6 +411,7 @@ void CG_UpdateCvars( void ) {
 		else if ( cv->vmCvar == &cl_timeNudge ) {
 			CG_Cvar_ClampInt( cv->cvarName, cv->vmCvar, -50, 50 );
 		}
+#if CGX_DEBUG && CGX_UNLAGGED
 		// don't let this go too high - no point
 		else if ( cv->vmCvar == &cg_latentSnaps ) {
 			CG_Cvar_ClampInt( cv->cvarName, cv->vmCvar, 0, 10 );
@@ -405,15 +424,22 @@ void CG_UpdateCvars( void ) {
 		else if ( cv->vmCvar == &cg_plOut ) {
 			CG_Cvar_ClampInt( cv->cvarName, cv->vmCvar, 0, 100 );
 		}
-		//unlagged - client options
+#endif //  CGX_DEBUG
+		//unlagged - client options		
+
 		trap_Cvar_Update( cv->vmCvar );
 	}
 
-	if (cgx_maxpackets.integer < MIN_MAXPACKETS)
+	if (cgx_maxpackets.integer < MIN_MAXPACKETS) {
+		trap_Print(va("Min cl_maxpackets is %i", MIN_MAXPACKETS));
+		cgx_maxpackets.integer = MIN_MAXPACKETS;
 		trap_Cvar_Set("cl_maxpackets", "30");
-
-	if (cgx_maxfps.integer > 333)
+	}
+	if (cgx_maxfps.integer > 333) {
+		cgx_maxfps.integer = 333;
+		trap_Print(va("Max com_maxfps is %i", 333));
 		trap_Cvar_Set("com_maxfps", "333");
+	}
 
 	// check for modications here
 	// X-MOD: reinit vScreen if value changed
@@ -820,6 +846,7 @@ static void CG_RegisterGraphics( void ) {
 
 	//X-MOD: fixed crosshair shaders for crosshair color
 	for ( i = 0 ; i < NUM_CROSSHAIRS ; i++ ) {
+		cgs.media.defaultCrosshair[i] = trap_R_RegisterShader( va("gfx/2d/crosshair%c", 'a'+i) );
 		cgs.media.crosshairShader[i] = trap_R_RegisterShader( va("gfx/2d/fixed_crosshair%c", 'a'+i) );
 	}
 

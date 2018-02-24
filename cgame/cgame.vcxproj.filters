@@ -77,9 +77,6 @@
     <ClCompile Include="cg_view.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cg_weapons.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\game\q_math.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -90,6 +87,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cg_unlagged.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cg_weapons.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

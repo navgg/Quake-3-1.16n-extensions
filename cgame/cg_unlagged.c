@@ -42,13 +42,13 @@ void CG_PredictWeaponEffects( centity_t *cent ) {
 	vec3_t		muzzlePoint, forward, right, up;
 	entityState_t *ent = &cent->currentState;
 
-	// if the client isn't us, forget it
-	if ( cent->currentState.number != cg.predictedPlayerState.clientNum ) {
+	// if it's not switched on server-side, forget it
+	if ( !cgs.delagHitscan ) {
 		return;
 	}
 
-	// if it's not switched on server-side, forget it
-	if ( !cgs.delagHitscan ) {
+	// if the client isn't us, forget it
+	if ( cent->currentState.number != cg.predictedPlayerState.clientNum ) {
 		return;
 	}
 
@@ -69,7 +69,7 @@ void CG_PredictWeaponEffects( centity_t *cent ) {
 
 			// trace forward
 			VectorMA( muzzlePoint, 8192, forward, endPoint );
-
+#if CGX_DEBUG
 			// THIS IS FOR DEBUGGING!
 			// you definitely *will* want something like this to test the backward reconciliation
 			// to make sure it's working *exactly* right
@@ -123,7 +123,7 @@ void CG_PredictWeaponEffects( centity_t *cent ) {
 					}
 				}
 			}
-
+#endif
 			// find the rail's end point
 			CG_Trace( &trace, muzzlePoint, vec3_origin, vec3_origin, endPoint, cg.predictedPlayerState.clientNum, CONTENTS_SOLID );
 
@@ -237,6 +237,7 @@ CG_AddBoundingBox
 Draws a bounding box around a player.  Called from CG_Player.
 =================
 */
+#if CGX_DEBUG
 void CG_AddBoundingBox( centity_t *cent ) {
 	polyVert_t verts[4];
 	clientInfo_t *ci;
@@ -393,6 +394,7 @@ void CG_AddBoundingBox( centity_t *cent ) {
 	VectorCopy( corners[5], verts[3].xyz );
 	trap_R_AddPolyToScene( bboxShader_nocull, 4, verts );
 }
+#endif
 
 /*
 ================
@@ -408,6 +410,7 @@ qboolean CG_Cvar_ClampInt( const char *name, vmCvar_t *vmCvar, int min, int max 
 		Com_sprintf( vmCvar->string, MAX_CVAR_VALUE_STRING, "%d", max );
 		vmCvar->value = max;
 		vmCvar->integer = max;
+		vmCvar->modificationCount++;
 
 		trap_Cvar_Set( name, vmCvar->string );
 		return qtrue;
@@ -419,6 +422,7 @@ qboolean CG_Cvar_ClampInt( const char *name, vmCvar_t *vmCvar, int min, int max 
 		Com_sprintf( vmCvar->string, MAX_CVAR_VALUE_STRING, "%d", min );
 		vmCvar->value = min;
 		vmCvar->integer = min;
+		vmCvar->modificationCount++;
 
 		trap_Cvar_Set( name, vmCvar->string );
 		return qtrue;

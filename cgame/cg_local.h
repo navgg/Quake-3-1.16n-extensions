@@ -603,6 +603,7 @@ typedef struct {
 	qhandle_t	selectShader;
 	qhandle_t	viewBloodShader;
 	qhandle_t	tracerShader;
+	qhandle_t	defaultCrosshair[NUM_CROSSHAIRS];
 	qhandle_t	crosshairShader[NUM_CROSSHAIRS];
 	qhandle_t	lagometerShader;
 	qhandle_t	backTileShader;
@@ -800,8 +801,8 @@ typedef struct {
 	cgMedia_t		media;
 
 	//X-MOD: save delag and server info
-	int				delag;
 	int				sv_fps;
+	int				minSnaps;
 	int				sv_maxrate;
 
 	//unlagged - client options
@@ -859,10 +860,11 @@ extern	vmCvar_t		cgx_drawSpeed;
 extern	vmCvar_t		cgx_hitsounds;
 extern	vmCvar_t		cgx_coloredPing;
 extern	vmCvar_t		cgx_networkAdjustments;
+extern	vmCvar_t		cgx_drawScoreBox;
 
 extern	vmCvar_t		cgx_maxfps;
 extern	vmCvar_t		cgx_maxpackets;
-extern	vmCvar_t		cgx_timeNudge;
+//extern	vmCvar_t		cgx_timeNudge;
 extern	vmCvar_t		cgx_delag;
 
 extern	vmCvar_t		cgx_debug;
@@ -879,7 +881,9 @@ extern	vmCvar_t		cg_shadows;
 extern	vmCvar_t		cg_gibs;
 extern	vmCvar_t		cg_drawTimer;
 extern	vmCvar_t		cg_drawFPS;
+#if CGX_DEBUG
 extern	vmCvar_t		cg_drawSnapshot;
+#endif
 extern	vmCvar_t		cg_draw3dIcons;
 extern	vmCvar_t		cg_drawIcons;
 extern	vmCvar_t		cg_drawAmmoWarning;
@@ -895,15 +899,19 @@ extern	vmCvar_t		cg_crosshairHealth;
 extern	vmCvar_t		cg_drawStatus;
 extern	vmCvar_t		cg_draw2D;
 extern	vmCvar_t		cg_animSpeed;
+#if CGX_DEBUG
 extern	vmCvar_t		cg_debugAnim;
 extern	vmCvar_t		cg_debugPosition;
 extern	vmCvar_t		cg_debugEvents;
+#endif
 extern	vmCvar_t		cg_railTrailTime;
 extern	vmCvar_t		cg_errorDecay;
 extern	vmCvar_t		cg_nopredict;
+#if CGX_DEBUG
 extern	vmCvar_t		cg_noPlayerAnims;
 extern	vmCvar_t		cg_showmiss;
 extern	vmCvar_t		cg_footsteps;
+#endif
 extern	vmCvar_t		cg_addMarks;
 extern	vmCvar_t		cg_brassTime;
 extern	vmCvar_t		cg_gun_frame;
@@ -939,16 +947,18 @@ extern	vmCvar_t		cg_deferPlayers;
 
 //unlagged - client options
 extern	vmCvar_t		cg_delag;
-extern	vmCvar_t		cg_debugDelag;
-extern	vmCvar_t		cg_drawBBox;
 extern	vmCvar_t		cg_cmdTimeNudge;
-extern	vmCvar_t		sv_fps;
 extern	vmCvar_t		cg_projectileNudge;
 extern	vmCvar_t		cg_optimizePrediction;
 extern	vmCvar_t		cl_timeNudge;
+#if CGX_DEBUG
+extern	vmCvar_t		sv_fps;
+extern	vmCvar_t		cg_debugDelag;
+extern	vmCvar_t		cg_drawBBox;
 extern	vmCvar_t		cg_latentSnaps;
 extern	vmCvar_t		cg_latentCmds;
 extern	vmCvar_t		cg_plOut;
+#endif
 //unlagged - client options
 
 //unlagged - cg_unlagged.c
