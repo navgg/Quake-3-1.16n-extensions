@@ -4,7 +4,7 @@ Custom extensions for patching Quake 3 1.16n
 Still under development, beta version
 
 ###### Features
-- wide screen fix, supports any ratio, icons not stretching
+- wide screen fix, supports any ratio, icons not stretching, fov fix for widescreens
 - extended ingame ui with short description of many settings
 - added advanced settings menu with many hidden game settings
 - extended display menu, brightness options, fps selection, primitives etc.
