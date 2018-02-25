@@ -51,7 +51,7 @@ void CGX_Init_vScreen(void) {
 	trap_GetGlconfig( &cgs.glconfig );
 
 	// X-MOD: init virtual screen sizes for wide screen fix
-
+	
 	if ( (cgx_wideScreenFix.integer & CGX_WFIX_SCREEN) && cgs.glconfig.vidWidth * 480 > cgs.glconfig.vidHeight * 640 ) {
 		vScreen.width = (float)cgs.glconfig.vidWidth / (float)cgs.glconfig.vidHeight * 480.0f;		 				 				
 		vScreen.offsetx = (vScreen.width - 640) / 2.0f;

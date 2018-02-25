@@ -864,6 +864,7 @@ extern	vmCvar_t		cgx_hitsounds;
 extern	vmCvar_t		cgx_coloredPing;
 extern	vmCvar_t		cgx_networkAdjustments;
 extern	vmCvar_t		cgx_drawScoreBox;
+extern	vmCvar_t		cgx_scoreboard;
 
 extern	vmCvar_t		cgx_maxfps;
 extern	vmCvar_t		cgx_maxpackets;

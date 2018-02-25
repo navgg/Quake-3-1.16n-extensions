@@ -339,7 +339,7 @@ qboolean CG_DrawScoreboard( void ) {
 	y = SB_TOP;
 
 	// If there are more than SB_MAXCLIENTS_NORMAL, use the interleaved scores
-	if ( cg.numScores > SB_MAXCLIENTS_NORMAL /*|| cgx_drawScoreBox.integer*/) {
+	if (cg.numScores > SB_MAXCLIENTS_NORMAL || cgx_scoreboard.integer == 1) {
 		maxClients = SB_MAXCLIENTS_INTER;
 		lineHeight = SB_INTER_HEIGHT;
 		topBorderSize = 8;

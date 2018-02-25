@@ -1190,7 +1190,10 @@ static void CG_DrawLowerRight( void ) {
 		y = CG_DrawTeamOverlay( y, qtrue, qfalse );
 	} 
 
-	y = CG_DrawScores( y );
+	if (cgx_drawScoreBox.integer) {
+		y = CG_DrawScores(y);
+	}
+
 	y = CG_DrawPowerups( y );
 }
 

@@ -22,7 +22,7 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
 	case CG_SHUTDOWN:
 		CG_Shutdown();
 		return 0;
-	case CG_CONSOLE_COMMAND:
+	case CG_CONSOLE_COMMAND:		
 		return CG_ConsoleCommand();
 	case CG_DRAW_ACTIVE_FRAME:
 		CG_DrawActiveFrame( arg0, arg1, arg2 );
@@ -65,6 +65,9 @@ vmCvar_t	cgx_hitsounds;
 vmCvar_t	cgx_coloredPing;
 vmCvar_t	cgx_networkAdjustments;
 vmCvar_t	cgx_drawScoreBox;
+vmCvar_t	cgx_scoreboard;
+
+vmCvar_t	cgx_sharedConfig;
 
 vmCvar_t	cgx_maxfps;
 vmCvar_t	cgx_maxpackets;
@@ -268,6 +271,10 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
 	{ &cgx_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },
 	{ &cgx_networkAdjustments, "cg_networkAdjustments", "1", CVAR_ARCHIVE },
+	{ &cgx_scoreboard, "cg_scoreboard", "1", CVAR_TEMP },
+	{ &cgx_drawScoreBox, "cg_drawScoreBox", "1", CVAR_ARCHIVE },
+
+	{ &cgx_sharedConfig, "cg_sharedConfig", "0", CVAR_TEMP },	
 #if CGX_UNLAGGED
 	//unlagged - client options
 	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},	
@@ -288,18 +295,9 @@ cvarTable_t		cvarTable[] = {
 	//unlagged - client options
 #endif
 
-//#if CGX_DEBUG
-	// X-MOD: compability with noghost
-
 	{ &cgx_maxfps, "com_maxfps", "125", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
 	//{ &cgx_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
-	{ &cgx_maxpackets, "cl_maxpackets", "40", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },		
-//#else
-//	// X-MOD: compability with noghost
-//	{ &cgx_maxfps, "com_maxfps", "125", CVAR_ARCHIVE | CVAR_USERINFO },
-//	{ &cgx_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CVAR_USERINFO },
-//	{ &cgx_maxpackets, "cl_maxpackets", "40", CVAR_ARCHIVE | CVAR_USERINFO },	
-//#endif	
+	{ &cgx_maxpackets, "cl_maxpackets", "40", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },			
 
 #if CGX_DEBUG
 	{ &cgx_debug, "cgx_debug", "1", CVAR_TEMP },
@@ -396,6 +394,7 @@ void CG_UpdateCvars( void ) {
 	int			i;
 	cvarTable_t	*cv;	
 
+#if CGX_UNLAGGED
 	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
 		//unlagged - client options
 		// clamp the value between 0 and 999
@@ -411,7 +410,7 @@ void CG_UpdateCvars( void ) {
 		else if ( cv->vmCvar == &cl_timeNudge ) {
 			CG_Cvar_ClampInt( cv->cvarName, cv->vmCvar, -50, 50 );
 		}
-#if CGX_DEBUG && CGX_UNLAGGED
+#if CGX_DEBUG
 		// don't let this go too high - no point
 		else if ( cv->vmCvar == &cg_latentSnaps ) {
 			CG_Cvar_ClampInt( cv->cvarName, cv->vmCvar, 0, 10 );
@@ -426,6 +425,7 @@ void CG_UpdateCvars( void ) {
 		}
 #endif //  CGX_DEBUG
 		//unlagged - client options		
+#endif //  CGX_UNLAGGED
 
 		trap_Cvar_Update( cv->vmCvar );
 	}
@@ -1116,7 +1116,22 @@ CG_Shutdown
 Called before every level change or subsystem restart
 =================
 */
-void CG_Shutdown( void ) {		
+void CG_Shutdown( void ) {	
+	// X-MOD: potential fix for q3config saving problem
+
+	if (cgx_sharedConfig.integer) {
+		char buf[32];
+		trap_Cvar_VariableStringBuffer("fs_game", buf, sizeof(buf));
+
+		trap_Print(buf);
+
+		if (buf[0] == '\0')
+			trap_SendConsoleCommand("writeconfig q3config.cfg;");
+		else
+			trap_SendConsoleCommand("writeconfig ..\\baseq3\\q3config.cfg;");
+	}
+
+
 	// some mods may need to do cleanup work here,
 	// like closing files or archiving session data
 }
