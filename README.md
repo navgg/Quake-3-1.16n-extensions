@@ -26,7 +26,7 @@ Still under development, beta version
 
 ###### Command list
 
-- `cg_wideScreenFix 1|0` - fix perspective for widescreen
+- `cg_wideScreenFix 0|1|2|3` - fix perspective for widescreen 0: no fixes 1: fix only icons 2: fix only fov 3: fix fov and icons
 - `cg_defaultWeapon 0-9` - default weapon when spawn 0: default 1: gauntlet ...
 - `cg_drawPlayerIDs 0|1` - show player id in scoreboard	
 - `cg_centerPrintAlpha 1.0-0` - center print transparency
