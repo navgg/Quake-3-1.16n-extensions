@@ -45,5 +45,8 @@ Still under development, beta version
 - `cg_hitsounds 0|1|2` - 0: default 1: pro mode hi-low 2: low-hi hp hitsounds
 - `cg_networkAdjustments 0|1|2` - off, 1: packets 40-60 rate min 8000, 2: packets 60+ rate min 25000 packetdup off (snaps = sv_fps or min 40 in both cases)
 - `cg_drawGun 0|1|2` - 0: no gun 1: default bobbing 2: not bobbing cpm style
+- `cg_drawScoreBox 1|0` - display score box in low right corner 
+- `cg_scoreboard 0|1` - scoreboard 0: default large-small 1: always small
+- `cg_sharedConfig 0|1` - in development
 - `cgx_debug 0|1|2` - show debug info
 - `cgx_version` - show version
