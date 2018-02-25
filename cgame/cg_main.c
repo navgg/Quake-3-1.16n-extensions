@@ -208,7 +208,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_simpleItems, "cg_simpleItems", "0", CVAR_ARCHIVE },
 	{ &cg_addMarks, "cg_marks", "1", CVAR_ARCHIVE },
 	// X-MOD: nethgraph + ping
-	{ &cg_lagometer, "cg_lagometer", "3", CVAR_ARCHIVE },
+	{ &cg_lagometer, "cg_lagometer", "1", CVAR_ARCHIVE },
 	{ &cg_railTrailTime, "cg_railTrailTime", "400", CVAR_ARCHIVE  },
 	// X-MOD: cg_gun no more cheats
 	{ &cg_gun_x, "cg_gunX", "0", CVAR_ARCHIVE },
@@ -251,7 +251,7 @@ cvarTable_t		cvarTable[] = {
 
 	// X-MOD: extended cgx commands
 
-	{ &cgx_wideScreenFix, "cg_wideScreenFix", "1", CVAR_ARCHIVE },
+	{ &cgx_wideScreenFix, "cg_wideScreenFix", "3", CVAR_ARCHIVE },
 	{ &cgx_defaultWeapon, "cg_defaultWeapon", "0", CVAR_ARCHIVE },
 	{ &cgx_drawPlayerIDs, "cg_drawPlayerIDs", "0", CVAR_ARCHIVE },
 	
@@ -270,10 +270,10 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_crosshairColor, "cg_crosshairColor", "", CVAR_ARCHIVE },
 	{ &cgx_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
 	{ &cgx_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },
-	{ &cgx_networkAdjustments, "cg_networkAdjustments", "1", CVAR_ARCHIVE },
-	{ &cgx_scoreboard, "cg_scoreboard", "1", CVAR_TEMP },
+	{ &cgx_networkAdjustments, "cg_networkAdjustments", "0", CVAR_ARCHIVE },
+	{ &cgx_scoreboard, "cg_scoreboard", "0", CVAR_ARCHIVE },
 	{ &cgx_drawScoreBox, "cg_drawScoreBox", "1", CVAR_ARCHIVE },
-
+	//develop
 	{ &cgx_sharedConfig, "cg_sharedConfig", "0", CVAR_TEMP },	
 #if CGX_UNLAGGED
 	//unlagged - client options
@@ -330,6 +330,7 @@ cvarTable_t		cvarTable[] = {
 	// colored server names shifting left bug fixed
 	// optimization: removed many debug info in CG_EntityEvent
 	// other commands
+	// cinematics menu fixed
 	// cgx_debug 0|1|2 - show debug info
 	// cgx_version - show version
 	// TODO: 	

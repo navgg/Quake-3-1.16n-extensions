@@ -154,7 +154,9 @@ vmCvar_t	uix_drawSpeed;
 vmCvar_t	uix_coloredPing;
 vmCvar_t	uix_lagometer;
 vmCvar_t	uix_networkAdjustments;
-
+vmCvar_t	uix_scoreboard;
+vmCvar_t	uix_drawScoreBox;
+// some q3 defaults to init
 vmCvar_t	uix_fov;
 vmCvar_t	uix_zoomfov;
 vmCvar_t	uix_drawgun;
@@ -227,12 +229,12 @@ cvarTable_t		cvarTable[] = {
 	{ &uix_noTaunt, "cg_noTaunt", "0", CVAR_ARCHIVE },
 	{ &uix_hitsounds, "cg_hitsounds", "0", CVAR_ARCHIVE },
 	{ &uix_centerPrintAlpha, "cg_centerPrintAlpha", "1.0", CVAR_ARCHIVE },
-	{ &uix_crosshairColor, "cg_crosshairColor", "", CVAR_ARCHIVE },
-	{ &uix_crosshairSize, "cg_crosshairSize", "24", CVAR_ARCHIVE },
+	{ &uix_crosshairColor, "cg_crosshairColor", "", CVAR_ARCHIVE },	
 	{ &uix_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
-	{ &uix_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },
-	{ &uix_lagometer, "cg_lagometer", "3", CVAR_ARCHIVE },
-	{ &uix_networkAdjustments, "cg_networkAdjustments", "1", CVAR_ARCHIVE },
+	{ &uix_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },	
+	{ &uix_networkAdjustments, "cg_networkAdjustments", "0", CVAR_ARCHIVE },
+	{ &uix_scoreboard, "cg_scoreboard", "0", CVAR_ARCHIVE },
+	{ &uix_drawScoreBox, "cg_drawScoreBox", "1", CVAR_ARCHIVE },
 
 	{ &uix_cinematicplayed, "uix_cinematicplayed", "-1", CVAR_TEMP },
 
@@ -249,6 +251,8 @@ cvarTable_t		cvarTable[] = {
 	{ &uix_drawrewards, "cg_drawRewards", "1", CVAR_ARCHIVE },	
 	{ &uix_draw3dicons, "cg_draw3dIcons", "1", CVAR_ARCHIVE },	
 	{ &uix_gibs, "cg_gibs", "1", CVAR_ARCHIVE },	
+	{ &uix_crosshairSize, "cg_crosshairSize", "24", CVAR_ARCHIVE },
+	{ &uix_lagometer, "cg_lagometer", "1", CVAR_ARCHIVE },
 
 	{ &ui_server1, "server1", "sodmod.ga:27962", CVAR_ARCHIVE },
 	{ &ui_server2, "server2", "sodmod.ga:27963", CVAR_ARCHIVE },
