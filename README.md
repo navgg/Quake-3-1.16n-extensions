@@ -21,6 +21,7 @@ Still under development, beta version
 - ability to disable chat beep or enemy taunt sounds
 - resolving favorite servers by domain name
 - rewards display fixed if it's more than 10
+- video playback in cinematics menu fixed for widescreens
 - colored server names shifting left bug fixed in server browser menu
 - optimization: removed some debug info
 
@@ -30,7 +31,7 @@ Still under development, beta version
 - `cg_defaultWeapon 0-9` - default weapon when spawn 0: default 1: gauntlet ...
 - `cg_drawPlayerIDs 0|1` - show player id in scoreboard	
 - `cg_centerPrintAlpha 1.0-0` - center print transparency
-- `cg_crosshairColor 0-35` - crosshair color 0
+- `cg_crosshairColor 0-35` - crosshair color "" - default, 0: black 1: red etc.
 - `cg_drawSpeed 0|1|2` - speedometer 0: off 1: top corner 2: center screen
 - `cg_deadBodyDarken 0|1|2|3` - pm skins becomes gray after death 0: off 1: Just grey 2: BT709 Greyscale 3: Y-Greyscale (PAL/NTSC)
 - `cg_chatSound 1|0` - chat beep sound
