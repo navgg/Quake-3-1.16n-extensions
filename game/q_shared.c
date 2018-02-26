@@ -739,7 +739,7 @@ void QDECL Com_sprintf( char *dest, int size, const char *fmt, ...) {
 		Com_Error( ERR_FATAL, "Com_sprintf: overflowed bigbuffer" );
 	}
 	if (len >= size) {
-		Com_Printf ("Com_sprintf: overflow of %i in %i\n", len, size);
+		Com_Printf ("Com_sprintf: overflow of %i in %i '%s'\n", len, size, dest);
 	}
 	Q_strncpyz (dest, bigbuffer, size );
 }

@@ -1,4 +1,6 @@
 set "gamedir=C:\Games\Quake 3 Arena 1.16n\"
+rem set "gamedir=C:\Games\Quake\Quake 3 Arena 1.16n Vanilla\Vanilla Quake III Arena 1.16n\"
+
 set "pakname=pak2X.pk3"
 
 bin_nt\7za a -tzip -mx9 %pakname% %CD%\baseq3\vm

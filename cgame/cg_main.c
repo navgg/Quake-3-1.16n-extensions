@@ -649,7 +649,7 @@ static void CG_RegisterSounds( void ) {
 	int		i;
 	char	items[MAX_ITEMS+1];
 	char	name[MAX_QPATH];
-	const char	*soundName;
+	const char	*soundName;	
 
 	if ( cgs.timelimit || cg_buildScript.integer ) {	// should we always load this?
 		cgs.media.oneMinuteSound = trap_S_RegisterSound( "sound/feedback/1_minute.wav" );
@@ -807,9 +807,9 @@ static void CG_RegisterGraphics( void ) {
 	trap_R_ClearScene();
 
 	CG_LoadingString( cgs.mapname );
-
+	trap_DPrint("trap_R_LoadWorldMap\n");
 	trap_R_LoadWorldMap( cgs.mapname );
-
+	trap_DPrint("precache status bar pics\n");
 	// precache status bar pics
 	CG_LoadingString( "game media" );
 
@@ -914,7 +914,7 @@ static void CG_RegisterGraphics( void ) {
 
 	memset( cg_items, 0, sizeof( cg_items ) );
 	memset( cg_weapons, 0, sizeof( cg_weapons ) );
-
+	trap_DPrint("only register the items that the server says we need\n");
 	// only register the items that the server says we need
 	strcpy( items, CG_ConfigString( CS_ITEMS) );
 
@@ -924,7 +924,7 @@ static void CG_RegisterGraphics( void ) {
 			CG_RegisterItemVisuals( i );
 		}
 	}
-
+	trap_DPrint("wall marks\n");
 	// wall marks
 	cgs.media.bulletMarkShader = trap_R_RegisterShader( "gfx/damage/bullet_mrk" );
 	cgs.media.burnMarkShader = trap_R_RegisterShader( "gfx/damage/burn_med_mrk" );
@@ -933,7 +933,7 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.shadowMarkShader = trap_R_RegisterShader( "markShadow" );
 	cgs.media.wakeMarkShader = trap_R_RegisterShader( "wake" );
 	cgs.media.bloodMarkShader = trap_R_RegisterShader( "bloodMark" );
-
+	trap_DPrint("register the inline models\n");
 	// register the inline models
 	cgs.numInlineModels = trap_CM_NumInlineModels();
 	for ( i = 1 ; i < cgs.numInlineModels ; i++ ) {
@@ -948,7 +948,7 @@ static void CG_RegisterGraphics( void ) {
 			cgs.inlineModelMidpoints[i][j] = mins[j] + 0.5 * ( maxs[j] - mins[j] );
 		}
 	}
-
+	trap_DPrint("register all the server specified models\n");
 	// register all the server specified models
 	for (i=1 ; i<MAX_MODELS ; i++) {
 		const char		*modelName;
@@ -969,7 +969,7 @@ CG_RegisterClients
 */
 static void CG_RegisterClients( void ) {
 	int		i;
-
+	
 	for (i=0 ; i<MAX_CLIENTS ; i++) {
 		const char		*clientInfo;
 
@@ -1080,31 +1080,31 @@ void CG_Init( int serverMessageNum, int serverCommandSequence ) {
 
 	// load the new map
 	CG_LoadingString( "collision map" );
-
+	trap_DPrint("trap_CM_LoadMap\n");
 	trap_CM_LoadMap( cgs.mapname );
 
 	cg.loading = qtrue;		// force players to load instead of defer
 
 	CG_LoadingString( "sounds" );
-
+	trap_DPrint("CG_RegisterSounds\n");
 	CG_RegisterSounds();
-
+	trap_DPrint("CG_RegisterGraphics\n");
 	CG_RegisterGraphics();
-
+	trap_DPrint("CG_RegisterClients\n");
 	CG_RegisterClients();		// if low on memory, some clients will be deferred
 
 	cg.loading = qfalse;	// future players will be deferred
-
+	trap_DPrint("CG_InitLocalEntities\n");
 	CG_InitLocalEntities();
-
+	trap_DPrint("CG_InitMarkPolys\n");
 	CG_InitMarkPolys();
 
 	// remove the last loading update
 	cg.infoScreenText[0] = 0;
-
+	trap_DPrint("CG_SetConfigValues\n");
 	// Make sure we have update values (scores)
 	CG_SetConfigValues();
-
+	trap_DPrint("CG_StartMusic\n");
 	CG_StartMusic();
 
 	CG_LoadingString( "" );	
