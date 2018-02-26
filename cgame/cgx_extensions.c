@@ -397,14 +397,20 @@ void CGX_AutoAdjustNetworkSettings(void) {
 		
 		i = 0;		
 
-		if (cgx_networkAdjustments.integer == 1) {
-			k = 2;
+		if (cgx_networkAdjustments.integer == 1) {			
 			minRate = 8000;			
+
+			// if packets < 30 set it to 30
+			if (cgx_maxpackets.integer < CGX_MIN_MAXPACKETS)
+				i = CGX_MIN_MAXPACKETS;
+		} else if (cgx_networkAdjustments.integer == 2) {
+			k = 2;
+			minRate = 10000;			
 
 			// if it's something lower than 100 - adjust
 			if (cgx_maxpackets.integer < 100)
 				while ((i = cgx_maxfps.integer / k++) > 60);			
-		} else if (cgx_networkAdjustments.integer == 2) {
+		} else if (cgx_networkAdjustments.integer == 3) {
 			k = 1;
 			minRate = 25000;			
 
@@ -446,7 +452,7 @@ void CGX_AutoAdjustNetworkSettings(void) {
 			trap_Print(va("Auto: rate %i\n", minRate));
 		}
 
-		if (cgx_networkAdjustments.integer == 2) {
+		if (cgx_networkAdjustments.integer == 3) {
 			// check and off packetdup
 			trap_Cvar_VariableStringBuffer("cl_packetdup", buf, sizeof(buf));
 			i = atoi(buf);
@@ -460,14 +466,14 @@ void CGX_AutoAdjustNetworkSettings(void) {
 
 	// check time nudge
 	// if server delaged it's better off
-	if (cgs.delagHitscan && cl_timeNudge.integer < 0) {
-		trap_Cvar_Set("cl_timeNudge", "0");
-		trap_Print("Auto: cl_timeNudge 0\n");
-	} else if (cl_timeNudge.integer > 50) {
-		trap_Cvar_Set("cl_timeNudge", "50");
-		trap_Print("Auto: cl_timeNudge 50\n");
-	} else if (cl_timeNudge.integer < -50) {
-		trap_Cvar_Set("cl_timeNudge", "-50");
-		trap_Print("Auto: cl_timeNudge -50\n");
-	}
+	//if (cgs.delagHitscan && cl_timeNudge.integer < 0) {
+	//	trap_Cvar_Set("cl_timeNudge", "0");
+	//	trap_Print("Auto: cl_timeNudge 0\n");
+	//} else if (cl_timeNudge.integer > 50) {
+	//	trap_Cvar_Set("cl_timeNudge", "50");
+	//	trap_Print("Auto: cl_timeNudge 50\n");
+	//} else if (cl_timeNudge.integer < -50) {
+	//	trap_Cvar_Set("cl_timeNudge", "-50");
+	//	trap_Print("Auto: cl_timeNudge -50\n");
+	//}
 }

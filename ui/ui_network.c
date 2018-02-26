@@ -71,7 +71,8 @@ static const char *packets_items[] = {
 
 static const char *autoadjustments_items[] = {
 	"Off",
-	"Default",
+	"Min",
+	"Medium",
 	"Max",
 	0
 };
@@ -448,7 +449,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.packetdup.curvalue = trap_Cvar_VariableValue("cl_packetdup") != 0;
 	networkOptionsInfo.delag.curvalue = trap_Cvar_VariableValue("cg_delag") != 0;	
 	networkOptionsInfo.prediction.curvalue = trap_Cvar_VariableValue("cg_delag_optimizePrediction") != 0;	
-	networkOptionsInfo.adjustments.curvalue = abs((int)trap_Cvar_VariableValue("cg_networkAdjustments") % 3);
+	networkOptionsInfo.adjustments.curvalue = abs((int)trap_Cvar_VariableValue("cg_networkAdjustments") % 4);
 
 	UI_NetworkOptionsMenu_CheckGrayed();
 }

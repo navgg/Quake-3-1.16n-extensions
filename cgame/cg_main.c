@@ -280,8 +280,8 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},	
 	{ &cg_projectileNudge, "cg_delag_projectileNudge", "0", CVAR_ARCHIVE },
 	{ &cg_optimizePrediction, "cg_delag_optimizePrediction", "1", CVAR_ARCHIVE },
-
 	{ &cg_cmdTimeNudge, "cg_delag_cmdTimeNudge", "0", CVAR_ARCHIVE },
+
 	{ &cl_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},
 	// this will be automagically copied from the server	
 #if CGX_DEBUG
