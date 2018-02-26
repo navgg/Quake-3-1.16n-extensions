@@ -672,6 +672,32 @@ static float CGX_DrawSpeedMeter(float y) {
 
 /*
 =================
+CGX_DrawAcc
+=================
+*/
+static float CGX_DrawAcc( float y ) {
+	char *s;
+	int acc;
+	int i, w;
+	
+	i = cg.snap->ps.persistant[PERS_ACCURACY_SHOTS];
+	if (i > 0)
+		i = cg.snap->ps.persistant[PERS_ACCURACY_HITS] * 1000 / i;
+	else
+		i = 0;	
+
+	w = i / 10;
+
+	s = va("Acc: %i.%i", w, i - w * 10);
+	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
+
+	CG_DrawBigString(vScreen.width5 - w, y + 2, s, 1.0F);	
+
+	return y + BIGCHAR_HEIGHT + 4;	
+}
+
+/*
+=================
 CG_DrawTeamOverlay
 =================
 */
@@ -871,6 +897,9 @@ static void CG_DrawUpperRight( void ) {
 	}
 	if (cgx_drawSpeed.integer) {
 		y = CGX_DrawSpeedMeter(y);
+	}
+	if (cgx_drawAccuracy.integer) {
+		y = CGX_DrawAcc(y);
 	}
 #if CGX_DEBUG
 	if (cgx_debug.integer > 1) {

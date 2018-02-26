@@ -66,6 +66,7 @@ vmCvar_t	cgx_coloredPing;
 vmCvar_t	cgx_networkAdjustments;
 vmCvar_t	cgx_drawScoreBox;
 vmCvar_t	cgx_scoreboard;
+vmCvar_t	cgx_drawAccuracy;
 
 vmCvar_t	cgx_sharedConfig;
 
@@ -253,7 +254,7 @@ cvarTable_t		cvarTable[] = {
 
 	{ &cgx_wideScreenFix, "cg_wideScreenFix", "3", CVAR_ARCHIVE },
 	{ &cgx_defaultWeapon, "cg_defaultWeapon", "0", CVAR_ARCHIVE },
-	{ &cgx_drawPlayerIDs, "cg_drawPlayerIDs", "0", CVAR_ARCHIVE },
+	{ &cgx_drawPlayerIDs, "cg_drawPlayerIDs", "1", CVAR_ARCHIVE },
 	
 	{ &cgx_enemyModel_enabled, "cg_enemyModel_enabled", "0", CVAR_ARCHIVE },
 	{ &cgx_enemyModel, "cg_enemyModel", "", CVAR_ARCHIVE },		
@@ -273,6 +274,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_networkAdjustments, "cg_networkAdjustments", "0", CVAR_ARCHIVE },
 	{ &cgx_scoreboard, "cg_scoreboard", "0", CVAR_ARCHIVE },
 	{ &cgx_drawScoreBox, "cg_drawScoreBox", "1", CVAR_ARCHIVE },
+	{ &cgx_drawAccuracy, "cg_drawAccuracy", "0", CVAR_ARCHIVE },
 	//develop
 	{ &cgx_sharedConfig, "cg_sharedConfig", "0", CVAR_TEMP },	
 #if CGX_UNLAGGED
@@ -326,6 +328,7 @@ cvarTable_t		cvarTable[] = {
 	// cg_coloredPing 0|1 - toggles ping colors below 50 white, below 100 green, below 250 yellow, below 400 magenta, more than 400 red
 	// cg_lagometer 0|1|2|3 - off, netgraph, netgraph+ping, only when lag
 	// cg_networkAdjustments 0|1|2 - off, 1: packets 40-60 rate min 8000, 2: packets 60+ rate min 25000 packetdup off (snaps = sv_fps or min 40 in both cases)
+	// cg_drawAccuracy 0 1 draw acc	
 	// resolving favorite servers by domain name
 	// colored server names shifting left bug fixed
 	// optimization: removed many debug info in CG_EntityEvent
@@ -333,17 +336,12 @@ cvarTable_t		cvarTable[] = {
 	// cinematics menu fixed
 	// cgx_debug 0|1|2 - show debug info
 	// cgx_version - show version
+	
+	// unlagged
+	// g_delag	
+	// fov adjust for widescreen
 	// TODO: 	
-	// cg_profanityFilter 1|0 ?
-	// botColors botModels ? separate bots from humans
-	// cg_adjustFov fov adjust	
-	// cg_drawAccuracy 0 1 draw acc	
-	// modified hud?
-	// unlagged?
-	// cl_autoTimeNudge	
-	// g_delag?
-	// FIX:
-	// on noghost server, before match end go to advanced menu and podium will not draw? need to check or no
+	// cg_profanityFilter 1|0 ?			
 
 	// the following variables are created in other parts of the system,
 	// but we also reference them here

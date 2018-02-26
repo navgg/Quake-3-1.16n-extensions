@@ -215,7 +215,7 @@ cvarTable_t		cvarTable[] = {
 	// X-MOD: default parameters
 	{ &uix_wideScreenFix, "cg_wideScreenFix", "3", CVAR_ARCHIVE },
 	{ &uix_defaultWeapon, "cg_defaultWeapon", "0", CVAR_ARCHIVE },
-	{ &uix_drawPlayerIDs, "cg_drawPlayerIDs", "0", CVAR_ARCHIVE },
+	{ &uix_drawPlayerIDs, "cg_drawPlayerIDs", "1", CVAR_ARCHIVE },
 
 	{ &uix_enemyModel_enabled, "cg_enemyModel_enabled", "0", CVAR_ARCHIVE },
 	{ &uix_enemyModel, "cg_enemyModel", "", CVAR_ARCHIVE },		
