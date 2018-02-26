@@ -1,6 +1,7 @@
 -o "cgame"
 cg_main
 cgx_extensions
+cg_unlagged
 ..\cg_syscalls
 cg_consolecmds
 cg_draw

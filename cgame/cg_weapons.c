@@ -676,9 +676,19 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin ) {
 
 	memset( &beam, 0, sizeof( beam ) );
 
-	// find muzzle point for this frame
-	VectorCopy( cent->lerpOrigin, muzzlePoint );
-	AngleVectors( cent->lerpAngles, forward, NULL, NULL );
+	//unlagged - attack prediction #1
+	// if the entity is us, unlagged is on server-side, and we've got it on for the lightning gun
+	if ( (cent->currentState.number == cg.predictedPlayerState.clientNum) && cgs.delagHitscan &&
+		( cg_delag.integer & 1 || cg_delag.integer & 8 ) ) {
+		// always shoot straight forward from our current position
+		AngleVectors( cg.predictedPlayerState.viewangles, forward, NULL, NULL );
+		VectorCopy( cg.predictedPlayerState.origin, muzzlePoint );
+	//unlagged - attack prediction #1
+	} else {    
+		// find muzzle point for this frame
+		VectorCopy(cent->lerpOrigin, muzzlePoint);
+		AngleVectors(cent->lerpAngles, forward, NULL, NULL);
+	}
 
 	// FIXME: crouch
 	muzzlePoint[2] += DEFAULT_VIEWHEIGHT;
@@ -1335,6 +1345,10 @@ void CG_FireWeapon( centity_t *cent ) {
 	if ( weap->ejectBrassFunc && cg_brassTime.integer > 0 ) {
 		weap->ejectBrassFunc( cent );
 	}
+
+	//unlagged - attack prediction #1
+	CG_PredictWeaponEffects( cent );
+	//unlagged - attack prediction #1
 }
 
 
@@ -1577,7 +1591,9 @@ Perform the same traces the server did to locate the
 hit splashes (FIXME: ranom seed isn't synce anymore)
 ================
 */
-static void CG_ShotgunPattern( vec3_t origin, vec3_t origin2, int otherEntNum ) {
+//unlagged - attack prediction
+// made this non-static for access from cg_unlagged.c
+void CG_ShotgunPattern( vec3_t origin, vec3_t origin2, int otherEntNum ) {
 	int			i;
 	float		r, u;
 	vec3_t		end;

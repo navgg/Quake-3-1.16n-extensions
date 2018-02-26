@@ -1,0 +1,6 @@
+models\*
+sound\*
+vm\*
+scripts\crosshair.shader
+scripts\players.shader
+default.cfg

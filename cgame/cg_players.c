@@ -681,10 +681,11 @@ static void CG_SetLerpFrameAnimation( clientInfo_t *ci, lerpFrame_t *lf, int new
 
 	lf->animation = anim;
 	lf->animationTime = lf->frameTime + anim->initialLerp;
-
+#if CGX_DEBUG
 	if ( cg_debugAnim.integer ) {
 		CG_Printf( "Anim: %i\n", newAnimation );
 	}
+#endif
 }
 
 /*
@@ -743,9 +744,11 @@ static void CG_RunLerpFrame( clientInfo_t *ci, lerpFrame_t *lf, int newAnimation
 		lf->frame = anim->firstFrame + f;
 		if ( cg.time > lf->frameTime ) {
 			lf->frameTime = cg.time;
+#if CGX_DEBUG
 			if ( cg_debugAnim.integer ) {
 				CG_Printf( "Clamp lf->frameTime\n");
 			}
+#endif
 		}
 	}
 
@@ -789,11 +792,12 @@ static void CG_PlayerAnimation( centity_t *cent, int *legsOld, int *legs, float 
 	float			speedScale;
 
 	clientNum = cent->currentState.clientNum;
-
+#if CGX_DEBUG
 	if ( cg_noPlayerAnims.integer ) {
 		*legsOld = *legs = *torsoOld = *torso = 0;
 		return;
 	}
+#endif
 
 	if ( cent->currentState.powerups & ( 1 << PW_HASTE ) ) {
 		speedScale = 1.5;
@@ -1533,6 +1537,12 @@ void CG_Player( centity_t *cent ) {
 	// add the gun / barrel / flash
 	//
 	CG_AddPlayerWeapon( &torso, NULL, cent );
+#if CGX_DEBUG
+	//unlagged - client options
+	// add the bounding box (if cg_drawBBox is 1)
+	CG_AddBoundingBox( cent );
+	//unlagged - client options
+#endif
 }
 
 
@@ -1569,9 +1579,10 @@ void CG_ResetPlayerEntity( centity_t *cent ) {
 	cent->pe.torso.yawing = qfalse;
 	cent->pe.torso.pitchAngle = cent->rawAngles[PITCH];
 	cent->pe.torso.pitching = qfalse;
-
+#if CGX_DEBUG
 	if ( cg_debugPosition.integer ) {
 		CG_Printf("%i ResetPlayerEntity yaw=%i\n", cent->currentState.number, cent->pe.torso.yawAngle );
 	}
+#endif
 }
 

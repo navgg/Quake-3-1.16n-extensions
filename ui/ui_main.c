@@ -149,17 +149,26 @@ vmCvar_t	uix_noTaunt;
 vmCvar_t	uix_hitsounds;
 vmCvar_t	uix_centerPrintAlpha;
 vmCvar_t	uix_crosshairColor;
+vmCvar_t	uix_crosshairSize;
 vmCvar_t	uix_drawSpeed;
 vmCvar_t	uix_coloredPing;
 vmCvar_t	uix_lagometer;
 vmCvar_t	uix_networkAdjustments;
-
+vmCvar_t	uix_scoreboard;
+vmCvar_t	uix_drawScoreBox;
+// some q3 defaults to init
 vmCvar_t	uix_fov;
 vmCvar_t	uix_zoomfov;
 vmCvar_t	uix_drawgun;
 vmCvar_t	uix_drawrewards;
 vmCvar_t	uix_draw3dicons;
 vmCvar_t	uix_gibs;
+
+#if CGX_UNLAGGED
+vmCvar_t	cg_delag;
+vmCvar_t	cg_projectileNudge;
+vmCvar_t	cg_optimizePrediction;
+#endif
 
 //X-MOD: ui_cinematics playback fix for custom resolutions
 vmCvar_t	uix_cinematicplayed;
@@ -204,9 +213,9 @@ cvarTable_t		cvarTable[] = {
 	{ &ui_marks, "cg_marks", "1", CVAR_ARCHIVE },
 
 	// X-MOD: default parameters
-	{ &uix_wideScreenFix, "cg_wideScreenFix", "1", CVAR_ARCHIVE },
+	{ &uix_wideScreenFix, "cg_wideScreenFix", "3", CVAR_ARCHIVE },
 	{ &uix_defaultWeapon, "cg_defaultWeapon", "0", CVAR_ARCHIVE },
-	{ &uix_drawPlayerIDs, "cg_drawPlayerIDs", "0", CVAR_ARCHIVE },
+	{ &uix_drawPlayerIDs, "cg_drawPlayerIDs", "1", CVAR_ARCHIVE },
 
 	{ &uix_enemyModel_enabled, "cg_enemyModel_enabled", "0", CVAR_ARCHIVE },
 	{ &uix_enemyModel, "cg_enemyModel", "", CVAR_ARCHIVE },		
@@ -220,13 +229,20 @@ cvarTable_t		cvarTable[] = {
 	{ &uix_noTaunt, "cg_noTaunt", "0", CVAR_ARCHIVE },
 	{ &uix_hitsounds, "cg_hitsounds", "0", CVAR_ARCHIVE },
 	{ &uix_centerPrintAlpha, "cg_centerPrintAlpha", "1.0", CVAR_ARCHIVE },
-	{ &uix_crosshairColor, "cg_crosshairColor", "7", CVAR_ARCHIVE },
+	{ &uix_crosshairColor, "cg_crosshairColor", "", CVAR_ARCHIVE },	
 	{ &uix_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
-	{ &uix_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },
-	{ &uix_lagometer, "cg_lagometer", "3", CVAR_ARCHIVE },
-	{ &uix_networkAdjustments, "cg_networkAdjustments", "1", CVAR_ARCHIVE },
+	{ &uix_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },	
+	{ &uix_networkAdjustments, "cg_networkAdjustments", "0", CVAR_ARCHIVE },
+	{ &uix_scoreboard, "cg_scoreboard", "0", CVAR_ARCHIVE },
+	{ &uix_drawScoreBox, "cg_drawScoreBox", "1", CVAR_ARCHIVE },
 
 	{ &uix_cinematicplayed, "uix_cinematicplayed", "-1", CVAR_TEMP },
+
+#if CGX_UNLAGGED
+	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},	
+	{ &cg_projectileNudge, "cg_delag_projectileNudge", "0", CVAR_ARCHIVE },
+	{ &cg_optimizePrediction, "cg_delag_optimizePrediction", "1", CVAR_ARCHIVE },
+#endif
 
 	// some quake3 not initialized variables
 	{ &uix_zoomfov, "cg_zoomfov", "22.5", CVAR_ARCHIVE },	
@@ -235,6 +251,8 @@ cvarTable_t		cvarTable[] = {
 	{ &uix_drawrewards, "cg_drawRewards", "1", CVAR_ARCHIVE },	
 	{ &uix_draw3dicons, "cg_draw3dIcons", "1", CVAR_ARCHIVE },	
 	{ &uix_gibs, "cg_gibs", "1", CVAR_ARCHIVE },	
+	{ &uix_crosshairSize, "cg_crosshairSize", "24", CVAR_ARCHIVE },
+	{ &uix_lagometer, "cg_lagometer", "1", CVAR_ARCHIVE },
 
 	{ &ui_server1, "server1", "sodmod.ga:27962", CVAR_ARCHIVE },
 	{ &ui_server2, "server2", "sodmod.ga:27963", CVAR_ARCHIVE },

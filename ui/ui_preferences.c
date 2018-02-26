@@ -43,10 +43,10 @@ static void UI_Preferences_StatusBar( void *self ) {
 	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
 		{ "Sets ingame crosshair", "" },
 		{ "Sets display of objects in game", "'On' - all weapons and items will be 2D, 'Off' - 3D" },
-		{ "If it's off sky will not draw", "May increase slightly FPS on weak PC" },
+		{ "If it's off sky will not draw", "May increase slightly FPS on old PC" },
 		{ "Toggles ejecting brass", "" },
 		{ "Toggles display of marks on walls", "Turning off may increase FPS in some cases" },
-		{ "Renders realtime dynamic lights", "Turning off may slightly increase FPS" },
+		{ "Renders realtime dynamic lights", "Turning off may increase FPS on some PC" },
 		{ "Display target name above crosshair", "" },
 		{ "V-Sync (Vertical synchronization)", "Strongly recommended 'Off'" },
 		{ "Forces all player models to be same", "All enemies in game will be using player's model" },
@@ -81,6 +81,7 @@ typedef struct {
 	menuradiobutton_s	allowdownload;
 	menubitmap_s		back;
 
+	qhandle_t			defaultCrosshair[NUM_CROSSHAIRS];
 	qhandle_t			crosshairShader[NUM_CROSSHAIRS];
 } preferences_t;
 
@@ -101,6 +102,7 @@ static const char *teamoverlay_names[] =
 static const char *crosshair_colors[] =
 {	
 	"default",	
+	"black",
 	"red",
 	"green",
 	"yellow",
@@ -167,9 +169,9 @@ static void Preferences_SetMenuItems( void ) {
 	trap_Cvar_VariableStringBuffer("cg_crosshairColor", buf, sizeof(buf));
 
 	if (buf[0] == '\0')
-		crosshaircolor = 7;
+		crosshaircolor = 0;
 	else 
-		crosshaircolor = atoi(buf) % 36;
+		crosshaircolor = atoi(buf) % 36 + 1;
 
 	s_preferences.crosshaircolor.curvalue = crosshaircolor;
 
@@ -203,7 +205,10 @@ static void Preferences_Event( void* ptr, int notification ) {
 
 	case ID_CROSSHAIR_COLOR:			
 		crosshaircolor = s_preferences.crosshaircolor.curvalue;
-		trap_Cvar_SetValue("cg_crosshairColor", crosshaircolor);
+		if (crosshaircolor == 0)
+			trap_Cvar_Set("cg_crosshairColor", "");
+		else
+			trap_Cvar_SetValue("cg_crosshairColor", crosshaircolor - 1);
 		break;
 
 	case ID_CROSSHAIR_SIZE:		
@@ -307,11 +312,15 @@ static void Crosshair_Draw( void *self ) {
 		return;
 	}
 
-	if (crosshaircolor > 0)
-		trap_R_SetColor(g_color_table_ex[crosshaircolor]);
+	if (crosshaircolor > 0) {
+		trap_R_SetColor(g_color_table_ex[crosshaircolor - 1]);
 
-	UI_DrawHandlePic( x + SMALLCHAR_WIDTH + (24 - crosshairsize) / 2, y - 4 + (24 - crosshairsize) / 2, 
-		crosshairsize, crosshairsize, s_preferences.crosshairShader[s->curvalue] );
+		UI_DrawHandlePic(x + SMALLCHAR_WIDTH + (24 - crosshairsize) / 2, y - 4 + (24 - crosshairsize) / 2,
+			crosshairsize, crosshairsize, s_preferences.crosshairShader[s->curvalue]);
+	} else if (crosshaircolor == 0) {
+		UI_DrawHandlePic(x + SMALLCHAR_WIDTH + (24 - crosshairsize) / 2, y - 4 + (24 - crosshairsize) / 2,
+			crosshairsize, crosshairsize, s_preferences.defaultCrosshair[s->curvalue]);
+	}
 
 	trap_R_SetColor(NULL);
 }
@@ -541,6 +550,7 @@ void Preferences_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_BACK1 );
 	for( n = 0; n < NUM_CROSSHAIRS; n++ ) {
 		s_preferences.crosshairShader[n] = trap_R_RegisterShaderNoMip( va("gfx/2d/fixed_crosshair%c", 'a' + n ) );
+		s_preferences.defaultCrosshair[n] = trap_R_RegisterShaderNoMip( va("gfx/2d/crosshair%c", 'a' + n ) );
 	}
 }
 

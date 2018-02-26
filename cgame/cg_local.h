@@ -61,8 +61,8 @@
 //X-MOD: custom color extensions
 #define ShaderRGBACopy(a,b)	((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2],(b)[3]=(255))
 //X-MOD: maxpackets limits
-#define MIN_MAXPACKETS 30
-#define MAX_MAXPACKETS 100
+#define CGX_MIN_MAXPACKETS 30
+#define CGX_MAX_MAXPACKETS 100
 
 typedef enum {
 	FOOTSTEP_NORMAL,
@@ -367,6 +367,10 @@ typedef struct {
 // all cg.stepTime, cg.duckTime, cg.landTime, etc are set to cg.time when the action
 // occurs, and they will have visible effects for #define STEP_TIME or whatever msec after
  
+//unlagged - optimized prediction
+#define NUM_SAVED_STATES (CMD_BACKUP + 2)
+//unlagged - optimized prediction
+
 typedef struct {
 	int			clientFrame;		// incremented each frame
 	
@@ -538,6 +542,13 @@ typedef struct {
 	int			rateDelayedTotal;	
 	
 	int			connectionInterrupteds;
+
+	//unlagged - optimized prediction
+	int			lastPredictedCommand;
+	int			lastServerTime;
+	playerState_t savedPmoveStates[NUM_SAVED_STATES];
+	int			stateHead, stateTail;
+	//unlagged - optimized prediction
 } cg_t;
 
 
@@ -592,6 +603,7 @@ typedef struct {
 	qhandle_t	selectShader;
 	qhandle_t	viewBloodShader;
 	qhandle_t	tracerShader;
+	qhandle_t	defaultCrosshair[NUM_CROSSHAIRS];
 	qhandle_t	crosshairShader[NUM_CROSSHAIRS];
 	qhandle_t	lagometerShader;
 	qhandle_t	backTileShader;
@@ -789,9 +801,14 @@ typedef struct {
 	cgMedia_t		media;
 
 	//X-MOD: save delag and server info
-	int				delag;
 	int				sv_fps;
+	int				minSnaps;
 	int				sv_maxrate;
+
+	//unlagged - client options
+	// this will be set to the server's g_delagHitscan
+	int				delagHitscan;
+	//unlagged - client options
 } cgs_t;
 
 typedef struct {
@@ -812,6 +829,9 @@ typedef struct {
 
 	int				width48;
 	int				width5;
+
+	/*float			fov_x;
+	float			fov_y;*/
 } vScreen_t;
 
 //==============================================================================
@@ -843,10 +863,13 @@ extern	vmCvar_t		cgx_drawSpeed;
 extern	vmCvar_t		cgx_hitsounds;
 extern	vmCvar_t		cgx_coloredPing;
 extern	vmCvar_t		cgx_networkAdjustments;
+extern	vmCvar_t		cgx_drawScoreBox;
+extern	vmCvar_t		cgx_scoreboard;
+extern	vmCvar_t		cgx_drawAccuracy;
 
 extern	vmCvar_t		cgx_maxfps;
 extern	vmCvar_t		cgx_maxpackets;
-extern	vmCvar_t		cgx_timeNudge;
+//extern	vmCvar_t		cgx_timeNudge;
 extern	vmCvar_t		cgx_delag;
 
 extern	vmCvar_t		cgx_debug;
@@ -863,7 +886,9 @@ extern	vmCvar_t		cg_shadows;
 extern	vmCvar_t		cg_gibs;
 extern	vmCvar_t		cg_drawTimer;
 extern	vmCvar_t		cg_drawFPS;
+#if CGX_DEBUG
 extern	vmCvar_t		cg_drawSnapshot;
+#endif
 extern	vmCvar_t		cg_draw3dIcons;
 extern	vmCvar_t		cg_drawIcons;
 extern	vmCvar_t		cg_drawAmmoWarning;
@@ -879,15 +904,19 @@ extern	vmCvar_t		cg_crosshairHealth;
 extern	vmCvar_t		cg_drawStatus;
 extern	vmCvar_t		cg_draw2D;
 extern	vmCvar_t		cg_animSpeed;
+#if CGX_DEBUG
 extern	vmCvar_t		cg_debugAnim;
 extern	vmCvar_t		cg_debugPosition;
 extern	vmCvar_t		cg_debugEvents;
+#endif
 extern	vmCvar_t		cg_railTrailTime;
 extern	vmCvar_t		cg_errorDecay;
 extern	vmCvar_t		cg_nopredict;
+#if CGX_DEBUG
 extern	vmCvar_t		cg_noPlayerAnims;
 extern	vmCvar_t		cg_showmiss;
 extern	vmCvar_t		cg_footsteps;
+#endif
 extern	vmCvar_t		cg_addMarks;
 extern	vmCvar_t		cg_brassTime;
 extern	vmCvar_t		cg_gun_frame;
@@ -920,6 +949,28 @@ extern	vmCvar_t		cg_paused;
 extern	vmCvar_t		cg_blood;
 extern	vmCvar_t		cg_predictItems;
 extern	vmCvar_t		cg_deferPlayers;
+
+//unlagged - client options
+extern	vmCvar_t		cg_delag;
+extern	vmCvar_t		cg_cmdTimeNudge;
+extern	vmCvar_t		cg_projectileNudge;
+extern	vmCvar_t		cg_optimizePrediction;
+extern	vmCvar_t		cl_timeNudge;
+#if CGX_DEBUG
+extern	vmCvar_t		sv_fps;
+extern	vmCvar_t		cg_debugDelag;
+extern	vmCvar_t		cg_drawBBox;
+extern	vmCvar_t		cg_latentSnaps;
+extern	vmCvar_t		cg_latentCmds;
+extern	vmCvar_t		cg_plOut;
+#endif
+//unlagged - client options
+
+//unlagged - cg_unlagged.c
+void CG_PredictWeaponEffects( centity_t *cent );
+void CG_AddBoundingBox( centity_t *cent );
+qboolean CG_Cvar_ClampInt( const char *name, vmCvar_t *vmCvar, int min, int max );
+//unlagged - cg_unlagged.c
 
 //
 // cgx_extensions.c
@@ -1120,6 +1171,9 @@ localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 // cg_snapshot.c
 //
 void CG_ProcessSnapshots( void );
+//unlagged - early transitioning
+void CG_TransitionEntity( centity_t *cent );
+//unlagged - early transitioning
 
 //
 // cg_info.c

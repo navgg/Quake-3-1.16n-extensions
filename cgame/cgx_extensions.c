@@ -51,8 +51,8 @@ void CGX_Init_vScreen(void) {
 	trap_GetGlconfig( &cgs.glconfig );
 
 	// X-MOD: init virtual screen sizes for wide screen fix
-
-	if ( cgx_wideScreenFix.integer && cgs.glconfig.vidWidth * 480 > cgs.glconfig.vidHeight * 640 ) {
+	
+	if ( (cgx_wideScreenFix.integer & CGX_WFIX_SCREEN) && cgs.glconfig.vidWidth * 480 > cgs.glconfig.vidHeight * 640 ) {
 		vScreen.width = (float)cgs.glconfig.vidWidth / (float)cgs.glconfig.vidHeight * 480.0f;		 				 				
 		vScreen.offsetx = (vScreen.width - 640) / 2.0f;
 	} else {
@@ -397,36 +397,42 @@ void CGX_AutoAdjustNetworkSettings(void) {
 		
 		i = 0;		
 
-		if (cgx_networkAdjustments.integer == 1) {
-			k = 2;
+		if (cgx_networkAdjustments.integer == 1) {			
 			minRate = 8000;			
+
+			// if packets < 30 set it to 30
+			if (cgx_maxpackets.integer < CGX_MIN_MAXPACKETS)
+				i = CGX_MIN_MAXPACKETS;
+		} else if (cgx_networkAdjustments.integer == 2) {
+			k = 2;
+			minRate = 10000;			
 
 			// if it's something lower than 100 - adjust
 			if (cgx_maxpackets.integer < 100)
 				while ((i = cgx_maxfps.integer / k++) > 60);			
-		} else if (cgx_networkAdjustments.integer == 2) {
+		} else if (cgx_networkAdjustments.integer == 3) {
 			k = 1;
 			minRate = 25000;			
 
 			// if it's already 100 skip, lower - adjust
 			if (cgx_maxpackets.integer < 100)
-				while((i = cgx_maxfps.integer / k++) > MAX_MAXPACKETS);						
+				while((i = cgx_maxfps.integer / k++) > CGX_MAX_MAXPACKETS);						
 
-			if (i >= MAX_MAXPACKETS)
+			if (i >= CGX_MAX_MAXPACKETS)
 				i--;			
 		} 
 
 		// set packets first
 		if (i > 0) {
-			if (i < MIN_MAXPACKETS) i = MIN_MAXPACKETS;
-			else if (i > MAX_MAXPACKETS) i = MAX_MAXPACKETS;
+			if (i < CGX_MIN_MAXPACKETS) i = CGX_MIN_MAXPACKETS;
+			else if (i > CGX_MAX_MAXPACKETS) i = CGX_MAX_MAXPACKETS;
 
 			trap_Cvar_Set("cl_maxpackets", va("%i", i));
 			trap_Print(va("Auto: cl_maxpackets %i\n", i));
 		}
 
 		// no sense in snaps > 30 for default quake3.exe set it to sv_fps if possible, otherwise set it to 40 
-		minSnaps = cgs.sv_fps > 0 ? cgs.sv_fps : 40;
+		minSnaps = cgs.minSnaps;
 
 		// check and set snaps		
 		trap_Cvar_VariableStringBuffer("snaps", buf, sizeof(buf));
@@ -446,7 +452,7 @@ void CGX_AutoAdjustNetworkSettings(void) {
 			trap_Print(va("Auto: rate %i\n", minRate));
 		}
 
-		if (cgx_networkAdjustments.integer == 2) {
+		if (cgx_networkAdjustments.integer == 3) {
 			// check and off packetdup
 			trap_Cvar_VariableStringBuffer("cl_packetdup", buf, sizeof(buf));
 			i = atoi(buf);
@@ -460,14 +466,14 @@ void CGX_AutoAdjustNetworkSettings(void) {
 
 	// check time nudge
 	// if server delaged it's better off
-	if (cgs.delag && cgx_timeNudge.integer < 0) {
-		trap_Cvar_Set("cl_timeNudge", "0");
-		trap_Print("Auto: cl_timeNudge 0\n");
-	} else if (cgx_timeNudge.integer > 30) {
-		trap_Cvar_Set("cl_timeNudge", "30");
-		trap_Print("Auto: cl_timeNudge 30\n");
-	} else if (cgx_timeNudge.integer < -30) {
-		trap_Cvar_Set("cl_timeNudge", "-30");
-		trap_Print("Auto: cl_timeNudge -30\n");
-	}
+	//if (cgs.delagHitscan && cl_timeNudge.integer < 0) {
+	//	trap_Cvar_Set("cl_timeNudge", "0");
+	//	trap_Print("Auto: cl_timeNudge 0\n");
+	//} else if (cl_timeNudge.integer > 50) {
+	//	trap_Cvar_Set("cl_timeNudge", "50");
+	//	trap_Print("Auto: cl_timeNudge 50\n");
+	//} else if (cl_timeNudge.integer < -50) {
+	//	trap_Cvar_Set("cl_timeNudge", "-50");
+	//	trap_Print("Auto: cl_timeNudge -50\n");
+	//}
 }

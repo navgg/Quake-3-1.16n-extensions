@@ -672,6 +672,32 @@ static float CGX_DrawSpeedMeter(float y) {
 
 /*
 =================
+CGX_DrawAcc
+=================
+*/
+static float CGX_DrawAcc( float y ) {
+	char *s;
+	int acc;
+	int i, w;
+	
+	i = cg.snap->ps.persistant[PERS_ACCURACY_SHOTS];
+	if (i > 0)
+		i = cg.snap->ps.persistant[PERS_ACCURACY_HITS] * 1000 / i;
+	else
+		i = 0;	
+
+	w = i / 10;
+
+	s = va("Acc: %i.%i", w, i - w * 10);
+	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
+
+	CG_DrawBigString(vScreen.width5 - w, y + 2, s, 1.0F);	
+
+	return y + BIGCHAR_HEIGHT + 4;	
+}
+
+/*
+=================
 CG_DrawTeamOverlay
 =================
 */
@@ -841,8 +867,9 @@ static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
 
 	return ret_y;
 }
-
+#if CGX_DEBUG
 static float CGX_DrawDebugInfo(float y);
+#endif
 /*
 =====================
 CG_DrawUpperRight
@@ -857,9 +884,11 @@ static void CG_DrawUpperRight( void ) {
 	if ( cgs.gametype >= GT_TEAM && cg_drawTeamOverlay.integer == 1 ) {
 		y = CG_DrawTeamOverlay( y, qtrue, qtrue );
 	} 
+#if CGX_DEBUG
 	if ( cg_drawSnapshot.integer ) {
 		y = CG_DrawSnapshot( y );
 	}
+#endif
 	if ( cg_drawFPS.integer ) {
 		y = CG_DrawFPS( y );
 	}
@@ -869,9 +898,14 @@ static void CG_DrawUpperRight( void ) {
 	if (cgx_drawSpeed.integer) {
 		y = CGX_DrawSpeedMeter(y);
 	}
+	if (cgx_drawAccuracy.integer) {
+		y = CGX_DrawAcc(y);
+	}
+#if CGX_DEBUG
 	if (cgx_debug.integer > 1) {
 		y = CGX_DrawDebugInfo(y);
 	}
+#endif
 	if ( cg_drawAttacker.integer ) {
 		y = CG_DrawAttacker( y );
 	}
@@ -1185,7 +1219,10 @@ static void CG_DrawLowerRight( void ) {
 		y = CG_DrawTeamOverlay( y, qtrue, qfalse );
 	} 
 
-	y = CG_DrawScores( y );
+	if (cgx_drawScoreBox.integer) {
+		y = CG_DrawScores(y);
+	}
+
 	y = CG_DrawPowerups( y );
 }
 
@@ -1447,6 +1484,7 @@ static void CGX_UpdateNetworkStats(snapshot_t *snap) {
 	lagometer.rateDelayed = 0;
 }
 
+#if CGX_DEBUG
 // X-MOD: display custom debug info
 static float CGX_DrawDebugInfo( float y ) {	
 	char		*s;
@@ -1488,7 +1526,7 @@ static float CGX_DrawDebugInfo( float y ) {
 
 	return y + BIGCHAR_HEIGHT + 4;
 }
-
+#endif
 /*
 ==============
 CG_AddLagometerFrameInfo
@@ -1839,7 +1877,7 @@ static void CG_DrawCrosshair(void) {
 	}
 	
 	// X-MOD: set crosshair color
-	if (cgx_crosshairColor.integer) {	
+	if (cgx_crosshairColor.integer >= 0) {	
 		trap_R_SetColor(g_color_table_ex[cgx_crosshairColor.integer % 35]);
 	}
 	// set color based on health
@@ -1865,8 +1903,11 @@ static void CG_DrawCrosshair(void) {
 	x = cg_crosshairX.integer;
 	y = cg_crosshairY.integer;
 	CG_AdjustFrom640( &x, &y, &w, &h );
-
-	hShader = cgs.media.crosshairShader[ cg_drawCrosshair.integer % NUM_CROSSHAIRS ];	
+	
+	if (cgx_crosshairColor.string[0] == '\0')
+		hShader = cgs.media.defaultCrosshair[ cg_drawCrosshair.integer % NUM_CROSSHAIRS ];	
+	else		
+		hShader = cgs.media.crosshairShader[ cg_drawCrosshair.integer % NUM_CROSSHAIRS ];
 
 	trap_R_DrawStretchPic( x + cg.refdef.x + 0.5f * (cg.refdef.width - w), 
 		y + cg.refdef.y + 0.5f * (cg.refdef.height - h), 

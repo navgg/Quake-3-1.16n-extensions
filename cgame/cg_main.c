@@ -22,7 +22,7 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
 	case CG_SHUTDOWN:
 		CG_Shutdown();
 		return 0;
-	case CG_CONSOLE_COMMAND:
+	case CG_CONSOLE_COMMAND:		
 		return CG_ConsoleCommand();
 	case CG_DRAW_ACTIVE_FRAME:
 		CG_DrawActiveFrame( arg0, arg1, arg2 );
@@ -64,15 +64,35 @@ vmCvar_t	cgx_drawSpeed;
 vmCvar_t	cgx_hitsounds;
 vmCvar_t	cgx_coloredPing;
 vmCvar_t	cgx_networkAdjustments;
+vmCvar_t	cgx_drawScoreBox;
+vmCvar_t	cgx_scoreboard;
+vmCvar_t	cgx_drawAccuracy;
+
+vmCvar_t	cgx_sharedConfig;
 
 vmCvar_t	cgx_maxfps;
 vmCvar_t	cgx_maxpackets;
 vmCvar_t	cgx_rate;
-vmCvar_t	cgx_timeNudge;
 vmCvar_t	cgx_delag;
 
 vmCvar_t	cgx_debug;
 vmCvar_t	cgx_version;
+
+//unlagged - client options
+vmCvar_t	cg_delag;
+vmCvar_t	cg_cmdTimeNudge;
+vmCvar_t	cg_projectileNudge;
+vmCvar_t	cg_optimizePrediction;
+vmCvar_t	cl_timeNudge;
+#if CGX_DEBUG
+vmCvar_t	sv_fps;
+vmCvar_t	cg_debugDelag;
+vmCvar_t	cg_drawBBox;
+vmCvar_t	cg_latentSnaps;
+vmCvar_t	cg_latentCmds;
+vmCvar_t	cg_plOut;
+#endif
+//unlagged - client options
 
 vmCvar_t	cg_railTrailTime;
 vmCvar_t	cg_centertime;
@@ -86,7 +106,9 @@ vmCvar_t	cg_shadows;
 vmCvar_t	cg_gibs;
 vmCvar_t	cg_drawTimer;
 vmCvar_t	cg_drawFPS;
+#if CGX_DEBUG
 vmCvar_t	cg_drawSnapshot;
+#endif
 vmCvar_t	cg_draw3dIcons;
 vmCvar_t	cg_drawIcons;
 vmCvar_t	cg_drawAmmoWarning;
@@ -100,14 +122,18 @@ vmCvar_t	cg_crosshairHealth;
 vmCvar_t	cg_draw2D;
 vmCvar_t	cg_drawStatus;
 vmCvar_t	cg_animSpeed;
+#if CGX_DEBUG
 vmCvar_t	cg_debugAnim;
 vmCvar_t	cg_debugPosition;
 vmCvar_t	cg_debugEvents;
+#endif
 vmCvar_t	cg_errorDecay;
 vmCvar_t	cg_nopredict;
+#if CGX_DEBUG
 vmCvar_t	cg_noPlayerAnims;
 vmCvar_t	cg_showmiss;
 vmCvar_t	cg_footsteps;
+#endif
 vmCvar_t	cg_addMarks;
 vmCvar_t	cg_brassTime;
 vmCvar_t	cg_viewsize;
@@ -165,7 +191,9 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_drawStatus, "cg_drawStatus", "1", CVAR_ARCHIVE  },
 	{ &cg_drawTimer, "cg_drawTimer", "0", CVAR_ARCHIVE  },
 	{ &cg_drawFPS, "cg_drawFPS", "0", CVAR_ARCHIVE  },
+#if CGX_DEBUG
 	{ &cg_drawSnapshot, "cg_drawSnapshot", "0", CVAR_ARCHIVE  },
+#endif
 	{ &cg_draw3dIcons, "cg_draw3dIcons", "1", CVAR_ARCHIVE  },
 	{ &cg_drawIcons, "cg_drawIcons", "1", CVAR_ARCHIVE  },
 	{ &cg_drawAmmoWarning, "cg_drawAmmoWarning", "1", CVAR_ARCHIVE  },
@@ -181,7 +209,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_simpleItems, "cg_simpleItems", "0", CVAR_ARCHIVE },
 	{ &cg_addMarks, "cg_marks", "1", CVAR_ARCHIVE },
 	// X-MOD: nethgraph + ping
-	{ &cg_lagometer, "cg_lagometer", "3", CVAR_ARCHIVE },
+	{ &cg_lagometer, "cg_lagometer", "1", CVAR_ARCHIVE },
 	{ &cg_railTrailTime, "cg_railTrailTime", "400", CVAR_ARCHIVE  },
 	// X-MOD: cg_gun no more cheats
 	{ &cg_gun_x, "cg_gunX", "0", CVAR_ARCHIVE },
@@ -195,14 +223,18 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_bobroll, "cg_bobroll", "0.0", CVAR_ARCHIVE },
 	{ &cg_swingSpeed, "cg_swingSpeed", "0.3", CVAR_CHEAT },
 	{ &cg_animSpeed, "cg_animspeed", "1", CVAR_CHEAT },
+#if CGX_DEBUG
 	{ &cg_debugAnim, "cg_debuganim", "0", CVAR_CHEAT },
 	{ &cg_debugPosition, "cg_debugposition", "0", CVAR_CHEAT },
 	{ &cg_debugEvents, "cg_debugevents", "0", CVAR_CHEAT },
+#endif
 	{ &cg_errorDecay, "cg_errordecay", "100", 0 },
 	{ &cg_nopredict, "cg_nopredict", "0", 0 },
+#if CGX_DEBUG
 	{ &cg_noPlayerAnims, "cg_noplayeranims", "0", CVAR_CHEAT },
 	{ &cg_showmiss, "cg_showmiss", "0", 0 },
 	{ &cg_footsteps, "cg_footsteps", "1", CVAR_CHEAT },
+#endif
 	{ &cg_tracerChance, "cg_tracerchance", "0.4", CVAR_CHEAT },
 	{ &cg_tracerWidth, "cg_tracerwidth", "1", CVAR_CHEAT },
 	{ &cg_tracerLength, "cg_tracerlength", "100", CVAR_CHEAT },
@@ -220,9 +252,9 @@ cvarTable_t		cvarTable[] = {
 
 	// X-MOD: extended cgx commands
 
-	{ &cgx_wideScreenFix, "cg_wideScreenFix", "1", CVAR_ARCHIVE },
+	{ &cgx_wideScreenFix, "cg_wideScreenFix", "3", CVAR_ARCHIVE },
 	{ &cgx_defaultWeapon, "cg_defaultWeapon", "0", CVAR_ARCHIVE },
-	{ &cgx_drawPlayerIDs, "cg_drawPlayerIDs", "0", CVAR_ARCHIVE },
+	{ &cgx_drawPlayerIDs, "cg_drawPlayerIDs", "1", CVAR_ARCHIVE },
 	
 	{ &cgx_enemyModel_enabled, "cg_enemyModel_enabled", "0", CVAR_ARCHIVE },
 	{ &cgx_enemyModel, "cg_enemyModel", "", CVAR_ARCHIVE },		
@@ -236,25 +268,38 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_noTaunt, "cg_noTaunt", "0", CVAR_ARCHIVE },
 	{ &cgx_hitsounds, "cg_hitsounds", "0", CVAR_ARCHIVE },
 	{ &cgx_centerPrintAlpha, "cg_centerPrintAlpha", "1.0", CVAR_ARCHIVE },
-	{ &cgx_crosshairColor, "cg_crosshairColor", "7", CVAR_ARCHIVE },
+	{ &cgx_crosshairColor, "cg_crosshairColor", "", CVAR_ARCHIVE },
 	{ &cgx_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
 	{ &cgx_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },
-	{ &cgx_networkAdjustments, "cg_networkAdjustments", "1", CVAR_ARCHIVE },
+	{ &cgx_networkAdjustments, "cg_networkAdjustments", "0", CVAR_ARCHIVE },
+	{ &cgx_scoreboard, "cg_scoreboard", "0", CVAR_ARCHIVE },
+	{ &cgx_drawScoreBox, "cg_drawScoreBox", "1", CVAR_ARCHIVE },
+	{ &cgx_drawAccuracy, "cg_drawAccuracy", "0", CVAR_ARCHIVE },
+	//develop
+	{ &cgx_sharedConfig, "cg_sharedConfig", "0", CVAR_TEMP },	
+#if CGX_UNLAGGED
+	//unlagged - client options
+	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},	
+	{ &cg_projectileNudge, "cg_delag_projectileNudge", "0", CVAR_ARCHIVE },
+	{ &cg_optimizePrediction, "cg_delag_optimizePrediction", "1", CVAR_ARCHIVE },
+	{ &cg_cmdTimeNudge, "cg_delag_cmdTimeNudge", "0", CVAR_ARCHIVE },
 
-//#if CGX_DEBUG
-	// X-MOD: compability with noghost
+	{ &cl_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},
+	// this will be automagically copied from the server	
+#if CGX_DEBUG
+	{ &sv_fps, "sv_fps", "20", 0 },	
+	{ &cg_debugDelag, "cg_debugDelag", "0", CVAR_CHEAT },
+	{ &cg_drawBBox, "cg_drawBBox", "0", CVAR_CHEAT },
+	{ &cg_latentSnaps, "cg_latentSnaps", "0", CVAR_CHEAT },
+	{ &cg_latentCmds, "cg_latentCmds", "0", CVAR_CHEAT },
+	{ &cg_plOut, "cg_plOut", "0", CVAR_CHEAT },
+#endif
+	//unlagged - client options
+#endif
 
 	{ &cgx_maxfps, "com_maxfps", "125", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
-	{ &cgx_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
-	{ &cgx_maxpackets, "cl_maxpackets", "40", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },		
-//#else
-//	// X-MOD: compability with noghost
-//	{ &cgx_maxfps, "com_maxfps", "125", CVAR_ARCHIVE | CVAR_USERINFO },
-//	{ &cgx_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CVAR_USERINFO },
-//	{ &cgx_maxpackets, "cl_maxpackets", "40", CVAR_ARCHIVE | CVAR_USERINFO },	
-//#endif
-
-	{ &cgx_delag, "cg_delag", "1", CVAR_ARCHIVE },
+	//{ &cgx_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
+	{ &cgx_maxpackets, "cl_maxpackets", "40", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },			
 
 #if CGX_DEBUG
 	{ &cgx_debug, "cgx_debug", "1", CVAR_TEMP },
@@ -280,25 +325,23 @@ cvarTable_t		cvarTable[] = {
 	// cg_teamColors "" - same as cg_enemyColors but for team
 	// cg_lagometer 0|1|2 - 0: off 1: netgraph 2: netgraph + client ping
 	// cg_hitsounds 0|1|2 - 0: default 1: pro mode hi-low 2: low-hi hp hitsounds	
-	// cg_coloredPing 0|1 - toggles ping colors below 50 white, below 100 green, below 200 yellow, below 350 magenta, more than 350 red
+	// cg_coloredPing 0|1 - toggles ping colors below 50 white, below 100 green, below 250 yellow, below 400 magenta, more than 400 red
 	// cg_lagometer 0|1|2|3 - off, netgraph, netgraph+ping, only when lag
+	// cg_networkAdjustments 0|1|2 - off, 1: packets 40-60 rate min 8000, 2: packets 60+ rate min 25000 packetdup off (snaps = sv_fps or min 40 in both cases)
+	// cg_drawAccuracy 0 1 draw acc	
 	// resolving favorite servers by domain name
 	// colored server names shifting left bug fixed
 	// optimization: removed many debug info in CG_EntityEvent
 	// other commands
+	// cinematics menu fixed
 	// cgx_debug 0|1|2 - show debug info
 	// cgx_version - show version
+	
+	// unlagged
+	// g_delag	
+	// fov adjust for widescreen
 	// TODO: 	
-	// cg_profanityFilter 1|0 ?
-	// botColors botModels ? separate bots from humans
-	// cg_adjustFov fov adjust	
-	// cg_drawAccuracy 0 1 draw acc	
-	// modified hud?
-	// unlagged?
-	// cl_autoTimeNudge	
-	// g_delag?
-	// FIX:
-	// on noghost server, before match end go to advanced menu and podium will not draw? need to check or no
+	// cg_profanityFilter 1|0 ?			
 
 	// the following variables are created in other parts of the system,
 	// but we also reference them here
@@ -350,15 +393,52 @@ void CG_UpdateCvars( void ) {
 	int			i;
 	cvarTable_t	*cv;	
 
+#if CGX_UNLAGGED
 	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
+		//unlagged - client options
+		// clamp the value between 0 and 999
+		// negative values would suck - people could conceivably shoot other
+		// players *long* after they had left the area, on purpose
+		if ( cv->vmCvar == &cg_cmdTimeNudge ) {
+			CG_Cvar_ClampInt( cv->cvarName, cv->vmCvar, 0, 999 );
+		}
+		// cl_timenudge less than -50 or greater than 50 doesn't actually
+		// do anything more than -50 or 50 (actually the numbers are probably
+		// closer to -30 and 30, but 50 is nice and round-ish)
+		// might as well not feed the myth, eh?
+		else if ( cv->vmCvar == &cl_timeNudge ) {
+			CG_Cvar_ClampInt( cv->cvarName, cv->vmCvar, -50, 50 );
+		}
+#if CGX_DEBUG
+		// don't let this go too high - no point
+		else if ( cv->vmCvar == &cg_latentSnaps ) {
+			CG_Cvar_ClampInt( cv->cvarName, cv->vmCvar, 0, 10 );
+		}
+		// don't let this get too large
+		else if ( cv->vmCvar == &cg_latentCmds ) {
+			CG_Cvar_ClampInt( cv->cvarName, cv->vmCvar, 0, MAX_LATENT_CMDS - 1 );
+		}
+		// no more than 100% packet loss
+		else if ( cv->vmCvar == &cg_plOut ) {
+			CG_Cvar_ClampInt( cv->cvarName, cv->vmCvar, 0, 100 );
+		}
+#endif //  CGX_DEBUG
+		//unlagged - client options		
+#endif //  CGX_UNLAGGED
+
 		trap_Cvar_Update( cv->vmCvar );
 	}
 
-	if (cgx_maxpackets.integer < MIN_MAXPACKETS)
+	if (cgx_maxpackets.integer < CGX_MIN_MAXPACKETS) {
+		trap_Print(va("Min cl_maxpackets is %i\n", CGX_MIN_MAXPACKETS));
+		cgx_maxpackets.integer = CGX_MIN_MAXPACKETS;
 		trap_Cvar_Set("cl_maxpackets", "30");
-
-	if (cgx_maxfps.integer > 333)
+	}
+	if (cgx_maxfps.integer > 333) {
+		cgx_maxfps.integer = 333;
+		trap_Print(va("Max com_maxfps is %i\n", 333));
 		trap_Cvar_Set("com_maxfps", "333");
+	}
 
 	// check for modications here
 	// X-MOD: reinit vScreen if value changed
@@ -567,7 +647,7 @@ static void CG_RegisterSounds( void ) {
 	int		i;
 	char	items[MAX_ITEMS+1];
 	char	name[MAX_QPATH];
-	const char	*soundName;
+	const char	*soundName;	
 
 	if ( cgs.timelimit || cg_buildScript.integer ) {	// should we always load this?
 		cgs.media.oneMinuteSound = trap_S_RegisterSound( "sound/feedback/1_minute.wav" );
@@ -725,9 +805,9 @@ static void CG_RegisterGraphics( void ) {
 	trap_R_ClearScene();
 
 	CG_LoadingString( cgs.mapname );
-
+	trap_DPrint("trap_R_LoadWorldMap\n");
 	trap_R_LoadWorldMap( cgs.mapname );
-
+	trap_DPrint("precache status bar pics\n");
 	// precache status bar pics
 	CG_LoadingString( "game media" );
 
@@ -765,6 +845,7 @@ static void CG_RegisterGraphics( void ) {
 
 	//X-MOD: fixed crosshair shaders for crosshair color
 	for ( i = 0 ; i < NUM_CROSSHAIRS ; i++ ) {
+		cgs.media.defaultCrosshair[i] = trap_R_RegisterShader( va("gfx/2d/crosshair%c", 'a'+i) );
 		cgs.media.crosshairShader[i] = trap_R_RegisterShader( va("gfx/2d/fixed_crosshair%c", 'a'+i) );
 	}
 
@@ -831,7 +912,7 @@ static void CG_RegisterGraphics( void ) {
 
 	memset( cg_items, 0, sizeof( cg_items ) );
 	memset( cg_weapons, 0, sizeof( cg_weapons ) );
-
+	trap_DPrint("only register the items that the server says we need\n");
 	// only register the items that the server says we need
 	strcpy( items, CG_ConfigString( CS_ITEMS) );
 
@@ -841,7 +922,7 @@ static void CG_RegisterGraphics( void ) {
 			CG_RegisterItemVisuals( i );
 		}
 	}
-
+	trap_DPrint("wall marks\n");
 	// wall marks
 	cgs.media.bulletMarkShader = trap_R_RegisterShader( "gfx/damage/bullet_mrk" );
 	cgs.media.burnMarkShader = trap_R_RegisterShader( "gfx/damage/burn_med_mrk" );
@@ -850,7 +931,7 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.shadowMarkShader = trap_R_RegisterShader( "markShadow" );
 	cgs.media.wakeMarkShader = trap_R_RegisterShader( "wake" );
 	cgs.media.bloodMarkShader = trap_R_RegisterShader( "bloodMark" );
-
+	trap_DPrint("register the inline models\n");
 	// register the inline models
 	cgs.numInlineModels = trap_CM_NumInlineModels();
 	for ( i = 1 ; i < cgs.numInlineModels ; i++ ) {
@@ -865,7 +946,7 @@ static void CG_RegisterGraphics( void ) {
 			cgs.inlineModelMidpoints[i][j] = mins[j] + 0.5 * ( maxs[j] - mins[j] );
 		}
 	}
-
+	trap_DPrint("register all the server specified models\n");
 	// register all the server specified models
 	for (i=1 ; i<MAX_MODELS ; i++) {
 		const char		*modelName;
@@ -886,7 +967,7 @@ CG_RegisterClients
 */
 static void CG_RegisterClients( void ) {
 	int		i;
-
+	
 	for (i=0 ; i<MAX_CLIENTS ; i++) {
 		const char		*clientInfo;
 
@@ -997,31 +1078,31 @@ void CG_Init( int serverMessageNum, int serverCommandSequence ) {
 
 	// load the new map
 	CG_LoadingString( "collision map" );
-
+	trap_DPrint("trap_CM_LoadMap\n");
 	trap_CM_LoadMap( cgs.mapname );
 
 	cg.loading = qtrue;		// force players to load instead of defer
 
 	CG_LoadingString( "sounds" );
-
+	trap_DPrint("CG_RegisterSounds\n");
 	CG_RegisterSounds();
-
+	trap_DPrint("CG_RegisterGraphics\n");
 	CG_RegisterGraphics();
-
+	trap_DPrint("CG_RegisterClients\n");
 	CG_RegisterClients();		// if low on memory, some clients will be deferred
 
 	cg.loading = qfalse;	// future players will be deferred
-
+	trap_DPrint("CG_InitLocalEntities\n");
 	CG_InitLocalEntities();
-
+	trap_DPrint("CG_InitMarkPolys\n");
 	CG_InitMarkPolys();
 
 	// remove the last loading update
 	cg.infoScreenText[0] = 0;
-
+	trap_DPrint("CG_SetConfigValues\n");
 	// Make sure we have update values (scores)
 	CG_SetConfigValues();
-
+	trap_DPrint("CG_StartMusic\n");
 	CG_StartMusic();
 
 	CG_LoadingString( "" );	
@@ -1034,7 +1115,22 @@ CG_Shutdown
 Called before every level change or subsystem restart
 =================
 */
-void CG_Shutdown( void ) {		
+void CG_Shutdown( void ) {	
+	// X-MOD: potential fix for q3config saving problem
+
+	if (cgx_sharedConfig.integer) {
+		char buf[32];
+		trap_Cvar_VariableStringBuffer("fs_game", buf, sizeof(buf));
+
+		trap_Print(buf);
+
+		if (buf[0] == '\0')
+			trap_SendConsoleCommand("writeconfig q3config.cfg;");
+		else
+			trap_SendConsoleCommand("writeconfig ..\\baseq3\\q3config.cfg;");
+	}
+
+
 	// some mods may need to do cleanup work here,
 	// like closing files or archiving session data
 }
