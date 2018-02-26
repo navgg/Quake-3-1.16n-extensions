@@ -1,4 +1,5 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
+// Copyright (C) 2018 NaViGaToR (322)
 //
 #include "../game/q_shared.h"
 #include "tr_types.h"

@@ -1,4 +1,5 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
+// Copyright (C) 2018 NaViGaToR (322)
 //
 // q_math.c -- stateless support routines that are included in each code module
 #include "q_shared.h"

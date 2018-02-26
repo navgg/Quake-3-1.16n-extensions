@@ -1,4 +1,5 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
+// Copyright (C) 2018 NaViGaToR (322)
 //
 // cg_drawtools.c -- helper functions called by cg_draw, cg_scoreboard, cg_info, etc
 #include "cg_local.h"

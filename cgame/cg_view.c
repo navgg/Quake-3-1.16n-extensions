@@ -1,4 +1,5 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
+// Copyright (C) 2018 NaViGaToR (322)
 //
 // cg_view.c -- setup all the parameters (position, angle, etc)
 // for a 3D rendering

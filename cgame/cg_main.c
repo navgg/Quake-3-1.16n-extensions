@@ -1,4 +1,5 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
+// Copyright (C) 2018 NaViGaToR (322)
 //
 // cg_main.c -- initialization and primary entry point for cgame
 #include "cg_local.h"

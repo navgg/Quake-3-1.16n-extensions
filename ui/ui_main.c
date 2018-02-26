@@ -1,4 +1,6 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
+// Copyright (C) 2018 NaViGaToR (322) - CGX
+// Copyright (C) 2006 Neil Toronto - Unlagged 2.01
 //
 /*
 =======================================================================

@@ -1,4 +1,5 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
+// Copyright (C) 2018 NaViGaToR (322)
 //
 // cg_snapshot.c -- things that happen on snapshot transition,
 // not necessarily every single rendered frame
