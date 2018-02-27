@@ -46,12 +46,13 @@ ADVANCED OPTIONS MENU
 #define ID_DEFAULTWEAPON		147
 #define ID_LAGOMETER			148
 #define ID_HITSOUNDS			149
-#define ID_SCOREBOX				150
-#define ID_SCOREBOARD			151
+#define ID_SCOREBOARD			150
+#define ID_ACC					151
+//#define ID_SCOREBOX				152
 
 #define ID_BACK					190
 
-#define MAX_INFO_MESSAGES		25
+#define MAX_INFO_MESSAGES		26
 static void Preferences2_StatusBar( void *self ) {	
 	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
 		{ "Toggles display ingame rewards", "On screen center - Excellent, Impressive etc."},
@@ -76,9 +77,10 @@ static void Preferences2_StatusBar( void *self ) {
 		{ "Toggles colored ping on scoreboard","" },
 		{ "Sets default weapon switch after respawn","If server sends you BFG but you want shotgun" },
 		{ "Draw ingame lagometer", "" },
-		{ "Sets hitsounds default - one hit sound", "Other options 4 sounds based on damage done"},
-		{ "Toggles display of scorebox in right lower corner", ""},
-		{ "Sets ingame scoreboard type", ""}
+		{ "Sets hitsounds default - one hit sound", "Other options 4 sounds based on damage done"},		
+		{ "Sets ingame scoreboard type", ""},
+		{ "Toggles display total weapon accuracy", ""},
+		/*{ "Toggles display of scorebox in right lower corner", ""}*/
 	};
 
 	UIX_CommonStatusBar(self, ID_REWARDS, MAX_INFO_MESSAGES, info_messages);
@@ -103,7 +105,8 @@ typedef struct {
 	menuradiobutton_s	chatbeep;
 	menuradiobutton_s	enemytaunt;
 	menuradiobutton_s	coloredping;
-	menuradiobutton_s	scorebox;
+	//menuradiobutton_s	scorebox;
+	menuradiobutton_s	accuracy;
 	menulist_s			scoreboard;
 	menulist_s			centerprint;
 	menulist_s			deafultweapon;
@@ -215,7 +218,8 @@ static void Preferences2_SetMenuItems( void ) {
 	s_preferences2.drawgun.curvalue = (int)trap_Cvar_VariableValue("cg_drawGun") % 3;
 
 	s_preferences2.scoreboard.curvalue = trap_Cvar_VariableValue("cg_scoreboard") != 0;
-	s_preferences2.scorebox.curvalue = trap_Cvar_VariableValue("cg_drawScoreBox") != 0;
+	s_preferences2.accuracy.curvalue = trap_Cvar_VariableValue("cg_drawAccuracy") != 0;
+	/*s_preferences2.scorebox.curvalue = trap_Cvar_VariableValue("cg_drawScoreBox") != 0;*/
 
 	trap_Cvar_VariableStringBuffer("cg_fov", s_preferences2.fov.field.buffer, sizeof(s_preferences2.fov.field.buffer));
 	trap_Cvar_VariableStringBuffer("cg_zoomfov", s_preferences2.zoomfov.field.buffer, sizeof(s_preferences2.zoomfov.field.buffer));
@@ -315,6 +319,10 @@ static void Preferences2_Event( void* ptr, int notification ) {
 		trap_Cvar_SetValue("cg_enemyModel_enabled", s_preferences2.enemymodelenabled.curvalue);
 		break;
 
+	case ID_ACC:
+		trap_Cvar_SetValue("cg_drawAccuracy", s_preferences2.accuracy.curvalue);
+		break;
+
 	case ID_CHATBEEP:
 		trap_Cvar_SetValue("cg_chatSound", s_preferences2.chatbeep.curvalue);
 		break;
@@ -347,9 +355,9 @@ static void Preferences2_Event( void* ptr, int notification ) {
 		trap_Cvar_SetValue("cg_scoreboard", s_preferences2.scoreboard.curvalue );
 		break;
 
-	case ID_SCOREBOX:		
-		trap_Cvar_SetValue("cg_drawScoreBox", s_preferences2.scorebox.curvalue);
-		break;
+	//case ID_SCOREBOX:		
+	//	trap_Cvar_SetValue("cg_drawScoreBox", s_preferences2.scorebox.curvalue);
+	//	break;
 
 	case ID_BACK:
 		Preferences2_SaveChanges();
@@ -579,15 +587,24 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.lagometer.generic.id = ID_LAGOMETER;
 	s_preferences2.lagometer.generic.y = y;
 	s_preferences2.lagometer.itemnames = lagometer_items;
+	//y += BIGCHAR_HEIGHT+2;		
+	//s_preferences2.scorebox.generic.type			= MTYPE_RADIOBUTTON;
+	//s_preferences2.scorebox.generic.name			= "Scorebox:";
+	//s_preferences2.scorebox.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	//s_preferences2.scorebox.generic.callback		= Preferences2_Event;
+	//s_preferences2.scorebox.generic.statusbar	= Preferences2_StatusBar;
+	//s_preferences2.scorebox.generic.id			= ID_SCOREBOX;
+	//s_preferences2.scorebox.generic.x			= PREFERENCES_X_POS_1;
+	//s_preferences2.scorebox.generic.y			= y;
 	y += BIGCHAR_HEIGHT+2;		
-	s_preferences2.scorebox.generic.type			= MTYPE_RADIOBUTTON;
-	s_preferences2.scorebox.generic.name			= "Scorebox:";
-	s_preferences2.scorebox.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
-	s_preferences2.scorebox.generic.callback		= Preferences2_Event;
-	s_preferences2.scorebox.generic.statusbar	= Preferences2_StatusBar;
-	s_preferences2.scorebox.generic.id			= ID_SCOREBOX;
-	s_preferences2.scorebox.generic.x			= PREFERENCES_X_POS_1;
-	s_preferences2.scorebox.generic.y			= y;
+	s_preferences2.accuracy.generic.type			= MTYPE_RADIOBUTTON;
+	s_preferences2.accuracy.generic.name			= "Accuracy:";
+	s_preferences2.accuracy.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_preferences2.accuracy.generic.callback		= Preferences2_Event;
+	s_preferences2.accuracy.generic.statusbar	= Preferences2_StatusBar;
+	s_preferences2.accuracy.generic.id			= ID_ACC;
+	s_preferences2.accuracy.generic.x			= PREFERENCES_X_POS_1;
+	s_preferences2.accuracy.generic.y			= y;
 	//y += BIGCHAR_HEIGHT+2;
 	s_preferences2.scoreboard.generic.type = MTYPE_SPINCONTROL;
 	s_preferences2.scoreboard.generic.name = "Scoreboard:";
@@ -598,6 +615,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.scoreboard.generic.id = ID_SCOREBOARD;
 	s_preferences2.scoreboard.generic.y = y;
 	s_preferences2.scoreboard.itemnames = scoreboar_items;
+
 
 	y += (BIGCHAR_HEIGHT+2)* 2;
 	s_preferences2.enemymodelenabled.generic.type = MTYPE_RADIOBUTTON;
@@ -618,8 +636,8 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.enemymodel.generic.statusbar	= Preferences2_StatusBar;
 	s_preferences2.enemymodel.generic.id         = ID_ENEMYMODEL;
 	s_preferences2.enemymodel.generic.y			 = y;
-	s_preferences2.enemymodel.field.widthInChars = 18;
-	s_preferences2.enemymodel.field.maxchars     = 17;
+	s_preferences2.enemymodel.field.widthInChars = 17;
+	s_preferences2.enemymodel.field.maxchars     = 16;
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences2.enemycolors.generic.type       = MTYPE_FIELD;
@@ -642,8 +660,8 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.teammodel.generic.statusbar	= Preferences2_StatusBar;
 	s_preferences2.teammodel.generic.id         = ID_TEAMMODEL;
 	s_preferences2.teammodel.generic.y			 = y;
-	s_preferences2.teammodel.field.widthInChars = 18;
-	s_preferences2.teammodel.field.maxchars     = 17;
+	s_preferences2.teammodel.field.widthInChars = 17;
+	s_preferences2.teammodel.field.maxchars     = 16;
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences2.teamcolors.generic.type       = MTYPE_FIELD;
@@ -696,8 +714,9 @@ static void Preferences2_MenuInit( void ) {
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.centerprint );	
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.lagometer );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.hitsounds );
-	Menu_AddItem( &s_preferences2.menu, &s_preferences2.scorebox );
+	/*Menu_AddItem( &s_preferences2.menu, &s_preferences2.scorebox );*/
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.scoreboard );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.accuracy );
 
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.back );
 
