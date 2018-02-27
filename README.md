@@ -24,6 +24,7 @@ Still under development, beta version
 - video playback in cinematics menu fixed for widescreens
 - colored server names shifting left bug fixed in server browser menu
 - optimization: removed some debug info
+- integrated unlagged 2.01 (client compatible with noghost servers)
 
 ###### Command list
 
@@ -48,6 +49,22 @@ Still under development, beta version
 - `cg_drawGun 0|1|2` - 0: no gun 1: default bobbing 2: not bobbing cpm style
 - `cg_drawScoreBox 1|0` - display score box in low right corner 
 - `cg_scoreboard 0|1` - scoreboard 0: default large-small 1: always small
+- `cg_drawAccuracy 0|1` - total weapon accuracy
 - `cg_sharedConfig 0|1` - in development
 - `cgx_debug 0|1|2` - show debug info
 - `cgx_version` - show version
+
+###### Unlagged 2.01 command list
+
+- `cg_delag 1|0` - If this is set to "1" (the default), your lag with all instant-hit weapons will be compensated for. You can also set it for individual weapons. These are the important values:
+  - 1 - Everything
+  - 2 - Shotgun
+  - 4 - Machinegun
+  - 8 - Lightning Gun
+  - 16 - Railgun
+  
+  Add the values together. For example, if you want lag compensation for just the lightning gun and the machinegun, you would set cg_delag to "12".
+- `cg_delag_projectileNudge 0..999` - projectile time nudge, set it to your average ping on server may make easier dodging rockets
+- `cg_delag_optimizePrediction 1|0` - optimized prediction, if your CPU bottleneck this may give some serious perfomance improvement
+- `cg_delag_cmdTimeNudge 0..999` - number of milliseconds you would like the server to "nudge" the time of your instant-hit attacks. For example, if you feel that the server overcompensates for your ping, you might try setting it to 25. That will effectively add 25ms of lag.
+
