@@ -12,22 +12,25 @@ Still under development, beta version
 - misc controls added to menu, like kill, screenshot etc.
 - colored crossairs, 36 colors in total
 - bright cpm skins for enemies and team with custom coloring
-- cpm hitsounds based on damage dealt cg_hitsounds
-- draw gun with no bobbing like in cpm cg_drawGun 2
+- cpm hitsounds based on damage dealt
+- draw gun with no bobbing like in cpm
 - weapon auto swith after respawn settings
 - speedometer options, extended lagometer + ping or display only when packetloss
 - display played id on scoreboard, useful for private chatting/following eg. \tell id \follow id
 - ping colors, below 50 white, below 100 green, below 250 yellow, below 400 magenta, more than 400 red
 - ability to disable chat beep or enemy taunt sounds
 - resolving favorite servers by domain name
-- rewards display fixed if it's more than 10
-- video playback in cinematics menu fixed for widescreens
-- colored server names shifting left bug fixed in server browser menu
+- integrated unlagged 2.01 (`client compatible with noghost911 servers`)
 - optimization: removed some debug info
-- integrated unlagged 2.01 (client compatible with noghost servers)
+
+###### Buf fixes
+- rewards display fixed if it's more than 10
+- cinematics playback fixed for widescreens (only from cinematics menu and singleplayer games)
+- colored server names shifting left bug fixed in server browser menu
+- sarge/default model in team games
+- display cg_shadow 1 when cg_marks 0
 
 ###### Command list
-
 - `cg_wideScreenFix 0|1|2|3` - fix perspective for widescreen 0: no fixes 1: fix only icons 2: fix only fov 3: fix fov and icons
 - `cg_defaultWeapon 0-9` - default weapon when spawn 0: default 1: gauntlet ...
 - `cg_drawPlayerIDs 0|1` - show player id in scoreboard	
@@ -50,12 +53,11 @@ Still under development, beta version
 - `cg_drawScoreBox 1|0` - display score box in low right corner 
 - `cg_scoreboard 0|1` - scoreboard 0: default large-small 1: always small
 - `cg_drawAccuracy 0|1` - total weapon accuracy
-- `cg_sharedConfig 0|1` - in development
-- `cgx_debug 0|1|2` - show debug info
+- `cg_sharedConfig 0|1` - not working yet, in development
+- `cgx_debug 0|1` - show debug info
 - `cgx_version` - show version
 
 ###### Unlagged 2.01 command list
-
 - `cg_delag 1|0` - If this is set to "1" (the default), your lag with all instant-hit weapons will be compensated for. You can also set it for individual weapons. These are the important values:
   - 1 - Everything
   - 2 - Shotgun
