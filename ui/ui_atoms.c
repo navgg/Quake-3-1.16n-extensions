@@ -1017,7 +1017,7 @@ void UI_Init( void ) {
 
 	//X-MOD: if we played cinematic in custom resolution then restore resolution	
 	i = trap_Cvar_VariableValue("uix_cinematicplayed");
-	trap_Print(va("I: %i", i));
+	
 	if (i == 300)
 		trap_Cmd_ExecuteText(EXEC_APPEND, "uix_cinematicplayed -1\n");
 	else if (i == 200)

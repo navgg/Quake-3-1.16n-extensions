@@ -483,6 +483,18 @@ static void CG_SetDeferredClientInfo( clientInfo_t *ci ) {
 	CG_LoadClientInfo( ci );
 }
 
+void RemoveChars(char *s, char c)
+{
+	int writer = 0, reader = 0;
+
+	while (s[reader]) {
+		if (s[reader]!=c) 		
+			s[writer++] = s[reader];		
+		reader++;       
+	}
+
+	s[writer]=0;
+}
 
 /*
 ======================
@@ -538,6 +550,7 @@ void CG_NewClientInfo( int clientNum ) {
 
 	// model
 	v = Info_ValueForKey( configstring, "model" );
+
 	if ( cg_forceModel.integer ) {
 		// forcemodel makes everyone use a single model
 		// to prevent load hitches
@@ -566,12 +579,39 @@ void CG_NewClientInfo( int clientNum ) {
 			}
 		}
 	} else {
-		Q_strncpyz( newInfo.modelName, v, sizeof( newInfo.modelName ) );
+		char buf[MAX_QPATH];
+
+		Q_strncpyz( buf, v, sizeof( buf ) );
+
+		// fix model sarge/default in team game
+		if (clientNum != cg.clientNum) {			
+			int writer = 0, reader = 0;
+
+			while (buf[reader]) {
+				if (buf[reader]!='^') 		
+					buf[writer++] = buf[reader];		
+				reader++;       
+			}
+
+			buf[writer]=0;
+		}
+
+		Q_strncpyz( newInfo.modelName, buf, sizeof( newInfo.modelName ) );
 
 		slash = strchr( newInfo.modelName, '/' );
 		if ( !slash ) {
-			// modelName didn not include a skin name
-			Q_strncpyz( newInfo.skinName, "default", sizeof( newInfo.skinName ) );
+			// modelName didn not include a skin name			
+			if (cg.clientNum != cg.clientNum) {
+				//fix model sarge/default in team game
+				if (cgs.gametype >= GT_TEAM && newInfo.team == TEAM_RED)
+					Q_strncpyz( newInfo.skinName, "red", sizeof( newInfo.skinName ) );
+				else if (cgs.gametype >= GT_TEAM && newInfo.team == TEAM_BLUE)
+					Q_strncpyz( newInfo.skinName, "blue", sizeof( newInfo.skinName ) );
+				else
+					Q_strncpyz( newInfo.skinName, "default", sizeof( newInfo.skinName ) );
+			} else {
+				Q_strncpyz(newInfo.skinName, "default", sizeof(newInfo.skinName));
+			}
 		} else {
 			Q_strncpyz( newInfo.skinName, slash + 1, sizeof( newInfo.skinName ) );
 			// truncate modelName

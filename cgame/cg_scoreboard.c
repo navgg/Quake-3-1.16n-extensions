@@ -161,8 +161,6 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 		pingCol = ColorIndex(COLOR_YELLOW);
 	else if (score->ping <= 400)
 		pingCol = ColorIndex(COLOR_MAGENTA);
-	else if (score->ping == 999)
-		pingCol = ColorIndex(COLOR_WHITE);
 	else
 		pingCol = ColorIndex(COLOR_RED);
 
