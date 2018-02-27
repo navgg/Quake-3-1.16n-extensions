@@ -9,7 +9,7 @@
 
 #define	Q3_VERSION		"Q3 1.16n"
 #define CGX_VERSION		"0.65b"
-#define CGX_DATE		"26 Feb 2018"
+#define CGX_DATE		"27 Feb 2018"
 #define CGX_DEBUG		0
 #define	CGX_UNLAGGED	1
 #define CGX_NOGHOST_COMPATIBLE CVAR_USERINFO

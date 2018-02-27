@@ -330,15 +330,31 @@ static void UI_SPPostgameMenu_MenuDraw( void ) {
 			}
 		}
 		else if( postgameMenuInfo.won > -1 && UI_ShowTierVideo( postgameMenuInfo.won + 1 )) {
-			if( postgameMenuInfo.won == postgameMenuInfo.lastTier ) {
-				trap_Cvar_Set( "nextmap", "" );
-				trap_Cmd_ExecuteText( EXEC_APPEND, "disconnect; cinematic end.RoQ\n" );
+			if( postgameMenuInfo.won == postgameMenuInfo.lastTier ) {							
+				// X-MOD: hack - play cinematic in custom resolution, set 640x480 to play and then restore old resolution
+				if (trap_Cvar_VariableValue("r_mode") == -1.0f) {
+					trap_Cvar_Set( "nextmap", "vid_restart" );
+					trap_Cmd_ExecuteText(EXEC_APPEND, "disconnect; r_mode 3; vid_restart; cinematic end.RoQ; r_mode -1; uix_cinematicplayed 300\n");
+				} else {
+					trap_Cvar_Set( "nextmap", "" );
+					trap_Cmd_ExecuteText(EXEC_APPEND, "disconnect; cinematic end.RoQ\n");
+				}
 				return;
 			}
 
 			trap_Cvar_SetValue( "ui_spSelection", postgameMenuInfo.won * ARENAS_PER_TIER );
-			trap_Cvar_Set( "nextmap", "levelselect" );
-			trap_Cmd_ExecuteText( EXEC_APPEND, va( "disconnect; cinematic tier%i.RoQ\n", postgameMenuInfo.won + 1 ) );
+			
+			// X-MOD: hack - play cinematic in custom resolution, set 640x480 to play and then restore old resolution
+			if (trap_Cvar_VariableValue("r_mode") == -1.0f) {
+				trap_Cvar_Set( "nextmap", "vid_restart" );
+				trap_Cmd_ExecuteText(EXEC_APPEND, va("disconnect; r_mode 3; vid_restart; cinematic tier%i.RoQ; r_mode -1; uix_cinematicplayed 200\n", postgameMenuInfo.won + 1));
+			} else {
+				trap_Cvar_Set( "nextmap", "levelselect" );			
+				trap_Cmd_ExecuteText(EXEC_APPEND, va("disconnect; cinematic tier%i.RoQ\n", postgameMenuInfo.won + 1));
+			}
+
+			return;
+
 			return;
 		}
 

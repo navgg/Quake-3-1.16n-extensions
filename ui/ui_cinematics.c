@@ -82,16 +82,19 @@ static void UI_CinematicsMenu_Event( void *ptr, int event ) {
 		return;
 
 	n = ((menucommon_s*)ptr)->id - ID_CIN_IDLOGO;
-	trap_Cvar_Set( "nextmap", va( "ui_cinematics %i", n ) );
+	
 	if( uis.demoversion && ((menucommon_s*)ptr)->id == ID_CIN_END ) {
+		trap_Cvar_Set( "nextmap", va( "ui_cinematics %i", n ) );
 		trap_Cmd_ExecuteText( EXEC_APPEND, "disconnect; cinematic demoEnd.RoQ 1\n" );
 	}
 	else {
 		// X-MOD: hack - play cinematic in custom resolution, set 640x480 to play and then restore old resolution
 		if (trap_Cvar_VariableValue("r_mode") == -1.0f) {
-			trap_Cmd_ExecuteText(EXEC_APPEND, va("disconnect; r_mode 3; vid_restart; cinematic %s.RoQ\n; r_mode -1; uix_cinematicplayed %i", cinematics[n], n));
+			trap_Cvar_Set( "nextmap", "vid_restart" );
+			trap_Cmd_ExecuteText(EXEC_APPEND, va("disconnect; r_mode 3; vid_restart; cinematic %s.RoQ; r_mode -1; uix_cinematicplayed %i\n", cinematics[n], n + 100));
 		} else {
-			trap_Cmd_ExecuteText(EXEC_APPEND, va("disconnect; cinematic %s.RoQ\n;", cinematics[n]));
+			trap_Cvar_Set( "nextmap", va( "ui_cinematics %i", n ) );
+			trap_Cmd_ExecuteText(EXEC_APPEND, va("disconnect; cinematic %s.RoQ\n", cinematics[n]));
 		}
 	}
 }
@@ -104,11 +107,6 @@ UI_CinematicsMenu_Init
 */
 static void UI_CinematicsMenu_Init( void ) {
 	int		y;
-	
-	//X-MOD: if we played cinematic in custom resolution then restore resolution	
-	y = trap_Cvar_VariableValue("uix_cinematicplayed");
-	if (y >= 0) 		
-		trap_Cmd_ExecuteText(EXEC_APPEND, va("uix_cinematicplayed %i; vid_restart;", y + 100));	
 
 	UI_CinematicsMenu_Cache();
 
