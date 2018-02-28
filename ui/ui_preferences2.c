@@ -66,7 +66,7 @@ static void Preferences2_StatusBar( void *self ) {
 		{ "Forces all enemies colors eg. '2222' '1234' '2!2!'","'?' and '!' - use team color '*' and '.' - random"},
 		{ "Toggles 3D icons display (ammo, armor etc.)","If it's on icons will be 3D, off - 2D"},
 		{ "Field of view when zoom in degrees","Min - 1 Max - 160"},
-		{ "Enables forcing enemy and team models",""},
+		{ "Enables forcing bright enemy and team models",""},
 		{ "Toggles beep when chatting",""},
 		{ "Toggles enemy taunt sound",""},
 		{ "'You fragged...' message transparency level",""},

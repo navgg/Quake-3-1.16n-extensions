@@ -223,7 +223,6 @@ static const char *s_drivers[] =
 };
 
 #define ID_BACK2		101
-#define ID_FULLSCREEN	102
 #define ID_DRIVERINFO	103
 #define ID_GRAPHICS		104
 #define ID_DISPLAY		105
@@ -236,20 +235,21 @@ static const char *s_drivers[] =
 #define ID_GLDRIVER			111
 #define ID_GLEXT			112
 #define ID_COLORDEPTH		113
-#define	ID_LIGHTNING		114
-#define	ID_GEOMETRICDETAIL	115
-#define	ID_TEXTUREDETAIL	116
-#define	ID_TEXTUREQUALITY	117
-#define	ID_TEXTUREFILTER	118
+#define ID_FULLSCREEN		114
+#define	ID_LIGHTNING		115
+#define	ID_GEOMETRICDETAIL	116
+#define	ID_TEXTUREDETAIL	117
+#define	ID_TEXTUREQUALITY	118
+#define	ID_TEXTUREFILTER	119
 
 #define MAX_INFO_MESSAGES	11
 static void UI_Video_StatusBar( void *self ) {	
 	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
 		{ "Switches graphics settings presets", "" },
-		{ "Specifies GL Driver", "Recommended 'Default' (Voodoo - for PC before 2000)" },
-		{ "Toggles GL Extensions", "Recommended 'On' (Turning off may decrease FPS a lot)" },
 		{ "Sets display resolution", "Lowering may significant increase FPS" },
-		{ "Sets display color depth", "Setting 16bit may increase FPS" },
+		{ "Specifies GL Driver", "Recommended 'Default' (Voodoo - for PC before 2000)" },		
+		{ "Toggles GL Extensions", "Recommended 'On' (Turning off may decrease FPS a lot)" },		
+		{ "Sets display color depth", "Setting 16bit may increase FPS" },		
 		{ "Toggles fullscreen or windowed mode", "Shortcut - Alt + Enter" },
 		{ "Switches lightning mode", "Vertex may significant increase FPS" },
 		{ "Sets detail level of player models and weapons", "Lowering may slightly increase FPS" },
