@@ -1,7 +1,9 @@
 # Quake 3 1.16 extensions
-Custom extensions for patching Quake 3 1.16n
+Custom extensions for patching Quake 3 1.16n (beta version)
 
-Still under development, beta version
+###### Installation & Requirements
+- requires quake 3 arena version 1.16n
+- to install unzip pak2X.pk3 to baseq3 folder of your quake 3 arena installation path
 
 ###### Features
 - wide screen fix, supports any ratio, icons not stretching, fov fix for widescreens
