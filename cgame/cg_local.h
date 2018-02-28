@@ -979,6 +979,7 @@ qboolean CG_Cvar_ClampInt( const char *name, vmCvar_t *vmCvar, int min, int max 
 
 void CGX_Init_vScreen(void);
 void CGX_AutoAdjustNetworkSettings(void);
+void CGX_CheckChatCommand(const char *str);
 
 void CGX_Init_enemyModels(void);
 void CGX_SetModelAndSkin(clientInfo_t *ci);

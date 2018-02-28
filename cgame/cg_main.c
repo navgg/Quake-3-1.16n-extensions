@@ -272,7 +272,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_crosshairColor, "cg_crosshairColor", "", CVAR_ARCHIVE },
 	{ &cgx_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
 	{ &cgx_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },
-	{ &cgx_networkAdjustments, "cg_networkAdjustments", "0", CVAR_ARCHIVE },
+	{ &cgx_networkAdjustments, "cg_networkAdjustments", "1", CVAR_ARCHIVE },
 	{ &cgx_scoreboard, "cg_scoreboard", "0", CVAR_ARCHIVE },
 	{ &cgx_drawScoreBox, "cg_drawScoreBox", "1", CVAR_ARCHIVE },
 	{ &cgx_drawAccuracy, "cg_drawAccuracy", "0", CVAR_ARCHIVE },
@@ -307,7 +307,7 @@ cvarTable_t		cvarTable[] = {
 #else
 	{ &cgx_debug, "cgx_debug", "0", CVAR_TEMP },
 #endif
-	{ &cgx_version, "cgx_version", "CGX "CGX_VERSION" "CGX_DATE, CVAR_ROM | CVAR_TEMP},
+	{ &cgx_version, "cgx_version", "CGX "CGX_VERSION" "CGX_DATE, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO},
 
 	// cg_wideScreenFix 1|0 - fix perspective for widescreen
 	// cg_defaultWeapon 0-9 - default weapon when spawn 0: default 1: gauntlet ...
@@ -335,6 +335,7 @@ cvarTable_t		cvarTable[] = {
 	// optimization: removed many debug info in CG_EntityEvent
 	// other commands
 	// cinematics menu fixed
+	// model sarge^^^ fixed
 	// cgx_debug 0|1|2 - show debug info
 	// cgx_version - show version
 	

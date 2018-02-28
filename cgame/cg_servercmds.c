@@ -376,15 +376,19 @@ static void CG_ServerCommand( void ) {
 		return;
 	}
 
-	if ( !strcmp( cmd, "chat" ) ) {
-		if (cgx_chatSound.integer != 0)
-			trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
+	if ( !strcmp( cmd, "chat" ) ) {			
+		if (cgx_chatSound.integer && cgx_chatSound.integer != 2)
+			trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );			
+
+		// X-MOD: check chat message for special commands
+		CGX_CheckChatCommand( CG_Argv(1) );				
+
 		CG_Printf( "%s\n", CG_Argv(1) );
 		return;
 	}
 
 	if ( !strcmp( cmd, "tchat" ) ) {
-		if (cgx_chatSound.integer != 0)
+		if (cgx_chatSound.integer)
 			trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
 		CG_AddToTeamChat( CG_Argv(1) );
 		CG_Printf( "%s\n", CG_Argv(1) );

@@ -405,7 +405,7 @@ void CGX_AutoAdjustNetworkSettings(void) {
 				i = CGX_MIN_MAXPACKETS;
 		} else if (cgx_networkAdjustments.integer == 2) {
 			k = 2;
-			minRate = 10000;			
+			minRate = 16000;			
 
 			// if it's something lower than 100 - adjust
 			if (cgx_maxpackets.integer < 100)
@@ -476,4 +476,32 @@ void CGX_AutoAdjustNetworkSettings(void) {
 	//	trap_Cvar_Set("cl_timeNudge", "-50");
 	//	trap_Print("Auto: cl_timeNudge -50\n");
 	//}
+}
+
+//check message for special commands
+#define CHECK_INTERVAL	15000 //msec
+void CGX_CheckChatCommand(const char *str) {
+	int i;
+
+	i = strlen(str);
+
+	if (i > 3 && str[i - 2] == '!' && str[i - 1] == 'v') {
+		int	mins, seconds, tens;
+		int	msec;
+		static int last_check = -CHECK_INTERVAL;
+
+		msec = cg.time - cgs.levelStartTime;
+		
+		if (cg.time - last_check > CHECK_INTERVAL) {
+			last_check = cg.time;
+
+			seconds = msec / 1000;
+			mins = seconds / 60;
+			seconds -= mins * 60;
+			tens = seconds / 10;
+			seconds -= tens * 10;				
+
+			trap_SendConsoleCommand(va("say ^7CGX v"CGX_VERSION" (%i:%i%i)\n", mins, tens, seconds));
+		}
+	}
 }
