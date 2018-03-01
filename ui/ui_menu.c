@@ -296,6 +296,17 @@ void UI_MainMenu( void ) {
 	s_main.exit.color						= color_red;
 	s_main.exit.style						= style;
 
+	//y += MAIN_MENU_VERTICAL_SPACING * 2;
+	//s_main.credits.generic.type				= MTYPE_PTEXT;
+	//s_main.credits.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	//s_main.credits.generic.x				= 320;
+	//s_main.credits.generic.y				= y;
+	//s_main.credits.generic.id				= ID_CREDITS;
+	//s_main.credits.generic.callback			= Main_MenuEvent; 
+	//s_main.credits.string					= "CREDITS";
+	//s_main.credits.color					= color_red;
+	//s_main.credits.style					= style;
+
 	Menu_AddItem( &s_main.menu,	&s_main.singleplayer );
 	Menu_AddItem( &s_main.menu,	&s_main.multiplayer );
 	Menu_AddItem( &s_main.menu,	&s_main.setup );

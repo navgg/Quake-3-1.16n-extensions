@@ -81,6 +81,9 @@ void CG_ParseServerinfo( void ) {
 	static int old_sv_fps = -1;
 	const char	*info;
 	char	*mapname;
+	int g_delagHitscan;
+	int g_delag;
+	char *g_unlaggedVersion;
 
 	info = CG_ConfigString( CS_SERVERINFO );
 	cgs.gametype = atoi( Info_ValueForKey( info, "g_gametype" ) );
@@ -95,8 +98,14 @@ void CG_ParseServerinfo( void ) {
 
 	//unlagged - server options
 	// we'll need this for deciding whether or not to predict weapon effects
-	cgs.delagHitscan = atoi( Info_ValueForKey( info, "g_delag" ) );
-	trap_Cvar_Set("g_delag", va("%i", cgs.delagHitscan));
+	g_delag = atoi( Info_ValueForKey( info, "g_delag" ) );
+	g_delagHitscan = atoi(Info_ValueForKey(info, "g_delagHitscan"));
+	g_unlaggedVersion = Info_ValueForKey(info, "g_unlaggedVersion");
+	cgs.delagHitscan = g_delag || g_delagHitscan || (Q_stricmpn("1.2", g_unlaggedVersion, 4) == 0);
+	trap_WPrint(va("cgs.delagHitscan '%i'\n", cgs.delagHitscan));
+	if (g_delagHitscan || g_unlaggedVersion[0] != '\0')
+		trap_WPrint(va("g_delagHitscan '%i' g_unlaggedVersion '%s'\n", g_delagHitscan, g_unlaggedVersion));	
+	//trap_Cvar_Set("g_delag", va("%i", cgs.delagHitscan));
 	//unlagged - server options
 	
 	cgs.sv_fps = atoi(Info_ValueForKey(info, "sv_fps"));
@@ -111,7 +120,7 @@ void CG_ParseServerinfo( void ) {
 		cgs.minSnaps = cgs.sv_fps;
 	}
 
-	trap_WPrint(va("g_delag '%i' sv_fps '%i' sv_maxrate '%i'\n", cgs.delagHitscan, cgs.sv_fps, cgs.sv_maxrate));
+	trap_WPrint(va("g_delag '%i' sv_fps '%i' sv_maxrate '%i'\n", cgs.delagHitscan, cgs.sv_fps, cgs.sv_maxrate));	
 
 	if (cgs.sv_fps != old_sv_fps) {
 		CGX_AutoAdjustNetworkSettings();
