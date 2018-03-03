@@ -1062,6 +1062,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence ) {
 	cg.oldTeam = -1;
 	
 	CGX_Init_enemyModels();
+	CGX_Init_teamModels();
 	CGX_Init_vScreen();
 
 	// get the gamestate from the client system
