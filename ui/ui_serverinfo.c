@@ -29,6 +29,9 @@ typedef struct
 	menutext_s		add;
 	char			info[MAX_INFO_STRING];
 	int				numlines;
+
+	float			y_pos;
+	float			y_max;
 } serverinfo_t;
 
 static serverinfo_t	s_serverinfo;
@@ -120,11 +123,11 @@ static void ServerInfo_MenuDraw( void )
 
 		Q_strcat( key, MAX_INFO_KEY, ":" ); 
 
-		UI_DrawString(SCREEN_WIDTH*0.50 - 8,y,key,UI_RIGHT|UI_SMALLFONT,color_red);
-		UI_DrawString(SCREEN_WIDTH*0.50 + 8,y,value,UI_LEFT|UI_SMALLFONT,text_color_normal);
+		UI_DrawString(SCREEN_WIDTH*0.50 - 8,y+s_serverinfo.y_pos,key,UI_RIGHT|UI_SMALLFONT,color_red);
+		UI_DrawString(SCREEN_WIDTH*0.50 + 8,y+s_serverinfo.y_pos,value,UI_LEFT|UI_SMALLFONT,text_color_normal);
 
 		y += SMALLCHAR_HEIGHT;
-	}
+	}	
 
 	Menu_Draw( &s_serverinfo.menu );
 }
@@ -136,6 +139,14 @@ ServerInfo_MenuKey
 */
 static sfxHandle_t ServerInfo_MenuKey( int key )
 {
+	if ((key == K_MWHEELDOWN || key == K_DOWNARROW || key == K_PGDN) 
+		&& s_serverinfo.y_pos > s_serverinfo.y_max) {
+		s_serverinfo.y_pos -= SMALLCHAR_HEIGHT;
+	} else if ((key == K_MWHEELUP || key == K_UPARROW || key == K_PGUP)
+		&& s_serverinfo.y_pos < 0) {
+		s_serverinfo.y_pos += SMALLCHAR_HEIGHT;
+	}
+
 	return ( Menu_DefaultKey( &s_serverinfo.menu, key ) );
 }
 
@@ -236,6 +247,9 @@ void UI_ServerInfoMenu( void )
 		}
 		s_serverinfo.numlines++;
 	}
+	
+	s_serverinfo.y_max = s_serverinfo.numlines > 16 ? -SMALLCHAR_HEIGHT * (s_serverinfo.numlines - 16) : 0;
+	s_serverinfo.y_pos = 0.0f;
 
 	if (s_serverinfo.numlines > 16)
 		s_serverinfo.numlines = 16;
@@ -244,7 +258,7 @@ void UI_ServerInfoMenu( void )
 	Menu_AddItem( &s_serverinfo.menu, (void*) &s_serverinfo.framel );
 	Menu_AddItem( &s_serverinfo.menu, (void*) &s_serverinfo.framer );
 	Menu_AddItem( &s_serverinfo.menu, (void*) &s_serverinfo.add );
-	Menu_AddItem( &s_serverinfo.menu, (void*) &s_serverinfo.back );
+	Menu_AddItem( &s_serverinfo.menu, (void*) &s_serverinfo.back );	
 
 	UI_PushMenu( &s_serverinfo.menu );
 }

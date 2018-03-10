@@ -40,6 +40,9 @@ typedef struct
 	char			stringbuff[1024];
 	char*			strings[64];
 	int				numstrings;
+
+	float			y_pos;
+	float			y_max;
 } driverinfo_t;
 
 static driverinfo_t	s_driverinfo;
@@ -74,17 +77,17 @@ static void DriverInfo_MenuDraw( void )
 
 	Menu_Draw( &s_driverinfo.menu );
 
-	UI_DrawString( 320, 80, "VENDOR", UI_CENTER|UI_SMALLFONT, color_red );
-	UI_DrawString( 320, 152, "PIXELFORMAT", UI_CENTER|UI_SMALLFONT, color_red );
-	UI_DrawString( 320, 192, "EXTENSIONS", UI_CENTER|UI_SMALLFONT, color_red );
+	UI_DrawString( 320, 80+s_driverinfo.y_pos, "VENDOR", UI_CENTER|UI_SMALLFONT, color_red );
+	UI_DrawString( 320, 152+s_driverinfo.y_pos, "PIXELFORMAT", UI_CENTER|UI_SMALLFONT, color_red );
+	UI_DrawString( 320, 192+s_driverinfo.y_pos, "EXTENSIONS", UI_CENTER|UI_SMALLFONT, color_red );
 
-	UI_DrawString( 320, 80+16, uis.glconfig.vendor_string, UI_CENTER|UI_SMALLFONT, text_color_normal );
-	UI_DrawString( 320, 96+16, uis.glconfig.version_string, UI_CENTER|UI_SMALLFONT, text_color_normal );
-	UI_DrawString( 320, 112+16, uis.glconfig.renderer_string, UI_CENTER|UI_SMALLFONT, text_color_normal );
-	UI_DrawString( 320, 152+16, va ("color(%d-bits) Z(%d-bits) stencil(%d-bits)", uis.glconfig.colorBits, uis.glconfig.depthBits, uis.glconfig.stencilBits), UI_CENTER|UI_SMALLFONT, text_color_normal );
+	UI_DrawString( 320, 80+16+s_driverinfo.y_pos, uis.glconfig.vendor_string, UI_CENTER|UI_SMALLFONT, text_color_normal );
+	UI_DrawString( 320, 96+16+s_driverinfo.y_pos, uis.glconfig.version_string, UI_CENTER|UI_SMALLFONT, text_color_normal );
+	UI_DrawString( 320, 112+16+s_driverinfo.y_pos, uis.glconfig.renderer_string, UI_CENTER|UI_SMALLFONT, text_color_normal );
+	UI_DrawString( 320, 152+16+s_driverinfo.y_pos, va ("color(%d-bits) Z(%d-bits) stencil(%d-bits)", uis.glconfig.colorBits, uis.glconfig.depthBits, uis.glconfig.stencilBits), UI_CENTER|UI_SMALLFONT, text_color_normal );
 
 	// double column
-	y = 192+16;
+	y = 192+16+s_driverinfo.y_pos;
 	for (i=0; i<s_driverinfo.numstrings/2; i++) {
 		UI_DrawString( 320-4, y, s_driverinfo.strings[i*2], UI_RIGHT|UI_SMALLFONT, text_color_normal );
 		UI_DrawString( 320+4, y, s_driverinfo.strings[i*2+1], UI_LEFT|UI_SMALLFONT, text_color_normal );
@@ -93,6 +96,24 @@ static void DriverInfo_MenuDraw( void )
 
 	if (s_driverinfo.numstrings & 1)
 		UI_DrawString( 320, y, s_driverinfo.strings[s_driverinfo.numstrings-1], UI_CENTER|UI_SMALLFONT, text_color_normal );
+}
+
+/*
+=================
+DriverInfo_MenuKey
+=================
+*/
+static sfxHandle_t DriverInfo_MenuKey( int key )
+{
+	if ((key == K_MWHEELDOWN || key == K_DOWNARROW || key == K_PGDN) 
+		&& s_driverinfo.y_pos > s_driverinfo.y_max) {		
+		s_driverinfo.y_pos -= SMALLCHAR_HEIGHT;
+	} else if ((key == K_MWHEELUP || key == K_UPARROW || key == K_PGUP)
+		&& s_driverinfo.y_pos < 0) {
+		s_driverinfo.y_pos += SMALLCHAR_HEIGHT;
+	}
+
+	return ( Menu_DefaultKey( &s_driverinfo.menu, key ) );
 }
 
 /*
@@ -131,6 +152,7 @@ static void UI_DriverInfo_Menu( void )
 
 	s_driverinfo.menu.fullscreen = qtrue;
 	s_driverinfo.menu.draw       = DriverInfo_MenuDraw;
+	s_driverinfo.menu.key        = DriverInfo_MenuKey;
 
 	s_driverinfo.banner.generic.type  = MTYPE_BTEXT;
 	s_driverinfo.banner.generic.x	  = 320;
@@ -191,6 +213,9 @@ static void UI_DriverInfo_Menu( void )
 			s_driverinfo.strings[i][len]   = '\0';
 		}
 	}
+
+	s_driverinfo.y_max = s_driverinfo.numstrings > 32 ? -SMALLCHAR_HEIGHT * (s_driverinfo.numstrings - 32) : 0;
+	s_driverinfo.y_pos = 0.0f;
 
 	Menu_AddItem( &s_driverinfo.menu, &s_driverinfo.banner );
 	Menu_AddItem( &s_driverinfo.menu, &s_driverinfo.framel );
@@ -351,7 +376,7 @@ static vidmode_t vidmodes[] = {
 
 #define MAX_CUSTOM_VIDMODES	( sizeof( vidmodes ) / sizeof( vidmodes[0] ) )
 
-void Set_r_mode() {
+void CGX_Set_r_mode() {
 	if (s_graphicsoptions.mode.curvalue < 12) {
 		trap_Cvar_SetValue("r_mode", s_graphicsoptions.mode.curvalue);
 	} else {
@@ -361,7 +386,7 @@ void Set_r_mode() {
 	}
 }
 
-void Get_r_mode() {
+void CGX_Get_r_mode() {
 	int i, width, height;
 	
 	s_graphicsoptions.mode.curvalue = trap_Cvar_VariableValue( "r_mode" );	
@@ -541,7 +566,7 @@ static void GraphicsOptions_ApplyChanges( void *unused, int notification )
 	}
 	trap_Cvar_SetValue( "r_picmip", 3 - s_graphicsoptions.tq.curvalue );
 	trap_Cvar_SetValue( "r_allowExtensions", s_graphicsoptions.allow_extensions.curvalue );
-	Set_r_mode();	
+	CGX_Set_r_mode();	
 	trap_Cvar_SetValue( "r_fullscreen", s_graphicsoptions.fs.curvalue );
 	trap_Cvar_Set( "r_glDriver", ( char * ) s_drivers[s_graphicsoptions.driver.curvalue] );
 	switch ( s_graphicsoptions.colordepth.curvalue )
@@ -691,7 +716,7 @@ GraphicsOptions_SetMenuItems
 */
 static void GraphicsOptions_SetMenuItems( void )
 {		
-	Get_r_mode();
+	CGX_Get_r_mode();
 	s_graphicsoptions.fs.curvalue = trap_Cvar_VariableValue("r_fullscreen");
 	s_graphicsoptions.allow_extensions.curvalue = trap_Cvar_VariableValue("r_allowExtensions");
 	s_graphicsoptions.tq.curvalue = 3-trap_Cvar_VariableValue( "r_picmip");

@@ -351,9 +351,7 @@ static void UI_SPPostgameMenu_MenuDraw( void ) {
 			} else {
 				trap_Cvar_Set( "nextmap", "levelselect" );			
 				trap_Cmd_ExecuteText(EXEC_APPEND, va("disconnect; cinematic tier%i.RoQ\n", postgameMenuInfo.won + 1));
-			}
-
-			return;
+			}			
 
 			return;
 		}
