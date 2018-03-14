@@ -207,6 +207,11 @@ void CG_DrawHead( float x, float y, float w, float h, int clientNum, vec3_t head
 			CG_Draw3DModel(x, y, w, h, ci->headModel, ci->headSkin, origin, headAngles);
 		}
 	} else if ( cg_drawIcons.integer ) {		
+		cm = ci->headModel;
+		if ( !cm ) {			
+			return;			
+		}
+
 		CG_DrawPic(x, y, w, h, ci->modelIcon);
 	}
 
