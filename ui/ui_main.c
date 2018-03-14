@@ -256,8 +256,8 @@ cvarTable_t		cvarTable[] = {
 	{ &uix_crosshairSize, "cg_crosshairSize", "24", CVAR_ARCHIVE },
 	{ &uix_lagometer, "cg_lagometer", "1", CVAR_ARCHIVE },
 
-	{ &ui_server1, "server1", "sodmod.ga:27962", CVAR_ARCHIVE },
-	{ &ui_server2, "server2", "sodmod.ga:27963", CVAR_ARCHIVE },
+	{ &ui_server1, "server1", "", CVAR_ARCHIVE },
+	{ &ui_server2, "server2", "", CVAR_ARCHIVE },
 	{ &ui_server3, "server3", "", CVAR_ARCHIVE },
 	{ &ui_server4, "server4", "", CVAR_ARCHIVE },
 	{ &ui_server5, "server5", "", CVAR_ARCHIVE },
@@ -270,8 +270,8 @@ cvarTable_t		cvarTable[] = {
 	{ &ui_server12, "server12", "", CVAR_ARCHIVE },
 	{ &ui_server13, "server13", "", CVAR_ARCHIVE },
 	{ &ui_server14, "server14", "", CVAR_ARCHIVE },
-	{ &ui_server15, "server15", "", CVAR_ARCHIVE },
-	{ &ui_server16, "server16", "", CVAR_ARCHIVE },
+	{ &ui_server15, "server15", "sodmod.ga:27962", CVAR_ARCHIVE },
+	{ &ui_server16, "server16", "sodmod.ga:27963", CVAR_ARCHIVE },
 
 	{ &ui_cdkeychecked, "ui_cdkeychecked", "0", CVAR_ROM }
 };

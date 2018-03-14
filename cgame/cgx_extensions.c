@@ -416,11 +416,11 @@ void CGX_AutoAdjustNetworkSettings(void) {
 
 			// if it's already 100 skip, lower - adjust
 			if (cgx_maxpackets.integer < 100)
-				while((i = cgx_maxfps.integer / k++) > CGX_MAX_MAXPACKETS);						
+				while ((i = cgx_maxfps.integer / k++) > 100);
 
-			if (i >= CGX_MAX_MAXPACKETS)
-				i--;			
-		} 
+			if (i >= 100)
+				i--;
+		}
 
 		// set packets first
 		if (i > 0) {
@@ -461,8 +461,8 @@ void CGX_AutoAdjustNetworkSettings(void) {
 				trap_Cvar_Set("cl_packetdup", "0");
 				trap_Print("Auto: cl_packetdup 0\n");
 			}
-		}				
-	}		
+		}
+	}
 
 	// check time nudge
 	// if server delaged it's better off
@@ -491,7 +491,7 @@ void CGX_CheckChatCommand(const char *str) {
 		static int last_check = -CHECK_INTERVAL;
 
 		msec = cg.time - cgs.levelStartTime;
-		
+
 		if (cg.time - last_check > CHECK_INTERVAL) {
 			last_check = cg.time;
 
@@ -499,7 +499,7 @@ void CGX_CheckChatCommand(const char *str) {
 			mins = seconds / 60;
 			seconds -= mins * 60;
 			tens = seconds / 10;
-			seconds -= tens * 10;				
+			seconds -= tens * 10;
 
 			trap_SendConsoleCommand(va("say ^7CGX v"CGX_VERSION" (%i:%i%i)\n", mins, tens, seconds));
 		}
