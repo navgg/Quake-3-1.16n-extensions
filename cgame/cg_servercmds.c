@@ -102,7 +102,11 @@ void CG_ParseServerinfo( void ) {
 	g_delag = atoi( Info_ValueForKey( info, "g_delag" ) );
 	g_delagHitscan = atoi(Info_ValueForKey(info, "g_delagHitscan"));
 	g_unlaggedVersion = Info_ValueForKey(info, "g_unlaggedVersion");
-	cgs.delagHitscan = g_delag || g_delagHitscan || (Q_stricmpn("1.2", g_unlaggedVersion, 4) == 0);
+
+	//2 - bma 3 - nemesis
+	if (cgs.delagHitscan != 2 && cgs.delagHitscan != 3)
+		cgs.delagHitscan = g_delag || g_delagHitscan || (Q_stricmpn("1.2", g_unlaggedVersion, 4) == 0);
+
 	trap_WPrint(va("cgs.delagHitscan '%i'\n", cgs.delagHitscan));
 	if (g_delagHitscan || g_unlaggedVersion[0] != '\0')
 		trap_WPrint(va("g_delagHitscan '%i' g_unlaggedVersion '%s'\n", g_delagHitscan, g_unlaggedVersion));	
@@ -338,6 +342,8 @@ static void CG_MapRestart( void ) {
 	cg.timelimitWarnings = 0;
 
 	cg.intermissionStarted = qfalse;
+	// X-MOD: send modinfo
+	CGX_SendModinfo();
 
 	cgs.voteTime = 0;
 
@@ -382,7 +388,10 @@ static void CG_ServerCommand( void ) {
 	}
 
 	if ( !strcmp( cmd, "print" ) ) {
-		CG_Printf( "%s", CG_Argv(1) );
+		// X-MOD: check for modinfo, bma\nemesis unlagged parameter, if it returns error message don't print it
+		if (CGX_CheckModInfo(CG_Argv(1)))
+			CG_Printf( "%s", CG_Argv(1) );
+
 		return;
 	}
 

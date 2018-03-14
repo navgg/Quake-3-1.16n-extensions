@@ -92,6 +92,9 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 		//check and restore other players models if needed, and set proper colors		
 		CGX_EnemyModelCheck();
 		CG_LoadDeferredPlayers();
+
+		// X-MOD: send modinfo
+		CGX_SendModinfo();
 	}
 
 	BG_PlayerStateToEntityState( &snap->ps, &cg_entities[ snap->ps.clientNum ].currentState, qfalse );

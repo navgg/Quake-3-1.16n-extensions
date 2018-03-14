@@ -505,3 +505,55 @@ void CGX_CheckChatCommand(const char *str) {
 		}
 	}
 }
+
+// check for unlagged enabled\disabled for bma\nms
+// send modinfo in initialsnapshot and check result here
+static int cgx_modinfosend = 0;
+qboolean CGX_CheckModInfo(const char *str) {
+	int i;
+	// if 1sec passed after sending then don't check
+	if (cg.time - cgx_modinfosend > 1000)
+		return qtrue;
+
+	i = strlen(str);
+
+	if (Q_stricmp(str, "^3Unlag:           ^5ENABLED\n") == 0) {
+		trap_DPrint("BMA Unlagged!\n");
+
+		cgs.delagHitscan = 2;
+	} else if (Q_stricmp(str, "^3Unlagged compensation: ^5ENABLED\n") == 0) {
+		trap_DPrint("Nemesis Unlagged!\n");
+
+		cgs.delagHitscan = 3;
+	} else if (Q_stricmp(str, "unknown cmd modinfo\n") == 0) {
+		return qfalse;
+	}
+
+	return qtrue;
+}
+
+// send modinfo if gamename nemesis or bma
+void CGX_SendModinfo(void) {
+	const char	*info;
+	char	*gamename;
+
+	if (cg.intermissionStarted || cgs.delagHitscan == 1)
+		return;
+
+	info = CG_ConfigString( CS_SERVERINFO );
+	gamename = Info_ValueForKey(info, "gamename");
+
+	trap_DPrint(va("gamename %s\n", gamename));
+
+	if (Q_stricmp(gamename, "Nemesis") == 0 ||
+		(gamename[0] == 'B' && gamename[1] == 'M' && gamename[2] == 'A')) {
+
+		cgx_modinfosend = cg.time;
+
+		trap_SendClientCommand("modinfo");
+
+		trap_DPrint("modinfo sent\n");
+	} else {
+		trap_DPrint("modinfo not sent\n");
+	}
+}

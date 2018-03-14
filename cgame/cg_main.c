@@ -81,6 +81,10 @@ vmCvar_t	cgx_version;
 
 vmCvar_t	cgx_last_error;
 
+// nemesis compability info
+vmCvar_t	cgx_cgame;
+vmCvar_t	cgx_uinfo;
+
 //unlagged - client options
 vmCvar_t	cg_delag;
 vmCvar_t	cg_cmdTimeNudge;
@@ -309,7 +313,11 @@ cvarTable_t		cvarTable[] = {
 #else
 	{ &cgx_debug, "cgx_debug", "0", CVAR_TEMP },
 #endif
-	{ &cgx_version, "cgx_version", "CGX "CGX_VERSION" "CGX_DATE, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO},
+	{ &cgx_version, "cgx_version", "CGX "CGX_VERSION" "CGX_DATE, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
+#if CGX_NEMESIS_COMPATIBLE
+	{ &cgx_cgame, "cgame", "CGX "CGX_VERSION, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
+	{ &cgx_uinfo, "cg_uinfo", "", CVAR_TEMP | CVAR_USERINFO | CVAR_ROM  },
+#endif
 
 	{ &cgx_last_error, "cgx_last_error", "",  CVAR_TEMP },
 
@@ -332,7 +340,7 @@ cvarTable_t		cvarTable[] = {
 	// cg_hitsounds 0|1|2 - 0: default 1: pro mode hi-low 2: low-hi hp hitsounds	
 	// cg_coloredPing 0|1 - toggles ping colors below 50 white, below 100 green, below 250 yellow, below 400 magenta, more than 400 red
 	// cg_lagometer 0|1|2|3 - off, netgraph, netgraph+ping, only when lag
-	// cg_networkAdjustments 0|1|2 - off, 1: packets 40-60 rate min 8000, 2: packets 60+ rate min 25000 packetdup off (snaps = sv_fps or min 40 in both cases)
+	// cg_networkAdjustments 0|1|2|3 - 0: off, 1: min rate 8000 packets 30, 2: packets 40-60 rate min 16000, 2: packets 60+ rate min 25000 packetdup off (snaps = sv_fps or min 40 in all cases if it's on)
 	// cg_drawAccuracy 0 1 draw acc	
 	// resolving favorite servers by domain name
 	// colored server names shifting left bug fixed
@@ -388,6 +396,9 @@ void CG_RegisterCvars( void ) {
 	// see if we are also running the server on this machine
 	trap_Cvar_VariableStringBuffer( "sv_running", var, sizeof( var ) );
 	cgs.localServer = atoi( var );
+
+
+	trap_Cvar_Set("cg_uinfo", va("%i %i 0", cl_timeNudge.integer, cgx_maxpackets.integer));
 }
 
 /*

@@ -13,6 +13,7 @@
 #define CGX_DEBUG		0
 #define	CGX_UNLAGGED	1
 #define CGX_NOGHOST_COMPATIBLE CVAR_USERINFO
+#define CGX_NEMESIS_COMPATIBLE 1
 
 // widescreen fix flags
 #define CGX_WFIX_SCREEN	0x0001

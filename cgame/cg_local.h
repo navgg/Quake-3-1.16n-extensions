@@ -768,6 +768,7 @@ typedef struct {
 	int				timelimit;
 	int				maxclients;
 	char			mapname[MAX_QPATH];
+	char			mapname_clean[MAX_QPATH];
 
 	int				voteTime;
 	int				voteYes;
@@ -980,6 +981,8 @@ qboolean CG_Cvar_ClampInt( const char *name, vmCvar_t *vmCvar, int min, int max 
 void CGX_Init_vScreen(void);
 void CGX_AutoAdjustNetworkSettings(void);
 void CGX_CheckChatCommand(const char *str);
+qboolean CGX_CheckModInfo(const char *str);
+void CGX_SendModinfo(void);
 
 void CGX_Init_enemyModels(void);
 void CGX_SetModelAndSkin(clientInfo_t *ci);
