@@ -1,7 +1,9 @@
-# Quake 3 1.16 extensions
-Custom extensions for patching Quake 3 1.16n
+# Quake 3 1.16 extensions (CGX)
+Custom extensions for patching Quake 3 1.16n (beta version)
 
-Still under development, beta version
+###### Installation & Requirements
+- requires quake 3 arena version 1.16n
+- to install unzip pak2X.pk3 to baseq3 folder of your quake 3 arena installation path
 
 ###### Features
 - wide screen fix, supports any ratio, icons not stretching, fov fix for widescreens
@@ -70,3 +72,8 @@ Still under development, beta version
 - `cg_delag_optimizePrediction 1|0` - optimized prediction, if your CPU bottleneck this may give some serious perfomance improvement
 - `cg_delag_cmdTimeNudge 0..999` - number of milliseconds you would like the server to "nudge" the time of your instant-hit attacks. For example, if you feel that the server overcompensates for your ping, you might try setting it to 25. That will effectively add 25ms of lag.
 
+###### Authors
+- CGX - (c) 2018 NaViGaToR (322)
+- Unlagged 2.01 - (c) 2006 Neil “haste” Toronto
+- CPMA - (c) 2000-2010 Challenge World, (c) 2016-2018 The ProMode Team
+- Quake 3 Arena - (c) 1999-2005 Id Software
