@@ -1,4 +1,4 @@
-# Quake 3 1.16 extensions (CGX)
+# Quake 3 1.16n extensions (CGX)
 Custom extensions for patching Quake 3 1.16n (beta version)
 
 ###### Installation & Requirements
@@ -22,15 +22,18 @@ Custom extensions for patching Quake 3 1.16n (beta version)
 - ping colors, below 50 white, below 100 green, below 250 yellow, below 400 magenta, more than 400 red
 - ability to disable chat beep or enemy taunt sounds
 - resolving favorite servers by domain name
-- integrated unlagged 2.01 (`client compatible with noghost911 servers`)
+- integrated unlagged 2.01 (`client compatible with noghost\nemesis\bma servers`)
 - optimization: removed some debug info
 
 ###### Buf fixes
 - rewards display fixed if it's more than 10
 - cinematics playback fixed for widescreens (only from cinematics menu and singleplayer games)
 - colored server names shifting left bug fixed in server browser menu
-- sarge/default model in team games
+- sarge/default bug model in team games
 - display cg_shadow 1 when cg_marks 0
+- scroll in serverinfo\driverinfo
+- couldn't load map error message
+- fixed empty attacker icon when cg_draw3dicons 0
 
 ###### Command list
 - `cg_wideScreenFix 0|1|2|3` - fix perspective for widescreen 0: no fixes 1: fix only icons 2: fix only fov 3: fix fov and icons
@@ -50,12 +53,11 @@ Custom extensions for patching Quake 3 1.16n (beta version)
 - `cg_teamColors ""` - same as cg_enemyColors but for team
 - `cg_lagometer 0|1|2|3` - 0 :off 1: default 2: default + ping 3: only when packetloss
 - `cg_hitsounds 0|1|2` - 0: default 1: pro mode hi-low 2: low-hi hp hitsounds
-- `cg_networkAdjustments 0|1|2` - off, 1: packets 40-60 rate min 8000, 2: packets 60+ rate min 25000 packetdup off (snaps = sv_fps or min 40 in both cases)
+- `cg_networkAdjustments 0|1|2|3` - 0: off, 1: min rate 8000 packets 30, 2: packets 40-60 rate min 16000, 2: packets 60+ rate min 25000 packetdup off (snaps = sv_fps or min 40 in all cases if it's on)
 - `cg_drawGun 0|1|2` - 0: no gun 1: default bobbing 2: not bobbing cpm style
 - `cg_drawScoreBox 1|0` - display score box in low right corner 
 - `cg_scoreboard 0|1` - scoreboard 0: default large-small 1: always small
 - `cg_drawAccuracy 0|1` - total weapon accuracy
-- `cg_sharedConfig 0|1` - not working yet, in development
 - `cgx_debug 0|1` - show debug info
 - `cgx_version` - show version
 
