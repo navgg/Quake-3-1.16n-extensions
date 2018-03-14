@@ -95,6 +95,7 @@ void CG_ParseServerinfo( void ) {
 	cgs.maxclients = atoi( Info_ValueForKey( info, "sv_maxclients" ) );
 	mapname = Info_ValueForKey( info, "mapname" );
 	Com_sprintf( cgs.mapname, sizeof( cgs.mapname ), "maps/%s.bsp", mapname );
+	Com_sprintf( cgs.mapname_clean, sizeof( cgs.mapname_clean ), "%s", mapname );
 
 	//unlagged - server options
 	// we'll need this for deciding whether or not to predict weapon effects

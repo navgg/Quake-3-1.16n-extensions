@@ -21,6 +21,8 @@ MAIN MENU
 #define ID_MODS					15
 #define ID_EXIT					16
 
+#define ID_LAST_ERROR			18
+
 #define MAIN_BANNER_MODEL				"models/mapobjects/banner/banner5.md3"
 #define MAIN_MENU_VERTICAL_SPACING		34
 
@@ -34,6 +36,7 @@ typedef struct {
 	menutext_s		cinematics;
 	menutext_s		mods;
 	menutext_s		exit;
+	menutext_s		lasterror;
 
 	qhandle_t		bannerModel;
 } mainmenu_t;
@@ -92,6 +95,10 @@ void Main_MenuEvent (void* ptr, int event) {
 
 	case ID_EXIT:
 		UI_ConfirmMenu( "EXIT GAME?", NULL, MainMenu_ExitAction );
+		break;
+
+	case ID_LAST_ERROR:
+		UI_PopMenu();
 		break;
 	}
 }
@@ -184,6 +191,13 @@ static void Main_MenuDraw( void ) {
 	}	
 }
 
+static char* mapName;
+
+static void UI_Menu_LastError(void *self) {	
+	UI_DrawString( 320, 300, "Download map at:" , UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawString( 320, 320, va("https://ws.q3df.org/map/%s/", mapName) , UI_CENTER|UI_SMALLFONT, color_orange );
+	UI_DrawString( 320, 340, "And put file in baseq3 game folder" , UI_CENTER|UI_SMALLFONT, color_white );
+}
 
 /*
 ===============
@@ -197,6 +211,19 @@ and that local cinematics are killed
 void UI_MainMenu( void ) {
 	int		y;
 	int		style = UI_CENTER | UI_DROPSHADOW;
+	static char	cgx_last_error[MAX_QPATH];
+	int		isHidden = 0;
+	int		isHidden2 = QMF_HIDDEN | QMF_GRAYED;
+
+	trap_Cvar_VariableStringBuffer("cgx_last_error", cgx_last_error, sizeof(cgx_last_error));
+	
+	if (cgx_last_error[0] != '\0') {
+		mapName = strchr(cgx_last_error, ':')+2;
+
+		isHidden = QMF_HIDDEN|QMF_GRAYED;
+		isHidden2 = 0;		
+		trap_Cvar_Set("cgx_last_error", "");
+	}
 
 	trap_Cvar_Set( "sv_killserver", "1" );	
 
@@ -221,7 +248,7 @@ void UI_MainMenu( void ) {
 
 	y = 134;
 	s_main.singleplayer.generic.type		= MTYPE_PTEXT;
-	s_main.singleplayer.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_main.singleplayer.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS|isHidden;
 	s_main.singleplayer.generic.x			= 320;
 	s_main.singleplayer.generic.y			= y;
 	s_main.singleplayer.generic.id			= ID_SINGLEPLAYER;
@@ -232,7 +259,7 @@ void UI_MainMenu( void ) {
 
 	y += MAIN_MENU_VERTICAL_SPACING;
 	s_main.multiplayer.generic.type			= MTYPE_PTEXT;
-	s_main.multiplayer.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_main.multiplayer.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS|isHidden;
 	s_main.multiplayer.generic.x			= 320;
 	s_main.multiplayer.generic.y			= y;
 	s_main.multiplayer.generic.id			= ID_MULTIPLAYER;
@@ -243,7 +270,7 @@ void UI_MainMenu( void ) {
 
 	y += MAIN_MENU_VERTICAL_SPACING;
 	s_main.setup.generic.type				= MTYPE_PTEXT;
-	s_main.setup.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_main.setup.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS|isHidden;
 	s_main.setup.generic.x					= 320;
 	s_main.setup.generic.y					= y;
 	s_main.setup.generic.id					= ID_SETUP;
@@ -254,7 +281,7 @@ void UI_MainMenu( void ) {
 
 	y += MAIN_MENU_VERTICAL_SPACING;
 	s_main.demos.generic.type				= MTYPE_PTEXT;
-	s_main.demos.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_main.demos.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS|isHidden;
 	s_main.demos.generic.x					= 320;
 	s_main.demos.generic.y					= y;
 	s_main.demos.generic.id					= ID_DEMOS;
@@ -265,7 +292,7 @@ void UI_MainMenu( void ) {
 
 	y += MAIN_MENU_VERTICAL_SPACING;
 	s_main.cinematics.generic.type			= MTYPE_PTEXT;
-	s_main.cinematics.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_main.cinematics.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS|isHidden;
 	s_main.cinematics.generic.x				= 320;
 	s_main.cinematics.generic.y				= y;
 	s_main.cinematics.generic.id			= ID_CINEMATICS;
@@ -276,7 +303,7 @@ void UI_MainMenu( void ) {
 
 	y += MAIN_MENU_VERTICAL_SPACING;
 	s_main.mods.generic.type			= MTYPE_PTEXT;
-	s_main.mods.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_main.mods.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS|isHidden;
 	s_main.mods.generic.x				= 320;
 	s_main.mods.generic.y				= y;
 	s_main.mods.generic.id				= ID_MODS;
@@ -287,7 +314,7 @@ void UI_MainMenu( void ) {
 
 	y += MAIN_MENU_VERTICAL_SPACING;
 	s_main.exit.generic.type				= MTYPE_PTEXT;
-	s_main.exit.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_main.exit.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS|isHidden;
 	s_main.exit.generic.x					= 320;
 	s_main.exit.generic.y					= y;
 	s_main.exit.generic.id					= ID_EXIT;
@@ -296,16 +323,17 @@ void UI_MainMenu( void ) {
 	s_main.exit.color						= color_red;
 	s_main.exit.style						= style;
 
-	//y += MAIN_MENU_VERTICAL_SPACING * 2;
-	//s_main.credits.generic.type				= MTYPE_PTEXT;
-	//s_main.credits.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	//s_main.credits.generic.x				= 320;
-	//s_main.credits.generic.y				= y;
-	//s_main.credits.generic.id				= ID_CREDITS;
-	//s_main.credits.generic.callback			= Main_MenuEvent; 
-	//s_main.credits.string					= "CREDITS";
-	//s_main.credits.color					= color_red;
-	//s_main.credits.style					= style;
+	s_main.lasterror.generic.type			= MTYPE_PTEXT;
+	s_main.lasterror.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS|isHidden2;
+	s_main.lasterror.generic.x				= 320;
+	s_main.lasterror.generic.y				= 180;
+	s_main.lasterror.generic.id				= ID_LAST_ERROR;
+	s_main.lasterror.generic.callback		= Main_MenuEvent; 
+	s_main.lasterror.string					= cgx_last_error;
+	s_main.lasterror.generic.statusbar		= UI_Menu_LastError;
+	s_main.lasterror.color					= color_white;
+	s_main.lasterror.style					= style | UI_SMALLFONT;
+
 
 	Menu_AddItem( &s_main.menu,	&s_main.singleplayer );
 	Menu_AddItem( &s_main.menu,	&s_main.multiplayer );
@@ -313,7 +341,8 @@ void UI_MainMenu( void ) {
 	Menu_AddItem( &s_main.menu,	&s_main.demos );
 	Menu_AddItem( &s_main.menu,	&s_main.cinematics );
 	Menu_AddItem( &s_main.menu,	&s_main.mods );
-	Menu_AddItem( &s_main.menu,	&s_main.exit );             
+	Menu_AddItem( &s_main.menu,	&s_main.exit );   
+	Menu_AddItem( &s_main.menu,	&s_main.lasterror );
 
 	trap_Key_SetCatcher( KEYCATCH_UI );
 	uis.menusp = 0;

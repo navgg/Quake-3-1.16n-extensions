@@ -79,6 +79,8 @@ vmCvar_t	cgx_delag;
 vmCvar_t	cgx_debug;
 vmCvar_t	cgx_version;
 
+vmCvar_t	cgx_last_error;
+
 //unlagged - client options
 vmCvar_t	cg_delag;
 vmCvar_t	cg_cmdTimeNudge;
@@ -308,6 +310,8 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_debug, "cgx_debug", "0", CVAR_TEMP },
 #endif
 	{ &cgx_version, "cgx_version", "CGX "CGX_VERSION" "CGX_DATE, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO},
+
+	{ &cgx_last_error, "cgx_last_error", "",  CVAR_TEMP },
 
 	// cg_wideScreenFix 1|0 - fix perspective for widescreen
 	// cg_defaultWeapon 0-9 - default weapon when spawn 0: default 1: gauntlet ...
@@ -1081,8 +1085,11 @@ void CG_Init( int serverMessageNum, int serverCommandSequence ) {
 
 	// load the new map
 	CG_LoadingString( "collision map" );
-	trap_DPrint("trap_CM_LoadMap\n");
+	trap_DPrint("trap_CM_LoadMap\n");	
+	trap_Cvar_Set("cgx_last_error", va("Couldn't load map: %s", cgs.mapname_clean));	
+	
 	trap_CM_LoadMap( cgs.mapname );
+	trap_Cvar_Set("cgx_last_error", "");	
 
 	cg.loading = qtrue;		// force players to load instead of defer
 
@@ -1119,6 +1126,8 @@ Called before every level change or subsystem restart
 =================
 */
 void CG_Shutdown( void ) {	
+	trap_DPrint("CG_Shutdown\n");
+	trap_DPrint(va("cgx_last_error %s\n", cgx_last_error.string));
 	// X-MOD: potential fix for q3config saving problem
 
 	if (cgx_sharedConfig.integer) {
