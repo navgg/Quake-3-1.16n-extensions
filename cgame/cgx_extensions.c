@@ -462,20 +462,20 @@ void CGX_AutoAdjustNetworkSettings(void) {
 				trap_Print("Auto: cl_packetdup 0\n");
 			}
 		}
-	}
 
-	// check time nudge
-	// if server delaged it's better off
-	//if (cgs.delagHitscan && cl_timeNudge.integer < 0) {
-	//	trap_Cvar_Set("cl_timeNudge", "0");
-	//	trap_Print("Auto: cl_timeNudge 0\n");
-	//} else if (cl_timeNudge.integer > 50) {
-	//	trap_Cvar_Set("cl_timeNudge", "50");
-	//	trap_Print("Auto: cl_timeNudge 50\n");
-	//} else if (cl_timeNudge.integer < -50) {
-	//	trap_Cvar_Set("cl_timeNudge", "-50");
-	//	trap_Print("Auto: cl_timeNudge -50\n");
-	//}
+		// check time nudge
+		// if server delaged it's better off
+		if (cgs.delagHitscan && cl_timeNudge.integer < 0) {
+			trap_Cvar_Set("cl_timeNudge", "0");
+			trap_Print("Auto: cl_timeNudge 0\n");
+		} 
+		//	trap_Cvar_Set("cl_timeNudge", "50");
+		//	trap_Print("Auto: cl_timeNudge 50\n");
+		//} else if (cl_timeNudge.integer < -50) {
+		//	trap_Cvar_Set("cl_timeNudge", "-50");
+		//	trap_Print("Auto: cl_timeNudge -50\n");
+		//}
+	}
 }
 
 //check message for special commands
@@ -521,10 +521,12 @@ qboolean CGX_CheckModInfo(const char *str) {
 		trap_DPrint("BMA Unlagged!\n");
 
 		cgs.delagHitscan = 2;
+		CGX_AutoAdjustNetworkSettings();
 	} else if (Q_stricmp(str, "^3Unlagged compensation: ^5ENABLED\n") == 0) {
 		trap_DPrint("Nemesis Unlagged!\n");
 
 		cgs.delagHitscan = 3;
+		CGX_AutoAdjustNetworkSettings();
 	} else if (Q_stricmp(str, "unknown cmd modinfo\n") == 0) {
 		return qfalse;
 	}
