@@ -40,6 +40,8 @@ set cc=lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\
 @if errorlevel 1 goto quit
 %cc% ../ui_credits.c
 @if errorlevel 1 goto quit
+%cc% ../ui_credits2.c
+@if errorlevel 1 goto quit
 %cc% ../ui_menu.c
 @if errorlevel 1 goto quit
 %cc% ../ui_options.c

@@ -161,6 +161,7 @@
     <ClCompile Include="ui_connect.c" />
     <ClCompile Include="ui_controls2.c" />
     <ClCompile Include="ui_credits.c" />
+    <ClCompile Include="ui_credits2.c" />
     <ClCompile Include="ui_demo2.c" />
     <ClCompile Include="ui_display.c" />
     <ClCompile Include="ui_gameinfo.c" />

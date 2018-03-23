@@ -20,6 +20,7 @@ MAIN MENU
 #define ID_CINEMATICS			14
 #define ID_MODS					15
 #define ID_EXIT					16
+#define ID_CREDITS				17
 
 #define ID_LAST_ERROR			18
 
@@ -36,6 +37,7 @@ typedef struct {
 	menutext_s		cinematics;
 	menutext_s		mods;
 	menutext_s		exit;
+	menutext_s		credits;
 	menutext_s		lasterror;
 
 	qhandle_t		bannerModel;
@@ -95,6 +97,10 @@ void Main_MenuEvent (void* ptr, int event) {
 
 	case ID_EXIT:
 		UI_ConfirmMenu( "EXIT GAME?", NULL, MainMenu_ExitAction );
+		break;
+
+	case ID_CREDITS:
+		UI_CreditMenu2();
 		break;
 
 	case ID_LAST_ERROR:
@@ -189,6 +195,12 @@ static void Main_MenuDraw( void ) {
 		
 		UI_DrawString( 320, 450, "Quake III Arena(c) 1999-2000, Id Software, Inc.  All Rights Reserved", UI_CENTER|UI_SMALLFONT, color );
 	}	
+}
+
+static void UI_Menu_Credits(void *self) {
+	vec4_t			cgx_color2 = { 0.5, 0.2, 0.2, 0.5 };
+
+	UI_DrawString( 320, 422, va("CGX %s (c) 2018 NaViGaToR (322)", CGX_VERSION), UI_CENTER|UI_SMALLFONT|UI_PULSE, cgx_color2 );
 }
 
 static char* mapName;
@@ -334,6 +346,16 @@ void UI_MainMenu( void ) {
 	s_main.lasterror.color					= color_white;
 	s_main.lasterror.style					= style | UI_SMALLFONT;
 
+	s_main.credits.generic.type				= MTYPE_PTEXT;
+	s_main.credits.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS|QMF_SMALLFONT|isHidden;
+	s_main.credits.generic.x				= 320;
+	s_main.credits.generic.y				= 420;
+	s_main.credits.generic.id				= ID_CREDITS;
+	s_main.credits.generic.callback			= Main_MenuEvent; 
+	s_main.credits.string					= "                                 ";
+	s_main.credits.generic.statusbar		= UI_Menu_Credits;
+	s_main.credits.color					= color_red;
+	s_main.credits.style					= style | UI_SMALLFONT;
 
 	Menu_AddItem( &s_main.menu,	&s_main.singleplayer );
 	Menu_AddItem( &s_main.menu,	&s_main.multiplayer );
@@ -343,6 +365,7 @@ void UI_MainMenu( void ) {
 	Menu_AddItem( &s_main.menu,	&s_main.mods );
 	Menu_AddItem( &s_main.menu,	&s_main.exit );   
 	Menu_AddItem( &s_main.menu,	&s_main.lasterror );
+	Menu_AddItem( &s_main.menu,	&s_main.credits );	
 
 	trap_Key_SetCatcher( KEYCATCH_UI );
 	uis.menusp = 0;
