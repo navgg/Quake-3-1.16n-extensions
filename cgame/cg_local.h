@@ -952,6 +952,8 @@ extern	vmCvar_t		cg_blood;
 extern	vmCvar_t		cg_predictItems;
 extern	vmCvar_t		cg_deferPlayers;
 
+//extern	pmove_t			cg_pmove;
+
 //unlagged - client options
 extern	vmCvar_t		cg_delag;
 extern	vmCvar_t		cg_cmdTimeNudge;

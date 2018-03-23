@@ -1,0 +1,15 @@
+0.70b
+
+added 1920x1200 in menu
+added credits menu
+added scroll in serverinfo
+added scroll in driverinfo
+added unlag\compability with nemesis servers
+added unlag with bma servers
+added message if game couldn't load map
+max fps limit set to 500
+
+fixed cg_teamModel "" init
+fixed static gun when jump
+fixed players jittering with timeNudge other than 0 (removed timeNudge extrapolation of unlagged 2.01)
+fix black color names (dark gray color used instead black)

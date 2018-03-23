@@ -340,7 +340,7 @@ cvarTable_t		cvarTable[] = {
 	// cg_hitsounds 0|1|2 - 0: default 1: pro mode hi-low 2: low-hi hp hitsounds	
 	// cg_coloredPing 0|1 - toggles ping colors below 50 white, below 100 green, below 250 yellow, below 400 magenta, more than 400 red
 	// cg_lagometer 0|1|2|3 - off, netgraph, netgraph+ping, only when lag
-	// cg_networkAdjustments 0|1|2|3 - 0: off, 1: min rate 8000 packets 30, 2: packets 40-60 rate min 16000, 2: packets 60+ rate min 25000 packetdup off (snaps = sv_fps or min 40 in all cases if it's on)
+	// cg_networkAdjustments 0|1|2|3 - 0: off 1: min rate 8000 packets 30 2: packets 40-60 rate min 16000 3: packets 60-100 rate min 25000 packetdup off (snaps = sv_fps or min 40 in all cases if it's on)
 	// cg_drawAccuracy 0 1 draw acc	
 	// resolving favorite servers by domain name
 	// colored server names shifting left bug fixed
@@ -350,6 +350,8 @@ cvarTable_t		cvarTable[] = {
 	// model sarge^^^ fixed
 	// cgx_debug 0|1|2 - show debug info
 	// cgx_version - show version
+
+	// - `cg_sharedConfig 0|1` - not working yet, in development
 	
 	// unlagged
 	// g_delag	
@@ -451,10 +453,10 @@ void CG_UpdateCvars( void ) {
 		cgx_maxpackets.integer = CGX_MIN_MAXPACKETS;
 		trap_Cvar_Set("cl_maxpackets", "30");
 	}
-	if (cgx_maxfps.integer > 333) {
-		cgx_maxfps.integer = 333;
-		trap_Print(va("Max com_maxfps is %i\n", 333));
-		trap_Cvar_Set("com_maxfps", "333");
+	if (cgx_maxfps.integer > 500) {
+		cgx_maxfps.integer = 500;
+		trap_Print(va("Max com_maxfps is %i\n", 500));
+		trap_Cvar_Set("com_maxfps", "500");
 	}
 
 	// check for modications here
@@ -1141,17 +1143,17 @@ void CG_Shutdown( void ) {
 	trap_DPrint(va("cgx_last_error %s\n", cgx_last_error.string));
 	// X-MOD: potential fix for q3config saving problem
 
-	if (cgx_sharedConfig.integer) {
-		char buf[32];
-		trap_Cvar_VariableStringBuffer("fs_game", buf, sizeof(buf));
+	//if (cgx_sharedConfig.integer) {
+	//	char buf[32];
+	//	trap_Cvar_VariableStringBuffer("fs_game", buf, sizeof(buf));
 
-		trap_Print(buf);
+	//	trap_Print(buf);
 
-		if (buf[0] == '\0')
-			trap_SendConsoleCommand("writeconfig q3config.cfg;");
-		else
-			trap_SendConsoleCommand("writeconfig ..\\baseq3\\q3config.cfg;");
-	}
+	//	if (buf[0] == '\0')
+	//		trap_SendConsoleCommand("writeconfig q3config.cfg;");
+	//	else
+	//		trap_SendConsoleCommand("writeconfig ..\\baseq3\\q3config.cfg;");
+	//}
 
 
 	// some mods may need to do cleanup work here,

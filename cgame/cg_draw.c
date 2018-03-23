@@ -702,6 +702,78 @@ static float CGX_DrawAcc( float y ) {
 	return y + BIGCHAR_HEIGHT + 4;	
 }
 
+#if 0
+/*
+=================
+CGX_DrawAngles
+=================
+*/
+static float CGX_DrawAngles( float y ) {
+	char *s;	
+	int w;
+	vec3_t angles;
+
+	VectorCopy(cg.snap->ps.viewangles, angles);	
+
+	s = va("%f'", angles[1]);	
+	w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
+
+	if (1) {
+		CG_DrawSmallString(vScreen.hwidth - w / 2 + 32, 240 - SMALLCHAR_HEIGHT / 2, s, 0.5f);
+		return y;
+	}	
+
+	CG_DrawBigString(vScreen.width5 - w, y + 2, s, 1.0F);	
+
+	return y + BIGCHAR_HEIGHT + 4;	
+}
+
+/*
+=================
+CGX_DrawButtons
+=================
+*/
+//static float CGX_DrawButtons( float y ) {
+//	char *s;	
+//	int w, i;	
+//	char fm, rm, um;		
+//
+//	cg.snap->ps.pm_flags
+//
+//	if (cg_pmove.cmd.forwardmove)
+//		fm = cg_pmove.cmd.forwardmove > 0 ? 'W': 'S';
+//	else 
+//		fm = ' ';	
+//
+//	if (cg_pmove.cmd.rightmove)
+//		rm = cg_pmove.cmd.rightmove > 0 ? '>': '<';
+//	else 
+//		rm = ' ';	
+//
+//	if (cg_pmove.cmd.upmove)
+//		um = cg_pmove.cmd.upmove > 0 ? 'J': 'C';
+//	else 
+//		um = ' ';	
+//
+//	s = va("%c %c %c %c", 		
+//		fm, 		
+//		rm, 		
+//		um,
+//		cg_pmove.cmd.buttons & BUTTON_ATTACK);
+//
+//	w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
+//
+//	if (1) {
+//		CG_DrawSmallString(vScreen.hwidth - w / 2 - 64, 240 - SMALLCHAR_HEIGHT / 2, s, 0.5f);
+//		return y;
+//	}	
+//
+//	CG_DrawBigString(vScreen.width5 - w, y + 2, s, 1.0F);	
+//
+//	return y + BIGCHAR_HEIGHT + 4;	
+//}
+#endif
+
 /*
 =================
 CG_DrawTeamOverlay
@@ -907,6 +979,14 @@ static void CG_DrawUpperRight( void ) {
 	if (cgx_drawAccuracy.integer) {
 		y = CGX_DrawAcc(y);
 	}
+
+#if 0
+	// angles still not checked in other defrags or quake versions
+	y = CGX_DrawAngles(y);
+	// buttons only can draw of current client
+	y = CGX_DrawButtons(y);
+#endif
+
 #if CGX_DEBUG
 	if (cgx_debug.integer > 1) {
 		y = CGX_DrawDebugInfo(y);
