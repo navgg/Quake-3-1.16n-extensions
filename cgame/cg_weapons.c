@@ -617,21 +617,22 @@ static void CG_CalculateWeaponPosition( vec3_t origin, vec3_t angles ) {
 	}	
 
 	// gun angles from bobbing
-	if (cg_drawGun.integer != 2) {		
+	if (cg_drawGun.integer < 2) {		
 		angles[ROLL] += scale * cg.bobfracsin * 0.005;
 		angles[YAW] += scale * cg.bobfracsin * 0.01;
 		angles[PITCH] += cg.xyspeed * cg.bobfracsin * 0.005;
 	}
 
-	// drop the weapon when landing
-	delta = cg.time - cg.landTime;
-	if ( delta < LAND_DEFLECT_TIME ) {
-		origin[2] += cg.landChange*0.25 * delta / LAND_DEFLECT_TIME;
-	} else if ( delta < LAND_DEFLECT_TIME + LAND_RETURN_TIME ) {
-		origin[2] += cg.landChange*0.25 * 
-			(LAND_DEFLECT_TIME + LAND_RETURN_TIME - delta) / LAND_RETURN_TIME;
+	if (cg_drawGun.integer != 2) {
+		// drop the weapon when landing
+		delta = cg.time - cg.landTime;
+		if (delta < LAND_DEFLECT_TIME) {
+			origin[2] += cg.landChange*0.25 * delta / LAND_DEFLECT_TIME;
+		} else if (delta < LAND_DEFLECT_TIME + LAND_RETURN_TIME) {
+			origin[2] += cg.landChange*0.25 *
+				(LAND_DEFLECT_TIME + LAND_RETURN_TIME - delta) / LAND_RETURN_TIME;
+		}
 	}
-
 #if 0
 	// drop the weapon when stair climbing
 	delta = cg.time - cg.stepTime;
@@ -643,7 +644,7 @@ static void CG_CalculateWeaponPosition( vec3_t origin, vec3_t angles ) {
 #endif
 
 	// idle drift	
-	if (cg_drawGun.integer != 2) {
+	if (cg_drawGun.integer < 2) {
 		scale = cg.xyspeed + 40;
 		fracsin = sin(cg.time * 0.001);
 
