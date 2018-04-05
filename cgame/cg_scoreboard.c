@@ -102,22 +102,29 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 			}
 		} else if ( ci->handicap < 100 ) {
 			Com_sprintf( string, sizeof( string ), "%i", ci->handicap );
-			if ( cgs.gametype == GT_TOURNAMENT )
-				//CG_DrawSmallString()
-				CG_DrawSmallStringColor( iconx - iconxoffs * 1.75f, y, string, color );
+			//if ( cgs.gametype == GT_TOURNAMENT )			
+			//	CG_DrawSmallStringColor( iconx - iconxoffs * 1.75f, y, string, color );
+			//else
+			//	CG_DrawSmallStringColor( iconx - iconxoffs * 1.75f, y, string, color );
+			if( largeFormat )
+				CG_DrawSmallStringColor( iconx + 8, y + 16, string, color );
 			else
-				CG_DrawSmallStringColor( iconx - iconxoffs * 1.75f, y, string, color );
+				CG_DrawSmallStringColor( iconx - iconxoffs * 1.75f, y, string, color );		
 		}
 
 		// draw the wins / losses
 		if ( cgs.gametype == GT_TOURNAMENT ) {
-			Com_sprintf( string, sizeof( string ), "%i/%i", ci->wins, ci->losses );
-			if( ci->handicap < 100 && !ci->botSkill ) {
-				CG_DrawSmallStringColor( iconx - iconxoffs * 0.75f - 34, y, string, color );
-			}
-			else {
-				CG_DrawSmallStringColor( iconx - iconxoffs * 0.75f - 34, y, string, color );
-			}
+			Com_sprintf( string, sizeof( string ), "11/11", ci->wins, ci->losses );
+			//if( ci->handicap < 100 && !ci->botSkill ) {
+			//	CG_DrawSmallStringColor( iconx - iconxoffs * 0.75f - 34, y, string, color );
+			//}
+			//else {
+			//	CG_DrawSmallStringColor( iconx - iconxoffs * 0.75f - 34, y, string, color );
+			//}
+			if( largeFormat )
+				CG_DrawSmallStringColor( iconx - iconxoffs * 0.75f - 52, y, string, color );
+			else 
+				CG_DrawSmallStringColor( iconx - iconxoffs * 0.75f - 48, y, string, color );
 		}
 	}
 
