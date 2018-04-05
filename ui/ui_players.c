@@ -717,6 +717,16 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	refdef.height = h;
 
 	refdef.fov_x = (int)((float)refdef.width / 640.0f * 90.0f);
+
+	// X-MOD: fix fov for widescreen and etc in menu and credits
+	{
+		const float baseAspect = 0.75f; // 3/4
+		const float aspect = (float)refdef.width / (float)refdef.height;
+		const float desiredFov = refdef.fov_x;
+
+		refdef.fov_x = atan2(tan(desiredFov * M_PI / 360.0f) * baseAspect * aspect, 1) * 360.0f / M_PI;
+	}
+
 	xx = refdef.width / tan( refdef.fov_x / 360 * M_PI );
 	refdef.fov_y = atan2( refdef.height, xx );
 	refdef.fov_y *= ( 360 / M_PI );
