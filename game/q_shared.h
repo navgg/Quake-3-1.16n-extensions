@@ -14,6 +14,8 @@
 #define	CGX_UNLAGGED	1
 #define CGX_NOGHOST_COMPATIBLE CVAR_USERINFO
 #define CGX_NEMESIS_COMPATIBLE 1
+#define CGX_MAPURL		"https://ws.q3df.org/map/"
+#define CGX_MAPBAT		"download_map.bat"
 
 // widescreen fix flags
 #define CGX_WFIX_SCREEN	0x0001

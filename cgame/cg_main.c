@@ -1138,22 +1138,12 @@ CG_Shutdown
 Called before every level change or subsystem restart
 =================
 */
-void CG_Shutdown( void ) {	
+void CG_Shutdown( void ) {		
 	trap_DPrint("CG_Shutdown\n");
 	trap_DPrint(va("cgx_last_error %s\n", cgx_last_error.string));
-	// X-MOD: potential fix for q3config saving problem
 
-	//if (cgx_sharedConfig.integer) {
-	//	char buf[32];
-	//	trap_Cvar_VariableStringBuffer("fs_game", buf, sizeof(buf));
-
-	//	trap_Print(buf);
-
-	//	if (buf[0] == '\0')
-	//		trap_SendConsoleCommand("writeconfig q3config.cfg;");
-	//	else
-	//		trap_SendConsoleCommand("writeconfig ..\\baseq3\\q3config.cfg;");
-	//}
+	if (cgx_last_error.string[0] != '\0')
+		CGX_GenerateMapBat();
 
 
 	// some mods may need to do cleanup work here,

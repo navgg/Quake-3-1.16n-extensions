@@ -559,3 +559,25 @@ void CGX_SendModinfo(void) {
 		trap_DPrint("modinfo not sent\n");
 	}
 }
+// generate script to open url to worldspawn to download map
+void CGX_GenerateMapBat(void) {
+	fileHandle_t f;
+
+	trap_Print("Generating "CGX_MAPBAT);
+
+	trap_FS_FOpenFile("..\\"CGX_MAPBAT, &f, FS_WRITE);
+
+	if (f) {
+		char *buf;
+
+		/*buf = va("echo \"Download .pk3 file and put in baseq3 game folder\"\r\nexplorer \""CGX_MAPURL"%s/\"\r\npause",
+		cgs.mapname_clean);		*/
+		buf = va("explorer \""CGX_MAPURL"%s/\"", cgs.mapname_clean);
+		trap_FS_Write(buf, strlen(buf), f);
+
+		trap_FS_FCloseFile(f);
+	}
+	else {
+		trap_Print("WARNING: Couldn't open a file "CGX_MAPBAT);
+	}
+}

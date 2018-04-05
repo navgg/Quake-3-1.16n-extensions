@@ -207,8 +207,9 @@ static char* mapName;
 
 static void UI_Menu_LastError(void *self) {	
 	UI_DrawString( 320, 300, "Download map at:" , UI_CENTER|UI_SMALLFONT, color_white );
-	UI_DrawString( 320, 320, va("https://ws.q3df.org/map/%s/", mapName) , UI_CENTER|UI_SMALLFONT, color_orange );
+	UI_DrawString( 320, 320, va(CGX_MAPURL"%s/", mapName) , UI_CENTER|UI_SMALLFONT, color_orange );
 	UI_DrawString( 320, 340, "And put file in baseq3 game folder" , UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawString( 320, 380, "Or run script: \""CGX_MAPBAT"\" in game folder", UI_CENTER|UI_SMALLFONT, colorLtGrey );
 }
 
 /*
