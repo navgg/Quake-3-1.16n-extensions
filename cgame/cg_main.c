@@ -79,8 +79,6 @@ vmCvar_t	cgx_delag;
 vmCvar_t	cgx_debug;
 vmCvar_t	cgx_version;
 
-vmCvar_t	cgx_last_error;
-
 // nemesis compability info
 vmCvar_t	cgx_cgame;
 vmCvar_t	cgx_uinfo;
@@ -317,9 +315,7 @@ cvarTable_t		cvarTable[] = {
 #if CGX_NEMESIS_COMPATIBLE
 	{ &cgx_cgame, "cgame", "CGX "CGX_VERSION, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
 	{ &cgx_uinfo, "cg_uinfo", "", CVAR_TEMP | CVAR_USERINFO | CVAR_ROM  },
-#endif
-
-	{ &cgx_last_error, "cgx_last_error", "",  CVAR_TEMP },
+#endif	
 
 	// cg_wideScreenFix 1|0 - fix perspective for widescreen
 	// cg_defaultWeapon 0-9 - default weapon when spawn 0: default 1: gauntlet ...
@@ -1139,10 +1135,14 @@ Called before every level change or subsystem restart
 =================
 */
 void CG_Shutdown( void ) {		
-	trap_DPrint("CG_Shutdown\n");
-	trap_DPrint(va("cgx_last_error %s\n", cgx_last_error.string));
+	char cgx_last_error[MAX_QPATH];
 
-	if (cgx_last_error.string[0] != '\0')
+	trap_DPrint("CG_Shutdown\n");
+
+	trap_Cvar_VariableStringBuffer("cgx_last_error", cgx_last_error, sizeof(cgx_last_error));
+	trap_DPrint(va("cgx_last_error %s\n", cgx_last_error));
+
+	if (cgx_last_error[0] != '\0')
 		CGX_GenerateMapBat();
 
 
