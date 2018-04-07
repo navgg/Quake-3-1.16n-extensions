@@ -263,7 +263,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_defaultWeapon, "cg_defaultWeapon", "0", CVAR_ARCHIVE },
 	{ &cgx_drawPlayerIDs, "cg_drawPlayerIDs", "1", CVAR_ARCHIVE },
 	
-	{ &cgx_enemyModel_enabled, "cg_enemyModel_enabled", "0", CVAR_ARCHIVE },
+	{ &cgx_enemyModel_enabled, "cg_enemyModel_enabled", "1", CVAR_ARCHIVE },
 	{ &cgx_enemyModel, "cg_enemyModel", "", CVAR_ARCHIVE },		
 	{ &cgx_enemyColors, "cg_enemyColors", "", CVAR_ARCHIVE },
 	//{ &cgx_teamModel_enabled, "cg_teamModel_enabled", "0", CVAR_ARCHIVE },

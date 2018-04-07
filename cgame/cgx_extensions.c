@@ -194,7 +194,7 @@ static void CGX_SetColorInfo(const char *color, clientInfo_t *info) {
 		return;
 
 	if (color[0] == '\0')
-		color = "!!!!";
+		color = "????";
 
 	trap_DPrint(va("CGX_SetColorInfo %s\n", color));
 
