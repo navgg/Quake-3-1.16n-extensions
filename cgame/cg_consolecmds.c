@@ -115,6 +115,9 @@ static void CG_TellAttacker_f( void ) {
 	trap_SendClientCommand( command );
 }
 
+static void CGX_SaveSharedConfig_f( void ) {
+	CGX_SaveSharedConfig();	
+}
 
 typedef struct {
 	char	*cmd;
@@ -141,7 +144,9 @@ static consoleCommand_t	commands[] = {
 	{ "tell_target", CG_TellTarget_f },
 	{ "tell_attacker", CG_TellAttacker_f },
 	{ "tcmd", CG_TargetCommand_f },
-	{ "loaddefered", CG_LoadDeferredPlayers }	// spelled wrong, but not changing for demo...
+	{ "loaddefered", CG_LoadDeferredPlayers },	// spelled wrong, but not changing for demo...
+	// X-MOD: quit override
+	{ "cgx_savesharedconfig", CGX_SaveSharedConfig_f }
 };
 
 

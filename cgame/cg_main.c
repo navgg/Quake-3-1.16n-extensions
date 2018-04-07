@@ -281,7 +281,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_drawScoreBox, "cg_drawScoreBox", "1", CVAR_ARCHIVE },
 	{ &cgx_drawAccuracy, "cg_drawAccuracy", "0", CVAR_ARCHIVE },
 	//develop
-	{ &cgx_sharedConfig, "cg_sharedConfig", "0", CVAR_TEMP },	
+	{ &cgx_sharedConfig, "cg_sharedConfig", "1", CVAR_ARCHIVE },	
 #if CGX_UNLAGGED
 	//unlagged - client options
 	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},	
@@ -1153,6 +1153,7 @@ void CG_Shutdown( void ) {
 	if (cgx_last_error[0] != '\0')
 		CGX_GenerateMapBat();
 
+	//CGX_SaveSharedConfig();
 
 	// some mods may need to do cleanup work here,
 	// like closing files or archiving session data

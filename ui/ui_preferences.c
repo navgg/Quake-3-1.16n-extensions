@@ -34,12 +34,13 @@ GAME OPTIONS MENU
 
 #define ID_CROSSHAIR_COLOR		138
 #define ID_CROSSHAIR_SIZE		139
+#define ID_SHAREDCONFIG			140
 
-#define ID_BACK					140
+#define ID_BACK					150
 
 #define	NUM_CROSSHAIRS			10
 
-#define MAX_INFO_MESSAGES	13
+#define MAX_INFO_MESSAGES	14
 static void UI_Preferences_StatusBar( void *self ) {	
 	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
 		{ "Sets ingame crosshair", "" },
@@ -55,6 +56,7 @@ static void UI_Preferences_StatusBar( void *self ) {
 		{ "Allows autodowloading content from pure servers", "" },
 		{ "Sets crosshair color", "" },
 		{ "Sets crosshair size", "" },
+		{ "Toggles auto saving q3config.cfg into baseq3 folder", "Fixes problems of not saving config after game exit"}
 	};
 
 	UIX_CommonStatusBar(self, ID_CROSSHAIR, MAX_INFO_MESSAGES, info_messages);
@@ -81,6 +83,7 @@ typedef struct {
 	menulist_s			drawteamoverlay;
 	menuradiobutton_s	allowdownload;
 	menubitmap_s		back;
+	menuradiobutton_s	sharedconfig;
 
 	qhandle_t			defaultCrosshair[NUM_CROSSHAIRS];
 	qhandle_t			crosshairShader[NUM_CROSSHAIRS];
@@ -166,6 +169,8 @@ static void Preferences_SetMenuItems( void ) {
 	s_preferences.forcemodel.curvalue		= trap_Cvar_VariableValue( "cg_forcemodel" ) != 0;
 	s_preferences.drawteamoverlay.curvalue	= Com_Clamp( 0, 3, trap_Cvar_VariableValue( "cg_drawTeamOverlay" ) );
 	s_preferences.allowdownload.curvalue	= trap_Cvar_VariableValue( "cl_allowDownload" ) != 0;
+
+	s_preferences.sharedconfig.curvalue		= trap_Cvar_VariableValue("cg_sharedConfig") != 0;
 
 	trap_Cvar_VariableStringBuffer("cg_crosshairColor", buf, sizeof(buf));
 
@@ -258,6 +263,10 @@ static void Preferences_Event( void* ptr, int notification ) {
 
 	case ID_ALLOWDOWNLOAD:
 		trap_Cvar_SetValue( "cl_allowDownload", s_preferences.allowdownload.curvalue );
+		break;
+
+	case ID_SHAREDCONFIG:
+		trap_Cvar_SetValue("cg_sharedConfig", s_preferences.sharedconfig.curvalue);
 		break;
 
 	case ID_BACK:
@@ -501,6 +510,16 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.allowdownload.generic.y	       = y;
 	s_preferences.allowdownload.generic.statusbar   = UI_Preferences_StatusBar;
 
+	y += (BIGCHAR_HEIGHT+2)*2;	
+	s_preferences.sharedconfig.generic.type = MTYPE_RADIOBUTTON;
+	s_preferences.sharedconfig.generic.name = "Shared Config:";
+	s_preferences.sharedconfig.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	s_preferences.sharedconfig.generic.callback = Preferences_Event;
+	s_preferences.sharedconfig.generic.statusbar = UI_Preferences_StatusBar;
+	s_preferences.sharedconfig.generic.id = ID_SHAREDCONFIG;
+	s_preferences.sharedconfig.generic.x = PREFERENCES_X_POS;
+	s_preferences.sharedconfig.generic.y = y;
+
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.back.generic.type	    = MTYPE_BITMAP;
 	s_preferences.back.generic.name     = ART_BACK0;
@@ -530,6 +549,8 @@ static void Preferences_MenuInit( void ) {
 	Menu_AddItem( &s_preferences.menu, &s_preferences.allowdownload );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.crosshaircolor );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.crosshairsize);
+
+	Menu_AddItem( &s_preferences.menu, &s_preferences.sharedconfig );
 
 	Menu_AddItem( &s_preferences.menu, &s_preferences.back );
 

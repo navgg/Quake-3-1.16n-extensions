@@ -158,6 +158,7 @@ vmCvar_t	uix_lagometer;
 vmCvar_t	uix_networkAdjustments;
 vmCvar_t	uix_scoreboard;
 vmCvar_t	uix_drawScoreBox;
+vmCvar_t	uix_sharedConfig;
 // some q3 defaults to init
 vmCvar_t	uix_fov;
 vmCvar_t	uix_zoomfov;
@@ -237,6 +238,7 @@ cvarTable_t		cvarTable[] = {
 	{ &uix_networkAdjustments, "cg_networkAdjustments", "1", CVAR_ARCHIVE },
 	{ &uix_scoreboard, "cg_scoreboard", "0", CVAR_ARCHIVE },
 	{ &uix_drawScoreBox, "cg_drawScoreBox", "1", CVAR_ARCHIVE },
+	{ &uix_sharedConfig, "cg_sharedConfig", "1", CVAR_ARCHIVE },
 
 	{ &uix_cinematicplayed, "uix_cinematicplayed", "-1", CVAR_TEMP },
 

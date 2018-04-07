@@ -559,6 +559,31 @@ void CGX_SendModinfo(void) {
 		trap_DPrint("modinfo not sent\n");
 	}
 }
+
+// X-MOD: potential fix for q3config saving problem
+void CGX_SaveSharedConfig(void) {
+	if (cgx_sharedConfig.integer) {
+		char buf[32];
+		trap_Cvar_VariableStringBuffer("version", buf, 8);
+
+		if (Q_stricmp(buf, "Q3 1.16") != 0) {
+			trap_Print(va("Version %s skip shared config save", buf));
+			return;
+		}
+
+		trap_Cvar_VariableStringBuffer("fs_game", buf, sizeof(buf));		
+
+		if (buf[0] == '\0') {
+			trap_Print("Saving shared config... Mod: baseq3");
+			trap_SendConsoleCommand("writeconfig q3config.cfg;");
+		}
+		else {
+			trap_Print(va("Saving shared config... Mod: %s\n", buf));
+			trap_SendConsoleCommand("writeconfig ..\\baseq3\\q3config.cfg;");
+		}
+	}
+}
+
 // generate script to open url to worldspawn to download map
 void CGX_GenerateMapBat(void) {
 	fileHandle_t f;
