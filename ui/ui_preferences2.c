@@ -21,7 +21,7 @@ ADVANCED OPTIONS MENU
 #define PREFERENCES_X_POS		340
 //360
 #define PREFERENCES_X_POS_1		230
-#define PREFERENCES_X_POS_2		430
+#define PREFERENCES_X_POS_2		450
 
 #define ID_REWARDS				127
 #define ID_BLOOD				128
@@ -49,7 +49,6 @@ ADVANCED OPTIONS MENU
 #define ID_SCOREBOARD			150
 #define ID_ACC					151
 //#define ID_SCOREBOX				152
-#define ID_SHAREDCONFIG			152
 
 #define ID_BACK					190
 
@@ -81,8 +80,7 @@ static void Preferences2_StatusBar( void *self ) {
 		{ "Sets hitsounds default - one hit sound", "Other options 4 sounds based on damage done"},		
 		{ "Sets ingame scoreboard type", ""},
 		{ "Toggles display total weapon accuracy", ""},
-		{ "Toggles auto saving config into baseq3 folder", "Fixes problems of not saving config after exit game"}
-		/*{ "Toggles display of scorebox in right lower corner", ""}*/		
+		/*{ "Toggles display of scorebox in right lower corner", ""}*/
 	};
 
 	UIX_CommonStatusBar(self, ID_REWARDS, MAX_INFO_MESSAGES, info_messages);
@@ -109,7 +107,7 @@ typedef struct {
 	menuradiobutton_s	coloredping;
 	//menuradiobutton_s	scorebox;
 	menuradiobutton_s	accuracy;
-	menulist_s			scoreboard;	
+	menulist_s			scoreboard;
 	menulist_s			centerprint;
 	menulist_s			deafultweapon;
 	menulist_s			hitsounds;
@@ -121,7 +119,6 @@ typedef struct {
 	menufield_s			enemycolors;	
 	menufield_s			teammodel;
 	menufield_s			teamcolors;		
-	menulist_s			sharedconfig;
 	//menuradiobutton_s	dynamiclights;	
 
 	menubitmap_s		back;	
@@ -223,7 +220,6 @@ static void Preferences2_SetMenuItems( void ) {
 	s_preferences2.scoreboard.curvalue = trap_Cvar_VariableValue("cg_scoreboard") != 0;
 	s_preferences2.accuracy.curvalue = trap_Cvar_VariableValue("cg_drawAccuracy") != 0;
 	/*s_preferences2.scorebox.curvalue = trap_Cvar_VariableValue("cg_drawScoreBox") != 0;*/
-	s_preferences2.sharedconfig.curvalue = trap_Cvar_VariableValue("cg_sharedConfig") != 0;
 
 	trap_Cvar_VariableStringBuffer("cg_fov", s_preferences2.fov.field.buffer, sizeof(s_preferences2.fov.field.buffer));
 	trap_Cvar_VariableStringBuffer("cg_zoomfov", s_preferences2.zoomfov.field.buffer, sizeof(s_preferences2.zoomfov.field.buffer));
@@ -363,10 +359,6 @@ static void Preferences2_Event( void* ptr, int notification ) {
 	//	trap_Cvar_SetValue("cg_drawScoreBox", s_preferences2.scorebox.curvalue);
 	//	break;
 
-	case ID_SHAREDCONFIG:
-		trap_Cvar_SetValue("cg_sharedConfig", s_preferences2.sharedconfig.curvalue);
-		break;
-
 	case ID_BACK:
 		Preferences2_SaveChanges();
 		UI_PopMenu();
@@ -420,7 +412,7 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.framer.width  	   = 256;
 	s_preferences2.framer.height  	   = 334;
 
-	y = 144 - BIGCHAR_HEIGHT * 4 + 8;
+	y = 144 - BIGCHAR_HEIGHT * 3;
 
 	y += BIGCHAR_HEIGHT + 2;
 	s_preferences2.rewards.generic.type       = MTYPE_RADIOBUTTON;
@@ -683,16 +675,6 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.teamcolors.field.widthInChars = 5;
 	s_preferences2.teamcolors.field.maxchars     = 4;
 
-	y += BIGCHAR_HEIGHT+2;	
-	s_preferences2.sharedconfig.generic.type = MTYPE_RADIOBUTTON;
-	s_preferences2.sharedconfig.generic.name = "Shared config:";
-	s_preferences2.sharedconfig.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
-	s_preferences2.sharedconfig.generic.callback = Preferences2_Event;
-	s_preferences2.sharedconfig.generic.statusbar = Preferences2_StatusBar;
-	s_preferences2.sharedconfig.generic.id = ID_SHAREDCONFIG;
-	s_preferences2.sharedconfig.generic.x = PREFERENCES_X_POS;
-	s_preferences2.sharedconfig.generic.y = y;
-
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences2.back.generic.type	    = MTYPE_BITMAP;
 	s_preferences2.back.generic.name     = ART_BACK0;
@@ -733,7 +715,6 @@ static void Preferences2_MenuInit( void ) {
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.lagometer );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.hitsounds );
 	/*Menu_AddItem( &s_preferences2.menu, &s_preferences2.scorebox );*/
-	Menu_AddItem( &s_preferences2.menu, &s_preferences2.sharedconfig );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.scoreboard );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.accuracy );
 
