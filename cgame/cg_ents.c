@@ -668,43 +668,43 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 
 	//unlagged - projectile nudge
 	// if it's a missile but not a grappling hook
-	//if ( cent->currentState.eType == ET_MISSILE && cent->currentState.weapon != WP_GRAPPLING_HOOK ) {
-	//	// if it's one of ours
-	//	if ( cent->currentState.otherEntityNum == cg.clientNum ) {
-	//		// extrapolate one server frame's worth - this will correct for tiny
-	//		// visual inconsistencies introduced by backward-reconciling all players
-	//		// one server frame before running projectiles
-	//		timeshift = 1000 / cgs.sv_fps;
-	//	}
-	//	// if it's not, and it's not a grenade launcher
-	//	else if ( cent->currentState.weapon != WP_GRENADE_LAUNCHER ) {
-	//		// extrapolate based on cg_projectileNudge
-	//		timeshift = cg_projectileNudge.integer + 1000 / cgs.sv_fps;
-	//	}
-	//}
+	if ( cent->currentState.eType == ET_MISSILE && cent->currentState.weapon != WP_GRAPPLING_HOOK ) {
+		// if it's one of ours
+		if ( cent->currentState.otherEntityNum == cg.clientNum ) {
+			// extrapolate one server frame's worth - this will correct for tiny
+			// visual inconsistencies introduced by backward-reconciling all players
+			// one server frame before running projectiles
+			timeshift = 1000 / cgs.sv_fps;
+		}
+		// if it's not, and it's not a grenade launcher
+		else if ( cent->currentState.weapon != WP_GRENADE_LAUNCHER ) {
+			// extrapolate based on cg_projectileNudge
+			timeshift = cg_projectileNudge.integer + 1000 / cgs.sv_fps;
+		}
+	}
 
 	// just use the current frame and evaluate as best we can
-		BG_EvaluateTrajectory( &cent->currentState.pos, cg.time, cent->lerpOrigin );
-		BG_EvaluateTrajectory( &cent->currentState.apos, cg.time, cent->lerpAngles );
-	/*BG_EvaluateTrajectory( &cent->currentState.pos, cg.time + timeshift, cent->lerpOrigin );
-	BG_EvaluateTrajectory( &cent->currentState.apos, cg.time + timeshift, cent->lerpAngles );*/
+		/*BG_EvaluateTrajectory( &cent->currentState.pos, cg.time, cent->lerpOrigin );
+		BG_EvaluateTrajectory( &cent->currentState.apos, cg.time, cent->lerpAngles );*/
+	BG_EvaluateTrajectory( &cent->currentState.pos, cg.time + timeshift, cent->lerpOrigin );
+	BG_EvaluateTrajectory( &cent->currentState.apos, cg.time + timeshift, cent->lerpAngles );
 
 	// if there's a time shift
-	//if ( timeshift != 0 ) {
-	//	trace_t tr;
-	//	vec3_t lastOrigin;
+	if ( timeshift != 0 ) {
+		trace_t tr;
+		vec3_t lastOrigin;
 
-	//	BG_EvaluateTrajectory( &cent->currentState.pos, cg.time, lastOrigin );
+		BG_EvaluateTrajectory( &cent->currentState.pos, cg.time, lastOrigin );
 
-	//	CG_Trace( &tr, lastOrigin, vec3_origin, vec3_origin, cent->lerpOrigin, cent->currentState.number, MASK_SHOT );
+		CG_Trace( &tr, lastOrigin, vec3_origin, vec3_origin, cent->lerpOrigin, cent->currentState.number, MASK_SHOT );
 
-	//	// don't let the projectile go through the floor
-	//	if ( tr.fraction < 1.0f ) {
-	//		cent->lerpOrigin[0] = lastOrigin[0] + tr.fraction * ( cent->lerpOrigin[0] - lastOrigin[0] );
-	//		cent->lerpOrigin[1] = lastOrigin[1] + tr.fraction * ( cent->lerpOrigin[1] - lastOrigin[1] );
-	//		cent->lerpOrigin[2] = lastOrigin[2] + tr.fraction * ( cent->lerpOrigin[2] - lastOrigin[2] );
-	//	}
-	//}
+		// don't let the projectile go through the floor
+		if ( tr.fraction < 1.0f ) {
+			cent->lerpOrigin[0] = lastOrigin[0] + tr.fraction * ( cent->lerpOrigin[0] - lastOrigin[0] );
+			cent->lerpOrigin[1] = lastOrigin[1] + tr.fraction * ( cent->lerpOrigin[1] - lastOrigin[1] );
+			cent->lerpOrigin[2] = lastOrigin[2] + tr.fraction * ( cent->lerpOrigin[2] - lastOrigin[2] );
+		}
+	}
 	//unlagged - projectile nudge
 
 	// adjust for riding a mover if it wasn't rolled into the predicted
