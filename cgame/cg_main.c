@@ -467,15 +467,23 @@ void CG_UpdateCvars( void ) {
 	if (cgx_enemyModelModificationCount != cgx_enemyModel.modificationCount ||
 		cgx_teamModelModificationCount != cgx_teamModel.modificationCount ||
 		cgx_enemyModel_enabledModificationCount != cgx_enemyModel_enabled.modificationCount) {
+		
+		if (!cgx_enemyModel_enabled.integer && cgx_enemyModel.string[0] != '\0' &&
+			cgx_enemyModel_enabled.modificationCount == cgx_enemyModel_enabledModificationCount) {
+			trap_Cvar_Set("cg_enemyModel_enabled", "1");
+			trap_RPrint("cg_enemyModel_enabled 1\n");
+		}
+		else {
+			CGX_Init_enemyModels();
+			CGX_Init_teamModels();
+			CGX_EnemyModelCheck();
+			CG_LoadDeferredPlayers();
+			trap_RPrint("CG_UpdateCvars value changed\n");
+		}
+
 		cgx_enemyModelModificationCount = cgx_enemyModel.modificationCount;
 		cgx_teamModelModificationCount = cgx_teamModel.modificationCount;
 		cgx_enemyModel_enabledModificationCount = cgx_enemyModel_enabled.modificationCount;	
-
-		CGX_Init_enemyModels();	
-		CGX_Init_teamModels();
-		CGX_EnemyModelCheck();
-		CG_LoadDeferredPlayers();
-		trap_RPrint("CG_UpdateCvars value changed\n");
 	}	
 
 	// X-MOD: reinit enemycolors if vaue changed
