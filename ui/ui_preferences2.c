@@ -52,7 +52,7 @@ ADVANCED OPTIONS MENU
 
 #define ID_BACK					190
 
-#define MAX_INFO_MESSAGES		26
+#define MAX_INFO_MESSAGES		25
 static void Preferences2_StatusBar( void *self ) {	
 	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
 		{ "Toggles display ingame rewards", "On screen center - Excellent, Impressive etc."},

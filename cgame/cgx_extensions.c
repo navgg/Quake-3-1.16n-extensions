@@ -588,12 +588,12 @@ void CGX_SaveSharedConfig(void) {
 void CGX_GenerateMapBat(void) {
 	fileHandle_t f;
 
-	trap_Print("Generating "CGX_MAPBAT);
+	trap_Print("Generating "CGX_MAPBAT"...");
 
 	trap_FS_FOpenFile("..\\"CGX_MAPBAT, &f, FS_WRITE);
 
 	if (f) {
-		char *buf;
+		char *buf;		
 
 		/*buf = va("echo \"Download .pk3 file and put in baseq3 game folder\"\r\nexplorer \""CGX_MAPURL"%s/\"\r\npause",
 		cgs.mapname_clean);		*/
