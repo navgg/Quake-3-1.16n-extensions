@@ -623,6 +623,8 @@ void CG_NewClientInfo( int clientNum ) {
 	//save original models
 	Q_strncpyz( newInfo.skinNameCopy, newInfo.skinName, sizeof( newInfo.skinName ) );
 	Q_strncpyz( newInfo.modelNameCopy, newInfo.modelName, sizeof( newInfo.modelName ) );	
+	//save original railgun
+	VectorCopy(newInfo.color, newInfo.colorCopy);
 	//change models and skins if needed or restore
 	if (cg.clientNum != clientNum && cgs.gametype != GT_SINGLE_PLAYER) {
 		trap_DPrint(va("CG_NewClientInfo %i\n", cg.clientNum));		

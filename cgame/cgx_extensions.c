@@ -211,8 +211,14 @@ static void CGX_SetColorInfo(const char *color, clientInfo_t *info) {
 			ShaderRGBACopy(info->colors[i], info->darkenColors[i]);		
 	}	
 
-	for (i = 0; i < 3; i++)
-		info->color[i] = (float)info->colors[0][i] / 255.0f;	
+	// copy rail color
+	if (color[0] == '!') {
+		VectorCopy(info->colorCopy, info->color);
+	}
+	else {
+		for (i = 0; i < 3; i++)
+			info->color[i] = (float)info->colors[0][i] / 255.0f;
+	}
 }
 
 void CGX_Init_enemyAndTeamColors(void) {

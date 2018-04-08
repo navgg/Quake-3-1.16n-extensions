@@ -301,8 +301,10 @@ typedef struct {
 	//X-MOD: enemy model check, save read models to restore if anything	
 	char			modelNameCopy[MAX_QPATH];
 	char			skinNameCopy[MAX_QPATH];	
+	// rail color copy
+	vec3_t			colorCopy;
 
-	//X-MOD: model colors for pm skins
+	//X-MOD: model colors for pm skins	
 	byte			colors[4][3];
 	byte			darkenColors[4][3];
 } clientInfo_t;
