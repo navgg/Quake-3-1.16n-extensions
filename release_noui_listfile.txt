@@ -1,0 +1,7 @@
+models\*
+sound\*
+vm\cgame.qvm
+icons\*
+scripts\crosshair.shader
+scripts\players.shader
+default.cfg
