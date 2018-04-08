@@ -561,26 +561,29 @@ void CGX_SendModinfo(void) {
 }
 
 // X-MOD: potential fix for q3config saving problem
-void CGX_SaveSharedConfig(void) {
-	if (cgx_sharedConfig.integer) {
+void CGX_SaveSharedConfig(qboolean forced) {
+	if (cgx_sharedConfig.integer || forced) {
 		char buf[32];
 		trap_Cvar_VariableStringBuffer("version", buf, 8);
 
 		if (Q_stricmp(buf, "Q3 1.16") != 0) {
-			trap_Print(va("Version %s skip shared config save", buf));
+			trap_Print(va("Version %s skip shared config save\n", buf));
 			return;
 		}
 
 		trap_Cvar_VariableStringBuffer("fs_game", buf, sizeof(buf));		
 
 		if (buf[0] == '\0') {
-			trap_Print("Saving shared config... Mod: baseq3");
-			trap_SendConsoleCommand("writeconfig q3config.cfg;");
+			trap_Print("Saving shared config... Mod: baseq3\n");
+			trap_SendConsoleCommand("writeconfig q3config.cfg\n");
 		}
 		else {
 			trap_Print(va("Saving shared config... Mod: %s\n", buf));
-			trap_SendConsoleCommand("writeconfig ..\\baseq3\\q3config.cfg;");
+			trap_SendConsoleCommand("writeconfig ..\\baseq3\\q3config.cfg\n");
 		}
+	}
+	else {
+		trap_Print("Shared config saving is disabled (cg_sharedConfig)\n");
 	}
 }
 

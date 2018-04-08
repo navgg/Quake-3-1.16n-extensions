@@ -373,6 +373,7 @@ int		cgx_teamColorsModificationCount = 1;
 int		cgx_deadBodyDarkenModificationCount = 1;
 int		cgx_enemyModel_enabledModificationCount = 1;
 int		cgx_fps_modificationCount = 1;
+int		cgx_sharedConfigModificationCount = 1;
 
 
 
@@ -513,6 +514,12 @@ void CG_UpdateCvars( void ) {
 		cgx_fps_modificationCount = cgx_maxfps.modificationCount;
 
 		CGX_AutoAdjustNetworkSettings();
+	}
+
+	if (cgx_sharedConfigModificationCount != cgx_sharedConfig.modificationCount) {	
+		cgx_sharedConfigModificationCount = cgx_sharedConfig.modificationCount;
+
+		CGX_SaveSharedConfig(qtrue);
 	}
 
 	// If team overlay is on, ask for updates from the server.  If its off,

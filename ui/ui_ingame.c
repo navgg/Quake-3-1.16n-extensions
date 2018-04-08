@@ -71,7 +71,7 @@ static void InGame_QuitAction( qboolean result ) {
 	if( !result ) {
 		return;
 	}
-	trap_Cmd_ExecuteText(EXEC_NOW, "cgx_savesharedconfig\n");
+	trap_Cmd_ExecuteText(EXEC_NOW, "writesharedconfig\n");
 
 	UI_PopMenu();
 	UI_CreditMenu();
@@ -98,7 +98,7 @@ void InGame_Event( void *ptr, int notification ) {
 		break;
 
 	case ID_LEAVEARENA:
-		trap_Cmd_ExecuteText( EXEC_APPEND, "cgx_savesharedconfig\n");
+		trap_Cmd_ExecuteText( EXEC_APPEND, "writesharedconfig\n");
 		trap_Cmd_ExecuteText( EXEC_APPEND, "disconnect\n" );
 		break;
 

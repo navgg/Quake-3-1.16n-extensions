@@ -116,7 +116,7 @@ static void CG_TellAttacker_f( void ) {
 }
 
 static void CGX_SaveSharedConfig_f( void ) {
-	CGX_SaveSharedConfig();	
+	CGX_SaveSharedConfig(qfalse);	
 }
 
 typedef struct {
@@ -145,8 +145,8 @@ static consoleCommand_t	commands[] = {
 	{ "tell_attacker", CG_TellAttacker_f },
 	{ "tcmd", CG_TargetCommand_f },
 	{ "loaddefered", CG_LoadDeferredPlayers },	// spelled wrong, but not changing for demo...
-	// X-MOD: quit override
-	{ "cgx_savesharedconfig", CGX_SaveSharedConfig_f }
+	// X-MOD: save shared config command
+	{ "writesharedconfig", CGX_SaveSharedConfig_f }
 };
 
 
