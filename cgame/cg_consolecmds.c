@@ -119,6 +119,13 @@ static void CGX_SaveSharedConfig_f( void ) {
 	CGX_SaveSharedConfig(qfalse);	
 }
 
+static void CGX_RecordSync_f( void ) {
+	char	message[128];
+	trap_Args( message, 128 );
+
+	trap_SendConsoleCommand(va("g_syncronousClients 1; record %s; g_syncronousClients 0\n", message));
+}
+
 typedef struct {
 	char	*cmd;
 	void	(*function)(void);
@@ -146,7 +153,8 @@ static consoleCommand_t	commands[] = {
 	{ "tcmd", CG_TargetCommand_f },
 	{ "loaddefered", CG_LoadDeferredPlayers },	// spelled wrong, but not changing for demo...
 	// X-MOD: save shared config command
-	{ "writesharedconfig", CGX_SaveSharedConfig_f }
+	{ "writesharedconfig", CGX_SaveSharedConfig_f },
+	{ "recordsync", CGX_RecordSync_f }
 };
 
 
