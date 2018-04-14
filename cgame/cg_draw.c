@@ -701,6 +701,19 @@ static float CGX_DrawAcc( float y ) {
 
 	return y + BIGCHAR_HEIGHT + 4;	
 }
+#if CGX_DEBUG
+static float CG_DrawFreeMem(float y) {
+	char *s;
+	int i, w;
+
+	s = va("Mem: %i Mb", trap_MemoryRemaining() / 1024 / 1024);
+	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;	
+
+	CG_DrawBigString(vScreen.width5 - w, y + 2, s, 1.0F);	
+
+	return y + BIGCHAR_HEIGHT + 4;	
+}
+#endif
 
 #if 0
 /*
@@ -996,6 +1009,9 @@ static void CG_DrawUpperRight( void ) {
 		y = CG_DrawAttacker( y );
 	}
 
+#if 0
+	y = CG_DrawFreeMem(y);
+#endif
 }
 
 /*
