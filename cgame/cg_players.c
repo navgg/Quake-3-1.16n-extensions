@@ -395,6 +395,8 @@ static void CG_CopyClientInfoModel( clientInfo_t *from, clientInfo_t *to ) {
 
 	memcpy( to->animations, from->animations, sizeof( to->animations ) );
 	memcpy( to->sounds, from->sounds, sizeof( to->sounds ) );
+
+	//CG_Printf("CG_CopyClientInfoModel '%s' -> '%s' '%s' -> '%s'\n", from->modelName, to->modelName, from->skinName, to->skinName);	
 }
 
 /*
@@ -472,13 +474,17 @@ static void CG_SetDeferredClientInfo( clientInfo_t *ci ) {
 			continue;
 		}
 
+		// X-MOD: if enemy models enabled and its our model take next info
+		if (cgx_enemyModel_enabled.integer && i == cg.clientNum && !cg_forceModel.integer)
+			continue;
+
 		ci->deferred = qtrue;
 		CG_CopyClientInfoModel( match, ci );
 		return;
 	}
 
 	// we should never get here...
-	CG_Printf( "CG_SetDeferredClientInfo: no valid clients!\n" );
+	//CG_Printf( "CG_SetDeferredClientInfo: no valid clients!\n" );
 
 	CG_LoadClientInfo( ci );
 }
@@ -515,6 +521,11 @@ void CG_NewClientInfo( int clientNum ) {
 		memset( ci, 0, sizeof( *ci ) );
 		return;		// player just left
 	}
+
+	// X-MOD: fix emtpy models loading and colored axis moving bug
+	// weird bug, to reproduce connect to server, add two bots, join spect, add another bot
+	if (!ci->modelName[0] || !ci->skinName[0])
+		ci->infoValid = qfalse;
 
 	// build into a temp buffer so the defer checks can use
 	// the old value
@@ -584,17 +595,8 @@ void CG_NewClientInfo( int clientNum ) {
 		Q_strncpyz( buf, v, sizeof( buf ) );
 
 		// fix model sarge/default in team game
-		if (clientNum != cg.clientNum) {			
-			int writer = 0, reader = 0;
-
-			while (buf[reader]) {
-				if (buf[reader]!='^') 		
-					buf[writer++] = buf[reader];		
-				reader++;       
-			}
-
-			buf[writer]=0;
-		}
+		if (clientNum != cg.clientNum)
+			RemoveChars(buf, '^');		
 
 		Q_strncpyz( newInfo.modelName, buf, sizeof( newInfo.modelName ) );
 
@@ -626,11 +628,13 @@ void CG_NewClientInfo( int clientNum ) {
 	//save original railgun
 	VectorCopy(newInfo.color, newInfo.colorCopy);
 	//change models and skins if needed or restore
+	//CG_Printf("ni '%i' '%s' '%s' '%i' '%i'\n", clientNum, newInfo.modelName, newInfo.skinName, newInfo.infoValid, newInfo.deferred);
+	//CG_Printf("ci '%i' '%s' '%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->infoValid, ci->deferred);
 	if (cg.clientNum != clientNum && cgs.gametype != GT_SINGLE_PLAYER) {
 		trap_DPrint(va("CG_NewClientInfo %i\n", cg.clientNum));		
 		trap_DPrint(va("%s\n", configstring));
-		CGX_SetModelAndSkin(&newInfo);
-	}	
+		CGX_SetModelAndSkin(&newInfo, qfalse, clientNum);
+	}
 
 	// scan for an existing clientinfo that matches this modelname
 	// so we can avoid loading checks if possible

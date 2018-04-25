@@ -139,8 +139,8 @@ void CGX_EnemyModelCheck(void) {
 
 	//change models and skins if needed or restore
 	for ( i = 0, ci = cgs.clientinfo ; i < cgs.maxclients ; i++, ci++ )
-		if (cg.clientNum != i)
-			CGX_SetModelAndSkin(ci);																			
+		if (cg.clientNum != i && ci->infoValid)
+			CGX_SetModelAndSkin(ci, qtrue, i);																		
 }
 
 static void CGX_ColorFromChar(char v, byte *color, clientInfo_t *info) {
@@ -241,35 +241,38 @@ void CGX_RestoreModelNameFromCopy(clientInfo_t *ci) {
 	if (Q_stricmp(ci->modelName, ci->modelNameCopy) == 0)
 		return;
 
-	trap_DPrint(va("%s -> %s\n", ci->modelName, ci->modelNameCopy));
-
 	Q_strncpyz(ci->modelName, ci->modelNameCopy, sizeof(ci->modelName));	
-
-	ci->infoValid = qtrue;
-	ci->deferred = qtrue;
+	trap_DPrint(va("%s -> %s\n", ci->modelName, ci->modelNameCopy));	
 }
 
 void CGX_RestoreSkinNameFromCopy(clientInfo_t *ci) {
 	if (Q_stricmp(ci->skinName, ci->skinNameCopy) == 0)
 		return;
-		
-	trap_DPrint(va("%s -> %s\n", ci->skinName, ci->skinNameCopy));
 
 	Q_strncpyz(ci->skinName, ci->skinNameCopy, sizeof(ci->skinName));
-
-	ci->infoValid = qtrue;
-	ci->deferred = qtrue;		
+	trap_DPrint(va("%s -> %s\n", ci->skinName, ci->skinNameCopy));	
 }
 
 void CGX_RestoreModelAndSkin(clientInfo_t *ci) {
 	//skip emtpy models
-	if (ci->modelName[0] == '\0')		
-		return;	
+	if (ci->modelName[0] == '\0')
+		return;
 
 	trap_DPrint("CGX_RestoreModelAndSkin\n");
 
 	CGX_RestoreModelNameFromCopy(ci);
-	CGX_RestoreSkinNameFromCopy(ci);
+	CGX_RestoreSkinNameFromCopy(ci);	
+}
+
+void CGX_SaveModelAndSkinCopy(clientInfo_t *ci, char *enemyOrTeamModelName) {	
+	if (ci->modelNameCopy[0] == '\0')
+		Q_strncpyz(ci->modelNameCopy, ci->modelName, sizeof(ci->modelName));
+	if (ci->skinNameCopy[0] == '\0')
+		Q_strncpyz(ci->skinNameCopy, ci->skinName, sizeof(ci->skinName));
+
+	trap_DPrint(va("%s -> %s\n", ci->modelName, enemyOrTeamModelName));	
+
+	Q_strncpyz(ci->modelName, enemyOrTeamModelName, sizeof(ci->modelName));
 }
 
 static qboolean CGX_IsKnownModel(const char *modelName) {
@@ -283,7 +286,7 @@ static qboolean CGX_IsKnownModel(const char *modelName) {
 
 void CGX_SetPMSkin(clientInfo_t *ci) {
 	if (!CGX_IsKnownModel(ci->modelName)) {
-		trap_WPrint(va("No PM skin for model %s\n", ci->modelName));		
+		trap_Print(va("Warning: No PM skin for model %s\n", ci->modelName));		
 		//set sarge/pm		
 		Q_strncpyz(ci->modelName, DEFAULT_MODEL, sizeof(ci->modelName));
 	} else if (Q_stricmp(ci->skinName, "pm") == 0) {
@@ -292,23 +295,24 @@ void CGX_SetPMSkin(clientInfo_t *ci) {
 	}		
 
 	trap_DPrint(va("Setting PM skin %s\n", ci->modelName));
-	Q_strncpyz(ci->skinName, "pm", sizeof(ci->skinName));	
-
-	ci->infoValid = qtrue;
-	ci->deferred = qtrue;		
+	Q_strncpyz(ci->skinName, "pm", sizeof(ci->skinName));		
 }
 
-void CGX_SetModelAndSkin(clientInfo_t *ci) {	
-	qboolean isSameTeam = qfalse;
-	if (!cgx_enemyModel_enabled.integer) {
-		//if it's disabled maybe we need to restore models
-		CGX_RestoreModelAndSkin(ci);
+void CGX_SetModelAndSkin(clientInfo_t *ci, qboolean isDeferred, int clientNum) {	
+	qboolean isSameTeam = qfalse;	
+
+	// skip emtpy clientInfo 
+	if (ci->modelName[0] == '\0') {
+		//CG_Printf("Skip '%i' '%s' '%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->infoValid, ci->deferred);
 		return;
 	}
 
-	// skip emtpy clientInfo 
-	if (ci->modelName[0] == '\0')		
-		return;	
+	if (!cgx_enemyModel_enabled.integer) {
+		//if it's disabled maybe we need to restore models
+		CGX_RestoreModelAndSkin(ci);		
+		ci->deferred = isDeferred;
+		return;
+	}
 
 	// some additional checks after config string modified, it calls CG_NewClientInfo again
 	if (cg.clientNum != -1) {
@@ -317,11 +321,14 @@ void CGX_SetModelAndSkin(clientInfo_t *ci) {
 
 		if (isSpect) {
 			CGX_RestoreModelAndSkin(ci);
+			ci->deferred = isDeferred;		
+			//CG_Printf("Restore '%i' '%s' '%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->infoValid, ci->deferred);
 			return;
 		}
-	}		
+	}			
+	ci->deferred = isDeferred;	
 
-	trap_DPrint(va("CGX_SetModelAndSkin %i\n", cg.clientNum));
+	//CG_Printf("Set '%i' '%s' '%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->infoValid, ci->deferred);
 
 	if (!isSameTeam) {
 		// if enemymodels enabled and enemy model not specified, load saved real model name and set pm skin
@@ -333,14 +340,7 @@ void CGX_SetModelAndSkin(clientInfo_t *ci) {
 		}
 
 		// save model name and skin copy
-		if (ci->modelNameCopy[0] == '\0')
-			Q_strncpyz(ci->modelNameCopy, ci->modelName, sizeof(ci->modelName));
-		if (ci->skinNameCopy[0] == '\0')
-			Q_strncpyz(ci->skinNameCopy, ci->skinName, sizeof(ci->skinName));
-
-		trap_DPrint(va("%s -> %s\n", ci->modelName, cg.enemyModel));
-
-		Q_strncpyz(ci->modelName, cg.enemyModel, sizeof(ci->modelName));
+		CGX_SaveModelAndSkinCopy(ci, cg.enemyModel);
 
 		// if skin not specified set pm
 		if (cg.enemySkin[0] == '\0')
@@ -353,9 +353,6 @@ void CGX_SetModelAndSkin(clientInfo_t *ci) {
 		// if skin is pm set colors
 		if (Q_stricmp(ci->skinName, "pm") == 0)
 			CGX_SetColorInfo(cgx_enemyColors.string, ci);
-
-		ci->infoValid = qtrue;
-		ci->deferred = qtrue;
 	} else {
 		//copy pasteeeee
 
@@ -368,14 +365,7 @@ void CGX_SetModelAndSkin(clientInfo_t *ci) {
 		}
 
 		// save model name and skin copy
-		if (ci->modelNameCopy[0] == '\0')
-			Q_strncpyz(ci->modelNameCopy, ci->modelName, sizeof(ci->modelName));
-		if (ci->skinNameCopy[0] == '\0')
-			Q_strncpyz(ci->skinNameCopy, ci->skinName, sizeof(ci->skinName));
-
-		trap_DPrint(va("%s -> %s\n", ci->modelName, cg.teamModel));
-
-		Q_strncpyz(ci->modelName, cg.teamModel, sizeof(ci->modelName));
+		CGX_SaveModelAndSkinCopy(ci, cg.teamModel);
 
 		// if skin not specified set pm
 		if (cg.teamSkin[0] == '\0')
@@ -388,9 +378,6 @@ void CGX_SetModelAndSkin(clientInfo_t *ci) {
 		// if skin is pm set colors
 		if (Q_stricmp(ci->skinName, "pm") == 0)
 			CGX_SetColorInfo(cgx_teamColors.string, ci);
-
-		ci->infoValid = qtrue;
-		ci->deferred = qtrue;
 	}
 }
 

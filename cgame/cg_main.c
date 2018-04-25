@@ -499,7 +499,7 @@ void CG_UpdateCvars( void ) {
 		trap_RPrint("CG_UpdateCvars value changed\n");
 	}
 
-	//
+	// track team change
 	if (cg.clientNum != -1) {
 		if (cg.oldTeam != cgs.clientinfo[cg.clientNum].team) {
 			cg.oldTeam = cgs.clientinfo[cg.clientNum].team;
@@ -509,13 +509,13 @@ void CG_UpdateCvars( void ) {
 			trap_RPrint("TEAM CHANGED!\n");
 		}
 	}
-
+	//track fps change
 	if (cgx_fps_modificationCount != cgx_maxfps.modificationCount) {
 		cgx_fps_modificationCount = cgx_maxfps.modificationCount;
 
 		CGX_AutoAdjustNetworkSettings();
 	}
-
+	//track shared config change
 	if (cgx_sharedConfigModificationCount != cgx_sharedConfig.modificationCount) {	
 		cgx_sharedConfigModificationCount = cgx_sharedConfig.modificationCount;
 
