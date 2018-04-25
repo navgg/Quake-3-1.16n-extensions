@@ -28,10 +28,12 @@ NETWORK OPTIONS MENU
 #define ID_SNAPS			18
 #define ID_DELAG			19
 #define	ID_PREDICTION		20
+#define ID_PREDICTITEMS		21
+#define ID_LAGOMETER		22
 
 #define ID_BACK				29
 
-#define MAX_INFO_MESSAGES	7
+#define MAX_INFO_MESSAGES	9
 
 static void UI_Network_StatusBar( void *self ) {	
 	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
@@ -41,7 +43,9 @@ static void UI_Network_StatusBar( void *self ) {
 		{ "Set off if you know how to config rate/packets", "Set max if you have strong PC and cable internet" },
 		{ "Sets amout of snaps sent from server to client", "Min - 1, Max - 999. Recommended 40" },
 		{ "Sets client site delag if it's available on server", "Recommended on" },
-		{ "Sets prediction method", "Optimized can increase fps if your CPU was bottleneck" }
+		{ "Sets prediction method", "Optimized can increase fps if your CPU was bottleneck" },
+		{ "If prediction 'Optimized' is set", "or you have 'false' item pickups then this better off" },
+		{ "Draw ingame lagometer", "" },
 	};
 
 	UIX_CommonStatusBar(self, ID_RATE, MAX_INFO_MESSAGES, info_messages);
@@ -90,6 +94,14 @@ static const char *prediction_items[] = {
 	0
 };
 
+static const char *lagometer_items[] = {
+	"off",
+	"default",
+	"default + ping",
+	"if packetloss",
+	0
+};
+
 typedef struct {
 	menuframework_s	menu;
 
@@ -110,6 +122,8 @@ typedef struct {
 
 	menulist_s		delag;
 	menulist_s		prediction;
+	menuradiobutton_s	predictitems;
+	menulist_s		lagometer;
 
 	menubitmap_s	back;
 } networkOptionsInfo_t;
@@ -128,15 +142,21 @@ static void UI_NetworkOptionsMenu_SaveChanges( void ) {
 
 static void UI_NetworkOptionsMenu_CheckGrayed(void) {
 	if (!networkOptionsInfo.adjustments.curvalue) {
+		networkOptionsInfo.rate.generic.flags &= ~QMF_GRAYED;
+		networkOptionsInfo.packetdup.generic.flags &= ~QMF_GRAYED;
 		networkOptionsInfo.snaps.generic.flags &= ~QMF_GRAYED;
 		networkOptionsInfo.packets.generic.flags &= ~QMF_GRAYED;
 		networkOptionsInfo.delag.generic.flags &= ~QMF_GRAYED;
 		networkOptionsInfo.prediction.generic.flags &= ~QMF_GRAYED;
+		networkOptionsInfo.predictitems.generic.flags &= ~QMF_GRAYED;		
 	} else {
+		networkOptionsInfo.rate.generic.flags |= QMF_GRAYED;
+		networkOptionsInfo.packetdup.generic.flags |= QMF_GRAYED;
 		networkOptionsInfo.snaps.generic.flags |= QMF_GRAYED;
 		networkOptionsInfo.packets.generic.flags |= QMF_GRAYED;
 		networkOptionsInfo.delag.generic.flags |= QMF_GRAYED;
 		networkOptionsInfo.prediction.generic.flags |= QMF_GRAYED;
+		networkOptionsInfo.predictitems.generic.flags |= QMF_GRAYED;				
 	}
 }
 
@@ -207,7 +227,20 @@ static void UI_NetworkOptionsMenu_Event( void* ptr, int event ) {
 		break;
 
 	case ID_PREDICTION:
-		trap_Cvar_SetValue( "cg_delag_optimizePrediction", networkOptionsInfo.prediction.curvalue );							
+		trap_Cvar_SetValue( "cg_delag_optimizePrediction", networkOptionsInfo.prediction.curvalue );
+		if (networkOptionsInfo.prediction.curvalue)
+			networkOptionsInfo.predictitems.curvalue = 0;					
+		else
+			networkOptionsInfo.predictitems.curvalue = 1;	
+		trap_Cvar_SetValue( "cg_predictitems", networkOptionsInfo.predictitems.curvalue );	
+		break;
+
+	case ID_PREDICTITEMS:
+		trap_Cvar_SetValue( "cg_predictitems", networkOptionsInfo.predictitems.curvalue );							
+		break;
+
+	case ID_LAGOMETER:
+		trap_Cvar_SetValue( "cg_lagometer", networkOptionsInfo.lagometer.curvalue );
 		break;
 
 	case ID_BACK:
@@ -311,7 +344,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	y = 240 - 2 * (BIGCHAR_HEIGHT+2);
 	networkOptionsInfo.rate.generic.type		= MTYPE_SPINCONTROL;
 	networkOptionsInfo.rate.generic.name		= "Data Rate:";
-	networkOptionsInfo.rate.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	networkOptionsInfo.rate.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_GRAYED;
 	networkOptionsInfo.rate.generic.callback	= UI_NetworkOptionsMenu_Event;
 	networkOptionsInfo.rate.generic.id			= ID_RATE;
 	networkOptionsInfo.rate.generic.x			= 400;
@@ -333,7 +366,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	y = 240 - 1 * (BIGCHAR_HEIGHT+2);
 	networkOptionsInfo.packetdup.generic.type		= MTYPE_RADIOBUTTON;
 	networkOptionsInfo.packetdup.generic.name		= "Packet Dup:";
-	networkOptionsInfo.packetdup.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	networkOptionsInfo.packetdup.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_GRAYED;
 	networkOptionsInfo.packetdup.generic.callback	= UI_NetworkOptionsMenu_Event;
 	networkOptionsInfo.packetdup.generic.id			= ID_PACKETDUP;
 	networkOptionsInfo.packetdup.generic.x			= 400;
@@ -374,7 +407,28 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.prediction.itemnames			= prediction_items;
 	networkOptionsInfo.prediction.generic.statusbar	= UI_Network_StatusBar;
 
-	y = 240 - 3 * (BIGCHAR_HEIGHT + 2);
+	y = 240 + 4 * (BIGCHAR_HEIGHT+2);
+	networkOptionsInfo.predictitems.generic.type		= MTYPE_RADIOBUTTON;
+	networkOptionsInfo.predictitems.generic.name		= "Predict item pickups:";
+	networkOptionsInfo.predictitems.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_GRAYED;
+	networkOptionsInfo.predictitems.generic.callback	= UI_NetworkOptionsMenu_Event;
+	networkOptionsInfo.predictitems.generic.id			= ID_PREDICTITEMS;
+	networkOptionsInfo.predictitems.generic.x			= 400;
+	networkOptionsInfo.predictitems.generic.y			= y;	
+	networkOptionsInfo.predictitems.generic.statusbar	= UI_Network_StatusBar;
+
+	y = 240 + 6 * (BIGCHAR_HEIGHT+2);
+	networkOptionsInfo.lagometer.generic.type		= MTYPE_SPINCONTROL;
+	networkOptionsInfo.lagometer.generic.name		= "Lagometer:";
+	networkOptionsInfo.lagometer.generic.flags		= QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	networkOptionsInfo.lagometer.generic.x			= 400;
+	networkOptionsInfo.lagometer.generic.callback	= UI_NetworkOptionsMenu_Event;
+	networkOptionsInfo.lagometer.generic.statusbar	= UI_Network_StatusBar;
+	networkOptionsInfo.lagometer.generic.id			= ID_LAGOMETER;
+	networkOptionsInfo.lagometer.generic.y			= y;
+	networkOptionsInfo.lagometer.itemnames			= lagometer_items;
+
+	y = 240 - 4 * (BIGCHAR_HEIGHT + 2);
 	networkOptionsInfo.adjustments.generic.type = MTYPE_SPINCONTROL;
 	networkOptionsInfo.adjustments.generic.name = "Auto Settings:";
 	networkOptionsInfo.adjustments.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
@@ -410,6 +464,8 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.snaps );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.delag );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.prediction );
+	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.predictitems );
+	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.lagometer );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.back );
 
 	rate = trap_Cvar_VariableValue( "rate" );
@@ -451,6 +507,8 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.delag.curvalue = trap_Cvar_VariableValue("cg_delag") != 0;	
 	networkOptionsInfo.prediction.curvalue = trap_Cvar_VariableValue("cg_delag_optimizePrediction") != 0;	
 	networkOptionsInfo.adjustments.curvalue = abs((int)trap_Cvar_VariableValue("cg_networkAdjustments") % 4);
+	networkOptionsInfo.predictitems.curvalue = trap_Cvar_VariableValue("cg_predictitems") != 0;
+	networkOptionsInfo.lagometer.curvalue = abs((int)trap_Cvar_VariableValue("cg_lagometer") % 4);
 
 	UI_NetworkOptionsMenu_CheckGrayed();
 }
