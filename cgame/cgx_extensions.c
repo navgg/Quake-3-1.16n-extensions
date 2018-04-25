@@ -326,6 +326,7 @@ void CGX_SetModelAndSkin(clientInfo_t *ci, qboolean isDeferred, int clientNum) {
 			return;
 		}
 	}			
+
 	ci->deferred = isDeferred;	
 
 	//CG_Printf("Set '%i' '%s' '%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->infoValid, ci->deferred);
@@ -382,6 +383,8 @@ void CGX_SetModelAndSkin(clientInfo_t *ci, qboolean isDeferred, int clientNum) {
 }
 
 void CGX_AutoAdjustNetworkSettings(void) {
+	static int info_showed = 0;
+
 	trap_DPrint(va("CGX_AutoAdjustNetworkSettings %i\n", cgx_networkAdjustments.integer));
 
 	if (cgx_networkAdjustments.integer && !cgs.localServer) {
@@ -456,18 +459,17 @@ void CGX_AutoAdjustNetworkSettings(void) {
 			}
 		}
 
-		// check time nudge
+		// check time nudge & send hints
 		// if server delaged it's better off
-		if (cgs.delagHitscan && cl_timeNudge.integer < 0) {
-			trap_Cvar_Set("cl_timeNudge", "0");
-			trap_Print("Auto: cl_timeNudge 0\n");
+		if (cgs.delagHitscan && cl_timeNudge.integer < 0 && !info_showed) {			
+			trap_Print("^5Hint: server has hitscan delag, its nice to set cl_timeNudge 0\n");
+			info_showed = 1;
 		} 
-		//	trap_Cvar_Set("cl_timeNudge", "50");
-		//	trap_Print("Auto: cl_timeNudge 50\n");
-		//} else if (cl_timeNudge.integer < -50) {
-		//	trap_Cvar_Set("cl_timeNudge", "-50");
-		//	trap_Print("Auto: cl_timeNudge -50\n");
-		//}
+
+		if (cg_optimizePrediction.integer && cg_predictItems.integer && info_showed <= 1) {			
+			trap_Print("^5Hint: if you have false item pickups (picking up armor or weapon and it's doenst count) because cg_delag_optimizePrediction is set to 1 or you have high ping then try to set cg_predictitems 0\n");
+			info_showed = 2;
+		}				
 	}
 }
 
