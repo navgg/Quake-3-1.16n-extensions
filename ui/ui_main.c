@@ -220,7 +220,7 @@ cvarTable_t		cvarTable[] = {
 	{ &uix_defaultWeapon, "cg_defaultWeapon", "0", CVAR_ARCHIVE },
 	{ &uix_drawPlayerIDs, "cg_drawPlayerIDs", "1", CVAR_ARCHIVE },
 
-	{ &uix_enemyModel_enabled, "cg_enemyModel_enabled", "1", CVAR_ARCHIVE },
+	{ &uix_enemyModel_enabled, "cg_enemyModel_enabled", "0", CVAR_ARCHIVE },
 	{ &uix_enemyModel, "cg_enemyModel", "", CVAR_ARCHIVE },		
 	{ &uix_enemyColors, "cg_enemyColors", "", CVAR_ARCHIVE },
 	//{ &uix_teamModel_enabled, "cg_teamModel_enabled", "0", CVAR_ARCHIVE },
@@ -245,7 +245,7 @@ cvarTable_t		cvarTable[] = {
 #if CGX_UNLAGGED
 	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},	
 	{ &cg_projectileNudge, "cg_delag_projectileNudge", "0", CVAR_ARCHIVE },
-	{ &cg_optimizePrediction, "cg_delag_optimizePrediction", "1", CVAR_ARCHIVE },
+	{ &cg_optimizePrediction, "cg_delag_optimizePrediction", "0", CVAR_ARCHIVE },
 #endif
 
 	// some quake3 not initialized variables

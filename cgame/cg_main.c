@@ -261,7 +261,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_defaultWeapon, "cg_defaultWeapon", "0", CVAR_ARCHIVE },
 	{ &cgx_drawPlayerIDs, "cg_drawPlayerIDs", "1", CVAR_ARCHIVE },
 	
-	{ &cgx_enemyModel_enabled, "cg_enemyModel_enabled", "1", CVAR_ARCHIVE },
+	{ &cgx_enemyModel_enabled, "cg_enemyModel_enabled", "0", CVAR_ARCHIVE },
 	{ &cgx_enemyModel, "cg_enemyModel", "", CVAR_ARCHIVE },		
 	{ &cgx_enemyColors, "cg_enemyColors", "", CVAR_ARCHIVE },
 	//{ &cgx_teamModel_enabled, "cg_teamModel_enabled", "0", CVAR_ARCHIVE },
@@ -286,7 +286,7 @@ cvarTable_t		cvarTable[] = {
 	//unlagged - client options
 	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},	
 	{ &cg_projectileNudge, "cg_delag_projectileNudge", "0", CVAR_ARCHIVE },
-	{ &cg_optimizePrediction, "cg_delag_optimizePrediction", "1", CVAR_ARCHIVE },
+	{ &cg_optimizePrediction, "cg_delag_optimizePrediction", "0", CVAR_ARCHIVE },
 	{ &cg_cmdTimeNudge, "cg_delag_cmdTimeNudge", "0", CVAR_ARCHIVE },
 
 	{ &cl_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},
