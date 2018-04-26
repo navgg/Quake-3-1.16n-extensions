@@ -132,6 +132,7 @@ static char *aimnames[] = {
 	"Alice_K",
 	"Blackwidow",
 	"Boones",
+	"Boris Johnson",
 	"^buu!",
 	"CHAKO",	
 	"Disha",
@@ -152,6 +153,7 @@ static char *aimnames[] = {
 	"Ne4istaya sila",
 	"Never give up!",
 	"Susel",
+	"TEAM[*]KOREA",
 	"Uriel",
 	"wibley",
 	"yetlguru",
@@ -391,8 +393,8 @@ static void UI_CreditMenu2_Draw( void ) {
 	DRAW_WSTEP1("But they love quake")
 
 	DRAW_WSTEP1("")
-	DRAW_WSTEP1("")
-	DRAW_WSTEP1("")
+	//DRAW_WSTEP1("")
+	//DRAW_WSTEP1("")
 	DRAW_WSTEP1("")
 	DRAW_WSTEP1("")
 	DRAW_RSTEP1("Special thanks to")
