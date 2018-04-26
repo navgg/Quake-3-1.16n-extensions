@@ -204,12 +204,25 @@ static void UI_Menu_Credits(void *self) {
 }
 
 static char* mapName;
+static int lastErrno = 0;
 
 static void UI_Menu_LastError(void *self) {	
-	UI_DrawString( 320, 300, "Download map at:" , UI_CENTER|UI_SMALLFONT, color_white );
-	UI_DrawString( 320, 320, va(CGX_MAPURL"%s/", mapName) , UI_CENTER|UI_SMALLFONT, color_orange );
-	UI_DrawString( 320, 340, "And put file in baseq3 game folder" , UI_CENTER|UI_SMALLFONT, color_white );
-	UI_DrawString( 320, 380, "Or run script: \""CGX_MAPBAT"\" in game folder", UI_CENTER|UI_SMALLFONT, colorLtGrey );
+	switch (lastErrno) {
+	case 1:
+		UI_DrawString( 320, 300, "Download map at:", UI_CENTER | UI_SMALLFONT, color_white );
+		UI_DrawString( 320, 320, va( CGX_MAPURL"%s/", mapName ), UI_CENTER | UI_SMALLFONT, color_orange );
+		UI_DrawString( 320, 340, "And put file in baseq3 game folder", UI_CENTER | UI_SMALLFONT, color_white );
+		UI_DrawString( 320, 380, "Or run script: \""CGX_MAPBAT"\" in game folder", UI_CENTER | UI_SMALLFONT, colorLtGrey );
+		break;
+	case 2:	
+		UI_DrawString( 320, 280, "Try to increase com_hunkmegs to 128 or 256", UI_CENTER | UI_SMALLFONT, color_white );
+		UI_DrawString( 320, 300, "Type in console", UI_CENTER | UI_SMALLFONT, color_white );
+		UI_DrawString( 320, 320, "\\com_hunkmegs 128", UI_CENTER | UI_SMALLFONT, color_orange );
+		UI_DrawString( 320, 340, "And restart game", UI_CENTER | UI_SMALLFONT, color_white );
+		UI_DrawString( 320, 360, "Try to set vertex light", UI_CENTER | UI_SMALLFONT, color_white );
+		UI_DrawString( 320, 380, "\\r_vertexlight 1", UI_CENTER | UI_SMALLFONT, color_orange );
+		break;
+	}	
 }
 
 /*
@@ -224,13 +237,16 @@ and that local cinematics are killed
 void UI_MainMenu( void ) {
 	int		y;
 	int		style = UI_CENTER | UI_DROPSHADOW;
-	static char	cgx_last_error[MAX_QPATH];
+	static char	cgx_last_error_buf[MAX_QPATH];
+	char* cgx_last_error;
 	int		isHidden = 0;
 	int		isHidden2 = QMF_HIDDEN | QMF_GRAYED;
 
-	trap_Cvar_VariableStringBuffer("cgx_last_error", cgx_last_error, sizeof(cgx_last_error));
+	trap_Cvar_VariableStringBuffer("cgx_last_error", cgx_last_error_buf, sizeof( cgx_last_error_buf ));
 	
-	if (cgx_last_error[0] != '\0') {
+	if (cgx_last_error_buf[0] != '\0') {
+		lastErrno = (int)(cgx_last_error_buf[0] - '0');
+		cgx_last_error = cgx_last_error_buf + 2;
 		mapName = strchr(cgx_last_error, ':')+2;
 
 		isHidden = QMF_HIDDEN|QMF_GRAYED;

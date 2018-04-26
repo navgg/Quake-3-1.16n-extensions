@@ -498,7 +498,15 @@ void CGX_CheckChatCommand(const char *str) {
 
 			trap_SendConsoleCommand(va("say ^7CGX v"CGX_VERSION" (%i:%i%i)\n", mins, tens, seconds));
 		}
-	}
+	} 
+}
+
+//void CGX_Delay( int msec ) {
+//	CG_Printf( "Delay for %i start...\n", msec );
+//	msec += trap_Milliseconds();	
+//	while (msec > trap_Milliseconds());
+//	CG_Printf( "Delay end\n" );
+//}
 }
 
 // check for unlagged enabled\disabled for bma\nms

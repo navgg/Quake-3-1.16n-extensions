@@ -833,10 +833,13 @@ static void CG_RegisterGraphics( void ) {
 	// clear any references to old media
 	memset( &cg.refdef, 0, sizeof( cg.refdef ) );
 	trap_R_ClearScene();
-
+	
 	CG_LoadingString( cgs.mapname );
-	trap_DPrint("trap_R_LoadWorldMap\n");
+	trap_DPrint( "trap_R_LoadWorldMap\n" );
+	//trap_Cvar_Set( "cgx_last_error", va( "2 Couldn't load world map: %s", cgs.mapname_clean ) );
 	trap_R_LoadWorldMap( cgs.mapname );
+	//trap_Cvar_Set( "cgx_last_error", "" );
+
 	trap_DPrint("precache status bar pics\n");
 	// precache status bar pics
 	CG_LoadingString( "game media" );
@@ -1110,7 +1113,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence ) {
 	// load the new map
 	CG_LoadingString( "collision map" );
 	trap_DPrint("trap_CM_LoadMap\n");	
-	trap_Cvar_Set("cgx_last_error", va("Couldn't load map: %s", cgs.mapname_clean));	
+	trap_Cvar_Set("cgx_last_error", va("1 Couldn't load map: %s", cgs.mapname_clean));	
 	
 	trap_CM_LoadMap( cgs.mapname );
 	trap_Cvar_Set("cgx_last_error", "");	
