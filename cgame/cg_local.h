@@ -935,7 +935,9 @@ extern	vmCvar_t		cg_tracerChance;
 extern	vmCvar_t		cg_tracerWidth;
 extern	vmCvar_t		cg_tracerLength;
 extern	vmCvar_t		cg_autoswitch;
+#if CGX_DEBUG
 extern	vmCvar_t		cg_ignore;
+#endif
 extern	vmCvar_t		cg_simpleItems;
 extern	vmCvar_t		cg_fov;
 extern	vmCvar_t		cg_zoomFov;
@@ -983,7 +985,7 @@ qboolean CG_Cvar_ClampInt( const char *name, vmCvar_t *vmCvar, int min, int max 
 //
 // cgx_extensions.c
 //
-
+//void CGX_Delay(int msec);
 void CGX_Init_vScreen(void);
 void CGX_AutoAdjustNetworkSettings(void);
 void CGX_CheckChatCommand(const char *str);

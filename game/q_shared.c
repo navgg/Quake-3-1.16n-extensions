@@ -1039,7 +1039,7 @@ void Info_SetValueForKey( char *s, const char *key, const char *value ) {
 
 	if (strchr (key, '\"') || strchr (value, '\"'))
 	{
-		Com_Printf ("Can't use keys or values with a \"\n");
+		Com_Printf (va("Can't use keys or values with a \" key %s value: %s\n", key, value));
 		return;
 	}
 
@@ -1086,7 +1086,7 @@ void Info_SetValueForKey_Big( char *s, const char *key, const char *value ) {
 
 	if (strchr (key, '\"') || strchr (value, '\"'))
 	{
-		Com_Printf ("Can't use keys or values with a \"\n");
+		Com_Printf (va("Can't use keys or values with a \" key %s value: %s\n", key, value));
 		return;
 	}
 

@@ -186,15 +186,14 @@ static void Main_MenuDraw( void ) {
 
 	Menu_Draw( &s_main.menu );
 
-	if (uis.demoversion) {
+/*	if (uis.demoversion) { //demo quake can't run mods
 		UI_DrawProportionalString( 320, 372, "DEMO      FOR MATURE AUDIENCES      DEMO", UI_CENTER|UI_SMALLFONT, color );
-		UI_DrawString( 320, 400, "Quake III Arena(c) 1999-2000, Id Software, Inc.  All Rights Reserved", UI_CENTER|UI_SMALLFONT, color );				
-		UI_DrawString( 320, 428, va("CGX %s (c) 2018 NaViGaToR (322)", CGX_VERSION), UI_CENTER|UI_SMALLFONT, cgx_color );
-	} else {			
+		UI_DrawString( 320, 400, "Quake III Arena(c) 1999-2000, Id Software, Inc.  All Rights Reserved", UI_CENTER|UI_SMALLFONT, color );						
+	} else {	*/		
 		UI_DrawString( 320, 422, va("CGX %s (c) 2018 NaViGaToR (322)", CGX_VERSION), UI_CENTER|UI_SMALLFONT, cgx_color );
 		
 		UI_DrawString( 320, 450, "Quake III Arena(c) 1999-2000, Id Software, Inc.  All Rights Reserved", UI_CENTER|UI_SMALLFONT, color );
-	}	
+	//}	
 }
 
 static void UI_Menu_Credits(void *self) {
@@ -256,15 +255,16 @@ void UI_MainMenu( void ) {
 
 	trap_Cvar_Set( "sv_killserver", "1" );	
 
-	if( !uis.demoversion && !ui_cdkeychecked.integer ) {
-		char	key[17];
+	//seems it's not necessary anymore
+	//if( !uis.demoversion && !ui_cdkeychecked.integer ) {
+	//	char	key[17];
 
-		trap_GetCDKey( key, sizeof(key) );
-		if( strcmp( key, "123456789" ) == 0 ) {
-			UI_CDKeyMenu();
-			return;
-		}
-	}
+	//	trap_GetCDKey( key, sizeof(key) );
+	//	if( strcmp( key, "123456789" ) == 0 ) {
+	//		UI_CDKeyMenu();
+	//		return;
+	//	}
+	//}
 
 	memset( &s_main, 0 ,sizeof(mainmenu_t) );
 

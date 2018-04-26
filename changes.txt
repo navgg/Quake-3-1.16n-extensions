@@ -13,3 +13,25 @@ fixed cg_teamModel "" init
 fixed static gun when jump
 fixed players jittering with timeNudge other than 0 (removed timeNudge extrapolation of unlagged 2.01)
 fix black color names (dark gray color used instead black)
+
+0.80b
+
+bright models replaced with high quality models
+lagometer moved from advanced to network menu
+removed "Gibs" from advanced menu (cg_gibs)
+cg_delag_optimizePrediction set to 0 by default
+symbol ! in cg_enemyModel for rail uses player's specified color
+
+added generation of "download_map.bat" script in game folder if map not found (opens in browser link to worldspawn to download map)
+added cg_sharedConfig 1|0 fixes problem with saving configs after game exit (0: off 1:automatically saves q3config.cfg to baseq3 folder after pressing 'leave arena' or 'exit game', to save manually use \writesharedconfig command)
+added command \autorecord to record demo (which do the following "g_syncronousClients 1; record <demoname>; g_syncronousClients 0")
+added "Predict items pickup" to network menu (cg_predictitems)
+added hints for some network settings
+
+fixed bug when enemy models was not loading (only three colorful lines was visible)
+fixed small visual inconsistencies of missle weapons
+fixed fov for models in credits & player menu for widescreens and etc.
+fixed display of players icons when loading (if more than 8)
+fixed handicap display in large scoreboard
+fixed win\loss display in large scoreboard
+fixed showplayerids toggle in menu

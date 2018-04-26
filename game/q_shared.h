@@ -8,8 +8,9 @@
 // A user mod should never modify this file
 
 #define	Q3_VERSION		"Q3 1.16n"
-#define CGX_VERSION		"0.70b"
-#define CGX_DATE		"23 Mar 2018"
+// X-MOD constants
+#define CGX_VERSION		"0.80b"
+#define CGX_DATE		"27 Apr 2018"
 #define CGX_DEBUG		0
 #define	CGX_UNLAGGED	1
 #define CGX_NOGHOST_COMPATIBLE CVAR_USERINFO

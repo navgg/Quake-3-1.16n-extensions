@@ -151,7 +151,9 @@ vmCvar_t	cg_tracerChance;
 vmCvar_t	cg_tracerWidth;
 vmCvar_t	cg_tracerLength;
 vmCvar_t	cg_autoswitch;
+#if CGX_DEBUG
 vmCvar_t	cg_ignore;
+#endif
 vmCvar_t	cg_simpleItems;
 vmCvar_t	cg_fov;
 vmCvar_t	cg_zoomFov;
@@ -183,7 +185,9 @@ typedef struct {
 } cvarTable_t;
 
 cvarTable_t		cvarTable[] = {
+#if CGX_DEBUG
 	{ &cg_ignore, "cg_ignore", "0", 0 },	// used for debugging
+#endif
 	{ &cg_autoswitch, "cg_autoswitch", "1", CVAR_ARCHIVE },
 	{ &cg_drawGun, "cg_drawGun", "1", CVAR_ARCHIVE },
 	{ &cg_zoomFov, "cg_zoomfov", "22.5", CVAR_ARCHIVE },
