@@ -5,7 +5,7 @@
 
 #include "cg_local.h"
 
-#define MAX_LOADING_PLAYER_ICONS	16
+#define MAX_LOADING_PLAYER_ICONS	26
 #define MAX_LOADING_ITEM_ICONS		26
 
 static int			loadingPlayerIconCount;
@@ -22,8 +22,16 @@ CG_DrawLoadingIcons
 static void CG_DrawLoadingIcons( void ) {
 	int		n;
 	int		x, y;
-
-	for( n = 0; n < loadingPlayerIconCount; n++ ) {
+	//X-MOD: fix for many icons
+	if (loadingPlayerIconCount > 8)
+	for (n = 0; n < loadingPlayerIconCount; n++) {				
+		y = 324 + 40;
+		if (n >= 13) y -= 40;		
+		x = 16 + n % 13 * 48;
+		CG_DrawPic( x + vScreen.offsetx, y, 32, 32, loadingPlayerIcons[n] );
+	}
+	else 
+	for( n = 0; n < loadingPlayerIconCount; n++ ) {				
 		x = 16 + n * 78;
 		y = 324;
 		CG_DrawPic( x + vScreen.offsetx, y, 64, 64, loadingPlayerIcons[n] );
