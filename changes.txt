@@ -16,6 +16,7 @@ fix black color names (dark gray color used instead black)
 
 0.80b
 
+mod renamed to X-Mod
 bright models replaced with high quality models
 lagometer moved from advanced to network menu
 removed "Gibs" from advanced menu (cg_gibs)
