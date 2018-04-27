@@ -507,7 +507,6 @@ void CGX_CheckChatCommand(const char *str) {
 //	while (msec > trap_Milliseconds());
 //	CG_Printf( "Delay end\n" );
 //}
-}
 
 // check for unlagged enabled\disabled for bma\nms
 // send modinfo in initialsnapshot and check result here
