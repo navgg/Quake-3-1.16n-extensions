@@ -1,5 +1,5 @@
 models\*
-sound\*
+sound\feedback\*
 vm\*
 scripts\crosshair.shader
 scripts\players.shader

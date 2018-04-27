@@ -335,7 +335,7 @@ static void UI_CreditMenu2_Draw( void ) {
 
 	y = y_pos;	
 
-	DRAW_RSTEP1("CGX "CGX_VERSION)		
+	DRAW_RSTEP1("Quake III "CGX_NAME" "CGX_VERSION)
 	DRAW_WSTEP1("Programming")
 	DRAW_WSTEP1("NaViGaToR (322)")	
 	DRAW_WSTEP1("")

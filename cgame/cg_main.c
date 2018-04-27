@@ -315,9 +315,9 @@ cvarTable_t		cvarTable[] = {
 #else
 	{ &cgx_debug, "cgx_debug", "0", CVAR_TEMP },
 #endif
-	{ &cgx_version, "cgx_version", "CGX "CGX_VERSION" "CGX_DATE, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
+	{ &cgx_version, "cgx_version", CGX_NAME" "CGX_VERSION" "CGX_DATE, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
 #if CGX_NEMESIS_COMPATIBLE
-	{ &cgx_cgame, "cgame", "CGX "CGX_VERSION, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
+	{ &cgx_cgame, "cgame", CGX_NAME" "CGX_VERSION, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
 	{ &cgx_uinfo, "cg_uinfo", "", CVAR_TEMP | CVAR_USERINFO | CVAR_ROM  },
 #endif	
 

@@ -9,6 +9,7 @@
 
 #define	Q3_VERSION		"Q3 1.16n"
 // X-MOD constants
+#define CGX_NAME		"X-Mod"
 #define CGX_VERSION		"0.80b"
 #define CGX_DATE		"27 Apr 2018"
 #define CGX_DEBUG		0

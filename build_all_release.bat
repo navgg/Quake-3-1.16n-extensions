@@ -3,7 +3,7 @@ cd ..
 call compile_ui
 cd ..
 
-set "pakname=pak2X.pk3"
+set "pakname={X-Mod}.pk3"
 
 cd baseq3
 
