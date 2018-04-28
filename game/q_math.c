@@ -1158,7 +1158,7 @@ vec_t VectorLength( const vec3_t v ) {
 }
 
 //unlagged
-/*
+/* moved from g_weapon.c
 ======================
 SnapVectorTowards
 Round a vector to integers for more efficient network

@@ -92,18 +92,19 @@ transmission, but make sure that it rounds towards a given point
 rather than blindly truncating.  This prevents it from truncating 
 into a wall.
 ======================
-*/
-void SnapVectorTowards( vec3_t v, vec3_t to ) {
-	int		i;
-
-	for ( i = 0 ; i < 3 ; i++ ) {
-		if ( to[i] <= v[i] ) {
-			v[i] = (int)v[i];
-		} else {
-			v[i] = (int)v[i] + 1;
-		}
-	}
-}
+*/ 
+//unlagged moved to q_math.c 
+//void SnapVectorTowards( vec3_t v, vec3_t to ) {
+//	int		i;
+//
+//	for ( i = 0 ; i < 3 ; i++ ) {
+//		if ( to[i] <= v[i] ) {
+//			v[i] = (int)v[i];
+//		} else {
+//			v[i] = (int)v[i] + 1;
+//		}
+//	}
+//}
 
 #define MACHINEGUN_SPREAD	200
 #define	MACHINEGUN_DAMAGE	7

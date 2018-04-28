@@ -1,3 +1,8 @@
+@echo off
+
+setlocal
+set "PATH=..\..\bin_nt;%PATH%"
+
 mkdir vm
 cd vm
 set cc=lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\..\ui %1
@@ -74,5 +79,11 @@ set cc=lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\
 @if errorlevel 1 goto quit
 
 q3asm -f ../game
+
+cd ../../baseq3
+mkdir vm
+cd ..
+move game\vm\qagame.qvm baseq3\vm\qagame.qvm
+
 :quit
 cd ..
