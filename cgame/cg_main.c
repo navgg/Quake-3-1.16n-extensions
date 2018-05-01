@@ -883,10 +883,13 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.tracerShader = trap_R_RegisterShader( "gfx/misc/tracer" );
 	cgs.media.selectShader = trap_R_RegisterShader( "gfx/2d/select" );
 
-	//X-MOD: fixed crosshair shaders for crosshair color
-	for ( i = 0 ; i < NUM_CROSSHAIRS ; i++ ) {
-		cgs.media.defaultCrosshair[i] = trap_R_RegisterShader( va("gfx/2d/crosshair%c", 'a'+i) );
-		cgs.media.crosshairShader[i] = trap_R_RegisterShader( va("gfx/2d/fixed_crosshair%c", 'a'+i) );
+	//X-MOD: fixed crosshair shaders for crosshair color		
+	for (i = 0; i < NUM_CROSSHAIRS; i++) {
+		cgs.media.crosshairShader[i] = trap_R_RegisterShader( va( "gfx/2d/fixed_crosshair%c", 'a' + i ) );
+	}
+	if (cgx_crosshairColor.string[0] == '\0')
+	for (i = 0; i < NUM_CROSSHAIRS; i++) {
+		cgs.media.defaultCrosshair[i] = trap_R_RegisterShader( va( "gfx/2d/crosshair%c", 'a' + i ) );
 	}
 
 	cgs.media.backTileShader = trap_R_RegisterShader( "gfx/2d/backtile" );
