@@ -1,4 +1,5 @@
-set "gamedir=D:\Games\Quake 3\"
+set "gamedir=C:\Games\Quake 3 Arena 1.16n\"
+rem set "gamedir=D:\Games\Quake 3\"
 rem set "gamedir=C:\Games\Quake\Quake 3 Arena 1.16n Vanilla\Vanilla Quake III Arena 1.16n\"
 
 set "pakname=pak2X.pk3"

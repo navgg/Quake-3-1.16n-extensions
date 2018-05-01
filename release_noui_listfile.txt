@@ -1,5 +1,5 @@
 models\*
-sound\*
+sound\feedback\*
 vm\cgame.qvm
 icons\*
 scripts\crosshair.shader

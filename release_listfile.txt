@@ -1,6 +1,7 @@
 models\*
 sound\feedback\*
-vm\*
+vm\cgame.qvm
+vm\ui.qvm
 scripts\crosshair.shader
 scripts\players.shader
 default.cfg
