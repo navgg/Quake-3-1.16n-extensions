@@ -720,3 +720,13 @@ static void CGX_LoadWorldMap() {
 	trap_Cvar_Set( "cgx_last_error", "" );
 }
 
+//check vertex light and register clients fix
+static void CGX_RegisterClients() {		
+	if (CGX_IsVertexLight()) {
+		trap_Cvar_Set("r_vertexLight", "0");
+		CG_RegisterClients();		// if low on memory, some clients will be deferred
+		trap_Cvar_Set("r_vertexLight", "1");
+	} else {
+		CG_RegisterClients();		// if low on memory, some clients will be deferred
+	}
+}

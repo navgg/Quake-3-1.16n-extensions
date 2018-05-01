@@ -1128,7 +1128,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence ) {
 	trap_DPrint("CG_RegisterGraphics\n");
 	CG_RegisterGraphics();
 	trap_DPrint("CG_RegisterClients\n");
-	CG_RegisterClients();		// if low on memory, some clients will be deferred
+	CGX_RegisterClients();
 
 	cg.loading = qfalse;	// future players will be deferred
 	trap_DPrint("CG_InitLocalEntities\n");
