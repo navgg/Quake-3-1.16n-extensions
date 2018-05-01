@@ -217,9 +217,8 @@ static void UI_Menu_LastError(void *self) {
 		UI_DrawString( 320, 280, "Try to increase com_hunkmegs to 128 or 256", UI_CENTER | UI_SMALLFONT, color_white );
 		UI_DrawString( 320, 300, "Type in console", UI_CENTER | UI_SMALLFONT, color_white );
 		UI_DrawString( 320, 320, "\\com_hunkmegs 128", UI_CENTER | UI_SMALLFONT, color_orange );
-		UI_DrawString( 320, 340, "And restart game", UI_CENTER | UI_SMALLFONT, color_white );
-		UI_DrawString( 320, 360, "Try to set vertex light", UI_CENTER | UI_SMALLFONT, color_white );
-		UI_DrawString( 320, 380, "\\r_vertexlight 1", UI_CENTER | UI_SMALLFONT, color_orange );
+		UI_DrawString( 320, 360, "And restart game", UI_CENTER | UI_SMALLFONT, color_white );
+		UI_DrawString( 320, 400, "*If you have more than 128Mb RAM", UI_CENTER | UI_SMALLFONT, colorLtGrey );		
 		break;
 	}	
 }

@@ -337,12 +337,24 @@ static void CG_LoadClientInfo( clientInfo_t *ci ) {
 		if ( cgs.gametype >= GT_TEAM ) {
 			// keep skin name
 			if ( !CG_RegisterClientModelname( ci, DEFAULT_MODEL, ci->skinName ) ) {
-				CG_Error( "DEFAULT_MODEL / skin (%s/%s) failed to register",
-					DEFAULT_MODEL, ci->skinName );
+				// X-MOD: if DEFAULT_MODEL error appeared during loading 
+				// its probably beacause of MAX_SHADERS hit error try fix load
+				if (!cgx_maploadingfix.integer && cg.loading) {						
+					CGX_TryLoadingFix();
+				} else {
+					CG_Error("DEFAULT_MODEL / skin (%s/%s) failed to register",
+						DEFAULT_MODEL, ci->skinName);
+				}
 			}
 		} else {
 			if ( !CG_RegisterClientModelname( ci, DEFAULT_MODEL, "default" ) ) {
-				CG_Error( "DEFAULT_MODEL (%s) failed to register", DEFAULT_MODEL );
+				// X-MOD: if DEFAULT_MODEL error appeared during loading 
+				// its probably beacause of MAX_SHADERS hit error try fix load
+				if (!cgx_maploadingfix.integer && cg.loading) {					
+					CGX_TryLoadingFix();
+				} else {
+					CG_Error("DEFAULT_MODEL (%s) failed to register", DEFAULT_MODEL);
+				}
 			}
 		}
 	}

@@ -64,6 +64,8 @@
 //X-MOD: maxpackets limits
 #define CGX_MIN_MAXPACKETS 30
 #define CGX_MAX_MAXPACKETS 125
+//X-MOD: limits
+#define CGX_MINHUNKMEGS 112
 
 typedef enum {
 	FOOTSTEP_NORMAL,
@@ -872,6 +874,7 @@ extern	vmCvar_t		cgx_scoreboard;
 extern	vmCvar_t		cgx_drawAccuracy;
 
 extern	vmCvar_t		cgx_sharedConfig;
+extern	vmCvar_t		cgx_maploadingfix;
 
 extern	vmCvar_t		cgx_maxfps;
 extern	vmCvar_t		cgx_maxpackets;
@@ -985,7 +988,6 @@ qboolean CG_Cvar_ClampInt( const char *name, vmCvar_t *vmCvar, int min, int max 
 //
 // cgx_extensions.c
 //
-//void CGX_Delay(int msec);
 void CGX_Init_vScreen(void);
 void CGX_AutoAdjustNetworkSettings(void);
 void CGX_CheckChatCommand(const char *str);

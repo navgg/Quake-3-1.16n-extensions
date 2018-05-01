@@ -611,3 +611,112 @@ void CGX_GenerateMapBat(void) {
 		trap_Print("WARNING: Couldn't open a file "CGX_MAPBAT);
 	}
 }
+
+static void CGX_IncreaseHunkmegs(int min) {
+	char buf[8];
+	trap_Cvar_VariableStringBuffer("com_hunkMegs", buf, sizeof(buf));
+
+	if (min > atoi(buf))
+		trap_Cvar_Set("com_hunkMegs", va("%i", min));
+}
+
+qboolean CGX_IsVertexLight() {
+	char buf[4];
+	trap_Cvar_VariableStringBuffer("r_vertexLight", buf, sizeof(buf));
+	return atoi(buf);
+}
+
+// load collision map with last error
+static void CGX_LoadCollisionMap() {	
+	trap_DPrint("CGX_LoadCollisionMap\n");
+	CG_LoadingString( "collision map" );
+
+	trap_Cvar_Set("cgx_last_error", va("1 Couldn't load map: %s", cgs.mapname_clean));
+	trap_CM_LoadMap( cgs.mapname );
+	trap_Cvar_Set("cgx_last_error", "");	
+}
+
+//cheks saved map string
+static qboolean CGX_IsRememberedMap() {
+	char buf[MAX_CVAR_VALUE_STRING];
+	char *s, *t;
+
+	trap_Cvar_VariableStringBuffer("cl_fixedmaps", buf, sizeof(buf));
+
+	for (t = s = buf; *t; t = s ) {
+		s = strchr(s, ' ');
+		if (!s)
+			break;
+		while (*s == ' ')
+			*s++ = 0;
+		if (*t && !Q_stricmp(t, cgs.mapname_clean))
+			return qtrue;		
+	}	
+
+	return qfalse;
+}
+
+//saves mapname to memory
+static void CGX_RememberBrokenMap() {
+	char buf[MAX_CVAR_VALUE_STRING];
+	int i;
+
+	if (CGX_IsRememberedMap())
+		return;
+
+	trap_Cvar_VariableStringBuffer("cl_fixedmaps", buf, sizeof(buf));
+
+	i = strlen(buf);
+	Com_sprintf(buf + i, sizeof(buf) - i, "%s ", cgs.mapname_clean);
+
+	trap_Cvar_Set("cl_fixedmaps", buf);
+}
+
+//save mapname and try load aganin with fix
+static void CGX_TryLoadingFix() {
+	CGX_RememberBrokenMap();	
+
+	if (cgs.localServer)
+		trap_SendConsoleCommand("vid_restart\n");
+	else 
+		trap_SendConsoleCommand("reconnect\n");
+}
+
+// check known maps and apply loading fix if needed
+static void CGX_CheckKnownMapsForFix() {
+	char buf[MAX_INFO_STRING];
+	char *s;
+
+	if (cgs.mapname_clean[0] != 'q' &&
+		cgs.mapname_clean[1] != '3' &&
+		CGX_IsRememberedMap()) {		
+		trap_Cvar_Set("cgx_fix_mapload", "1");
+	} else {
+		trap_Cvar_Set("cgx_fix_mapload", "0");
+	}
+
+	trap_Cvar_Update(&cgx_maploadingfix);
+}
+
+// load world map with last error
+static void CGX_LoadWorldMap() {
+	trap_DPrint( "CGX_LoadWorldMap\n" );
+	CG_LoadingString(cgs.mapname);
+	trap_Cvar_Set( "cgx_last_error", va( "2 Couldn't load world map: %s", cgs.mapname_clean ) );	
+
+	//check if need fix
+	CGX_CheckKnownMapsForFix();
+
+	//trying to apply fix only if vertexlight is off	
+	if (cgx_maploadingfix.integer && !CGX_IsVertexLight()) {
+		// load with fix
+		trap_Cvar_Set("r_vertexLight", "1");
+		trap_R_LoadWorldMap(cgs.mapname);
+		trap_Cvar_Set("r_vertexLight", "0");
+	} else {
+		// default load
+		trap_R_LoadWorldMap(cgs.mapname);
+	}
+	trap_Cvar_Set( "cgx_last_error", "" );
+}
+

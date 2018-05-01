@@ -70,6 +70,8 @@ vmCvar_t	cgx_scoreboard;
 vmCvar_t	cgx_drawAccuracy;
 
 vmCvar_t	cgx_sharedConfig;
+vmCvar_t	cgx_maploadingfix;
+vmCvar_t	cgx_fixedmaps;
 
 vmCvar_t	cgx_maxfps;
 vmCvar_t	cgx_maxpackets;
@@ -308,18 +310,23 @@ cvarTable_t		cvarTable[] = {
 
 	{ &cgx_maxfps, "com_maxfps", "125", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
 	//{ &cgx_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
-	{ &cgx_maxpackets, "cl_maxpackets", "40", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },			
+	{ &cgx_maxpackets, "cl_maxpackets", "40", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },				
+	
+#if CGX_NEMESIS_COMPATIBLE
+	{ &cgx_cgame, "cgame", CGX_NAME" "CGX_VERSION, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
+	{ &cgx_uinfo, "cg_uinfo", "", CVAR_TEMP | CVAR_USERINFO | CVAR_ROM  },
+#endif	
 
 #if CGX_DEBUG
 	{ &cgx_debug, "cgx_debug", "1", CVAR_TEMP },
 #else
 	{ &cgx_debug, "cgx_debug", "0", CVAR_TEMP },
 #endif
+	// X-MOD: fixes loading of some big maps 0: default 1: r_vertexLight 1 loading
+	{ &cgx_maploadingfix, "cgx_fix_mapload", "0", CVAR_TEMP | CVAR_ROM },
+	// stored fixed maplist, so if it once was fixed nextime will just read from this list
+	{ &cgx_fixedmaps, "cl_fixedmaps", "", CVAR_ROM | CVAR_ARCHIVE },
 	{ &cgx_version, "cgx_version", CGX_NAME" "CGX_VERSION" "CGX_DATE, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
-#if CGX_NEMESIS_COMPATIBLE
-	{ &cgx_cgame, "cgame", CGX_NAME" "CGX_VERSION, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
-	{ &cgx_uinfo, "cg_uinfo", "", CVAR_TEMP | CVAR_USERINFO | CVAR_ROM  },
-#endif	
 
 	// cg_wideScreenFix 1|0 - fix perspective for widescreen
 	// cg_defaultWeapon 0-9 - default weapon when spawn 0: default 1: gauntlet ...
@@ -838,11 +845,7 @@ static void CG_RegisterGraphics( void ) {
 	memset( &cg.refdef, 0, sizeof( cg.refdef ) );
 	trap_R_ClearScene();
 	
-	CG_LoadingString( cgs.mapname );
-	trap_DPrint( "trap_R_LoadWorldMap\n" );
-	//trap_Cvar_Set( "cgx_last_error", va( "2 Couldn't load world map: %s", cgs.mapname_clean ) );
-	trap_R_LoadWorldMap( cgs.mapname );
-	//trap_Cvar_Set( "cgx_last_error", "" );
+	CGX_LoadWorldMap();
 
 	trap_DPrint("precache status bar pics\n");
 	// precache status bar pics
@@ -1115,13 +1118,8 @@ void CG_Init( int serverMessageNum, int serverCommandSequence ) {
 	CG_ParseServerinfo();
 
 	// load the new map
-	CG_LoadingString( "collision map" );
-	trap_DPrint("trap_CM_LoadMap\n");	
-	trap_Cvar_Set("cgx_last_error", va("1 Couldn't load map: %s", cgs.mapname_clean));	
+	CGX_LoadCollisionMap();
 	
-	trap_CM_LoadMap( cgs.mapname );
-	trap_Cvar_Set("cgx_last_error", "");	
-
 	cg.loading = qtrue;		// force players to load instead of defer
 
 	CG_LoadingString( "sounds" );
@@ -1164,8 +1162,13 @@ void CG_Shutdown( void ) {
 	trap_Cvar_VariableStringBuffer("cgx_last_error", cgx_last_error, sizeof(cgx_last_error));
 	trap_DPrint(va("cgx_last_error %s\n", cgx_last_error));
 
-	if (cgx_last_error[0] != '\0')
+	if (cgx_last_error[0] == '1') {// error during loading collision map
 		CGX_GenerateMapBat();
+	} else if (cgx_last_error[0] == '2') { // error during loadworld map
+		if (cgx_maploadingfix.integer)
+			trap_Cvar_Set("r_vertexLight", "0");
+		CGX_IncreaseHunkmegs(CGX_MINHUNKMEGS); // prolly hunkmegs		
+	}
 
 	//CGX_SaveSharedConfig();
 
