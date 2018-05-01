@@ -87,7 +87,7 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 		
 		cur->infoValid = qtrue;
 
-		CG_LoadClientInfo( cur );	
+		CGX_LoadClientInfo( cur );	
 		
 		//check and restore other players models if needed, and set proper colors		
 		CGX_EnemyModelCheck();

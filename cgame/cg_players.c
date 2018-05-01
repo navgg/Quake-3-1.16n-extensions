@@ -475,7 +475,7 @@ static void CG_SetDeferredClientInfo( clientInfo_t *ci ) {
 		// an improper team skin.  This will cause a hitch for the first
 		// player, when the second enters.  Combat shouldn't be going on
 		// yet, so it shouldn't matter
-		CG_LoadClientInfo( ci );
+		CGX_LoadClientInfo( ci );
 		return;
 	}
 
@@ -498,7 +498,7 @@ static void CG_SetDeferredClientInfo( clientInfo_t *ci ) {
 	// we should never get here...
 	//CG_Printf( "CG_SetDeferredClientInfo: no valid clients!\n" );
 
-	CG_LoadClientInfo( ci );
+	CGX_LoadClientInfo( ci );
 }
 
 void RemoveChars(char *s, char c)
@@ -672,7 +672,7 @@ void CG_NewClientInfo( int clientNum ) {
 				newInfo.deferred = qfalse;
 			}
 		} else {
-			CG_LoadClientInfo( &newInfo );
+			CGX_LoadClientInfo( &newInfo );
 		}
 	}
 
@@ -704,7 +704,7 @@ void CG_LoadDeferredPlayers( void ) {
 				ci->deferred = qfalse;
 				continue;
 			}
-			CG_LoadClientInfo( ci );
+			CGX_LoadClientInfo( ci );
 //			break;
 		}
 	}

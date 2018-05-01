@@ -496,12 +496,12 @@ void CGX_CheckChatCommand(const char *str) {
 			tens = seconds / 10;
 			seconds -= tens * 10;
 
-			trap_SendConsoleCommand(va("say ^7CGX v"CGX_VERSION" (%i:%i%i)\n", mins, tens, seconds));
+			trap_SendConsoleCommand(va("say ^7"CGX_NAME" v"CGX_VERSION" (%i:%i%i)\n", mins, tens, seconds));
 		}
 	} 
 }
 
-//void CGX_Delay( int msec ) {
+//static void CGX_Delay( int msec ) {
 //	CG_Printf( "Delay for %i start...\n", msec );
 //	msec += trap_Milliseconds();	
 //	while (msec > trap_Milliseconds());
@@ -622,8 +622,12 @@ static void CGX_IncreaseHunkmegs(int min) {
 
 qboolean CGX_IsVertexLight() {
 	char buf[4];
-	trap_Cvar_VariableStringBuffer("r_vertexLight", buf, sizeof(buf));
-	return atoi(buf);
+	static int vertexLight = -1;
+	if (vertexLight == -1) {
+		trap_Cvar_VariableStringBuffer("r_vertexLight", buf, sizeof(buf));
+		vertexLight = atoi(buf);
+	}
+	return vertexLight;
 }
 
 // load collision map with last error
@@ -720,13 +724,14 @@ static void CGX_LoadWorldMap() {
 	trap_Cvar_Set( "cgx_last_error", "" );
 }
 
-//check vertex light and register clients fix
-static void CGX_RegisterClients() {		
+//fix enemymodels with vertex light
+//check vertex light and load client info
+static void CGX_LoadClientInfo( clientInfo_t *ci ) {
 	if (CGX_IsVertexLight()) {
 		trap_Cvar_Set("r_vertexLight", "0");
-		CG_RegisterClients();		// if low on memory, some clients will be deferred
+		CG_LoadClientInfo(ci);		// if low on memory, some clients will be deferred
 		trap_Cvar_Set("r_vertexLight", "1");
 	} else {
-		CG_RegisterClients();		// if low on memory, some clients will be deferred
+		CG_LoadClientInfo(ci);		// if low on memory, some clients will be deferred
 	}
 }
