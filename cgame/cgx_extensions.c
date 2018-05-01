@@ -612,6 +612,34 @@ void CGX_GenerateMapBat(void) {
 	}
 }
 
+//gets picmip and save its value
+int CGX_GetPicmip() {	
+	static int val = -1;
+	if (val == -1) {
+		char buf[4];
+		trap_Cvar_VariableStringBuffer("r_picmip", buf, sizeof(buf));		
+		val = atoi(buf);
+		//save for cg_nomip
+		if (cgx_nomip.integer && val)
+			trap_Cvar_Set("cgx_r_picmip", buf);
+		CG_Printf("picnic %i\n", val);
+	}
+	return val;
+}
+
+static void CGX_NomipStart() {	
+	if (cgx_nomip.integer && CGX_GetPicmip())
+		trap_Cvar_Set("r_picmip", "0");
+}
+
+static void CGX_NomipEnd() {		
+	if (cgx_nomip.integer && CGX_GetPicmip()) {
+		char buf[4];
+		trap_Cvar_VariableStringBuffer("cgx_r_picmip", buf, sizeof(buf));		
+		trap_Cvar_Set("r_picmip", buf);
+	}
+}
+
 static void CGX_IncreaseHunkmegs(int min) {
 	char buf[8];
 	trap_Cvar_VariableStringBuffer("com_hunkMegs", buf, sizeof(buf));
@@ -727,6 +755,8 @@ static void CGX_LoadWorldMap() {
 //fix enemymodels with vertex light
 //check vertex light and load client info
 static void CGX_LoadClientInfo( clientInfo_t *ci ) {
+	CGX_NomipStart();	
+
 	if (CGX_IsVertexLight()) {
 		trap_Cvar_Set("r_vertexLight", "0");
 		CG_LoadClientInfo(ci);		// if low on memory, some clients will be deferred
@@ -734,4 +764,6 @@ static void CGX_LoadClientInfo( clientInfo_t *ci ) {
 	} else {
 		CG_LoadClientInfo(ci);		// if low on memory, some clients will be deferred
 	}
+
+	CGX_NomipEnd();
 }

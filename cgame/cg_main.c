@@ -72,6 +72,7 @@ vmCvar_t	cgx_drawAccuracy;
 vmCvar_t	cgx_sharedConfig;
 vmCvar_t	cgx_maploadingfix;
 vmCvar_t	cgx_fixedmaps;
+vmCvar_t	cgx_nomip;
 
 vmCvar_t	cgx_maxfps;
 vmCvar_t	cgx_maxpackets;
@@ -286,8 +287,8 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_scoreboard, "cg_scoreboard", "0", CVAR_ARCHIVE },
 	{ &cgx_drawScoreBox, "cg_drawScoreBox", "1", CVAR_ARCHIVE },
 	{ &cgx_drawAccuracy, "cg_drawAccuracy", "0", CVAR_ARCHIVE },
-	//develop
-	{ &cgx_sharedConfig, "cg_sharedConfig", "1", CVAR_ARCHIVE },	
+	{ &cgx_sharedConfig, "cg_sharedConfig", "1", CVAR_ARCHIVE },
+	{ &cgx_nomip, "cg_nomip", "-1", CVAR_TEMP | CVAR_LATCH },
 #if CGX_UNLAGGED
 	//unlagged - client options
 	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},	
@@ -847,6 +848,8 @@ static void CG_RegisterGraphics( void ) {
 	
 	CGX_LoadWorldMap();
 
+	CGX_NomipStart();
+
 	trap_DPrint("precache status bar pics\n");
 	// precache status bar pics
 	CG_LoadingString( "game media" );
@@ -1000,6 +1003,8 @@ static void CG_RegisterGraphics( void ) {
 		}
 		cgs.gameModels[i] = trap_R_RegisterModel( modelName );
 	}
+
+	CGX_NomipEnd();
 }
 
 /*

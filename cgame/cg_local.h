@@ -875,6 +875,7 @@ extern	vmCvar_t		cgx_drawAccuracy;
 
 extern	vmCvar_t		cgx_sharedConfig;
 extern	vmCvar_t		cgx_maploadingfix;
+extern	vmCvar_t		cgx_nomip;
 
 extern	vmCvar_t		cgx_maxfps;
 extern	vmCvar_t		cgx_maxpackets;
