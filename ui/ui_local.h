@@ -68,6 +68,7 @@ extern vmCvar_t	ui_server16;
 extern vmCvar_t	ui_cdkey;
 extern vmCvar_t	ui_cdkeychecked;
 
+extern vmCvar_t uix_nomip;
 
 //
 // ui_qmenu.c

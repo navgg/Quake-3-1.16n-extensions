@@ -153,6 +153,7 @@
     <ClCompile Include="..\game\bg_misc.c" />
     <ClCompile Include="..\game\q_math.c" />
     <ClCompile Include="..\game\q_shared.c" />
+    <ClCompile Include="uix_extensions.c" />
     <ClCompile Include="ui_addbots.c" />
     <ClCompile Include="ui_atoms.c" />
     <ClCompile Include="ui_cdkey.c" />

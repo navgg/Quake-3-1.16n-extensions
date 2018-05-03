@@ -739,7 +739,7 @@ static void Controls_DrawPlayer( void *self ) {
 
 	trap_Cvar_VariableStringBuffer( "model", buf, sizeof( buf ) );
 	if ( strcmp( buf, s_controls.playerModel ) != 0 ) {
-		UI_PlayerInfo_SetModel( &s_controls.playerinfo, buf );
+		UIX_PlayerInfo_SetModel( &s_controls.playerinfo, buf );
 		strcpy( s_controls.playerModel, buf );
 		Controls_UpdateModel( ANIM_IDLE );
 	}
@@ -1155,7 +1155,7 @@ static void Controls_InitModel( void )
 {
 	memset( &s_controls.playerinfo, 0, sizeof(playerInfo_t) );
 
-	UI_PlayerInfo_SetModel( &s_controls.playerinfo, UI_Cvar_VariableString( "model" ) );
+	UIX_PlayerInfo_SetModel( &s_controls.playerinfo, UI_Cvar_VariableString( "model" ) );
 
 	Controls_UpdateModel( ANIM_IDLE );
 }

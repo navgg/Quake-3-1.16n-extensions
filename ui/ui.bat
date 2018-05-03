@@ -100,6 +100,8 @@ set cc=lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\
 @if errorlevel 1 goto quit
 %cc% ../ui_mods.c
 @if errorlevel 1 goto quit
+%cc% ../uix_extensions.c
+@if errorlevel 1 goto quit
 
 
 q3asm -f ../ui

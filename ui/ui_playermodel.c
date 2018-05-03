@@ -161,7 +161,7 @@ static void PlayerModel_UpdateModel( void )
 	viewangles[ROLL]  = 0;
 	VectorClear( moveangles );
 
-	UI_PlayerInfo_SetModel( &s_playermodel.playerinfo, s_playermodel.modelskin );
+	UIX_PlayerInfo_SetModel( &s_playermodel.playerinfo, s_playermodel.modelskin );
 	UI_PlayerInfo_SetInfo( &s_playermodel.playerinfo, LEGS_IDLE, TORSO_STAND, viewangles, moveangles, WP_MACHINEGUN, qfalse );
 }
 

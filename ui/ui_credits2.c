@@ -216,37 +216,37 @@ static void UI_InitPlayerModels() {
 	p_taunt = qfalse;
 	p_stand = qfalse;
 	
-	UI_PlayerInfo_SetModel( &s_credits2.playerinfo[0], "keel/red" );	
+	UIX_PlayerInfo_SetModel( &s_credits2.playerinfo[0], "keel/red" );	
 	viewangles[YAW]   = 180 - YAW1;
 	viewangles[PITCH] = PITCH1;
 	viewangles[ROLL]  = 0;
 	UI_PlayerInfo_SetInfo( &s_credits2.playerinfo[0], LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, WP_BFG, qfalse );
 
-	UI_PlayerInfo_SetModel( &s_credits2.playerinfo[1], "mynx/blue" );	
+	UIX_PlayerInfo_SetModel( &s_credits2.playerinfo[1], "mynx/blue" );	
 	viewangles[YAW]	  = 180 - YAW1;
 	viewangles[PITCH] = PITCH1;
 	viewangles[ROLL]  = 0;
 	UI_PlayerInfo_SetInfo( &s_credits2.playerinfo[1], LEGS_IDLECR, TORSO_STAND, viewangles, vec3_origin, WP_ROCKET_LAUNCHER, qfalse );
 
-	UI_PlayerInfo_SetModel( &s_credits2.playerinfo[2], "visor/default" );	
+	UIX_PlayerInfo_SetModel( &s_credits2.playerinfo[2], "visor/default" );	
 	viewangles[YAW]	  = 180 - YAW1;
 	viewangles[PITCH] = PITCH1;
 	viewangles[ROLL]  = 0;
 	UI_PlayerInfo_SetInfo( &s_credits2.playerinfo[2], LEGS_IDLECR, TORSO_STAND, viewangles, vec3_origin, WP_GRENADE_LAUNCHER, qfalse );
 
-	UI_PlayerInfo_SetModel( &s_credits2.playerinfo[3], "xaero/red" );	
+	UIX_PlayerInfo_SetModel( &s_credits2.playerinfo[3], "xaero/red" );	
 	viewangles[YAW]   = 270 - YAW2;
 	viewangles[PITCH] = PITCH1;
 	viewangles[ROLL]  = 0;
 	UI_PlayerInfo_SetInfo( &s_credits2.playerinfo[3], LEGS_IDLECR, TORSO_STAND, viewangles, vec3_origin, WP_RAILGUN, qfalse );
 
-	UI_PlayerInfo_SetModel( &s_credits2.playerinfo[4], "sarge/default" );	
+	UIX_PlayerInfo_SetModel( &s_credits2.playerinfo[4], "sarge/default" );	
 	viewangles[YAW]   = 270 - YAW2;
 	viewangles[PITCH] = PITCH1;
 	viewangles[ROLL]  = 0;
 	UI_PlayerInfo_SetInfo( &s_credits2.playerinfo[4], LEGS_IDLECR, TORSO_STAND, viewangles, vec3_origin, WP_MACHINEGUN, qfalse );
 
-	UI_PlayerInfo_SetModel( &s_credits2.playerinfo[5], "slash/blue" );	
+	UIX_PlayerInfo_SetModel( &s_credits2.playerinfo[5], "slash/blue" );	
 	viewangles[YAW]   = 270 - YAW2;
 	viewangles[PITCH] = PITCH1;
 	viewangles[ROLL]  = 0;
@@ -254,7 +254,7 @@ static void UI_InitPlayerModels() {
 
 	trap_Cvar_VariableStringBuffer( "model", buf, sizeof( buf ) );
 
-	UI_PlayerInfo_SetModel( &s_credits2.playerinfo[6], buf );	
+	UIX_PlayerInfo_SetModel( &s_credits2.playerinfo[6], buf );	
 	viewangles[YAW]   = 180;
 	viewangles[PITCH] = PITCH1;
 	viewangles[ROLL]  = 0;

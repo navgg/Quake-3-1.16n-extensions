@@ -218,7 +218,7 @@ static void PlayerSettings_DrawPlayer( void *self ) {
 
 	trap_Cvar_VariableStringBuffer( "model", buf, sizeof( buf ) );
 	if ( strcmp( buf, s_playersettings.playerModel ) != 0 ) {
-		UI_PlayerInfo_SetModel( &s_playersettings.playerinfo, buf );
+		UIX_PlayerInfo_SetModel( &s_playersettings.playerinfo, buf );
 		strcpy( s_playersettings.playerModel, buf );
 
 		viewangles[YAW]   = 180 - 30;
@@ -289,7 +289,7 @@ static void PlayerSettings_SetMenuItems( void ) {
 	viewangles[PITCH] = 0;
 	viewangles[ROLL]  = 0;
 
-	UI_PlayerInfo_SetModel( &s_playersettings.playerinfo, UI_Cvar_VariableString( "model" ) );
+	UIX_PlayerInfo_SetModel( &s_playersettings.playerinfo, UI_Cvar_VariableString( "model" ) );
 	UI_PlayerInfo_SetInfo( &s_playersettings.playerinfo, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, WP_MACHINEGUN, qfalse );
 
 	// handicap
