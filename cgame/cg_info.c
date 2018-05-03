@@ -169,6 +169,13 @@ void CG_DrawInformation( void ) {
 			UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 	}
 
+	//X-MOD: draw version
+	{
+		vec4_t	xmodcol = { 1.0f, 0.1f, 0.1f, 0.44f };
+		UI_DrawProportionalString(vScreen.width - 8, SCREEN_HEIGHT - SMALLCHAR_HEIGHT - 8, CGX_NAME" "CGX_VERSION, 
+			UI_RIGHT | UI_SMALLFONT, xmodcol);
+	}
+
 	// draw info string information
 
 	y = 180;

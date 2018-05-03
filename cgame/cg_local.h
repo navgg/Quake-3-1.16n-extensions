@@ -821,7 +821,7 @@ typedef struct {
 	int 			width;
 	int 			hwidth;
 	
-	int 			height;
+	//int 			height; //SCREEN_HEIGHT used
 	int 			hheight;
 	
 	float			ratiox;	

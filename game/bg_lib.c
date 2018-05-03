@@ -1,9 +1,6 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
 // Copyright (C) 2018 NaViGaToR (322)
 //
-// Copyright (C) 1999-2000 Id Software, Inc.
-// Copyright (C) 2018 NaViGaToR (322)
-//
 // bg_lib,c -- standard C library replacement routines used by code
 // compiled for the virtual machine
 

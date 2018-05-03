@@ -11,7 +11,7 @@
 // X-MOD constants
 #define CGX_NAME		"X-Mod"
 #define CGX_VERSION		"0.87b"
-#define CGX_DATE		__DATE__
+#define CGX_DATE		"May 02 2018" //__DATE__ not working with dd/mm/yyyy format
 #define CGX_DEBUG		0
 #define	CGX_UNLAGGED	1
 #define CGX_NOGHOST_COMPATIBLE CVAR_USERINFO
@@ -581,6 +581,9 @@ void	Q_strcat( char *dest, int size, const char *src );
 
 // X-MOD: externsions
 char *QX_trim(char *str);
+//moved from ai_dmq3.h
+//strstr but case insensitive
+char *stristr(char *str, char *charset);
 
 // strlen that discounts Quake color sequences
 int Q_PrintStrlen( const char *string );
