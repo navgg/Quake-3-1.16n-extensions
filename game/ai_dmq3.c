@@ -407,18 +407,18 @@ int ClientFromName(char *name) {
 stristr
 ==================
 */
-char *stristr(char *str, char *charset) {
-	int i;
-
-	while(*str) {
-		for (i = 0; charset[i] && str[i]; i++) {
-			if (toupper(charset[i]) != toupper(str[i])) break;
-		}
-		if (!charset[i]) return str;
-		str++;
-	}
-	return NULL;
-}
+//char *stristr(char *str, char *charset) {
+//	int i;
+//
+//	while(*str) {
+//		for (i = 0; charset[i] && str[i]; i++) {
+//			if (toupper(charset[i]) != toupper(str[i])) break;
+//		}
+//		if (!charset[i]) return str;
+//		str++;
+//	}
+//	return NULL;
+//}
 
 /*
 ==================

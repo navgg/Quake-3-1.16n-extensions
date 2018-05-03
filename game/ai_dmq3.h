@@ -97,7 +97,7 @@ bot_waypoint_t *BotCreateWayPoint(char *name, vec3_t origin, int areanum);
 //find a waypoint with the given name
 bot_waypoint_t *BotFindWayPoint(bot_waypoint_t *waypoints, char *name);
 //strstr but case insensitive
-char *stristr(char *str, char *charset);
+//char *stristr(char *str, char *charset);
 //returns the number of the client with the given name
 int ClientFromName(char *name);
 //

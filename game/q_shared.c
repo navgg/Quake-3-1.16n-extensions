@@ -683,6 +683,25 @@ char *QX_trim(char *str)
 	return str;
 }
 
+//X-Mod: moved from ai_dmq3.c
+/*
+==================
+stristr
+==================
+*/
+char *stristr(char *str, char *charset) {
+	int i;
+
+	while(*str) {
+		for (i = 0; charset[i] && str[i]; i++) {
+			if (toupper(charset[i]) != toupper(str[i])) break;
+		}
+		if (!charset[i]) return str;
+		str++;
+	}
+	return NULL;
+}
+
 int Q_PrintStrlen( const char *string ) {
 	int			len;
 	const char	*p;
