@@ -1,3 +1,4 @@
+doc\*
 models\*
 sound\feedback\*
 vm\cgame.qvm

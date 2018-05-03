@@ -43,7 +43,7 @@ fixed showplayerids toggle in menu
 
 0.90b
 
-added cg_nomip 1|0 (if it's on all objects will have r_picmip 0 regardless of current r_picmip settings)
+added cg_nomip -1|0 (if it's -1 all objects will have r_picmip 0 regardless of current r_picmip settings)
 
 fixed loading of some big maps (using r_vertexLight 1 during loading and switching back to 0)
 fixed bright models with r_vertexLight 1

@@ -1,3 +1,5 @@
+// Copyright (C) 2018 NaViGaToR (322)
+
 #include "cg_local.h"
 
 #define ShaderRGBAFill(a,c)	((a)[0]=(c),(a)[1]=(c),(a)[2]=(c),(a)[3]=(255))
@@ -621,8 +623,7 @@ int CGX_GetPicmip() {
 		val = atoi(buf);
 		//save for cg_nomip
 		if (cgx_nomip.integer && val)
-			trap_Cvar_Set("cgx_r_picmip", buf);
-		CG_Printf("picnic %i\n", val);
+			trap_Cvar_Set("cgx_r_picmip", buf);		
 	}
 	return val;
 }
@@ -759,10 +760,10 @@ static void CGX_LoadClientInfo( clientInfo_t *ci ) {
 
 	if (CGX_IsVertexLight()) {
 		trap_Cvar_Set("r_vertexLight", "0");
-		CG_LoadClientInfo(ci);		// if low on memory, some clients will be deferred
+		CG_LoadClientInfo(ci);
 		trap_Cvar_Set("r_vertexLight", "1");
 	} else {
-		CG_LoadClientInfo(ci);		// if low on memory, some clients will be deferred
+		CG_LoadClientInfo(ci);
 	}
 
 	CGX_NomipEnd();

@@ -9,13 +9,13 @@ cg_centerPrintAlpha 1.0-0 - center print transparency
 cg_crosshairColor 0-35 - crosshair color "" - default, 0: black 1: red etc.
 cg_drawSpeed 0|1|2 - speedometer 0: off 1: top corner 2: center screen
 cg_deadBodyDarken 0|1|2|3 - pm skins becomes gray after death 0: off 1: Just grey 2: BT709 Greyscale 3: Y-Greyscale (PAL/NTSC)
-cg_chatSound 1|0 - chat beep sound
+cg_chatSound 0|1|2 - chat beep sound 0: off 1: on 2: only team
 cg_noTaunt 0|1 - enemy taunt sound
 cg_drawGun 0|1|2 - 0: no gun 1: bobbing gun 2: static gun no bobbing
 cg_enemyModel_enabled 0|1 - enemy model on\off
-cg_enemyModel "" - forcing enemy model "keel/pm", "thankjr" etc. if it's empty and cg_enemyModel_enambled = 1 then 
+cg_enemyModel "" - forcing enemy model "keel/pm", "thankjr" etc. if it's empty and cg_enemyModel_enambled = 1 then
 		it will get pm skins for current player model eg. player model visor/blue it will make him visor/pm + specified colors
-cg_enemyColors "" - "1234" 1-rail 2-head 3-torso 4-legs (colors from 0 to 7 or any letter for extended color table, 
+cg_enemyColors "" - "1234" 1-rail 2-head 3-torso 4-legs (colors from 0 to 7 or any letter for extended color table,
 		special symbols ? - color depending on team (1 - red, 4 - blue, 2- ffa), ! - same as ? but in ffa color is random, 
 		* - random color 0-7, . - random extended color 0-35)
 cg_teamModel "" - same as cg_enemyModel but for team
@@ -24,9 +24,9 @@ cg_lagometer 0|1|2|3 - 0 :off 1: default 2: default + ping 3: only when packetlo
 cg_hitsounds 0|1|2 - 0: default 1: pro mode hi-low 2: low-hi hp hitsounds
 cg_networkAdjustments 0|1|2|3 - 0: off 1: min rate 8000 packets 30 2: packets 40-60 rate min 16000 3: packets 60-100 rate min 25000 packetdup off (snaps = sv_fps or min 40 in all cases if it's on)
 cg_drawGun 0|1|2 - 0: no gun 1: default bobbing 2: not bobbing cpm style
-cg_drawScoreBox 1|0 - display score box in low right corner
+cg_drawScoreBox 0|1 - display score box in low right corner
 cg_scoreboard 0|1 - scoreboard 0: default large-small 1: always small
 cg_drawAccuracy 0|1 - total weapon accuracy
-cgx_debug 0|1 - show debug info
 cgx_version - show version
+xmod - mod commands, use \xmod help to get info
 
