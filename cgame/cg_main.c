@@ -579,6 +579,8 @@ void QDECL CG_Error( const char *msg, ... ) {
 	va_list		argptr;
 	char		text[1024];
 
+	CGX_NomipEnd();//if anywhere was NomipStart then end it due to error
+
 	va_start (argptr, msg);
 	vsprintf (text, msg, argptr);
 	va_end (argptr);
