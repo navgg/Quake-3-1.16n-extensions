@@ -74,8 +74,9 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 
 	// X-MOD: save player's id in cg.clientNum then restore model and skin
 	if (cg.clientNum == -1) {	
-		// BUG: if follow other player with enemyModels enabled and make vid_restart, 
+		// if follow other player with enemyModels enabled and make vid_restart, 
 		// clientNum of followed player will come here
+		// so it's need to be updated in CG_TransitionPlayerState
 		cg.clientNum = cg.snap->ps.clientNum;
 
 		cur = &cgs.clientinfo[cg.clientNum];

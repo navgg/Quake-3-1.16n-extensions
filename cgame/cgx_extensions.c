@@ -141,7 +141,7 @@ void CGX_EnemyModelCheck(void) {
 
 	//change models and skins if needed or restore
 	for ( i = 0, ci = cgs.clientinfo ; i < cgs.maxclients ; i++, ci++ )
-		if (cg.clientNum != i && ci->infoValid)
+		if (/*cg.clientNum != i &&*/ ci->infoValid)
 			CGX_SetModelAndSkin(ci, qtrue, i);																		
 }
 
@@ -321,7 +321,8 @@ void CGX_SetModelAndSkin(clientInfo_t *ci, qboolean isDeferred, int clientNum) {
 		qboolean isSpect = cgs.clientinfo[cg.clientNum].team == TEAM_SPECTATOR || ci->team == TEAM_SPECTATOR;
 		isSameTeam = cgs.gametype >= GT_TEAM && cgs.clientinfo[cg.clientNum].team == ci->team;
 
-		if (isSpect) {
+		//if spect or it's our client
+		if (isSpect || cg.clientNum == clientNum) {
 			CGX_RestoreModelAndSkin(ci);
 			ci->deferred = isDeferred;		
 			//CG_Printf("Restore '%i' '%s' '%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->infoValid, ci->deferred);
@@ -382,6 +383,15 @@ void CGX_SetModelAndSkin(clientInfo_t *ci, qboolean isDeferred, int clientNum) {
 		if (Q_stricmp(ci->skinName, "pm") == 0)
 			CGX_SetColorInfo(cgx_teamColors.string, ci);
 	}
+}
+
+static void CGX_UpdateClientNum(int i) {
+	cg.clientNum = i;
+	cg.oldTeam = cgs.clientinfo[cg.clientNum].team;
+
+	CGX_EnemyModelCheck();
+	CG_LoadDeferredPlayers();
+	trap_DPrint(va("cg.clientNum %i\n", cg.clientNum));
 }
 
 void CGX_AutoAdjustNetworkSettings(void) {
