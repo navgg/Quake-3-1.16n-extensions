@@ -4,7 +4,7 @@ rem set "gamedir=C:\Games\Quake\Quake 3 Arena 1.16n Vanilla\Vanilla Quake III Ar
 
 set "pakname={X-Mod}.pk3"
 
-bin_nt\7za a -tzip -mx9 %pakname% %CD%\baseq3\vm
+bin_nt\7za a -tzip -mx0 %pakname% %CD%\baseq3\vm
 
 move "%pakname%" "%gamedir%baseq3\%pakname%"
 
