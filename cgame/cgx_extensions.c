@@ -762,3 +762,168 @@ static void CGX_LoadClientInfo( clientInfo_t *ci ) {
 
 	CGX_NomipEnd();
 }
+
+//safety open file
+int CGX_FOpenFile(char *filename, fileHandle_t *f, fsMode_t mode, int maxSize) {
+	int len;
+	len = trap_FS_FOpenFile( filename, f, mode );
+
+	if ( len <= 0 ) {
+		trap_Print( va( S_COLOR_RED "file not found: %s\n", filename ) );
+		return 0;
+	}
+	if ( len >= maxSize && maxSize != -1) {
+		trap_Print( va( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, maxSize ) );
+		trap_FS_FCloseFile( *f );
+		return 0;
+	}
+
+	return len;
+}
+
+//read all and close
+int CGX_FReadAll(char *filename, char *buffer, int bufsize) {
+	int len;
+	fileHandle_t	f;
+
+	if (len = CGX_FOpenFile(filename, &f, FS_READ, bufsize)) {
+		trap_FS_Read(buffer, len, f);
+		trap_FS_FCloseFile(f);
+		buffer[len] = 0;
+	}
+
+	return len;
+}
+
+void CGX_PrintLine(char c) {
+	int i;	
+	CG_Printf("^%c", c);
+	for(i = 0; i < 20*3/10; i++)
+		CG_Printf("^%c------------", c);
+	trap_Print("\n");
+}
+
+//parse info from file
+//format: cmd1 - description1\r\n
+void CGX_ShowHelp(char *filename, char *cmd) {
+	char			buf[1024 * 3];
+	static			qboolean exampleShown;
+
+	//start parse command list if read succesful
+	if (CGX_FReadAll(filename, buf, sizeof(buf))) {
+		int i, j;
+		char *s, *t, *nt;
+
+		//shift \r\n+two tabs
+		for (i = 1; i < sizeof(buf) - 1; i++) {			
+			if (buf[i] == '\t' && buf[i - 1] == '\t') {
+				buf[i] = buf[i - 1] = buf[i - 2] = buf[i - 3] = ' ';
+				for (j = i - 4; buf[j] != 0; j++)
+					buf[j] = buf[j + 4];
+			}
+		}
+
+		//if no command show all 
+		if (!cmd[0]) {
+			//find first command in file
+			s = strchr(buf, 'c');
+
+			CGX_PrintLine(COLOR_YELLOW);
+			for (t = s; *t; t = s) {
+				if (!(s = strchr(s, ' ')))
+					break;
+				*s++ = 0;
+				//print found info
+				CG_Printf("%25s", t);
+				if (!(s = strchr(s, '\n')))
+					break;		
+				s++;
+			}			
+			trap_Print("\n");
+			CGX_PrintLine(COLOR_YELLOW);
+			trap_Print("For detailed info: \\xmod <command>\n");
+			//show example
+			if (!exampleShown) {
+				trap_Print("Example: \\xmod cg_enemy\n"); exampleShown = qtrue;
+			}
+		} else {// find info abt command
+			i = strlen(cmd);
+			if (i < 3) {
+				CG_Printf("Too short cmd\n");
+				return;
+			}
+			//remove emtpy space
+			cmd[i - 1] = 0;			
+			
+			for (t = buf, i = 0; *t; t++) {
+				t = stristr(t, cmd);				
+				if (*(t - 1) == '\n') {			
+					s = strchr(t, '-');
+					//if - in text find next
+					if (*(s + 1) != ' ' || *(s - 1) != ' ')
+						s = strchr(s + 1, '-');
+					if (s) {
+						*(s) = COLOR_WHITE;
+						*(s - 1) = '^';
+					}					
+					if (s = strchr(s, '\r'))
+						*s = 0;
+					//print found info
+					CG_Printf("^3%s\n", t);
+					i++;
+					t = s;
+				}				
+			}
+			
+			//zero matches
+			if (!i)
+				CG_Printf("Unknown cmd '%s'\n", cmd);
+		} 		
+	}
+}
+
+//small talk
+#define XMOD_ANSWER(x) CG_Printf("^7[^1xmod^7]: ^6%s\n", x); trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
+char* CGX_XmodTalk(char *command) {
+	if (stristr(command, "fuck") || stristr(command, "suck") || stristr(command, "shit")) {
+		return command;
+	} else if (stristr(command, "hi") || stristr(command, "hello")) {
+		char *txt[] = { "hi! how are you?", "hello!", "hey" };
+		return txt[rand() % 3];
+	} else if (stristr(command, "fine") || stristr(command, "good") || stristr(command, "ok")) {
+		char *txt[] = { "good", "great", "okay" };
+		return txt[rand() % 3];
+	} else if (stristr(command, "you") || stristr(command, " u ") || stristr(command, "how")) {
+		char *txt[] = { "I'm just a program", "and you?", "I'm sequience of 0 and 1" };
+		return txt[rand() % 3];
+	} else if (stristr(command, "bye") || stristr(command, "bb")) {
+		char *txt[] = { "bb", "see you", "bye" };
+		return txt[rand() % 3];
+	}
+
+	return NULL;
+}
+
+//xmod command
+void CGX_Xmod(char *command) {
+	char* talk;
+
+	if (stristr(command, "help")) {
+		CGX_ShowHelp("doc\\2-comand_list.txt", "");
+	} else if (talk = CGX_XmodTalk(command)) {		
+		XMOD_ANSWER(talk);
+	} else if (stristr(command, "8ball")) {
+		char *balls[] = {
+			"listen to your heart",
+			"listen to your intuition",
+			"trust your hunches",
+			"follow your instincts",
+			"listen to your feelings",
+		};
+		XMOD_ANSWER(balls[rand() % 5]);
+	} else if (stristr(command, "coin")) {
+		XMOD_ANSWER(rand() % 100 >= 50 ? "true": "false");
+	} else {
+		CGX_ShowHelp("doc\\2-comand_list.txt", command);
+	}
+}

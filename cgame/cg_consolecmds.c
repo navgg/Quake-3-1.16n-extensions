@@ -120,10 +120,17 @@ static void CGX_SaveSharedConfig_f( void ) {
 }
 
 static void CGX_RecordSync_f( void ) {
-	char	message[128];
-	trap_Args( message, 128 );
+	char	name[MAX_QPATH];
+	trap_Args( name, MAX_QPATH );
 
-	trap_SendConsoleCommand(va("g_syncronousClients 1; record %s; g_syncronousClients 0\n", message));
+	trap_SendConsoleCommand(va("g_syncronousClients 1; record %s; g_syncronousClients 0\n", name));
+}
+
+static void CGX_Xmod_f(void) {
+	char	command[MAX_QPATH];
+	trap_Args( command, MAX_QPATH );
+
+	CGX_Xmod(command);
 }
 
 typedef struct {
@@ -155,7 +162,8 @@ static consoleCommand_t	commands[] = {
 	// X-MOD: save shared config command
 	{ "writesharedconfig", CGX_SaveSharedConfig_f },
 	{ "recordsync", CGX_RecordSync_f },
-	{ "autorecord", CGX_RecordSync_f },
+	{ "autorecord", CGX_RecordSync_f },	
+	{ "xmod", CGX_Xmod_f },
 };
 
 
