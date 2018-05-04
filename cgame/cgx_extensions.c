@@ -148,18 +148,11 @@ void CGX_EnemyModelCheck(void) {
 static void CGX_ColorFromChar(char v, byte *color, clientInfo_t *info) {
 	int j;
 
-	if (v == '?')
+	if (v == '?' || v == '!')
 		switch (info->team) {
 			case TEAM_RED:  v = '1'; break;
 			case TEAM_BLUE: v = '4'; break;
 			case TEAM_FREE: v = '2'; break;
-			default: v = '7'; break;
-		} 
-	else if (v == '!')
-		switch (info->team) {
-			case TEAM_RED:  v = '1'; break;
-			case TEAM_BLUE: v = '4'; break;
-			case TEAM_FREE: v = '0' + (random() * 7); break;
 			default: v = '7'; break;
 		} 
 	else if (v == '*')
