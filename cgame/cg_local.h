@@ -857,7 +857,7 @@ extern	vmCvar_t		cgx_enemyModel;
 extern	vmCvar_t		cgx_enemyModel_enabled;
 extern	vmCvar_t		cgx_enemyColors;
 extern	vmCvar_t		cgx_teamModel;
-extern	vmCvar_t		cgx_teamModel_enabled;
+//extern	vmCvar_t		cgx_teamModel_enabled;
 extern	vmCvar_t		cgx_teamColors;
 extern	vmCvar_t		cgx_deadBodyDarken;
 extern	vmCvar_t		cgx_defaultWeapon;
@@ -954,7 +954,9 @@ extern	vmCvar_t		cg_drawAttacker;
 extern	vmCvar_t		cg_syncronousClients;
 extern	vmCvar_t		cg_teamChatTime;
 extern	vmCvar_t		cg_teamChatHeight;
+#if CGX_DEBUG
 extern	vmCvar_t		cg_stats;
+#endif
 extern	vmCvar_t 		cg_forceModel;
 extern	vmCvar_t 		cg_buildScript;
 extern	vmCvar_t		cg_paused;

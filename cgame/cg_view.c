@@ -785,9 +785,10 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 
 	// actually issue the rendering calls
 	CG_DrawActive( stereoView );
-
+#if CGX_DEBUG
 	if ( cg_stats.integer ) {
 		CG_Printf( "cg.clientFrame:%i\n", cg.clientFrame );
 	}
+#endif
 }
 

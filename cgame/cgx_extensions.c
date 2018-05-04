@@ -721,9 +721,6 @@ static void CGX_TryLoadingFix() {
 
 // check known maps and apply loading fix if needed
 static void CGX_CheckKnownMapsForFix() {
-	char buf[MAX_INFO_STRING];
-	char *s;
-
 	if (cgs.mapname_clean[0] != 'q' &&
 		cgs.mapname_clean[1] != '3' &&
 		CGX_IsRememberedMap()) {		

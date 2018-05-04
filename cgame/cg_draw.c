@@ -1669,7 +1669,7 @@ void CG_AddLagometerSnapshotInfo( snapshot_t *snap ) {
 	lagometer.snapshotFlags[ lagometer.snapshotCount & ( LAG_SAMPLES - 1) ] = snap->snapFlags;
 	lagometer.snapshotCount++;
 
-	if (cg_lagometer.integer > 1 || cgx_networkAdjustments.integer)
+	if (cg_lagometer.integer > 1/* || cgx_networkAdjustments.integer*/)
 		CGX_UpdateNetworkStats(snap);		
 }
 

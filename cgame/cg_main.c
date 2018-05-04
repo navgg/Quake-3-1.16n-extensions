@@ -53,7 +53,7 @@ vmCvar_t	cgx_enemyModel;
 vmCvar_t	cgx_enemyModel_enabled;
 vmCvar_t	cgx_enemyColors;
 vmCvar_t	cgx_teamModel;
-vmCvar_t	cgx_teamModel_enabled;
+//vmCvar_t	cgx_teamModel_enabled;
 vmCvar_t	cgx_teamColors;
 vmCvar_t	cgx_deadBodyDarken;
 vmCvar_t	cgx_defaultWeapon;
@@ -81,6 +81,10 @@ vmCvar_t	cgx_delag;
 
 vmCvar_t	cgx_debug;
 vmCvar_t	cgx_version;
+
+// some temp info
+vmCvar_t	cgx_last_error;
+vmCvar_t	cgx_r_picmip;
 
 // nemesis compability info
 vmCvar_t	cgx_cgame;
@@ -169,7 +173,9 @@ vmCvar_t	cg_drawAttacker;
 vmCvar_t	cg_syncronousClients;
 vmCvar_t 	cg_teamChatTime;
 vmCvar_t 	cg_teamChatHeight;
+#if CGX_DEBUG
 vmCvar_t 	cg_stats;
+#endif
 vmCvar_t 	cg_buildScript;
 vmCvar_t 	cg_forceModel;
 vmCvar_t	cg_paused;
@@ -260,7 +266,9 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_deferPlayers, "cg_deferPlayers", "1", CVAR_ARCHIVE },
 	{ &cg_drawTeamOverlay, "cg_drawTeamOverlay", "0", CVAR_ARCHIVE },
 	{ &cg_teamOverlayUserinfo, "teamoverlay", "0", CVAR_ROM | CVAR_USERINFO },
+#if CGX_DEBUG
 	{ &cg_stats, "cg_stats", "0", 0 },
+#endif
 
 	// X-MOD: extended cgx commands
 
@@ -323,6 +331,8 @@ cvarTable_t		cvarTable[] = {
 #else
 	{ &cgx_debug, "cgx_debug", "0", CVAR_TEMP },
 #endif
+	{ &cgx_last_error, "cgx_last_error", "", CVAR_TEMP | CVAR_ROM },
+	{ &cgx_r_picmip, "cgx_r_picmip", "", CVAR_TEMP | CVAR_ROM },
 	// X-MOD: fixes loading of some big maps 0: default 1: r_vertexLight 1 loading
 	{ &cgx_maploadingfix, "cgx_fix_mapload", "0", CVAR_TEMP | CVAR_ROM },
 	// stored fixed maplist, so if it once was fixed nextime will just read from this list
@@ -369,8 +379,9 @@ cvarTable_t		cvarTable[] = {
 
 	// the following variables are created in other parts of the system,
 	// but we also reference them here
-
+#if CGX_DEBUG
 	{ &cg_buildScript, "com_buildScript", "0", 0 },	// force loading of all possible data amd error on failures
+#endif
 	{ &cg_paused, "cl_paused", "0", CVAR_ROM },
 	{ &cg_blood, "com_blood", "1", CVAR_ARCHIVE },
 	{ &cg_syncronousClients, "g_syncronousClients", "0", 0 },	// communicated by systeminfo
