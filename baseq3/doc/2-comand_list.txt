@@ -28,6 +28,14 @@ cg_networkAdjustments 0|1|2|3 - 0: off 1: min rate 8000 packets 30 2: packets 40
 cg_drawScoreBox 0|1 - display score box in low right corner
 cg_scoreboard 0|1 - scoreboard type 0: default large-small 1: always small
 cg_drawAccuracy 0|1 - total weapon accuracy
+autorecord - start record demo (command do the following "g_syncronousClients 1; record <demoname>; g_syncronousClients 0")
+		to stop record type \stoprecord to play type \demo <demoname>
+cg_sharedConfig 0|1 - fixes problem with saving configs after game exit in 1.16n 
+		(0: off 1: automatically saves q3config.cfg to baseq3 folder after pressing 'leave arena' or 'exit game', 
+		to save manually use command \writesharedconfig)
+writesharedconfig - writes q3config.cfg to baseq3 folder (command do the following 
+		"writeconfig ..\\baseq3\\q3config.cfg" - if playing on modded server,
+		"writeconfig q3config.cfg" - if playing on default quake 3 server)
 cgx_version - show version
 xmod - quick info & help on mod commands, usage \xmod <command>
 

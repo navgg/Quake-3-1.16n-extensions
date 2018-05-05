@@ -44,6 +44,9 @@ fixed showplayerids toggle in menu
 0.90b
 
 enemy models now switching when following someone in spectators
+enemy models code optimized and rewritten
+cg_sharedConfig by default is 0
+improved sync with server's sv_fps for unlagged (bma servers)
 
 added cg_nomip -1|0 (if it's -1 all objects will have r_picmip 0 regardless of current r_picmip settings)
 added \xmod command to get quick info about mod commands

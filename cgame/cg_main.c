@@ -320,8 +320,6 @@ cvarTable_t		cvarTable[] = {
 
 #if CGX_DEBUG
 	{ &cgx_debug, "cgx_debug", "1", CVAR_TEMP },
-#else
-	{ &cgx_debug, "cgx_debug", "0", CVAR_TEMP },
 #endif
 	// cg_wideScreenFix 1|0 - fix perspective for widescreen
 	// cg_defaultWeapon 0-9 - default weapon when spawn 0: default 1: gauntlet ...
@@ -423,7 +421,7 @@ void CG_RegisterCvars( void ) {
 	cgs.localServer = atoi( var );
 
 	//X-MOD: temp table, no update
-	for (i = 0, cv = cgx_cvarTable_temp; i < sizearr(cgx_cvarTable_temp); i++, cv++) {
+	for (i = 0, cv = cgx_cvarTable_temp; i < ArrLen(cgx_cvarTable_temp); i++, cv++) {
 		trap_Cvar_Register( cv->vmCvar, cv->cvarName,
 			cv->defaultString, cv->cvarFlags );
 	}

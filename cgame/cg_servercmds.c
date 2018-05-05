@@ -120,7 +120,7 @@ void CG_ParseServerinfo( void ) {
 	// get minsnaps for auto network adjustments
 
 	D_Printf(("^3g_delag '%i' sv_maxrate '%i'\n", cgs.delagHitscan, cgs.sv_maxrate));
-	D_Printf(("^3sv_fps serv '%i' sv_fps client '%i'", cgs.sv_fps, sv_fps.integer));
+	D_Printf(("^3sv_fps serv '%i' sv_fps client '%i' ", cgs.sv_fps, sv_fps.integer));
 
 	if (!cgs.sv_fps) {
 		cgs.minSnaps = 40;
@@ -212,9 +212,9 @@ static void CG_ConfigStringModified( void ) {
 		cgs.scores1 = atoi( str );
 	} else if ( num == CS_SCORES2 ) {
 		cgs.scores2 = atoi( str );
-	} else if ( num == CS_WARMUP ) {
+	} /*else if ( num == CS_WARMUP ) {
 		CG_ParseWarmup();
-	} else if ( num == CS_LEVEL_START_TIME ) {
+	} */else if ( num == CS_LEVEL_START_TIME ) {
 		cgs.levelStartTime = atoi( str );
 	} else if ( num == CS_VOTE_TIME ) {
 		cgs.voteTime = atoi( str );

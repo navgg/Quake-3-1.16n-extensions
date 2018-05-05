@@ -12,14 +12,18 @@
 #define CGX_NAME		"X-Mod"
 #define CGX_VERSION		"0.87b"
 #define CGX_DATE		"May 05 2018" //__DATE__ not working with dd/mm/yyyy format
-#define CGX_DEBUG		0
-#define	CGX_UNLAGGED	1
+#define CGX_DEBUG		1
+#define	CGX_UNLAGGED	1//0 not wokring
 #define CGX_NOGHOST_COMPATIBLE CVAR_USERINFO
-#define CGX_NEMESIS_COMPATIBLE CGX_DEBUG
+#if CGX_DEBUG
+#undef CGX_NOGHOST_COMPATIBLE
+#define CGX_NOGHOST_COMPATIBLE 0
+#endif
+#define CGX_NEMESIS_COMPATIBLE !CGX_DEBUG
 #define CGX_MAPURL		"https://ws.q3df.org/map/"
 #define CGX_MAPBAT		"download_map.bat"
-//size of array
-#define sizearr(x)	sizeof(x) / sizeof(x[0])
+//length of array
+#define ArrLen(x)	sizeof x / sizeof *x
 
 // widescreen fix flags
 #define CGX_WFIX_SCREEN	0x0001
