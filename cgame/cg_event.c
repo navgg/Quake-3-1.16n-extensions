@@ -851,7 +851,9 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	case EV_OBITUARY:
 		DEBUGNAME("EV_OBITUARY");
+#if !CGX_DEBUG
 		CG_Obituary( es );
+#endif
 		break;
 
 	//

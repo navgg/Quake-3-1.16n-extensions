@@ -107,9 +107,9 @@ void CG_ParseServerinfo( void ) {
 	if (cgs.delagHitscan != 2 && cgs.delagHitscan != 3)
 		cgs.delagHitscan = g_delag || g_delagHitscan || (Q_stricmpn("1.2", g_unlaggedVersion, 4) == 0);
 
-	trap_WPrint(va("cgs.delagHitscan '%i'\n", cgs.delagHitscan));
+	D_Printf(("cgs.delagHitscan '%i'\n", cgs.delagHitscan));
 	if (g_delagHitscan || g_unlaggedVersion[0] != '\0')
-		trap_WPrint(va("g_delagHitscan '%i' g_unlaggedVersion '%s'\n", g_delagHitscan, g_unlaggedVersion));	
+		D_Printf(("g_delagHitscan '%i' g_unlaggedVersion '%s'\n", g_delagHitscan, g_unlaggedVersion));	
 	//trap_Cvar_Set("g_delag", va("%i", cgs.delagHitscan));
 	//unlagged - server options
 	
@@ -125,7 +125,7 @@ void CG_ParseServerinfo( void ) {
 		cgs.minSnaps = cgs.sv_fps;
 	}
 
-	trap_WPrint(va("g_delag '%i' sv_fps '%i' sv_maxrate '%i'\n", cgs.delagHitscan, cgs.sv_fps, cgs.sv_maxrate));	
+	D_Printf(("g_delag '%i' sv_fps '%i' sv_maxrate '%i'\n", cgs.delagHitscan, cgs.sv_fps, cgs.sv_maxrate));	
 
 	if (cgs.sv_fps != old_sv_fps) {
 		CGX_AutoAdjustNetworkSettings();
@@ -222,6 +222,7 @@ static void CG_ConfigStringModified( void ) {
 		Q_strncpyz( cgs.voteString, str, sizeof( cgs.voteString ) );
 	} else if ( num == CS_INTERMISSION ) {
 		cg.intermissionStarted = atoi( str );
+		D_Printf(("^3cg.intermissionStarted %i\n", cg.intermissionStarted));
 	} else if ( num >= CS_MODELS && num < CS_MODELS+MAX_MODELS ) {
 		cgs.gameModels[ num-CS_MODELS ] = trap_R_RegisterModel( str );
 	} else if ( num >= CS_SOUNDS && num < CS_SOUNDS+MAX_MODELS ) {
@@ -230,7 +231,7 @@ static void CG_ConfigStringModified( void ) {
 		}
 	} else if ( num >= CS_PLAYERS && num < CS_PLAYERS+MAX_CLIENTS ) {
 		CG_NewClientInfo( num - CS_PLAYERS );	
-		trap_WPrint("CONFIG STRING MODIFIED\n");
+		D_Printf(("^3Config string modified...\n"));
 	} else if ( num == CS_FLAGSTATUS ) {
 		// format is rb where its red/blue, 0 is at base, 1 is taken, 2 is dropped
 		cgs.redflag = str[0] - '0';

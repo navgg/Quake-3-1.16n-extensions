@@ -86,7 +86,7 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 		Q_strncpyz( cur->skinName, cur->skinNameCopy, sizeof( cur->skinName ) );
 		Q_strncpyz( cur->modelName, cur->modelNameCopy, sizeof( cur->modelName ) );	
 
-		trap_DPrint( va("CG_SetInitialSnapshot restore player's models: %s %s\n", cur->skinName, cur->modelName) );
+		D_Printf(("CG_SetInitialSnapshot restore player's models: %s %s\n", cur->skinName, cur->modelName));
 		
 		cur->infoValid = qtrue;
 

@@ -139,12 +139,14 @@ typedef struct {
 } consoleCommand_t;
 
 static consoleCommand_t	commands[] = {
+#if CGX_DEBUG
 	{ "testgun", CG_TestGun_f },
 	{ "testmodel", CG_TestModel_f },
 	{ "nextframe", CG_TestModelNextFrame_f },
 	{ "prevframe", CG_TestModelPrevFrame_f },
 	{ "nextskin", CG_TestModelNextSkin_f },
 	{ "prevskin", CG_TestModelPrevSkin_f },
+#endif
 	{ "viewpos", CG_Viewpos_f },
 	{ "+scores", CG_ScoresDown_f },
 	{ "-scores", CG_ScoresUp_f },

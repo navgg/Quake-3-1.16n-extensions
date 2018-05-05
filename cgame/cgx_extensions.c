@@ -79,7 +79,7 @@ void CGX_Init_vScreen(void) {
 	vScreen.width48 = vScreen.width - 48;
 	vScreen.width5 = vScreen.width - 5;
 
-	trap_DPrint(va("CGX_Init_vScreen %fx%f cgx_wideScreenFix %d\n", vScreen.width, SCREEN_HEIGHT, cgx_wideScreenFix.integer));	
+	D_Printf(("CGX_Init_vScreen %fx%f cgx_wideScreenFix %d\n", vScreen.width, SCREEN_HEIGHT, cgx_wideScreenFix.integer));	
 }
 
 void CGX_Init_enemyModels(void) {
@@ -103,7 +103,7 @@ void CGX_Init_enemyModels(void) {
 
 	Q_strncpyz(cg.enemyModel, modelStr, sizeof(cg.enemyModel));	
 
-	trap_DPrint(va("CGX_Init_enemyModels cg.enemyModel: %s cg.enemySkin: %s\n", cg.enemyModel, cg.enemySkin));
+	D_Printf(("CGX_Init_enemyModels cg.enemyModel: %s cg.enemySkin: %s\n", cg.enemyModel, cg.enemySkin));
 }
 
 void CGX_Init_teamModels(void) {
@@ -127,7 +127,7 @@ void CGX_Init_teamModels(void) {
 
 	Q_strncpyz(cg.teamModel, modelStr, sizeof(cg.teamModel));	
 
-	trap_DPrint(va("CGX_Init_teamModels cg.teamModel: %s cg.teamSkin: %s\n", cg.teamModel, cg.teamSkin));
+	D_Printf(("CGX_Init_teamModels cg.teamModel: %s cg.teamSkin: %s\n", cg.teamModel, cg.teamSkin));
 }
 
 void CGX_EnemyModelCheck(void) {
@@ -198,7 +198,7 @@ static void CGX_SetColorInfo(const char *color, clientInfo_t *info) {
 			return;
 
 		CGX_ColorFromChar(color[i], info->colors[i], info);
-		//trap_DPrint(va("%3i %3i %3i\n", info->colors[i][0], info->colors[i][1], info->colors[i][2]));		
+		//D_Printf(("%3i %3i %3i\n", info->colors[i][0], info->colors[i][1], info->colors[i][2]));		
 
 		if (cgx_deadBodyDarken.integer)
 			ShaderRGBAFill(info->darkenColors[i], CGX_RGBToGray(info->colors[i]));
@@ -519,12 +519,12 @@ qboolean CGX_CheckModInfo(const char *str) {
 	i = strlen(str);
 
 	if (Q_stricmp(str, "^3Unlag:           ^5ENABLED\n") == 0) {
-		trap_DPrint("BMA Unlagged!\n");
+		D_Printf(("BMA Unlagged!\n"));
 
 		cgs.delagHitscan = 2;
 		CGX_AutoAdjustNetworkSettings();
 	} else if (Q_stricmp(str, "^3Unlagged compensation: ^5ENABLED\n") == 0) {
-		trap_DPrint("Nemesis Unlagged!\n");
+		D_Printf(("Nemesis Unlagged!\n"));
 
 		cgs.delagHitscan = 3;
 		CGX_AutoAdjustNetworkSettings();
@@ -546,7 +546,7 @@ void CGX_SendModinfo(void) {
 	info = CG_ConfigString( CS_SERVERINFO );
 	gamename = Info_ValueForKey(info, "gamename");
 
-	trap_DPrint(va("gamename %s\n", gamename));
+	D_Printf(("gamename %s\n", gamename));
 
 	if (Q_stricmp(gamename, "Nemesis") == 0 ||
 		(gamename[0] == 'B' && gamename[1] == 'M' && gamename[2] == 'A')) {
@@ -555,9 +555,9 @@ void CGX_SendModinfo(void) {
 
 		trap_SendClientCommand("modinfo");
 
-		trap_DPrint("modinfo sent\n");
+		D_Printf(("modinfo sent\n"));
 	} else {
-		trap_DPrint("modinfo not sent\n");
+		D_Printf(("modinfo not sent\n"));
 	}
 }
 
@@ -658,7 +658,7 @@ qboolean CGX_IsVertexLight() {
 
 // load collision map with last error
 static void CGX_LoadCollisionMap() {	
-	trap_DPrint("CGX_LoadCollisionMap\n");
+	D_Printf(("CGX_LoadCollisionMap\n"));
 	CG_LoadingString( "collision map" );
 
 	trap_Cvar_Set("cgx_last_error", va("1 Couldn't load map: %s", cgs.mapname_clean));
@@ -727,7 +727,7 @@ static void CGX_CheckKnownMapsForFix() {
 
 // load world map with last error
 static void CGX_LoadWorldMap() {
-	trap_DPrint( "CGX_LoadWorldMap\n" );
+	D_Printf(( "^5CGX_LoadWorldMap\n" ));
 	CG_LoadingString(cgs.mapname);
 	trap_Cvar_Set( "cgx_last_error", va( "2 Couldn't load world map: %s", cgs.mapname_clean ) );	
 

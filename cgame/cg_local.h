@@ -67,6 +67,12 @@
 //X-MOD: limits
 #define CGX_MINHUNKMEGS 112
 
+#if CGX_DEBUG 
+#define D_Printf(x) CG_Printf x
+#else
+#define D_Printf(x)
+#endif
+
 typedef enum {
 	FOOTSTEP_NORMAL,
 	FOOTSTEP_BOOT,

@@ -643,8 +643,8 @@ void CG_NewClientInfo( int clientNum ) {
 	//CG_Printf("ni '%i' '%s' '%s' '%i' '%i'\n", clientNum, newInfo.modelName, newInfo.skinName, newInfo.infoValid, newInfo.deferred);
 	//CG_Printf("ci '%i' '%s' '%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->infoValid, ci->deferred);
 	if (cg.clientNum != clientNum && cgs.gametype != GT_SINGLE_PLAYER) {
-		trap_DPrint(va("CG_NewClientInfo %i\n", cg.clientNum));		
-		trap_DPrint(va("%s\n", configstring));
+		//D_Printf(("CG_NewClientInfo %i\n", clientNum));
+		D_Printf(("^5CG_NewClientInfo '%i' '%s'\n", clientNum, configstring));
 		CGX_SetModelAndSkin(&newInfo, qfalse, clientNum);
 	}
 

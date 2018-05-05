@@ -484,7 +484,7 @@ void CG_UpdateCvars( void ) {
 	if (cgx_wideScreenFixmodificationCount != cgx_wideScreenFix.modificationCount) {
 		cgx_wideScreenFixmodificationCount = cgx_wideScreenFix.modificationCount;
 		CGX_Init_vScreen();
-		trap_RPrint("CG_UpdateCvars value changed\n");
+		D_Printf(("^6CG_UpdateCvars value changed\n"));
 	}
 
 	// X-MOD: reinit enemymodels if value or player's team changed
@@ -495,14 +495,14 @@ void CG_UpdateCvars( void ) {
 		if (!cgx_enemyModel_enabled.integer && cgx_enemyModel.string[0] != '\0' &&
 			cgx_enemyModel_enabled.modificationCount == cgx_enemyModel_enabledModificationCount) {
 			trap_Cvar_Set("cg_enemyModel_enabled", "1");
-			trap_RPrint("cg_enemyModel_enabled 1\n");
+			D_Printf(("^6cg_enemyModel_enabled 1\n"));
 		}
 		else {
 			CGX_Init_enemyModels();
 			CGX_Init_teamModels();
 			CGX_EnemyModelCheck();
 			CG_LoadDeferredPlayers();
-			trap_RPrint("CG_UpdateCvars value changed\n");
+			D_Printf(("^6CG_UpdateCvars value changed\n"));
 		}
 
 		cgx_enemyModelModificationCount = cgx_enemyModel.modificationCount;
@@ -519,7 +519,7 @@ void CG_UpdateCvars( void ) {
 		cgx_deadBodyDarkenModificationCount = cgx_deadBodyDarken.modificationCount;		
 
 		CGX_Init_enemyAndTeamColors();	
-		trap_RPrint("CG_UpdateCvars value changed\n");
+		D_Printf(("^6CG_UpdateCvars value changed\n"));
 	}
 
 	// track team change
@@ -529,7 +529,7 @@ void CG_UpdateCvars( void ) {
 		
 			CGX_EnemyModelCheck();
 			CG_LoadDeferredPlayers();
-			trap_RPrint("TEAM CHANGED!\n");
+			D_Printf(("^6TEAM CHANGED!\n"));
 		}
 	}
 	//track fps change
@@ -863,7 +863,7 @@ static void CG_RegisterGraphics( void ) {
 
 	CGX_NomipStart();
 
-	trap_DPrint("precache status bar pics\n");
+	//D_Printf(("precache status bar pics\n"));
 	// precache status bar pics
 	CG_LoadingString( "game media" );
 
@@ -971,7 +971,7 @@ static void CG_RegisterGraphics( void ) {
 
 	memset( cg_items, 0, sizeof( cg_items ) );
 	memset( cg_weapons, 0, sizeof( cg_weapons ) );
-	trap_DPrint("only register the items that the server says we need\n");
+	//D_Printf(("only register the items that the server says we need\n"));
 	// only register the items that the server says we need
 	strcpy( items, CG_ConfigString( CS_ITEMS) );
 
@@ -981,7 +981,7 @@ static void CG_RegisterGraphics( void ) {
 			CG_RegisterItemVisuals( i );
 		}
 	}
-	trap_DPrint("wall marks\n");
+	//D_Printf(("wall marks\n"));
 	// wall marks
 	cgs.media.bulletMarkShader = trap_R_RegisterShader( "gfx/damage/bullet_mrk" );
 	cgs.media.burnMarkShader = trap_R_RegisterShader( "gfx/damage/burn_med_mrk" );
@@ -990,7 +990,7 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.shadowMarkShader = trap_R_RegisterShader( "markShadow" );
 	cgs.media.wakeMarkShader = trap_R_RegisterShader( "wake" );
 	cgs.media.bloodMarkShader = trap_R_RegisterShader( "bloodMark" );
-	trap_DPrint("register the inline models\n");
+	//D_Printf(("register the inline models\n"));
 	// register the inline models
 	cgs.numInlineModels = trap_CM_NumInlineModels();
 	for ( i = 1 ; i < cgs.numInlineModels ; i++ ) {
@@ -1005,7 +1005,7 @@ static void CG_RegisterGraphics( void ) {
 			cgs.inlineModelMidpoints[i][j] = mins[j] + 0.5 * ( maxs[j] - mins[j] );
 		}
 	}
-	trap_DPrint("register all the server specified models\n");
+	//D_Printf(("register all the server specified models\n"));
 	// register all the server specified models
 	for (i=1 ; i<MAX_MODELS ; i++) {
 		const char		*modelName;
@@ -1144,25 +1144,25 @@ void CG_Init( int serverMessageNum, int serverCommandSequence ) {
 	cg.loading = qtrue;		// force players to load instead of defer
 
 	CG_LoadingString( "sounds" );
-	trap_DPrint("CG_RegisterSounds\n");
+	D_Printf(("CG_RegisterSounds\n"));
 	CG_RegisterSounds();
-	trap_DPrint("CG_RegisterGraphics\n");
+	D_Printf(("CG_RegisterGraphics\n"));
 	CG_RegisterGraphics();
-	trap_DPrint("CG_RegisterClients\n");
+	D_Printf(("CG_RegisterClients\n"));
 	CG_RegisterClients();		// if low on memory, some clients will be deferred
 
 	cg.loading = qfalse;	// future players will be deferred
-	trap_DPrint("CG_InitLocalEntities\n");
+	D_Printf(("CG_InitLocalEntities\n"));
 	CG_InitLocalEntities();
-	trap_DPrint("CG_InitMarkPolys\n");
+	D_Printf(("CG_InitMarkPolys\n"));
 	CG_InitMarkPolys();
 
 	// remove the last loading update
 	cg.infoScreenText[0] = 0;
-	trap_DPrint("CG_SetConfigValues\n");
+	D_Printf(("CG_SetConfigValues\n"));
 	// Make sure we have update values (scores)
 	CG_SetConfigValues();
-	trap_DPrint("CG_StartMusic\n");
+	D_Printf(("CG_StartMusic\n"));
 	CG_StartMusic();
 
 	CG_LoadingString( "" );	
@@ -1178,10 +1178,10 @@ Called before every level change or subsystem restart
 void CG_Shutdown( void ) {		
 	char cgx_last_error[MAX_QPATH];
 
-	trap_DPrint("CG_Shutdown\n");
+	D_Printf(("CG_Shutdown\n"));
 
 	trap_Cvar_VariableStringBuffer("cgx_last_error", cgx_last_error, sizeof(cgx_last_error));
-	trap_DPrint(va("cgx_last_error %s\n", cgx_last_error));
+	D_Printf(("cgx_last_error %s\n", cgx_last_error));
 
 	if (cgx_last_error[0] == '1') {// error during loading collision map
 		CGX_GenerateMapBat();
