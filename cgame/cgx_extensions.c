@@ -236,6 +236,7 @@ qboolean CGX_RestoreModelAndSkin(clientInfo_t *ci, int clientNum, qboolean isDef
 
 	//if disabled or its spect or it's own model or player is in spect
 	if (!cgx_enemyModel_enabled.integer || isSpect || isPlayerSpect || isPlayer) {
+		ci->deferred = isDeferred;
 		if (IsSameModel(ci)) {
 			D_Printf(("^3OK %i\n", clientNum));
 			return qtrue;
@@ -243,8 +244,6 @@ qboolean CGX_RestoreModelAndSkin(clientInfo_t *ci, int clientNum, qboolean isDef
 
 		Q_strncpyz(ci->modelName, ci->modelNameCopy, sizeof(ci->modelName));
 		Q_strncpyz(ci->skinName, ci->skinNameCopy, sizeof(ci->skinName));
-
-		ci->deferred = isDeferred;
 
 		D_Printf(("^3Restore '%i' '%s/%s' '%s/%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->modelNameCopy, ci->skinNameCopy, ci->infoValid, ci->deferred));
 		return qtrue;

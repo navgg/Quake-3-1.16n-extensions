@@ -207,6 +207,7 @@ static void CG_ConfigStringModified( void ) {
 		CG_ParseServerinfo();
 	} else if ( num == CS_WARMUP ) {
 		CG_ParseWarmup();
+		CGX_EnemyModelCheck();
 	} else if ( num == CS_SCORES1 ) {
 		cgs.scores1 = atoi( str );
 	} else if ( num == CS_SCORES2 ) {
