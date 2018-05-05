@@ -33,21 +33,6 @@ static char *known_models[] = {
 	"xaero"
 };
 
-void trap_DPrint(const char *str) {
-	if (cgx_debug.integer)
-	trap_Print(va ("^5DEBUG: %s", str) );
-}
-
-void trap_WPrint(const char *str) {
-	if (cgx_debug.integer)
-	trap_Print(va ("^3WARNING: %s", str) );
-}
-
-void trap_RPrint(const char *str) {
-	if (cgx_debug.integer)
-	trap_Print(va ("^6REASON: %s", str) );
-}
-
 void CGX_Init_vScreen(void) {	
 	// get the rendering configuration from the client system
 	trap_GetGlconfig( &cgs.glconfig );
@@ -367,7 +352,7 @@ static void CGX_UpdateClientNum(int i) {
 void CGX_AutoAdjustNetworkSettings(void) {
 	static int info_showed = 0;
 
-	trap_DPrint(va("CGX_AutoAdjustNetworkSettings %i\n", cgx_networkAdjustments.integer));
+	D_Printf(("CGX_AutoAdjustNetworkSettings %i\n", cgx_networkAdjustments.integer));
 
 	if (cgx_networkAdjustments.integer && !cgs.localServer) {
 		int i, minRate, minSnaps, k;
