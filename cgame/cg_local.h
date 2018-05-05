@@ -997,15 +997,9 @@ qboolean CG_Cvar_ClampInt( const char *name, vmCvar_t *vmCvar, int min, int max 
 //
 // cgx_extensions.c
 //
-void CGX_Init_vScreen(void);
-void CGX_AutoAdjustNetworkSettings(void);
-void CGX_CheckChatCommand(const char *str);
-qboolean CGX_CheckModInfo(const char *str);
 void CGX_SendModinfo(void);
 
-void CGX_Init_enemyModels(void);
 void CGX_SetModelAndSkin(clientInfo_t *ci, qboolean isDeferred, int clientNum);
-void CGX_EnemyModelCheck(void);
 
 //
 // cg_main.c

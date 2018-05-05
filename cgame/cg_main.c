@@ -501,7 +501,6 @@ void CG_UpdateCvars( void ) {
 			CGX_Init_enemyModels();
 			CGX_Init_teamModels();
 			CGX_EnemyModelCheck();
-			CG_LoadDeferredPlayers();
 			D_Printf(("^6CG_UpdateCvars value changed\n"));
 		}
 
@@ -528,7 +527,6 @@ void CG_UpdateCvars( void ) {
 			cg.oldTeam = cgs.clientinfo[cg.clientNum].team;
 		
 			CGX_EnemyModelCheck();
-			CG_LoadDeferredPlayers();
 			D_Printf(("^6TEAM CHANGED!\n"));
 		}
 	}
