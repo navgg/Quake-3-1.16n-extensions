@@ -529,8 +529,26 @@ void CGX_SendModinfo(void) {
 	}
 }
 
+//updates sv_fps if server screwed it with weird values
+void CGX_Adjust_sv_fps() {
+	if (cgx_networkAdjustments.integer || !cgs.localServer) {
+		int fps = sv_fps.integer;
+		if (fps <= 20)
+			trap_Cvar_Set("sv_fps", "20");
+		else if (fps <= 30)
+			trap_Cvar_Set("sv_fps", "30");
+		else if (fps <= 40 && fps != 33)
+			trap_Cvar_Set("sv_fps", "40");
+		else if (fps > 40 && !cgs.localServer)
+			trap_Cvar_Set("sv_fps", "40");
+	}
+}
+
 // X-MOD: potential fix for q3config saving problem
 void CGX_SaveSharedConfig(qboolean forced) {
+	//adjust sv_fps before saving
+	CGX_Adjust_sv_fps();
+
 	if (cgx_sharedConfig.integer || forced) {
 		char buf[32];
 		trap_Cvar_VariableStringBuffer("version", buf, 8);

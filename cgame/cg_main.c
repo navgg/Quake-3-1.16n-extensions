@@ -80,9 +80,9 @@ vmCvar_t	cgx_rate;
 vmCvar_t	cgx_delag;
 
 vmCvar_t	cgx_debug;
-vmCvar_t	cgx_version;
 
 // some temp info
+vmCvar_t	cgx_version;
 vmCvar_t	cgx_last_error;
 vmCvar_t	cgx_r_picmip;
 
@@ -96,8 +96,8 @@ vmCvar_t	cg_cmdTimeNudge;
 vmCvar_t	cg_projectileNudge;
 vmCvar_t	cg_optimizePrediction;
 vmCvar_t	cl_timeNudge;
-#if CGX_DEBUG
 vmCvar_t	sv_fps;
+#if CGX_DEBUG
 vmCvar_t	cg_debugDelag;
 vmCvar_t	cg_drawBBox;
 vmCvar_t	cg_latentSnaps;
@@ -295,7 +295,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_scoreboard, "cg_scoreboard", "0", CVAR_ARCHIVE },
 	{ &cgx_drawScoreBox, "cg_drawScoreBox", "1", CVAR_ARCHIVE },
 	{ &cgx_drawAccuracy, "cg_drawAccuracy", "0", CVAR_ARCHIVE },
-	{ &cgx_sharedConfig, "cg_sharedConfig", "1", CVAR_ARCHIVE },
+	{ &cgx_sharedConfig, "cg_sharedConfig", "0", CVAR_ARCHIVE },
 	{ &cgx_nomip, "cg_nomip", "-1", CVAR_TEMP | CVAR_LATCH },
 #if CGX_UNLAGGED
 	//unlagged - client options
@@ -305,9 +305,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_cmdTimeNudge, "cg_delag_cmdTimeNudge", "0", CVAR_ARCHIVE },
 
 	{ &cl_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},
-	// this will be automagically copied from the server	
 #if CGX_DEBUG
-	{ &sv_fps, "sv_fps", "20", 0 },	
 	{ &cg_debugDelag, "cg_debugDelag", "0", CVAR_CHEAT },
 	{ &cg_drawBBox, "cg_drawBBox", "0", CVAR_CHEAT },
 	{ &cg_latentSnaps, "cg_latentSnaps", "0", CVAR_CHEAT },
@@ -318,27 +316,13 @@ cvarTable_t		cvarTable[] = {
 #endif
 
 	{ &cgx_maxfps, "com_maxfps", "125", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
-	//{ &cgx_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
 	{ &cgx_maxpackets, "cl_maxpackets", "40", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },				
-	
-#if CGX_NEMESIS_COMPATIBLE
-	{ &cgx_cgame, "cgame", CGX_NAME" "CGX_VERSION, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
-	{ &cgx_uinfo, "cg_uinfo", "", CVAR_TEMP | CVAR_USERINFO | CVAR_ROM  },
-#endif	
 
 #if CGX_DEBUG
 	{ &cgx_debug, "cgx_debug", "1", CVAR_TEMP },
 #else
 	{ &cgx_debug, "cgx_debug", "0", CVAR_TEMP },
 #endif
-	{ &cgx_last_error, "cgx_last_error", "", CVAR_TEMP | CVAR_ROM },
-	{ &cgx_r_picmip, "cgx_r_picmip", "", CVAR_TEMP | CVAR_ROM },
-	// X-MOD: fixes loading of some big maps 0: default 1: r_vertexLight 1 loading
-	{ &cgx_maploadingfix, "cgx_fix_mapload", "0", CVAR_TEMP | CVAR_ROM },
-	// stored fixed maplist, so if it once was fixed nextime will just read from this list
-	{ &cgx_fixedmaps, "cl_fixedmaps", "", CVAR_ROM | CVAR_ARCHIVE },
-	{ &cgx_version, "cgx_version", CGX_NAME" "CGX_VERSION" "CGX_DATE, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
-
 	// cg_wideScreenFix 1|0 - fix perspective for widescreen
 	// cg_defaultWeapon 0-9 - default weapon when spawn 0: default 1: gauntlet ...
 	// cg_drawPlayerIDs 0|1 - show player id in scoreboard	
@@ -398,7 +382,26 @@ int		cgx_enemyModel_enabledModificationCount = 1;
 int		cgx_fps_modificationCount = 1;
 int		cgx_sharedConfigModificationCount = 1;
 
+cvarTable_t		cgx_cvarTable_temp[] = {
+	//handle map loading errors
+	{ &cgx_last_error, "cgx_last_error", "", CVAR_TEMP | CVAR_ROM },
+	//save for nomip
+	{ &cgx_r_picmip, "cgx_r_picmip", "", CVAR_TEMP | CVAR_ROM },
+	// X-MOD: fixes loading of some big maps 0: default 1: r_vertexLight 1 loading
+	{ &cgx_maploadingfix, "cgx_fix_mapload", "0", CVAR_TEMP | CVAR_ROM },
+	// stored fixed maplist, so if it once was fixed nextime will just read from this list
+	{ &cgx_fixedmaps, "cl_fixedmaps", "", CVAR_ROM | CVAR_ARCHIVE },
+	//mod version
+	{ &cgx_version, "cgx_version", CGX_NAME" "CGX_VERSION" "CGX_DATE, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
+	//for unlagged.c
+	// this will be automagically copied from the server	
+	{ &sv_fps, "sv_fps", "20", 0 },	
 
+#if CGX_NEMESIS_COMPATIBLE
+	{ &cgx_cgame, "cgame", CGX_NAME" "CGX_VERSION, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
+	{ &cgx_uinfo, "cg_uinfo", "", CVAR_TEMP | CVAR_USERINFO | CVAR_ROM  },
+#endif	
+};
 
 /*
 =================
@@ -419,8 +422,15 @@ void CG_RegisterCvars( void ) {
 	trap_Cvar_VariableStringBuffer( "sv_running", var, sizeof( var ) );
 	cgs.localServer = atoi( var );
 
+	//X-MOD: temp table, no update
+	for (i = 0, cv = cgx_cvarTable_temp; i < sizearr(cgx_cvarTable_temp); i++, cv++) {
+		trap_Cvar_Register( cv->vmCvar, cv->cvarName,
+			cv->defaultString, cv->cvarFlags );
+	}
 
+#if CGX_NEMESIS_COMPATIBLE
 	trap_Cvar_Set("cg_uinfo", va("%i %i 0", cl_timeNudge.integer, cgx_maxpackets.integer));
+#endif
 }
 
 /*

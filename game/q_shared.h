@@ -18,6 +18,8 @@
 #define CGX_NEMESIS_COMPATIBLE 1
 #define CGX_MAPURL		"https://ws.q3df.org/map/"
 #define CGX_MAPBAT		"download_map.bat"
+//size of array
+#define sizearr(x)	sizeof(x) / sizeof(x[0])
 
 // widescreen fix flags
 #define CGX_WFIX_SCREEN	0x0001

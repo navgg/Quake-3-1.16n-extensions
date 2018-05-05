@@ -889,7 +889,10 @@ extern	vmCvar_t		cgx_maxpackets;
 extern	vmCvar_t		cgx_delag;
 
 extern	vmCvar_t		cgx_debug;
+
+//some temp info
 extern	vmCvar_t		cgx_version;
+
 
 extern	vmCvar_t		cg_centertime;
 extern	vmCvar_t		cg_runpitch;
