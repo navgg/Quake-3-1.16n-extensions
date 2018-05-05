@@ -981,8 +981,8 @@ extern	vmCvar_t		cg_cmdTimeNudge;
 extern	vmCvar_t		cg_projectileNudge;
 extern	vmCvar_t		cg_optimizePrediction;
 extern	vmCvar_t		cl_timeNudge;
-#if CGX_DEBUG
 extern	vmCvar_t		sv_fps;
+#if CGX_DEBUG
 extern	vmCvar_t		cg_debugDelag;
 extern	vmCvar_t		cg_drawBBox;
 extern	vmCvar_t		cg_latentSnaps;
