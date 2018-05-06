@@ -78,8 +78,8 @@ void CGX_Init_enemyModels(void) {
 
 	slash = strchr( modelStr, '/' );
 	if ( !slash ) {
-		// modelName didn not include a skin name		
-		Q_strncpyz(cg.enemySkin, "pm", sizeof(cg.enemySkin));
+		// modelName didn not include a skin name				
+		Q_strncpyz(cg.enemySkin, "", sizeof(cg.enemySkin));
 	} else {		
 		Q_strncpyz(cg.enemySkin, slash + 1, sizeof(cg.enemySkin));
 		// truncate modelName
@@ -103,7 +103,7 @@ void CGX_Init_teamModels(void) {
 	slash = strchr( modelStr, '/' );
 	if ( !slash ) {
 		// modelName didn not include a skin name		
-		Q_strncpyz(cg.teamSkin, "pm", sizeof(cg.teamSkin));
+		Q_strncpyz(cg.teamSkin, "", sizeof(cg.teamSkin));
 	} else {		
 		Q_strncpyz(cg.teamSkin, slash + 1, sizeof(cg.teamSkin));
 		// truncate modelName
@@ -118,6 +118,9 @@ void CGX_Init_teamModels(void) {
 void CGX_EnemyModelCheck(void) {
 	int		i;
 	clientInfo_t	*ci;
+
+	if (!cgx_enemyModel_enabled.integer)
+		return;
 
 	if (cg.clientNum == -1) {
 		D_Printf(("^1CGX_EnemyModelCheck before clientNum init\n"));
@@ -276,7 +279,7 @@ void CGX_SetModel(clientInfo_t *ci, char *modelName) {
 
 static qboolean CGX_IsKnownModel(const char *modelName) {
 	int i;
-	for (i = 0; i < 23; i++)
+	for (i = 0; i < ArrLen(known_models); i++)
 		if (Q_stricmp(modelName, known_models[i]) == 0)
 			return qtrue;	
 
@@ -295,8 +298,8 @@ void CGX_SetPMSkin(clientInfo_t *ci) {
 void CGX_SetSkin(clientInfo_t *ci, char *skinName) {	
 	if (!skinName[0]) //if no skin set pm
 		CGX_SetPMSkin(ci);
-	else if (cgs.gametype < GT_TEAM || !Q_stricmp(cg.enemySkin, "pm"))
-		Q_strncpyz(ci->skinName, cg.enemySkin, sizeof(ci->skinName));
+	else if (cgs.gametype < GT_TEAM || !Q_stricmp(skinName, "pm"))
+		Q_strncpyz(ci->skinName, skinName, sizeof(ci->skinName));
 	// if gametype is not team\ctf or skin pm set it, otherwise red\blue will be used 
 }
 
@@ -354,17 +357,19 @@ void CGX_TrackEnemyModelChanges() {
 	if (cg.clientNum != cg.snap->ps.clientNum) {
 		cg.clientNum = cg.snap->ps.clientNum;
 		cg.oldTeam = cgs.clientinfo[cg.clientNum].team;
-		D_Printf(("cg.clientNum %i\n", cg.clientNum));
+				
 		CGX_EnemyModelCheck();
-		D_Printf(("^6Num changed!\n"));
+		D_Printf(("^6cg.clientNum %i\n", cg.clientNum));
 	} // track team change
 	else if (cg.oldTeam != cgs.clientinfo[cg.clientNum].team) {
 		cg.oldTeam = cgs.clientinfo[cg.clientNum].team;
 
 		CGX_EnemyModelCheck();
 		D_Printf(("^6TEAM CHANGED!\n"));
-	} else if (cg.snap->ps.pm_type == PM_INTERMISSION && !cg.clientIntermission) {
+	} //track intermission change
+	else if (cg.snap->ps.pm_type == PM_INTERMISSION && !cg.clientIntermission) {
 		cg.clientIntermission = qtrue;
+
 		CGX_EnemyModelCheck();
 		D_Printf(("^6PM_INTERMISSION!\n"));
 	}
