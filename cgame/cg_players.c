@@ -486,9 +486,12 @@ static void CG_SetDeferredClientInfo( clientInfo_t *ci ) {
 			continue;
 		}
 
-		// X-MOD: if enemy models enabled and its our model take next info
-		if (cgx_enemyModel_enabled.integer && i == cg.clientNum && !cg_forceModel.integer)
-			continue;
+		// X-MOD: if enemy models enabled and its our model take next info (or skin not match)
+		if (cgx_enemyModel_enabled.integer)
+			if (i == cg.clientNum && !cg_forceModel.integer)
+				continue;
+			else if (Q_stricmp( ci->skinName, match->skinName ))
+				continue;
 
 		ci->deferred = qtrue;
 		CG_CopyClientInfoModel( match, ci );
