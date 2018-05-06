@@ -541,6 +541,7 @@ typedef struct {
 	// X-MOD: current client num, before init = -1;
 	int			clientNum;	
 	team_t		oldTeam;
+	qboolean	clientIntermission;
 	char		enemyModel[MAX_QPATH];
 	char		enemySkin[MAX_QPATH];
 	char		teamModel[MAX_QPATH];

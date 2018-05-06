@@ -235,7 +235,8 @@ qboolean CGX_RestoreModelAndSkin(clientInfo_t *ci, int clientNum, qboolean isDef
 	}
 
 	//if disabled or its spect or it's own model or player is in spect
-	if (!cgx_enemyModel_enabled.integer || isSpect || isPlayerSpect || isPlayer) {
+	if (!cgx_enemyModel_enabled.integer || isSpect || isPlayerSpect || isPlayer || 
+		cg.clientIntermission) {
 		if (IsSameModel(ci)) {
 			D_Printf(("^3OK %i\n", clientNum));
 			return qtrue;
@@ -356,16 +357,22 @@ void CGX_TrackEnemyModelChanges() {
 
 		CGX_EnemyModelCheck();
 		D_Printf(("^6TEAM CHANGED!\n"));
-	}	
+	} else if (cg.snap->ps.pm_type == PM_INTERMISSION && !cg.clientIntermission) {
+		cg.clientIntermission = qtrue;
+		CGX_EnemyModelCheck();
+		D_Printf(("^6PM_INTERMISSION!\n"));
+	}
 }
 
 void CGX_MapRestart() {
 	D_Printf(("^1CGX_MapRestart\n"));
+
+	cg.clientIntermission = qfalse;
+
 	// X-MOD: send modinfo
 	CGX_SendModinfo();	
-	CGX_EnemyModelCheck();
-}
-
+	CGX_EnemyModelCheck();	
+	D_Printf(("^6CGX_MapRestart\n"));
 }
 
 void CGX_AutoAdjustNetworkSettings(void) {
@@ -913,7 +920,10 @@ char* CGX_XmodTalk(char *command) {
 void CGX_Xmod(char *command) {
 	char* talk;
 
-	if (stristr(command, "help")) {
+	if (stristr(command, "e")) {
+		CG_Printf("Checking enemy models...\n");
+		CGX_EnemyModelCheck();		
+	} else if (stristr(command, "help")) {
 		CGX_ShowHelp("doc\\2-comand_list.txt", "");
 	} else if (talk = CGX_XmodTalk(command)) {		
 		XMOD_ANSWER(talk);

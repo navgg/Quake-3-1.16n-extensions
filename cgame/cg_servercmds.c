@@ -158,6 +158,7 @@ static void CG_ParseWarmup( void ) {
 	} else if ( warmup > 0 && cg.warmup <= 0 ) {
 		trap_S_StartLocalSound( cgs.media.countPrepareSound, CHAN_ANNOUNCER );
 		CGX_EnemyModelCheck();
+		D_Printf(("^6CG_ParseWarmup\n"));
 	}
 
 	cg.warmup = warmup;
