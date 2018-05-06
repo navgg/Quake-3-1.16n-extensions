@@ -239,7 +239,7 @@ cvarTable_t		cvarTable[] = {
 	{ &uix_networkAdjustments, "cg_networkAdjustments", "1", CVAR_ARCHIVE },
 	{ &uix_scoreboard, "cg_scoreboard", "0", CVAR_ARCHIVE },
 	{ &uix_drawScoreBox, "cg_drawScoreBox", "1", CVAR_ARCHIVE },
-	{ &uix_sharedConfig, "cg_sharedConfig", "1", CVAR_ARCHIVE },
+	{ &uix_sharedConfig, "cg_sharedConfig", "0", CVAR_ARCHIVE },
 
 	{ &uix_cinematicplayed, "uix_cinematicplayed", "-1", CVAR_TEMP },
 	{ &uix_nomip, "cg_nomip", "-1", CVAR_ARCHIVE | CVAR_LATCH },

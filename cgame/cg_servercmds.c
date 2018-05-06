@@ -236,13 +236,15 @@ static void CG_ConfigStringModified( void ) {
 		CGX_NomipStart();
 		cgs.gameModels[ num-CS_MODELS ] = trap_R_RegisterModel( str );
 		CGX_NomipEnd();
+		D_Printf(("^6cgs.gameModels %i %s\n", num-CS_MODELS, str));		
 	} else if ( num >= CS_SOUNDS && num < CS_SOUNDS+MAX_MODELS ) {
+		D_Printf(("^4CS_SOUNDS %s\n", str));
 		if ( str[0] != '*' ) {	// player specific sounds don't register here
 			cgs.gameSounds[ num-CS_SOUNDS] = trap_S_RegisterSound( str );
 		}
 	} else if ( num >= CS_PLAYERS && num < CS_PLAYERS+MAX_CLIENTS ) {
 		CG_NewClientInfo( num - CS_PLAYERS );	
-		D_Printf(("^3Config string modified...\n"));
+		D_Printf(("^3CS_PLAYERS %i\n", num - CS_PLAYERS));
 	} else if ( num == CS_FLAGSTATUS ) {
 		// format is rb where its red/blue, 0 is at base, 1 is taken, 2 is dropped
 		cgs.redflag = str[0] - '0';

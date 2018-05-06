@@ -8,7 +8,8 @@ bin_nt\7za a -tzip -mx0 %pakname% %CD%\baseq3\vm
 
 move "%pakname%" "%gamedir%baseq3\%pakname%"
 
-START /D "%gamedir%" /MAX "" quake3.exe +set sv_pure 0 +devmap q3dm1
+START /D "%gamedir%" /MAX "" quake3.exe +set sv_pure 0 +connect localhost:27960
+rem START /D "%gamedir%" /MAX "" quake3.exe +set sv_pure 0 +devmap test_bigbox
 rem +devmap q3dm1 +set cg_debugEvents 1 +set cg_debugDelag 1 +set cg_showMiss 1 +set cg_drawBBox 1
 rem +cg_debuganim 1
 rem +devmap q3dm1

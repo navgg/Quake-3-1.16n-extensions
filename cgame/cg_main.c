@@ -1001,7 +1001,9 @@ static void CG_RegisterGraphics( void ) {
 		for ( j = 0 ; j < 3 ; j++ ) {
 			cgs.inlineModelMidpoints[i][j] = mins[j] + 0.5 * ( maxs[j] - mins[j] );
 		}
+		D_Printf(("^3%s ", name));
 	}
+	D_Printf(("\n"));
 	//D_Printf(("register all the server specified models\n"));
 	// register all the server specified models
 	for (i=1 ; i<MAX_MODELS ; i++) {
@@ -1012,6 +1014,7 @@ static void CG_RegisterGraphics( void ) {
 			break;
 		}
 		cgs.gameModels[i] = trap_R_RegisterModel( modelName );
+		D_Printf(("^6cgs.gameModels %i %s\n", i, modelName));		
 	}
 
 	CGX_NomipEnd();

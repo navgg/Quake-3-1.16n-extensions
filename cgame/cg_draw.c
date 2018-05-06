@@ -1009,7 +1009,7 @@ static void CG_DrawUpperRight( void ) {
 		y = CG_DrawAttacker( y );
 	}
 
-#if 0
+#if CGX_DEBUG
 	y = CG_DrawFreeMem(y);
 #endif
 }
