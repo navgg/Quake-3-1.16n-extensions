@@ -528,16 +528,7 @@ void CG_UpdateCvars( void ) {
 		CGX_Init_enemyAndTeamColors();	
 		D_Printf(("^6CG_UpdateCvars value changed\n"));
 	}
-
-	// track team change
-	if (cg.clientNum != -1) {
-		if (cg.oldTeam != cgs.clientinfo[cg.clientNum].team) {
-			cg.oldTeam = cgs.clientinfo[cg.clientNum].team;
-		
-			CGX_EnemyModelCheck();
-			D_Printf(("^6TEAM CHANGED!\n"));
-		}
-	}
+	
 	//track fps change
 	if (cgx_fps_modificationCount != cgx_maxfps.modificationCount) {
 		cgx_fps_modificationCount = cgx_maxfps.modificationCount;

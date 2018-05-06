@@ -157,6 +157,7 @@ static void CG_ParseWarmup( void ) {
 
 	} else if ( warmup > 0 && cg.warmup <= 0 ) {
 		trap_S_StartLocalSound( cgs.media.countPrepareSound, CHAN_ANNOUNCER );
+		CGX_EnemyModelCheck();
 	}
 
 	cg.warmup = warmup;
@@ -207,7 +208,7 @@ static void CG_ConfigStringModified( void ) {
 		CG_ParseServerinfo();
 	} else if ( num == CS_WARMUP ) {
 		CG_ParseWarmup();
-		CGX_EnemyModelCheck();
+		D_Printf(("^3cg.warmup %i\n", cg.warmup));		
 	} else if ( num == CS_SCORES1 ) {
 		cgs.scores1 = atoi( str );
 	} else if ( num == CS_SCORES2 ) {
@@ -352,8 +353,8 @@ static void CG_MapRestart( void ) {
 	cg.timelimitWarnings = 0;
 
 	cg.intermissionStarted = qfalse;
-	// X-MOD: send modinfo
-	CGX_SendModinfo();
+	//X-MOD: map restart
+	CGX_MapRestart();
 
 	cgs.voteTime = 0;
 

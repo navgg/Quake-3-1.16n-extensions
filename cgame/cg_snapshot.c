@@ -72,29 +72,9 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 
 	cg.snap = snap;	
 
-	// X-MOD: save player's id in cg.clientNum then restore model and skin
-	if (cg.clientNum == -1) {	
-		// if follow other player with enemyModels enabled and make vid_restart, 
-		// clientNum of followed player will come here
-		// so it's need to be updated in CG_TransitionPlayerState
-		cg.clientNum = cg.snap->ps.clientNum;
-
-		cur = &cgs.clientinfo[cg.clientNum];
-		
-		cg.oldTeam = cur->team;		
-
-		Q_strncpyz( cur->skinName, cur->skinNameCopy, sizeof( cur->skinName ) );
-		Q_strncpyz( cur->modelName, cur->modelNameCopy, sizeof( cur->modelName ) );	
-
-		D_Printf(("CG_SetInitialSnapshot restore player's models: %s %s\n", cur->skinName, cur->modelName));
-		
-		cur->infoValid = qtrue;
-
-		CGX_LoadClientInfo( cur );	
-		
-		//check and restore other players models if needed, and set proper colors		
-		CGX_EnemyModelCheck();
-
+	D_Printf(("^1CG_SetInitialSnapshot %i\n", cg.clientNum));
+	// X-MOD: if client is not initialized yet
+	if (cg.clientNum == -1) {
 		// X-MOD: send modinfo
 		CGX_SendModinfo();
 	}

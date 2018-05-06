@@ -126,7 +126,7 @@ void CGX_EnemyModelCheck(void) {
 
 	//change models and skins if needed or restore
 	for ( i = 0, ci = cgs.clientinfo ; i < cgs.maxclients ; i++, ci++ )
-		if (/*cg.clientNum != i &&*/ ci->infoValid)
+		if (ci->infoValid)
 			CGX_SetModelAndSkin(ci, qtrue, i);
 	
 	D_Printf(("CG_LoadDeferredPlayers\n"));
@@ -236,7 +236,6 @@ qboolean CGX_RestoreModelAndSkin(clientInfo_t *ci, int clientNum, qboolean isDef
 
 	//if disabled or its spect or it's own model or player is in spect
 	if (!cgx_enemyModel_enabled.integer || isSpect || isPlayerSpect || isPlayer) {
-		ci->deferred = isDeferred;
 		if (IsSameModel(ci)) {
 			D_Printf(("^3OK %i\n", clientNum));
 			return qtrue;
@@ -245,11 +244,11 @@ qboolean CGX_RestoreModelAndSkin(clientInfo_t *ci, int clientNum, qboolean isDef
 		Q_strncpyz(ci->modelName, ci->modelNameCopy, sizeof(ci->modelName));
 		Q_strncpyz(ci->skinName, ci->skinNameCopy, sizeof(ci->skinName));
 
+		ci->deferred = isDeferred;
+
 		D_Printf(("^3Restore '%i' '%s/%s' '%s/%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->modelNameCopy, ci->skinNameCopy, ci->infoValid, ci->deferred));
 		return qtrue;
 	}
-
-	//D_Printf(("'%i' '%s/%s' '%s/%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->modelNameCopy, ci->skinNameCopy, ci->infoValid, ci->deferred));
 
 	return qfalse;
 }
@@ -338,12 +337,33 @@ void CGX_SetModelAndSkin(clientInfo_t *ci, qboolean isDeferred, int clientNum) {
 	D_Printf(("^2Set '%i' '%s/%s' '%s/%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->modelNameCopy, ci->skinNameCopy, ci->infoValid, ci->deferred));
 }
 
-static void CGX_UpdateClientNum(int i) {
-	cg.clientNum = i;
-	cg.oldTeam = cgs.clientinfo[cg.clientNum].team;
+// tracking changes, only after cg.snap received
+void CGX_TrackEnemyModelChanges() {
+	// if it's disabled skip
+	if (!cgx_enemyModel_enabled.integer)
+		return;
 
+	// track client num change
+	if (cg.clientNum != cg.snap->ps.clientNum) {
+		cg.clientNum = cg.snap->ps.clientNum;
+		cg.oldTeam = cgs.clientinfo[cg.clientNum].team;	
+		D_Printf(("cg.clientNum %i\n", cg.clientNum));
+		CGX_EnemyModelCheck();
+		D_Printf(("^6Num changed!\n"));
+	} // track team change
+	else if (cg.oldTeam != cgs.clientinfo[cg.clientNum].team) {
+		cg.oldTeam = cgs.clientinfo[cg.clientNum].team;
+
+		CGX_EnemyModelCheck();
+		D_Printf(("^6TEAM CHANGED!\n"));
+	}	
+}
+
+void CGX_MapRestart() {
+	D_Printf(("^1CGX_MapRestart\n"));
+	// X-MOD: send modinfo
+	CGX_SendModinfo();	
 	CGX_EnemyModelCheck();
-	D_Printf(("cg.clientNum %i\n", cg.clientNum));
 }
 
 }
