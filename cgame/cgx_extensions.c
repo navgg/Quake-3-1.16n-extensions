@@ -119,10 +119,15 @@ void CGX_EnemyModelCheck(void) {
 	int		i;
 	clientInfo_t	*ci;
 
+	if (cg.clientNum == -1) {
+		D_Printf(("^1CGX_EnemyModelCheck before clientNum init\n"));
+		return;
+	}
+
 	if (cgs.gametype == GT_SINGLE_PLAYER)
 		return;
 
-	D_Printf(("CGX_EnemyModelCheck\n"));	
+	D_Printf(("CGX_EnemyModelCheck %i\n", cg.clientNum));	
 
 	//change models and skins if needed or restore
 	for ( i = 0, ci = cgs.clientinfo ; i < cgs.maxclients ; i++, ci++ )
@@ -296,7 +301,8 @@ void CGX_SetSkin(clientInfo_t *ci, char *skinName) {
 }
 
 #undef IsSameModel
-#define IsSameModel(x, y, z) !Q_stricmp(x->modelName, y) && !Q_stricmp(x->skinName, z)
+#define IsSameModel(x, y, z) (!Q_stricmp(x->modelName, y) && !Q_stricmp(x->skinName, z)) || \
+ (!*y && !Q_stricmp(x->modelName, x->modelNameCopy) && !Q_stricmp(x->skinName, "pm"))
 void CGX_SetModelAndSkin(clientInfo_t *ci, qboolean isDeferred, int clientNum) {	
 	qboolean isSameTeam = qfalse;	
 
@@ -347,7 +353,7 @@ void CGX_TrackEnemyModelChanges() {
 	// track client num change
 	if (cg.clientNum != cg.snap->ps.clientNum) {
 		cg.clientNum = cg.snap->ps.clientNum;
-		cg.oldTeam = cgs.clientinfo[cg.clientNum].team;	
+		cg.oldTeam = cgs.clientinfo[cg.clientNum].team;
 		D_Printf(("cg.clientNum %i\n", cg.clientNum));
 		CGX_EnemyModelCheck();
 		D_Printf(("^6Num changed!\n"));

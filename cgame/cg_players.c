@@ -536,8 +536,10 @@ void CG_NewClientInfo( int clientNum ) {
 
 	// X-MOD: fix emtpy models loading and colored axis moving bug
 	// weird bug, to reproduce connect to server, add two bots, join spect, add another bot
-	if (!ci->modelName[0] || !ci->skinName[0])
+	if (ci->infoValid && (!ci->modelName[0] || !ci->skinName[0])) {
+		D_Printf(("^1FUCK!!!"));
 		ci->infoValid = qfalse;
+	}
 
 	// build into a temp buffer so the defer checks can use
 	// the old value
@@ -642,7 +644,7 @@ void CG_NewClientInfo( int clientNum ) {
 	//change models and skins if needed or restore
 	//CG_Printf("ni '%i' '%s' '%s' '%i' '%i'\n", clientNum, newInfo.modelName, newInfo.skinName, newInfo.infoValid, newInfo.deferred);
 	//CG_Printf("ci '%i' '%s' '%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->infoValid, ci->deferred);
-	if (cg.clientNum != clientNum && cgs.gametype != GT_SINGLE_PLAYER) {
+	if (cgx_enemyModel_enabled.integer && cg.clientNum != clientNum && cgs.gametype != GT_SINGLE_PLAYER) {
 		//D_Printf(("CG_NewClientInfo %i\n", clientNum));
 		D_Printf(("^5CG_NewClientInfo '%i' '%s'\n", clientNum, configstring));
 		CGX_SetModelAndSkin(&newInfo, qfalse, clientNum);
