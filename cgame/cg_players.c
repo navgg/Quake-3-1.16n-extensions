@@ -245,6 +245,7 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/lower.md3", modelName );
 	ci->legsModel = trap_R_RegisterModel( filename );
 	if ( !ci->legsModel ) {
+		if (!cgx_enemyModel_enabled.integer)
 		Com_Printf( "Failed to load model file %s\n", filename );
 		return qfalse;
 	}
@@ -252,6 +253,7 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/upper.md3", modelName );
 	ci->torsoModel = trap_R_RegisterModel( filename );
 	if ( !ci->torsoModel ) {
+		if (!cgx_enemyModel_enabled.integer)
 		Com_Printf( "Failed to load model file %s\n", filename );
 		return qfalse;
 	}
@@ -259,6 +261,7 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/head.md3", modelName );
 	ci->headModel = trap_R_RegisterModel( filename );
 	if ( !ci->headModel ) {
+		if (!cgx_enemyModel_enabled.integer)
 		Com_Printf( "Failed to load model file %s\n", filename );
 		return qfalse;
 	}

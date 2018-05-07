@@ -119,9 +119,6 @@ void CGX_EnemyModelCheck(void) {
 	int		i;
 	clientInfo_t	*ci;
 
-	if (!cgx_enemyModel_enabled.integer)
-		return;
-
 	if (cg.clientNum == -1) {
 		D_Printf(("^1CGX_EnemyModelCheck before clientNum init\n"));
 		return;
@@ -288,7 +285,7 @@ static qboolean CGX_IsKnownModel(const char *modelName) {
 
 void CGX_SetPMSkin(clientInfo_t *ci) {
 	if (!CGX_IsKnownModel(ci->modelName)) {
-		CG_Printf("Warning: No PM skin for model %s\n", ci->modelName);
+		D_Printf(("^3Warning: No PM skin for model %s\n", ci->modelName));
 		Q_strncpyz(ci->modelName, DEFAULT_MODEL, sizeof(ci->modelName));
 	}
 
