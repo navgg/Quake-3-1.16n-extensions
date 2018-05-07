@@ -416,7 +416,7 @@ void CGX_AutoAdjustNetworkSettings(void) {
 				while ((i = cgx_maxfps.integer / k++) > 100);
 
 			if (i >= 100)
-				i--;
+				i-=5;
 		}
 
 		// set packets first
@@ -429,7 +429,7 @@ void CGX_AutoAdjustNetworkSettings(void) {
 		}
 
 		// no sense in snaps > 30 for default quake3.exe set it to sv_fps if possible, otherwise set it to 40 
-		minSnaps = cgs.minSnaps;
+		minSnaps = cgs.sv_fps > 20 ? cgs.sv_fps : 40;
 
 		// check and set snaps		
 		trap_Cvar_VariableStringBuffer("snaps", buf, sizeof(buf));

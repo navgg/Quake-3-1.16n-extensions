@@ -815,8 +815,7 @@ typedef struct {
 
 	//X-MOD: save delag and server info
 	int				sv_fps;
-	int				minSnaps;
-	int				sv_maxrate;
+	//int				sv_maxrate;
 
 	//unlagged - client options
 	// this will be set to the server's g_delagHitscan

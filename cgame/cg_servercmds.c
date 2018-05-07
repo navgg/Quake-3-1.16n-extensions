@@ -114,21 +114,18 @@ void CG_ParseServerinfo( void ) {
 	//unlagged - server options
 
 	cgs.sv_fps = atoi(Info_ValueForKey(info, "sv_fps"));
-	cgs.sv_maxrate = atoi(Info_ValueForKey(info, "sv_maxrate"));
+	//cgs.sv_maxrate = atoi(Info_ValueForKey(info, "sv_maxrate"));
 
 	// get sv_fps and save for unlagged
-	// get minsnaps for auto network adjustments
 
-	D_Printf(("^3g_delag '%i' sv_maxrate '%i'\n", cgs.delagHitscan, cgs.sv_maxrate));
+	//D_Printf(("^3g_delag '%i' sv_maxrate '%i'\n", cgs.delagHitscan, cgs.sv_maxrate));
+	D_Printf(("^3g_delag '%i'\n", cgs.delagHitscan));
 	D_Printf(("^3sv_fps serv '%i' sv_fps client '%i' ", cgs.sv_fps, sv_fps.integer));
 
-	if (!cgs.sv_fps) {
-		cgs.minSnaps = 40;
+	if (!cgs.sv_fps) {		
 		//on some servs fps coming to sv_fps client value, on some stored in server info
-		//try get from server info first, then from client
+		//try get from server info first, then from client		
 		cgs.sv_fps = sv_fps.integer ? sv_fps.integer : 20;
-	} else {		
-		cgs.minSnaps = cgs.sv_fps;
 	}
 
 	D_Printf(("^3sv_fps final '%i'\n", cgs.sv_fps));
