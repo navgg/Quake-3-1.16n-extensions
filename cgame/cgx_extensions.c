@@ -5,6 +5,7 @@
 #define ShaderRGBAFill(a,c)	((a)[0]=(c),(a)[1]=(c),(a)[2]=(c),(a)[3]=(255))
 //#define CGX_IsPMSkin(p) ( p && *(p) == 'p' && *((p)+1) && *((p)+1) == 'm' )
 
+#define XMOD_ANSWER(x) { CG_Printf("^7[^1xmod^7]: ^6%s\n", x); trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND ); }
 
 #define DARKEN_COLOR 64
 #define EM_SPECT			2
@@ -849,6 +850,37 @@ int CGX_FReadAll(char *filename, char *buffer, int bufsize) {
 	return len;
 }
 
+//small talk
+char* CGX_XmodTalk(char *command) {
+	int i;
+	i = strlen(command);
+	command[i] = ' ';
+
+	if (stristr(command, "fuck") || stristr(command, "suck") || stristr(command, "shit")) {
+		return command;
+	} else if (stristr(command, "hi ") || stristr(command, "hello")) {
+		char *txt[] = { "hi! how are you?", "hello!", "hey" };
+		return txt[rand() % ArrLen(txt)];
+	} else if (stristr(command, "fine") || stristr(command, "good") || stristr(command, "ok ") || stristr(command, "awesome") || stristr(command, "great")) {
+		char *txt[] = { "good", "great", "okay", "awesome" };
+		return rand() % 1000 > 500 ? txt[rand() % ArrLen(txt)] : command;
+	} else if (stristr(command, "you") || stristr(command, " u ")) {
+		char *txt[] = { "I'm just a program", "and you?", "I'm sequience of 0 and 1", "fine" };
+		return txt[rand() % ArrLen(txt)];
+	} else if (stristr(command, "bye ") || stristr(command, "bb ")) {
+		char *txt[] = { "bb", "see you", "bye" };
+		return txt[rand() % ArrLen(txt)];
+	} else if (stristr(command, "?") || stristr(command, "what") || stristr(command, "where") || stristr(command, "when") || 
+		stristr(command, "how") || stristr(command, "who") || stristr(command, "which") || stristr(command, "why")) {
+		char *txt[] = { "I don't know", "how do I know", "idk", "the answer is... "CGX_BP_STRING };
+		return txt[rand() % ArrLen(txt)];
+	}
+
+	command[i] = 0;
+
+	return NULL;
+}
+
 void CGX_PrintLine(char c) {
 	int i;	
 	CG_Printf("^%c", c);
@@ -860,7 +892,7 @@ void CGX_PrintLine(char c) {
 //parse info from file
 //format: cmd1 - description1\r\n
 void CGX_ShowHelp(char *filename, char *cmd) {
-	char			buf[1024 * 3];
+	char			buf[1024 * 4];
 	static			qboolean exampleShown;
 
 	//start parse command list if read succesful
@@ -881,7 +913,7 @@ void CGX_ShowHelp(char *filename, char *cmd) {
 		if (!cmd[0]) {
 			//find first command in file
 			s = strchr(buf, 'c');
-
+			XMOD_ANSWER("known command list");
 			CGX_PrintLine(COLOR_YELLOW);
 			for (t = s; *t; t = s) {
 				if (!(s = strchr(s, ' ')))
@@ -895,20 +927,12 @@ void CGX_ShowHelp(char *filename, char *cmd) {
 			}			
 			trap_Print("\n");
 			CGX_PrintLine(COLOR_YELLOW);
-			trap_Print("For detailed info: \\xmod <command>\n");
+			XMOD_ANSWER("for detailed info: \\xmod <command>");
 			//show example
 			if (!exampleShown) {
-				trap_Print("Example: \\xmod cg_enemy\n"); exampleShown = qtrue;
+				XMOD_ANSWER("example: \\xmod cg_enemy"); exampleShown = qtrue;
 			}
-		} else {// find info abt command
-			i = strlen(cmd);
-			if (i < 3) {
-				CG_Printf("Too short cmd\n");
-				return;
-			}
-			//remove emtpy space
-			cmd[i - 1] = 0;			
-			
+		} else {// find info abt command						
 			for (t = buf, i = 0; *t; t++) {
 				t = stristr(t, cmd);				
 				if (*(t - 1) == '\n') {			
@@ -923,53 +947,47 @@ void CGX_ShowHelp(char *filename, char *cmd) {
 					if (s = strchr(s, '\r'))
 						*s = 0;
 					//print found info
-					CG_Printf("^3%s\n", t);
+					XMOD_ANSWER(va("^3%s", t));
 					i++;
 					t = s;
 				}				
 			}
 			
 			//zero matches
-			if (!i)
-				CG_Printf("Unknown cmd '%s'\n", cmd);
+			if (!i) {
+				if (s = CGX_XmodTalk(cmd))
+					XMOD_ANSWER(s)
+				else
+					XMOD_ANSWER(va("unknown cmd '%s'", cmd))
+			}
 		} 		
 	}
-}
-
-//small talk
-#define XMOD_ANSWER(x) CG_Printf("^7[^1xmod^7]: ^6%s\n", x); trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
-char* CGX_XmodTalk(char *command) {
-	if (stristr(command, "fuck") || stristr(command, "suck") || stristr(command, "shit")) {
-		return command;
-	} else if (stristr(command, "hi") || stristr(command, "hello")) {
-		char *txt[] = { "hi! how are you?", "hello!", "hey" };
-		return txt[rand() % 3];
-	} else if (stristr(command, "fine") || stristr(command, "good") || stristr(command, "ok")) {
-		char *txt[] = { "good", "great", "okay" };
-		return txt[rand() % 3];
-	} else if (stristr(command, "you") || stristr(command, " u ") || stristr(command, "how")) {
-		char *txt[] = { "I'm just a program", "and you?", "I'm sequience of 0 and 1" };
-		return txt[rand() % 3];
-	} else if (stristr(command, "bye") || stristr(command, "bb")) {
-		char *txt[] = { "bb", "see you", "bye" };
-		return txt[rand() % 3];
-	}
-
-	return NULL;
 }
 
 //xmod command
 void CGX_Xmod(char *command) {
 	char* talk;
+	int i;
 
-	if (stristr(command, "e")) {
-		CG_Printf("Checking enemy models...\n");
-		CGX_EnemyModelCheck();		
-	} else if (stristr(command, "help")) {
+	if (!Q_stricmp(command, "e ")) {
+		XMOD_ANSWER("checking enemy models...");
+		CGX_EnemyModelCheck();
+		return;
+	} 
+
+	i = strlen(command);
+	if (i && i < 3) {
+		XMOD_ANSWER("too short cmd");		
+		return;
+	}
+	//remove emtpy space
+	command[i - 1] = 0;
+
+	if (!Q_stricmp(command, "version")) {
+		XMOD_ANSWER(cgx_version.string);
+	} else if (!Q_stricmp(command, "help")) {
 		CGX_ShowHelp("doc\\2-comand_list.txt", "");
-	} else if (talk = CGX_XmodTalk(command)) {		
-		XMOD_ANSWER(talk);
-	} else if (stristr(command, "8ball")) {
+	} else if (!stristr(command, "8ball")) {
 		char *balls[] = {
 			"listen to your heart",
 			"listen to your intuition",
@@ -978,7 +996,7 @@ void CGX_Xmod(char *command) {
 			"listen to your feelings",
 		};
 		XMOD_ANSWER(balls[rand() % 5]);
-	} else if (stristr(command, "coin")) {
+	} else if (!Q_stricmp(command, "coin")) {
 		XMOD_ANSWER(rand() % 100 >= 50 ? "true": "false");
 	} else {
 		CGX_ShowHelp("doc\\2-comand_list.txt", command);
