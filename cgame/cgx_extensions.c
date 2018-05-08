@@ -3,9 +3,20 @@
 #include "cg_local.h"
 
 #define ShaderRGBAFill(a,c)	((a)[0]=(c),(a)[1]=(c),(a)[2]=(c),(a)[3]=(255))
-#define CGX_IsPMSkin(p) ( p && *(p) == 'p' && *((p)+1) && *((p)+1) == 'm' )
+//#define CGX_IsPMSkin(p) ( p && *(p) == 'p' && *((p)+1) && *((p)+1) == 'm' )
+
 
 #define DARKEN_COLOR 64
+#define EM_SPECT			2
+#define EM_INTERMISSION		4
+
+// instead of modes 1 2 4 6 will be 1 2 3 4
+qboolean EM_Check(int x) {
+	int i = cgx_enemyModel_enabled.integer;
+	i = i == 3 ? i = 4 : i == 4 ? i = 6 : i;	
+	return i & x;
+}
+
 char CGX_StringToColor(const char *s) {
 	if (!Q_stricmp(s, "white")) 
 		return COLOR_WHITE;
@@ -246,7 +257,7 @@ void CGX_Init_enemyAndTeamColors(void) {
 //restore real model and skin if needed and return result
 #define IsSameModel(x) !Q_stricmp(x->modelName, x->modelNameCopy) && !Q_stricmp(x->skinName, x->skinNameCopy)
 qboolean CGX_RestoreModelAndSkin(clientInfo_t *ci, int clientNum, qboolean isDeferred) {
-	qboolean isSpect = ci->team == TEAM_SPECTATOR;
+	qboolean isSpect = ci->team == TEAM_SPECTATOR && !EM_Check(EM_SPECT);
 	qboolean isPlayer = qfalse;
 	qboolean isPlayerSpect = qfalse;
 
@@ -257,7 +268,7 @@ qboolean CGX_RestoreModelAndSkin(clientInfo_t *ci, int clientNum, qboolean isDef
 	}
 
 	if (cg.clientNum >= 0) {		
-		isPlayerSpect = cgs.clientinfo[cg.clientNum].team == TEAM_SPECTATOR;
+		isPlayerSpect = cgs.clientinfo[cg.clientNum].team == TEAM_SPECTATOR && !EM_Check(EM_SPECT);
 		isPlayer = cg.clientNum == clientNum;
 	}
 
@@ -386,7 +397,8 @@ void CGX_TrackEnemyModelChanges() {
 		CGX_EnemyModelCheck();
 		D_Printf(("^6TEAM CHANGED!\n"));
 	} //track intermission change
-	else if (cg.snap->ps.pm_type == PM_INTERMISSION && !cg.clientIntermission) {
+	else if (cg.snap->ps.pm_type == PM_INTERMISSION && !cg.clientIntermission &&
+		EM_Check(EM_INTERMISSION)) {
 		cg.clientIntermission = qtrue;
 
 		CGX_EnemyModelCheck();
