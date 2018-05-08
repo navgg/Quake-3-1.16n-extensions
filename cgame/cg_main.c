@@ -321,38 +321,13 @@ cvarTable_t		cvarTable[] = {
 #if CGX_DEBUG
 	{ &cgx_debug, "cgx_debug", "1", CVAR_TEMP },
 #endif
-	// cg_wideScreenFix 1|0 - fix perspective for widescreen
-	// cg_defaultWeapon 0-9 - default weapon when spawn 0: default 1: gauntlet ...
-	// cg_drawPlayerIDs 0|1 - show player id in scoreboard	
-	// cg_centerPrintAlpha 1.0-0 - center print transparency
-	// cg_crosshairColor 0-35 - crosshair color 0
-	// cg_drawSpeed 0|1|2 - speedmeter 0: off 1: top corner 2: center screen
-	// cg_deadBodyDarken 0|1|2|3 - pm skins becomes gray after death 0: off 1: Just grey 2: BT709 Greyscale 3: Y-Greyscale (PAL/NTSC)
-	// cg_chatSound 1|0 - chat beep sound
-	// cg_noTaunt 0|1 - enemy taunt sound
-	// cg_drawGun 0|1|2 - 0: no gun 1: bobbing gun 2: static gun
-	// cg_enemyModel_enabled 0|1 - enemy model on\off
-	// cg_enemyModel "" - forcing enemy model "keel/pm", "thankjr" etc.
-	// cg_enemyColors "" - "1234" 1-rail 2-head 3-torso 4-legs (colors from 0 to 7, special symbols ? - color depending on team, ! - same as ? but in ffa color is random, * - random color)	
-	// cg_teamModel "" - same as cg_enemyModel but for team
-	// cg_teamColors "" - same as cg_enemyColors but for team
-	// cg_lagometer 0|1|2 - 0: off 1: netgraph 2: netgraph + client ping
-	// cg_hitsounds 0|1|2 - 0: default 1: pro mode hi-low 2: low-hi hp hitsounds	
-	// cg_coloredPing 0|1 - toggles ping colors below 50 white, below 100 green, below 250 yellow, below 400 magenta, more than 400 red
-	// cg_lagometer 0|1|2|3 - off, netgraph, netgraph+ping, only when lag
-	// cg_networkAdjustments 0|1|2|3 - 0: off 1: min rate 8000 packets 30 2: packets 40-60 rate min 16000 3: packets 60-100 rate min 25000 packetdup off (snaps = sv_fps or min 40 in all cases if it's on)
-	// cg_drawAccuracy 0 1 draw acc	
 	// resolving favorite servers by domain name
 	// colored server names shifting left bug fixed
 	// optimization: removed many debug info in CG_EntityEvent
 	// other commands
 	// cinematics menu fixed
-	// model sarge^^^ fixed
-	// cgx_debug 0|1|2 - show debug info
-	// cgx_version - show version
-
-	// - `cg_sharedConfig 0|1` - not working yet, in development
-	
+	// model sarge^^^ fixed	
+	// cgx_version - show version	
 	// unlagged
 	// g_delag	
 	// fov adjust for widescreen
