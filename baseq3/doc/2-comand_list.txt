@@ -6,7 +6,8 @@ cg_wideScreenFix 0|1|2|3 - fix perspective for widescreen 0: no fixes 1: fix onl
 cg_defaultWeapon 0-9 - default weapon when spawn 0: default 1: gauntlet ...
 cg_drawPlayerIDs 0|1 - show player id in scoreboard
 cg_centerPrintAlpha 1.0-0 - center print transparency
-cg_crosshairColor 0-35 - crosshair color "" - default, 0: black 1: red etc.
+cg_crosshairColor 0-35 - crosshair color "" - default, 0: black 1: red 2: green etc.
+		or words "green", "red", "yellow", "white", "cyan", "magenta", "blue", "black"
 cg_drawSpeed 0|1|2 - speedometer 0: off 1: top corner 2: center screen
 cg_deadBodyDarken 0|1|2|3 - pm skins becomes gray after death 0: off 1: Just grey 2: BT709 Greyscale 3: Y-Greyscale (PAL/NTSC)
 cg_chatSound 0|1|2 - chat beep sound 0: off 1: on 2: only team
@@ -15,7 +16,8 @@ cg_nomip -1|0 - if it's -1 all objects will have r_picmip 0 regardless of curren
 cg_drawGun 0|1|2 - 0: no gun 1: bobbing gun 2: static gun no bobbing
 cg_enemyModel "" - forcing enemy model "keel/pm", "thankjr" etc. if it's empty and cg_enemyModel_enabled = 1 then
 		it will get pm skins for current player model eg. player model visor/blue it will make him visor/pm + specified colors
-cg_enemyColors "" - "1234" 1-rail 2-head 3-torso 4-legs (colors from 0 to 7 or any letter for extended color table,
+cg_enemyColors "" - use "green", "red", "yellow", "white", "cyan", "magenta", "blue", "black" 
+		or following pattern "1234" 1-rail 2-head 3-torso 4-legs (colors from 0 to 7 or any letter for extended color table,
 		special symbols ? - color depending on team (1 - red, 4 - blue, 2- ffa), ! - same as ? but use specific rail color of client, 
 		* - random color 0-7, . - random extended color 0-35)
 cg_enemyModel_enabled 0|1 - enemy model on\off 0: off 1: on(spectators off, intermission on)
@@ -26,18 +28,18 @@ cg_teamModel "" - same as cg_enemyModel but for team
 cg_teamColors "" - same as cg_enemyColors but for team
 cg_lagometer 0|1|2|3 - 0 :off 1: default 2: default + ping 3: only when packetloss
 cg_hitsounds 0|1|2 - 0: default 1: pro mode hi-low 2: low-hi hp hitsounds
-cg_networkAdjustments 0|1|2|3 - 0: off 1: min rate 8000 packets 30 2: packets 40-60 rate min 16000 3: packets 60-100 rate min 25000 packetdup off 
+cg_networkAdjustments 0|1|2|3 - 0: off 1: min rate 8000 packets 30 or sv_fps+10 2: packets 40-60 rate min 16000 3: packets 60-100 rate min 25000 packetdup off 
 		(snaps = sv_fps or min 40 in all cases if it's on)
 cg_drawScoreBox 0|1 - display score box in low right corner
 cg_scoreboard 0|1 - scoreboard type 0: default large-small 1: always small
 cg_drawAccuracy 0|1 - total weapon accuracy
-autorecord - start record demo (command do the following "g_syncronousClients 1; record <demoname>; g_syncronousClients 0")
-		to stop record type \stoprecord to play type \demo <demoname>
 cg_sharedConfig 0|1 - fixes problem with saving configs after game exit in 1.16n 
 		(0: off 1: automatically saves q3config.cfg to baseq3 folder after pressing 'leave arena' or 'exit game', 
 		to save manually use command \writesharedconfig)
 writesharedconfig - writes q3config.cfg to baseq3 folder (command do the following 
 		"writeconfig ..\\baseq3\\q3config.cfg" - if playing on modded server,
 		"writeconfig q3config.cfg" - if playing on default quake 3 server)
+autorecord - start record demo (command do the following "g_syncronousClients 1; record <demoname>; g_syncronousClients 0")
+		to stop record type \stoprecord to play type \demo <demoname>
+colorlist - 0: black, 1: red, 2: green, 3: yellow, 4: blue  5: cyan, 6: magenta, 7: white
 xmod - quick info & help on mod commands, usage \xmod <command>
-

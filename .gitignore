@@ -220,3 +220,4 @@ snd/
 baseq3/sound/cgx/
 *.zip
 changes.txt
+/*.txt

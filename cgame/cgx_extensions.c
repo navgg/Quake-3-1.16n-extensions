@@ -869,7 +869,7 @@ char* CGX_XmodTalk(char *command) {
 	} else if (stristr(command, "fine") || stristr(command, "good") || stristr(command, "ok ") || stristr(command, "awesome") || stristr(command, "great")) {
 		char *txt[] = { "good", "great", "okay", "awesome" };
 		return rand() % 1000 > 500 ? txt[rand() % ArrLen(txt)] : command;
-	} else if (stristr(command, "you") || stristr(command, " u ")) {
+	} else if (stristr(command, "you") || stristr(command, " u ") || !Q_stricmpn(command, "u ", 2)) {
 		char *txt[] = { "I'm just a program", "and you?", "I'm sequience of 0 and 1", "fine" };
 		return txt[rand() % ArrLen(txt)];
 	} else if (stristr(command, "bye ") || stristr(command, "bb ")) {
@@ -935,20 +935,34 @@ void CGX_ShowHelp(char *filename, char *cmd) {
 			XMOD_ANSWER("for detailed info: \\xmod <command>");
 			//show example
 			if (!exampleShown) {
-				XMOD_ANSWER("example: \\xmod cg_enemy"); exampleShown = qtrue;
+				XMOD_ANSWER("example: \\xmod cg_enemy"); 
+				XMOD_ANSWER("'Page Up','Page Down' - scroll 'Tab' - autocomplete\n'Up','Down' - input history");
+				exampleShown = qtrue; //19 - percent
 			}
 		} else {// find info abt command						
 			for (t = buf, i = 0; *t; t++) {
 				t = stristr(t, cmd);				
 				if (*(t - 1) == '\n') {			
 					s = strchr(t, '-');
-					//if - in text find next
+					//if '-' in text find next
 					if (*(s + 1) != ' ' || *(s - 1) != ' ')
 						s = strchr(s + 1, '-');
-					if (s) {
+					//if '-' found
+					if (s)		
+					// if it's colorlist then paint numbers
+					if (!Q_stricmpn(t, "colorlist", 8)) {						
+						for (t = s; *t && *t != '\r'; t++)
+							if (*t >= '0' && *t <= '7') {
+								*(t - 2) = ' ';//replace ','
+								*(t - 1) = Q_COLOR_ESCAPE;//replace ' '
+								*(t + 1) = *t++;//replace next ' ' with num
+							}
+						t = s + 1;
+					} else { //otherwise just put white color
 						*(s) = COLOR_WHITE;
 						*(s - 1) = '^';
-					}					
+					}	
+					//make end line
 					if (s = strchr(s, '\r'))
 						*s = 0;
 					//print found info
@@ -992,7 +1006,7 @@ void CGX_Xmod(char *command) {
 		XMOD_ANSWER(cgx_version.string);
 	} else if (!Q_stricmp(command, "help")) {
 		CGX_ShowHelp("doc\\2-comand_list.txt", "");
-	} else if (!stristr(command, "8ball")) {
+	} else if (stristr(command, "8ball")) {
 		char *balls[] = {
 			"listen to your heart",
 			"listen to your intuition",
