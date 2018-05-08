@@ -6,6 +6,26 @@
 #define CGX_IsPMSkin(p) ( p && *(p) == 'p' && *((p)+1) && *((p)+1) == 'm' )
 
 #define DARKEN_COLOR 64
+char CGX_StringToColor(const char *s) {
+	if (!Q_stricmp(s, "white")) 
+		return COLOR_WHITE;
+	else if (!Q_stricmp(s, "red"))
+		return COLOR_RED;
+	else if (!Q_stricmp(s, "yellow"))
+		return COLOR_YELLOW;
+	else if (!Q_stricmp(s, "green"))
+		return COLOR_GREEN;
+	else if (!Q_stricmp(s, "blue"))
+		return COLOR_BLUE;
+	else if (!Q_stricmp(s, "cyan"))
+		return COLOR_CYAN;
+	else if (!Q_stricmp(s, "magenta"))
+		return COLOR_MAGENTA;
+	else if (!Q_stricmp(s, "black"))
+		return COLOR_BLACK;
+
+	return 0;
+}
 
 static char *known_models[] = {
 	"anarki",
@@ -172,14 +192,16 @@ static byte CGX_RGBToGray(byte *c) {
 }
 
 static void CGX_SetColorInfo(clientInfo_t *info, const char *color) {	
-	int i;	
+	int i;
 
 	// if skin is not pm skip
 	if (Q_stricmp(info->skinName, "pm"))
 		return;
 
-	if (color[0] == '\0')
+	if (!*color)
 		color = "!!!!";
+	else if (i = CGX_StringToColor(color))
+		color = va("%c%c%c%c", i, i, i, i);			
 
 	//D_Printf(("CGX_SetColorInfo %s\n", color));
 

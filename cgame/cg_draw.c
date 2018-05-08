@@ -1979,8 +1979,15 @@ static void CG_DrawCrosshair(void) {
 	}
 	
 	// X-MOD: set crosshair color
-	if (cgx_crosshairColor.integer >= 0) {	
+	if (cgx_crosshairColor.integer) {	
 		trap_R_SetColor(g_color_table_ex[cgx_crosshairColor.integer % 35]);
+	} else if (*cgx_crosshairColor.string) {
+		//try set from string
+		char c = CGX_StringToColor(cgx_crosshairColor.string);
+		if (c) {
+			cgx_crosshairColor.integer = ColorIndex(c);			
+			trap_R_SetColor(g_color_table_ex[cgx_crosshairColor.integer % 35]);
+		}
 	}
 	// set color based on health
 	else if ( cg_crosshairHealth.integer ) {
