@@ -284,6 +284,8 @@ qboolean CGX_RestoreModelAndSkin(clientInfo_t *ci, int clientNum, qboolean isDef
 		Q_strncpyz(ci->modelName, ci->modelNameCopy, sizeof(ci->modelName));
 		Q_strncpyz(ci->skinName, ci->skinNameCopy, sizeof(ci->skinName));
 
+		Vector4Copy(ci->colorCopy, ci->color);
+
 		ci->deferred = isDeferred;
 
 		D_Printf(("^3Restore '%i' '%s/%s' '%s/%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->modelNameCopy, ci->skinNameCopy, ci->infoValid, ci->deferred));
