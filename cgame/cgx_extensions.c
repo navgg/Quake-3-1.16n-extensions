@@ -431,10 +431,13 @@ void CGX_AutoAdjustNetworkSettings(void) {
 
 		if (cgx_networkAdjustments.integer == 1) {			
 			minRate = 8000;			
-
+		
 			// if packets < 30 set it to 30
 			if (cgx_maxpackets.integer < CGX_MIN_MAXPACKETS)
 				i = CGX_MIN_MAXPACKETS;
+			// set it litle more than sv_fps
+			if (cgx_maxpackets.integer < cgs.sv_fps)
+				i = cgs.sv_fps + 10;
 		} else if (cgx_networkAdjustments.integer == 2) {
 			k = 2;
 			minRate = 16000;			
