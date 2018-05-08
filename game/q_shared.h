@@ -22,6 +22,8 @@
 #define CGX_NEMESIS_COMPATIBLE !CGX_DEBUG
 #define CGX_MAPURL		"https://ws.q3df.org/map/"
 #define CGX_MAPBAT		"download_map.bat"
+#define CGX_BP_NUMBER	44	//secret number
+#define CGX_BP_STRING	"44"
 //length of array
 #define ArrLen(x)	sizeof x / sizeof *x
 

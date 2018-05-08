@@ -746,6 +746,53 @@ char *Q_CleanStr( char *string ) {
 	return string;
 }
 
+// X-MOD: next methods to fix shifted colored server names in server list
+// modified Q_CleanStr method allows only to use color bug once in server name string
+char *QX_CleanStrHostnameFix( char *string ) {
+	char*	d;
+	char*	s;
+	int		c;
+	qboolean firstcolor = qfalse;
+
+	s = string;
+	d = string;	
+	while ((c = *s) != 0 ) {
+		if ( Q_IsColorString( s ) ) {
+			s++;
+		} 
+		else if ( c >= 0x20 && c <= 0x7E ) {
+			if (c != Q_COLOR_ESCAPE) {
+				// if for coloring bug used characted it will be dublicated if number then skipped
+				if (*(d - 1) == Q_COLOR_ESCAPE && (c < '0' || c > '9')) 
+					*d++ = c;														
+				*d++ = c;				
+			} else {
+				// allow coloring bug only once
+				if (!firstcolor) {
+					*d++ = c;
+					firstcolor = qtrue;
+				} else {				
+					*d++ = ' ';					
+				}
+			}
+		}
+		s++;
+	}
+	*d = '\0';
+
+	return string;
+}
+
+// adds two spaces if color bug used in server name to string shift right
+char* QX_GetHostnameSpacesFix(char *string) {		
+	char *s;
+
+	s = string;
+	while (*s != 0)
+		if (*s++ == Q_COLOR_ESCAPE) return "  ";
+
+	return "";	
+}
 
 void QDECL Com_sprintf( char *dest, int size, const char *fmt, ...) {
 	int		len;

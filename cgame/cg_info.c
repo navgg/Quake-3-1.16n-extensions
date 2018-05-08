@@ -156,6 +156,13 @@ void CG_DrawInformation( void ) {
 	detail = trap_R_RegisterShader( "levelShotDetail" );
 	trap_R_DrawStretchPic( 0, 0, cgs.glconfig.vidWidth, cgs.glconfig.vidHeight, 0, 0, 2.5, 2, detail );
 
+	//X-MOD: draw version
+	{
+		vec4_t	xmodcol = { 1.0f, 0.1f, 0.1f, CGX_BP_NUMBER / 100.0f };
+		UI_DrawProportionalString(vScreen.width - 8, SCREEN_HEIGHT - SMALLCHAR_HEIGHT - 8, CGX_NAME" "CGX_VERSION, 
+			UI_RIGHT | UI_SMALLFONT, xmodcol);
+	}
+
 	// draw the icons of thiings as they are loaded
 	CG_DrawLoadingIcons();
 
@@ -169,13 +176,6 @@ void CG_DrawInformation( void ) {
 			UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 	}
 
-	//X-MOD: draw version
-	{
-		vec4_t	xmodcol = { 1.0f, 0.1f, 0.1f, 0.44f };
-		UI_DrawProportionalString(vScreen.width - 8, SCREEN_HEIGHT - SMALLCHAR_HEIGHT - 8, CGX_NAME" "CGX_VERSION, 
-			UI_RIGHT | UI_SMALLFONT, xmodcol);
-	}
-
 	// draw info string information
 
 	y = 180;
@@ -183,10 +183,12 @@ void CG_DrawInformation( void ) {
 	// don't print server lines if playing a local game
 	trap_Cvar_VariableStringBuffer( "sv_running", buf, sizeof( buf ) );
 	if ( !atoi( buf ) ) {
+		char col;
 		// server hostname
 		s = Info_ValueForKey( info, "sv_hostname" );
+		col = CGX_ServerNameFixInfoLoad(s);
 		UI_DrawProportionalString( vScreen.hwidth, y, s,
-			UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+			UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, g_color_table[ColorIndex(col)] );
 		y += PROP_HEIGHT;
 
 		// pure server

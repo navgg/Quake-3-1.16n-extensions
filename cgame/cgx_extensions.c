@@ -984,3 +984,24 @@ void CGX_Xmod(char *command) {
 		CGX_ShowHelp("doc\\2-comand_list.txt", command);
 	}
 }
+
+//clears sv_hostname from ^. and returns color if ^^.. was used
+char CGX_ServerNameFixInfoLoad(char *str) {
+	char* c;
+	char res;
+	//clean with leaving color
+	QX_CleanStrHostnameFix(str);	
+
+	//check if color left
+	for (c = str; *c; c++)
+		if (*c == Q_COLOR_ESCAPE) {
+			//return the color and clean string completly
+			res = *(c + 1);
+			Q_CleanStr(str);			
+			return res;
+		}
+
+	return COLOR_WHITE;	
+}
+
+
