@@ -48,7 +48,7 @@ weaponInfo_t		cg_weapons[MAX_WEAPONS];
 itemInfo_t			cg_items[MAX_ITEMS];
 
 vmCvar_t	cgx_wideScreenFix;
-vmCvar_t	cgx_drawPlayerIDs;
+//vmCvar_t	cgx_drawPlayerIDs;
 vmCvar_t	cgx_enemyModel;
 vmCvar_t	cgx_enemyModel_enabled;
 vmCvar_t	cgx_enemyColors;
@@ -63,7 +63,7 @@ vmCvar_t	cgx_centerPrintAlpha;
 vmCvar_t	cgx_crosshairColor;
 vmCvar_t	cgx_drawSpeed;
 vmCvar_t	cgx_hitsounds;
-vmCvar_t	cgx_coloredPing;
+//vmCvar_t	cgx_coloredPing;
 vmCvar_t	cgx_networkAdjustments;
 vmCvar_t	cgx_drawScoreBox;
 vmCvar_t	cgx_scoreboard;
@@ -274,7 +274,7 @@ cvarTable_t		cvarTable[] = {
 
 	{ &cgx_wideScreenFix, "cg_wideScreenFix", "3", CVAR_ARCHIVE },
 	{ &cgx_defaultWeapon, "cg_defaultWeapon", "0", CVAR_ARCHIVE },
-	{ &cgx_drawPlayerIDs, "cg_drawPlayerIDs", "1", CVAR_ARCHIVE },
+	//{ &cgx_drawPlayerIDs, "cg_drawPlayerIDs", "1", CVAR_ARCHIVE },
 	
 	{ &cgx_enemyModel_enabled, "cg_enemyModel_enabled", "0", CVAR_ARCHIVE },
 	{ &cgx_enemyModel, "cg_enemyModel", "", CVAR_ARCHIVE },		
@@ -290,7 +290,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_centerPrintAlpha, "cg_centerPrintAlpha", "1.0", CVAR_ARCHIVE },
 	{ &cgx_crosshairColor, "cg_crosshairColor", "", CVAR_ARCHIVE },
 	{ &cgx_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
-	{ &cgx_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },
+	//{ &cgx_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },
 	{ &cgx_networkAdjustments, "cg_networkAdjustments", "1", CVAR_ARCHIVE },
 	{ &cgx_scoreboard, "cg_scoreboard", "0", CVAR_ARCHIVE },
 	{ &cgx_drawScoreBox, "cg_drawScoreBox", "1", CVAR_ARCHIVE },

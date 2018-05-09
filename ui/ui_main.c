@@ -219,7 +219,7 @@ cvarTable_t		cvarTable[] = {
 	// X-MOD: default parameters
 	{ &uix_wideScreenFix, "cg_wideScreenFix", "3", CVAR_ARCHIVE },
 	{ &uix_defaultWeapon, "cg_defaultWeapon", "0", CVAR_ARCHIVE },
-	{ &uix_drawPlayerIDs, "cg_drawPlayerIDs", "1", CVAR_ARCHIVE },
+	//{ &uix_drawPlayerIDs, "cg_drawPlayerIDs", "1", CVAR_ARCHIVE },
 
 	{ &uix_enemyModel_enabled, "cg_enemyModel_enabled", "0", CVAR_ARCHIVE },
 	{ &uix_enemyModel, "cg_enemyModel", "", CVAR_ARCHIVE },		
@@ -235,7 +235,7 @@ cvarTable_t		cvarTable[] = {
 	{ &uix_centerPrintAlpha, "cg_centerPrintAlpha", "1.0", CVAR_ARCHIVE },
 	{ &uix_crosshairColor, "cg_crosshairColor", "", CVAR_ARCHIVE },	
 	{ &uix_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
-	{ &uix_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },	
+	//{ &uix_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },	
 	{ &uix_networkAdjustments, "cg_networkAdjustments", "1", CVAR_ARCHIVE },
 	{ &uix_scoreboard, "cg_scoreboard", "0", CVAR_ARCHIVE },
 	{ &uix_drawScoreBox, "cg_drawScoreBox", "1", CVAR_ARCHIVE },

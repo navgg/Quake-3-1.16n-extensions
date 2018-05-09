@@ -27,7 +27,7 @@ ADVANCED OPTIONS MENU
 #define ID_BLOOD				128
 #define ID_GIBS					129
 #define ID_CAMERABOB			130
-#define ID_PLAYERIDS			131
+//#define ID_PLAYERIDS			131
 #define ID_FOV					132
 #define ID_TIMER				133
 #define ID_ENEMYMODEL			134
@@ -42,7 +42,7 @@ ADVANCED OPTIONS MENU
 #define ID_DRAW_GUN				143
 #define ID_TEAMMODEL			144
 #define ID_TEAMCOLORS			145
-#define ID_COLOREDPING			146
+//#define ID_COLOREDPING			146
 #define ID_DEFAULTWEAPON		147
 #define ID_LAGOMETER			148
 #define ID_HITSOUNDS			149
@@ -59,7 +59,8 @@ static void Preferences2_StatusBar( void *self ) {
 		{ "Toggles display blood after kill", ""},
 		{ "Toggles display gibs, if blood is on", ""},
 		{ "Toggles camera bobbing when running","Recommended 'Off'"},
-		{ "Toggles player ids display on scoreboard",""},
+		{"",""},
+		//{ "Toggles player ids display on scoreboard",""},
 		{ "Field of view in degrees","Min - 1 Max - 160"},
 		{ "Sets ingame timer display position",""},
 		{ "Forces all enemies one model eg. 'keel/pm' 'tankjr' ","Leave emtpy to use pm skin based on model"},
@@ -74,7 +75,8 @@ static void Preferences2_StatusBar( void *self ) {
 		{ "Sets draw gun method", "off - no gun, defaul - bobbing, still - promode"},
 		{ "Forces all teammates one model eg. 'bitterman/pm'","Leave emtpy to use pm skin based on model"},
 		{ "Forces all teammates colors eg. '!!!!' '5555' 'xyzw'","'?' and '!' - use team color '*' and '.' - random"},
-		{ "Toggles colored ping on scoreboard","" },
+		{"",""},
+		//{ "Toggles colored ping on scoreboard","" },
 		{ "Sets default weapon switch after respawn","If server sends you BFG but you want shotgun" },
 		{ "Draw ingame lagometer", "" },
 		{ "Sets hitsounds default - one hit sound", "Other options 4 sounds based on damage done"},		
@@ -100,11 +102,11 @@ typedef struct {
 	menuradiobutton_s	blood;
 	menuradiobutton_s	gibs;
 	menuradiobutton_s	camerabob;
-	menuradiobutton_s	playerids;
+	//menuradiobutton_s	playerids;
 	menuradiobutton_s	draw3dicons;
 	menuradiobutton_s	chatbeep;
 	menuradiobutton_s	enemytaunt;
-	menuradiobutton_s	coloredping;
+	//menuradiobutton_s	coloredping;
 	//menuradiobutton_s	scorebox;
 	menuradiobutton_s	accuracy;
 	menulist_s			scoreboard;
@@ -189,6 +191,7 @@ static const char *hitsounds_items[] = {
 static const char *scoreboar_items[] = {
 	"default",
 	"always small",
+	"Q3 default",
 	0
 };
 
@@ -198,7 +201,7 @@ static void Preferences2_SetMenuItems( void ) {
 	s_preferences2.speed.curvalue		= abs((int)trap_Cvar_VariableValue("cg_drawSpeed") % 3);
 	s_preferences2.blood.curvalue		= trap_Cvar_VariableValue( "com_blood" ) != 0;
 	s_preferences2.gibs.curvalue		= trap_Cvar_VariableValue( "cg_gibs" ) != 0;
-	s_preferences2.playerids.curvalue	= trap_Cvar_VariableValue( "cg_drawPlayerIDs" ) != 0;	
+	//s_preferences2.playerids.curvalue	= trap_Cvar_VariableValue( "cg_drawPlayerIDs" ) != 0;	
 	s_preferences2.draw3dicons.curvalue	= trap_Cvar_VariableValue( "cg_draw3Dicons" ) != 0;
 	s_preferences2.camerabob.curvalue	= trap_Cvar_VariableValue( "cg_bobup" ) != 0 
 										|| trap_Cvar_VariableValue( "cg_bobpitch" ) != 0 
@@ -207,7 +210,7 @@ static void Preferences2_SetMenuItems( void ) {
 	s_preferences2.enemymodelenabled.curvalue = trap_Cvar_VariableValue("cg_enemyModel_enabled") != 0;
 	s_preferences2.chatbeep.curvalue = trap_Cvar_VariableValue("cg_chatSound") != 0;
 	s_preferences2.enemytaunt.curvalue = trap_Cvar_VariableValue("cg_noTaunt") == 0;
-	s_preferences2.coloredping.curvalue = trap_Cvar_VariableValue("cg_coloredPing") != 0;	
+	//s_preferences2.coloredping.curvalue = trap_Cvar_VariableValue("cg_coloredPing") != 0;	
 	s_preferences2.deafultweapon.curvalue = abs((int)trap_Cvar_VariableValue("cg_defaultWeapon") % (WP_NUM_WEAPONS - 1));
 	s_preferences2.lagometer.curvalue = abs((int)trap_Cvar_VariableValue("cg_lagometer") % 4);
 	s_preferences2.hitsounds.curvalue = abs((int)trap_Cvar_VariableValue("cg_hitsounds") % 3);
@@ -305,9 +308,9 @@ static void Preferences2_Event( void* ptr, int notification ) {
 		}
 		break;	
 
-	case ID_PLAYERIDS:
-		trap_Cvar_SetValue( "cg_drawPlayerIDs", s_preferences2.playerids.curvalue );
-		break;
+	//case ID_PLAYERIDS:
+	//	trap_Cvar_SetValue( "cg_drawPlayerIDs", s_preferences2.playerids.curvalue );
+	//	break;
 
 	case ID_DRAW3DICONS:
 		trap_Cvar_SetValue( "cg_draw3Dicons", s_preferences2.draw3dicons.curvalue );
@@ -329,9 +332,9 @@ static void Preferences2_Event( void* ptr, int notification ) {
 		trap_Cvar_SetValue("cg_noTaunt", !s_preferences2.enemytaunt.curvalue);
 		break;
 
-	case ID_COLOREDPING:
-		trap_Cvar_SetValue("cg_coloredPing", s_preferences2.coloredping.curvalue);
-		break;
+	//case ID_COLOREDPING:
+	//	trap_Cvar_SetValue("cg_coloredPing", s_preferences2.coloredping.curvalue);
+	//	break;
 
 	case ID_DEFAULTWEAPON:
 		trap_Cvar_SetValue("cg_defaultWeapon", s_preferences2.deafultweapon.curvalue);
@@ -449,15 +452,15 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.camerabob.generic.id       = ID_CAMERABOB;
 	s_preferences2.camerabob.generic.x	      = PREFERENCES_X_POS_1;
 	s_preferences2.camerabob.generic.y	      = y;	
-	y += BIGCHAR_HEIGHT+2;
-	s_preferences2.playerids.generic.type     = MTYPE_RADIOBUTTON;
-	s_preferences2.playerids.generic.name	  = "Show Player ID:";
-	s_preferences2.playerids.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
-	s_preferences2.playerids.generic.callback = Preferences2_Event;
-	s_preferences2.playerids.generic.statusbar	= Preferences2_StatusBar;
-	s_preferences2.playerids.generic.id       = ID_PLAYERIDS;
-	s_preferences2.playerids.generic.x	      = PREFERENCES_X_POS_1;
-	s_preferences2.playerids.generic.y	      = y;
+	//y += BIGCHAR_HEIGHT+2;
+	//s_preferences2.playerids.generic.type     = MTYPE_RADIOBUTTON;
+	//s_preferences2.playerids.generic.name	  = "Show Player ID:";
+	//s_preferences2.playerids.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	//s_preferences2.playerids.generic.callback = Preferences2_Event;
+	//s_preferences2.playerids.generic.statusbar	= Preferences2_StatusBar;
+	//s_preferences2.playerids.generic.id       = ID_PLAYERIDS;
+	//s_preferences2.playerids.generic.x	      = PREFERENCES_X_POS_1;
+	//s_preferences2.playerids.generic.y	      = y;
 	y += BIGCHAR_HEIGHT + 2;
 	s_preferences2.chatbeep.generic.type = MTYPE_RADIOBUTTON;
 	s_preferences2.chatbeep.generic.name = "Chat Beep:";
@@ -476,15 +479,15 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.enemytaunt.generic.id = ID_ENEMY_TAUNT;
 	s_preferences2.enemytaunt.generic.x = PREFERENCES_X_POS_1;
 	s_preferences2.enemytaunt.generic.y = y;
-	y += BIGCHAR_HEIGHT + 2;
-	s_preferences2.coloredping.generic.type = MTYPE_RADIOBUTTON;
-	s_preferences2.coloredping.generic.name = "Colored Ping:";
-	s_preferences2.coloredping.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
-	s_preferences2.coloredping.generic.callback = Preferences2_Event;
-	s_preferences2.coloredping.generic.statusbar	= Preferences2_StatusBar;
-	s_preferences2.coloredping.generic.id = ID_COLOREDPING;
-	s_preferences2.coloredping.generic.x = PREFERENCES_X_POS_1;
-	s_preferences2.coloredping.generic.y = y;
+	//y += BIGCHAR_HEIGHT + 2;
+	//s_preferences2.coloredping.generic.type = MTYPE_RADIOBUTTON;
+	//s_preferences2.coloredping.generic.name = "Colored Ping:";
+	//s_preferences2.coloredping.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	//s_preferences2.coloredping.generic.callback = Preferences2_Event;
+	//s_preferences2.coloredping.generic.statusbar	= Preferences2_StatusBar;
+	//s_preferences2.coloredping.generic.id = ID_COLOREDPING;
+	//s_preferences2.coloredping.generic.x = PREFERENCES_X_POS_1;
+	//s_preferences2.coloredping.generic.y = y;
 	y += BIGCHAR_HEIGHT+2;		
 	s_preferences2.draw3dicons.generic.type			= MTYPE_RADIOBUTTON;
 	s_preferences2.draw3dicons.generic.name			= "3D Icons:";
@@ -512,6 +515,17 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.accuracy.generic.id			= ID_ACC;
 	s_preferences2.accuracy.generic.x			= PREFERENCES_X_POS_1;
 	s_preferences2.accuracy.generic.y			= y;
+
+	y += BIGCHAR_HEIGHT+2;
+	s_preferences2.scoreboard.generic.type = MTYPE_SPINCONTROL;
+	s_preferences2.scoreboard.generic.name = "Scoreboard:";
+	s_preferences2.scoreboard.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	s_preferences2.scoreboard.generic.x = PREFERENCES_X_POS_1;
+	s_preferences2.scoreboard.generic.callback = Preferences2_Event;
+	s_preferences2.scoreboard.generic.statusbar	= Preferences2_StatusBar;
+	s_preferences2.scoreboard.generic.id = ID_SCOREBOARD;
+	s_preferences2.scoreboard.generic.y = y;
+	s_preferences2.scoreboard.itemnames = scoreboar_items;
 
 	y = ystart;
 
@@ -607,16 +621,6 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.lagometer.generic.id = ID_LAGOMETER;
 	s_preferences2.lagometer.generic.y = y;
 	s_preferences2.lagometer.itemnames = lagometer_items;
-	y += BIGCHAR_HEIGHT+2;
-	s_preferences2.scoreboard.generic.type = MTYPE_SPINCONTROL;
-	s_preferences2.scoreboard.generic.name = "Scoreboard:";
-	s_preferences2.scoreboard.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
-	s_preferences2.scoreboard.generic.x = PREFERENCES_X_POS_2;
-	s_preferences2.scoreboard.generic.callback = Preferences2_Event;
-	s_preferences2.scoreboard.generic.statusbar	= Preferences2_StatusBar;
-	s_preferences2.scoreboard.generic.id = ID_SCOREBOARD;
-	s_preferences2.scoreboard.generic.y = y;
-	s_preferences2.scoreboard.itemnames = scoreboar_items;
 
 
 	y += (BIGCHAR_HEIGHT+2)* 2;
@@ -700,7 +704,7 @@ static void Preferences2_MenuInit( void ) {
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.blood );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.gibs );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.camerabob );
-	Menu_AddItem( &s_preferences2.menu, &s_preferences2.playerids );
+	//Menu_AddItem( &s_preferences2.menu, &s_preferences2.playerids );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.draw3dicons );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.fov );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.zoomfov );
@@ -711,7 +715,7 @@ static void Preferences2_MenuInit( void ) {
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.teamcolors );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.chatbeep );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.enemytaunt );
-	Menu_AddItem( &s_preferences2.menu, &s_preferences2.coloredping );
+	//Menu_AddItem( &s_preferences2.menu, &s_preferences2.coloredping );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.deafultweapon );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.centerprint );	
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.lagometer );

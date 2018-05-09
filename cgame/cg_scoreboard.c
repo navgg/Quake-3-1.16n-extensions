@@ -73,7 +73,7 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 
 	iconx = SB_BOTICON_X + vScreen.offsetx;
 	headx = SB_HEAD_X + vScreen.offsetx;
-	iconxoffs = cgx_drawPlayerIDs.integer ? -16 : 0;
+	iconxoffs = cgx_scoreboard.integer < 3 ? -16 : 0;
 
 	// draw the handicap or bot skill marker (unless player has flag)
 	if ( ci->powerups & ( 1 << PW_REDFLAG ) ) {
@@ -141,7 +141,7 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 
 	// X-MOD: draw player ID
 
-	if (cgx_drawPlayerIDs.integer) {		
+	if (cgx_scoreboard.integer < 3) {		
 		float color[4];
 		color[0] = color[1] = color[2] = 1.0f;
 		Com_sprintf(string, sizeof(string), "%3i", score->client);
@@ -158,7 +158,7 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 	}
 
 	// X-MOD: color ping
-	if (!cgx_coloredPing.integer)
+	if (cgx_scoreboard.integer > 2)
 		pingCol = ColorIndex(COLOR_WHITE);
 	else if (score->ping <= 50)
 		pingCol = ColorIndex(COLOR_WHITE);

@@ -858,7 +858,7 @@ extern	itemInfo_t		cg_items[MAX_ITEMS];
 extern	markPoly_t		cg_markPolys[MAX_MARK_POLYS];
 
 extern  vmCvar_t		cgx_wideScreenFix;
-extern  vmCvar_t		cgx_drawPlayerIDs;
+//extern  vmCvar_t		cgx_drawPlayerIDs;
 extern	vmCvar_t		cgx_enemyModel;
 extern	vmCvar_t		cgx_enemyModel_enabled;
 extern	vmCvar_t		cgx_enemyColors;
@@ -873,7 +873,7 @@ extern	vmCvar_t		cgx_centerPrintAlpha;
 extern	vmCvar_t		cgx_crosshairColor;
 extern	vmCvar_t		cgx_drawSpeed;
 extern	vmCvar_t		cgx_hitsounds;
-extern	vmCvar_t		cgx_coloredPing;
+//extern	vmCvar_t		cgx_coloredPing;
 extern	vmCvar_t		cgx_networkAdjustments;
 extern	vmCvar_t		cgx_drawScoreBox;
 extern	vmCvar_t		cgx_scoreboard;
