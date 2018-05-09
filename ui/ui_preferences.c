@@ -174,9 +174,11 @@ static void Preferences_SetMenuItems( void ) {
 
 	trap_Cvar_VariableStringBuffer("cg_crosshairColor", buf, sizeof(buf));
 
-	if (buf[0] == '\0')
+	if (!buf[0])
 		crosshaircolor = 0;
-	else 
+	else if (crosshaircolor = QX_StringToColor(buf))
+		crosshaircolor = ColorIndex(crosshaircolor) + 1;		
+	else
 		crosshaircolor = atoi(buf) % 36 + 1;
 
 	s_preferences.crosshaircolor.curvalue = crosshaircolor;
@@ -328,6 +330,8 @@ static void Crosshair_Draw( void *self ) {
 		UI_DrawHandlePic(x + SMALLCHAR_WIDTH + (24 - crosshairsize) / 2, y - 4 + (24 - crosshairsize) / 2,
 			crosshairsize, crosshairsize, s_preferences.crosshairShader[s->curvalue]);
 	} else if (crosshaircolor == 0) {
+		if (!s_preferences.defaultCrosshair[s->curvalue])
+			s_preferences.defaultCrosshair[s->curvalue] = trap_R_RegisterShaderNoMip( va("gfx/2d/crosshair%c", 'a' + s->curvalue ) );
 		UI_DrawHandlePic(x + SMALLCHAR_WIDTH + (24 - crosshairsize) / 2, y - 4 + (24 - crosshairsize) / 2,
 			crosshairsize, crosshairsize, s_preferences.defaultCrosshair[s->curvalue]);
 	}
@@ -570,9 +574,9 @@ void Preferences_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_FRAMER );
 	trap_R_RegisterShaderNoMip( ART_BACK0 );
 	trap_R_RegisterShaderNoMip( ART_BACK1 );
-	for( n = 0; n < NUM_CROSSHAIRS; n++ ) {
+	for( n = 0; n < NUM_CROSSHAIRS; n++ ) {		
 		s_preferences.crosshairShader[n] = trap_R_RegisterShaderNoMip( va("gfx/2d/fixed_crosshair%c", 'a' + n ) );
-		s_preferences.defaultCrosshair[n] = trap_R_RegisterShaderNoMip( va("gfx/2d/crosshair%c", 'a' + n ) );
+		/*s_preferences.defaultCrosshair[n] = trap_R_RegisterShaderNoMip( va("gfx/2d/crosshair%c", 'a' + n ) );*/
 	}
 }
 

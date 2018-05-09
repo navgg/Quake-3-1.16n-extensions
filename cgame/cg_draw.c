@@ -1983,7 +1983,7 @@ static void CG_DrawCrosshair(void) {
 		trap_R_SetColor(g_color_table_ex[cgx_crosshairColor.integer % 35]);
 	} else if (*cgx_crosshairColor.string) {
 		//try set from string
-		char c = CGX_StringToColor(cgx_crosshairColor.string);
+		char c = QX_StringToColor(cgx_crosshairColor.string);
 		if (c) {
 			cgx_crosshairColor.integer = ColorIndex(c);			
 			trap_R_SetColor(g_color_table_ex[cgx_crosshairColor.integer % 35]);

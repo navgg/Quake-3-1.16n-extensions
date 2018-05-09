@@ -18,27 +18,6 @@ qboolean EM_Check(int x) {
 	return i & x;
 }
 
-char CGX_StringToColor(const char *s) {
-	if (!Q_stricmp(s, "white")) 
-		return COLOR_WHITE;
-	else if (!Q_stricmp(s, "red"))
-		return COLOR_RED;
-	else if (!Q_stricmp(s, "yellow"))
-		return COLOR_YELLOW;
-	else if (!Q_stricmp(s, "green"))
-		return COLOR_GREEN;
-	else if (!Q_stricmp(s, "blue"))
-		return COLOR_BLUE;
-	else if (!Q_stricmp(s, "cyan"))
-		return COLOR_CYAN;
-	else if (!Q_stricmp(s, "magenta"))
-		return COLOR_MAGENTA;
-	else if (!Q_stricmp(s, "black"))
-		return COLOR_BLACK;
-
-	return 0;
-}
-
 static char *known_models[] = {
 	"anarki",
 	"biker",
@@ -212,7 +191,7 @@ static void CGX_SetColorInfo(clientInfo_t *info, const char *color) {
 
 	if (!*color)
 		color = "!!!!";
-	else if (i = CGX_StringToColor(color))
+	else if (i = QX_StringToColor(color))
 		color = va("%c%c%c%c", i, i, i, i);			
 
 	//D_Printf(("CGX_SetColorInfo %s\n", color));

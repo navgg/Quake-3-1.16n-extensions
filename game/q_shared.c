@@ -794,6 +794,28 @@ char* QX_GetHostnameSpacesFix(char *string) {
 	return "";	
 }
 
+//X-MOD: string to color
+char QX_StringToColor(const char *s) {
+	if (!Q_stricmp(s, "white")) 
+		return COLOR_WHITE;
+	else if (!Q_stricmp(s, "red"))
+		return COLOR_RED;
+	else if (!Q_stricmp(s, "yellow"))
+		return COLOR_YELLOW;
+	else if (!Q_stricmp(s, "green"))
+		return COLOR_GREEN;
+	else if (!Q_stricmp(s, "blue"))
+		return COLOR_BLUE;
+	else if (!Q_stricmp(s, "cyan"))
+		return COLOR_CYAN;
+	else if (!Q_stricmp(s, "magenta"))
+		return COLOR_MAGENTA;
+	else if (!Q_stricmp(s, "black"))
+		return COLOR_BLACK;
+
+	return 0;
+}
+
 void QDECL Com_sprintf( char *dest, int size, const char *fmt, ...) {
 	int		len;
 	va_list		argptr;
