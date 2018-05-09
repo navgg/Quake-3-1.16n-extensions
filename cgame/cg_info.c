@@ -158,7 +158,7 @@ void CG_DrawInformation( void ) {
 
 	//X-MOD: draw version
 	{
-		vec4_t	xmodcol = { 1.0f, 0.1f, 0.1f, CGX_BP_NUMBER / 100.0f };
+		vec4_t	xmodcol = { 1.0f, 0.1f, 0.1f, CGX_BP_NUMBER / 55.0f };
 		UI_DrawProportionalString(vScreen.width - 8, SCREEN_HEIGHT - SMALLCHAR_HEIGHT - 8, CGX_NAME" "CGX_VERSION, 
 			UI_RIGHT | UI_SMALLFONT, xmodcol);
 	}

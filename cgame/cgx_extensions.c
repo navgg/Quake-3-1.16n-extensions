@@ -404,10 +404,24 @@ void CGX_AutoAdjustNetworkSettings(void) {
 
 	D_Printf(("CGX_AutoAdjustNetworkSettings %i\n", cgx_networkAdjustments.integer));
 
-	if (cgx_networkAdjustments.integer && !cgs.localServer) {
+	if (cgx_networkAdjustments.integer) {
 		int i, minRate, minSnaps, k;
 		char buf[10];		
 		
+		//adjust sv_fps for local game
+		if (cgs.localServer) {			
+			sv_fps.integer = cgx_maxfps.integer;
+			if (sv_fps.integer < 40)
+				sv_fps.integer = 40;
+			else if (sv_fps.integer > 125)
+				sv_fps.integer = 125;
+
+			CG_Printf("Auto: sv_fps %i\n", sv_fps.integer);
+			trap_Cvar_Set("sv_fps", va("%i", sv_fps.integer));
+		
+			return;
+		}
+
 		i = 0;		
 
 		if (cgx_networkAdjustments.integer == 1) {			
@@ -481,15 +495,23 @@ void CGX_AutoAdjustNetworkSettings(void) {
 
 		// check time nudge & send hints
 		// if server delaged it's better off
-		if (cgs.delagHitscan && cl_timeNudge.integer < 0 && !info_showed) {			
+		/*if (cgs.delagHitscan && cl_timeNudge.integer < 0 && !info_showed) {			
 			trap_Print("^5Hint: server has hitscan delag, its nice to set cl_timeNudge 0\n");
 			info_showed = 1;
-		} 
+		}*/ 
 
-		if (cg_optimizePrediction.integer && cg_predictItems.integer && info_showed <= 1) {			
+		if (cl_timeNudge.integer < -15 && !info_showed) {
+			trap_Print("^5Hint: cl_timeNudge below -15 is quite useless, set it only if you really need it and know what you are doing\n");
+			info_showed = 1;
+		} else if (cl_timeNudge.integer > 0 && !info_showed) {
+			trap_Print("^5Hint: cl_timeNudge above 0 gives rendering delay in milliseonds, set it only if you really need it (mostly if your connection is not stable)\n");
+			info_showed = 1;
+		}
+
+		if (cg_optimizePrediction.integer && cg_predictItems.integer && info_showed <= 1) {
 			trap_Print("^5Hint: if you have false item pickups (picking up armor or weapon and it's doenst count) because cg_delag_optimizePrediction is set to 1 or you have high ping then try to set cg_predictitems 0\n");
 			info_showed = 2;
-		}				
+		}		
 	}
 }
 
@@ -556,10 +578,18 @@ qboolean CGX_CheckModInfo(const char *str) {
 	return qtrue;
 }
 
+#if CGX_NEMESIS_COMPATIBLE
+// nemesis compability info
+vmCvar_t	cgx_cgame;
+vmCvar_t	cgx_uinfo;
+#endif
+
 // send modinfo if gamename nemesis or bma
 void CGX_SendModinfo(void) {
 	const char	*info;
 	char	*gamename;
+	qboolean isNemesis = qfalse, isBMA = qfalse;
+	static qboolean isNemesisRegistered = qfalse;
 
 	if (cg.intermissionStarted || cgs.delagHitscan == 1)
 		return;
@@ -569,9 +599,21 @@ void CGX_SendModinfo(void) {
 
 	D_Printf(("gamename %s\n", gamename));
 
-	if (Q_stricmp(gamename, "Nemesis") == 0 ||
-		(gamename[0] == 'B' && gamename[1] == 'M' && gamename[2] == 'A')) {
+	isNemesis = !Q_stricmp(gamename, "Nemesis");
+	isBMA = gamename[0] == 'B' && gamename[1] == 'M' && gamename[2] == 'A';
 
+#if CGX_NEMESIS_COMPATIBLE
+	if (isNemesis && !isNemesisRegistered) {
+		//send info about clietn to nemesis servs
+		trap_Cvar_Register(&cgx_cgame, "cgame", CGX_NAME" "CGX_VERSION, CVAR_INIT | CVAR_ROM | CVAR_TEMP | CVAR_USERINFO);		
+		trap_Cvar_Register(&cgx_uinfo, "cg_uinfo", "", CVAR_INIT | CVAR_ROM | CVAR_TEMP | CVAR_USERINFO );
+		trap_Cvar_Set("cg_uinfo", va("%i %i 0", cl_timeNudge.integer, cgx_maxpackets.integer));
+
+		isNemesisRegistered = qtrue;
+	};
+#endif	
+
+	if (isNemesis || isBMA) {
 		cgx_modinfosend = cg.time;
 
 		trap_SendClientCommand("modinfo");
@@ -583,24 +625,24 @@ void CGX_SendModinfo(void) {
 }
 
 //updates sv_fps if server screwed it with weird values
-void CGX_Adjust_sv_fps() {
-	if (cgx_networkAdjustments.integer || !cgs.localServer) {
-		int fps = sv_fps.integer;
-		if (fps <= 20)
-			trap_Cvar_Set("sv_fps", "20");
-		else if (fps <= 30)
-			trap_Cvar_Set("sv_fps", "30");
-		else if (fps <= 40 && fps != 33)
-			trap_Cvar_Set("sv_fps", "40");
-		else if (fps > 40 && !cgs.localServer)
-			trap_Cvar_Set("sv_fps", "40");
-	}
-}
+//void CGX_Adjust_sv_fps() {
+	//if (cgx_networkAdjustments.integer || !cgs.localServer) {
+	//	int fps = sv_fps.integer;
+	//	if (fps <= 20)
+	//		trap_Cvar_Set("sv_fps", "20");
+	//	else if (fps <= 30)
+	//		trap_Cvar_Set("sv_fps", "30");
+	//	else if (fps <= 40 && fps != 33)
+	//		trap_Cvar_Set("sv_fps", "40");
+	//	else if (fps > 40 && !cgs.localServer)
+	//		trap_Cvar_Set("sv_fps", "40");
+	//}
+//}
 
 // X-MOD: potential fix for q3config saving problem
 void CGX_SaveSharedConfig(qboolean forced) {
 	//adjust sv_fps before saving
-	CGX_Adjust_sv_fps();
+	//CGX_Adjust_sv_fps();
 
 	if (cgx_sharedConfig.integer || forced) {
 		char buf[32];
@@ -718,8 +760,9 @@ static qboolean CGX_IsRememberedMap() {
 			break;
 		while (*s == ' ')
 			*s++ = 0;
-		if (*t && !Q_stricmp(t, cgs.mapname_clean))
-			return qtrue;		
+		if (*t && !Q_stricmp(t, cgs.mapname_clean)) {			
+			return qtrue;
+		}
 	}	
 
 	return qfalse;
@@ -731,7 +774,7 @@ static void CGX_RememberBrokenMap() {
 	int i;
 
 	if (CGX_IsRememberedMap())
-		return;
+		return;	
 
 	trap_Cvar_VariableStringBuffer("cl_fixedmaps", buf, sizeof(buf));
 
@@ -742,21 +785,35 @@ static void CGX_RememberBrokenMap() {
 }
 
 //save mapname and try load aganin with fix
-static void CGX_TryLoadingFix() {
-	CGX_RememberBrokenMap();	
+static void CGX_TryLoadingFix() {	
+	qboolean isQ3map = (cgs.mapname_clean[0] == 'q' || cgs.mapname_clean[0] == 'Q') && cgs.mapname_clean[1] == '3';
+	char buf[4];
 
-	if (cgs.localServer)
+	if (isQ3map)
+		return;
+
+	trap_Cvar_VariableStringBuffer("sv_pure", buf, sizeof(buf));
+	if (cgs.localServer && atoi(buf)) {
+		if (cgx_networkAdjustments.integer)
+			trap_Cvar_Set("sv_pure", "0");
+		//trap_SendConsoleCommand("vid_restart\n");
+	}
+	
+	CGX_RememberBrokenMap();
+
+	if (cgs.localServer) {
 		trap_SendConsoleCommand("vid_restart\n");
-	else 
+	} else {
 		trap_SendConsoleCommand("reconnect\n");
+	}
 }
 
 // check known maps and apply loading fix if needed
 static void CGX_CheckKnownMapsForFix() {
-	if (cgs.mapname_clean[0] != 'q' &&
-		cgs.mapname_clean[1] != '3' &&
-		CGX_IsRememberedMap()) {		
-		trap_Cvar_Set("cgx_fix_mapload", "1");
+	qboolean isQ3map = (cgs.mapname_clean[0] == 'q' || cgs.mapname_clean[0] == 'Q') && cgs.mapname_clean[1] == '3';
+
+	if (!isQ3map && CGX_IsRememberedMap()) {		
+		trap_Cvar_Set("cgx_fix_mapload", "1");		
 	} else {
 		trap_Cvar_Set("cgx_fix_mapload", "0");
 	}

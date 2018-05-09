@@ -1,9 +1,9 @@
-// Copyright (C) 1999-2000 Id Software, Inc.
+// Copyright (C) 2018 NaViGaToR (322)
 //
 /*
 =======================================================================
 
-CGX CREDITS 
+X-MOD CREDITS 
 
 =======================================================================
 */
@@ -335,7 +335,7 @@ static void UI_CreditMenu2_Draw( void ) {
 
 	y = y_pos;	
 
-	DRAW_RSTEP1("Quake III "CGX_NAME" "CGX_VERSION)
+	DRAW_RSTEP1("Quake III "CGX_NAME)
 	DRAW_WSTEP1("Programming")
 	DRAW_WSTEP1("NaViGaToR (322)")	
 	DRAW_WSTEP1("")

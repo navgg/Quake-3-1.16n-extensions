@@ -653,7 +653,7 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 		CG_InterpolateEntityPosition( cent );
 		return;
 	}	
-	
+	//X-MOD: this part of code makes everything worse, probably because of 1.16n
 	//unlagged - timenudge extrapolation
 	// interpolating failed (probably no nextSnap), so extrapolate
 	// this can also happen if the teleport bit is flipped, but that

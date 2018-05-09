@@ -48,12 +48,12 @@ ADVANCED OPTIONS MENU
 #define ID_HITSOUNDS			149
 #define ID_SCOREBOARD			150
 #define ID_ACC					151
-//#define ID_SCOREBOX				152
-#define ID_SHAREDCONFIG			152
+#define ID_SCOREBOX				152
+#define ID_SHAREDCONFIG			153
 
 #define ID_BACK					190
 
-#define MAX_INFO_MESSAGES		26
+#define MAX_INFO_MESSAGES		27
 static void Preferences2_StatusBar( void *self ) {	
 	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
 		{ "Toggles display ingame rewards", "On screen center - Excellent, Impressive etc."},
@@ -83,7 +83,7 @@ static void Preferences2_StatusBar( void *self ) {
 		{ "Sets hitsounds default - one hit sound", "Other options 4 sounds based on damage done"},		
 		{ "Sets ingame scoreboard type", ""},
 		{ "Toggles display total weapon accuracy", ""},
-		/*{ "Toggles display of scorebox in right lower corner", ""}*/
+		{ "Toggles display of scorebox in right lower corner", ""},
 		{ "Toggles auto saving q3config.cfg into baseq3 folder", "Fixes problems of not saving config after game exit"},
 	};
 
@@ -109,7 +109,7 @@ typedef struct {
 	menuradiobutton_s	chatbeep;
 	menuradiobutton_s	enemytaunt;
 	//menuradiobutton_s	coloredping;
-	//menuradiobutton_s	scorebox;
+	menuradiobutton_s	scorebox;
 	menuradiobutton_s	accuracy;
 	menuradiobutton_s	sharedconfig;
 	menulist_s			scoreboard;
@@ -194,7 +194,7 @@ static const char *hitsounds_items[] = {
 static const char *scoreboar_items[] = {
 	"default",
 	"always small",
-	"default Q3",
+	"vanilla Q3",
 	0
 };
 
@@ -221,9 +221,9 @@ static void Preferences2_SetMenuItems( void ) {
 	s_preferences2.centerprint.curvalue = (int)(trap_Cvar_VariableValue("cg_centerPrintAlpha") * 2) % 3;
 	s_preferences2.drawgun.curvalue = (int)trap_Cvar_VariableValue("cg_drawGun") % 3;
 
-	s_preferences2.scoreboard.curvalue = trap_Cvar_VariableValue("cg_scoreboard") != 0;
+	s_preferences2.scoreboard.curvalue = abs((int)trap_Cvar_VariableValue("cg_scoreboard") % 3);
 	s_preferences2.accuracy.curvalue = trap_Cvar_VariableValue("cg_drawAccuracy") != 0;
-	/*s_preferences2.scorebox.curvalue = trap_Cvar_VariableValue("cg_drawScoreBox") != 0;*/
+	s_preferences2.scorebox.curvalue = trap_Cvar_VariableValue("cg_drawScoreBox") != 0;
 	s_preferences2.sharedconfig.curvalue		= trap_Cvar_VariableValue("cg_sharedConfig") != 0;
 
 	trap_Cvar_VariableStringBuffer("cg_fov", s_preferences2.fov.field.buffer, sizeof(s_preferences2.fov.field.buffer));
@@ -360,9 +360,9 @@ static void Preferences2_Event( void* ptr, int notification ) {
 		trap_Cvar_SetValue("cg_scoreboard", s_preferences2.scoreboard.curvalue );
 		break;
 
-	//case ID_SCOREBOX:		
-	//	trap_Cvar_SetValue("cg_drawScoreBox", s_preferences2.scorebox.curvalue);
-	//	break;
+	case ID_SCOREBOX:		
+		trap_Cvar_SetValue("cg_drawScoreBox", s_preferences2.scorebox.curvalue);
+		break;
 
 	case ID_SHAREDCONFIG:
 		trap_Cvar_SetValue("cg_sharedConfig", s_preferences2.sharedconfig.curvalue);
@@ -505,15 +505,6 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.draw3dicons.generic.id			= ID_DRAW3DICONS;
 	s_preferences2.draw3dicons.generic.x			= PREFERENCES_X_POS_1;
 	s_preferences2.draw3dicons.generic.y			= y;
-	//y += BIGCHAR_HEIGHT+2;		
-	//s_preferences2.scorebox.generic.type			= MTYPE_RADIOBUTTON;
-	//s_preferences2.scorebox.generic.name			= "Scorebox:";
-	//s_preferences2.scorebox.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
-	//s_preferences2.scorebox.generic.callback		= Preferences2_Event;
-	//s_preferences2.scorebox.generic.statusbar	= Preferences2_StatusBar;
-	//s_preferences2.scorebox.generic.id			= ID_SCOREBOX;
-	//s_preferences2.scorebox.generic.x			= PREFERENCES_X_POS_1;
-	//s_preferences2.scorebox.generic.y			= y;
 	y += BIGCHAR_HEIGHT+2;		
 	s_preferences2.accuracy.generic.type			= MTYPE_RADIOBUTTON;
 	s_preferences2.accuracy.generic.name			= "Accuracy:";
@@ -523,7 +514,15 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.accuracy.generic.id			= ID_ACC;
 	s_preferences2.accuracy.generic.x			= PREFERENCES_X_POS_1;
 	s_preferences2.accuracy.generic.y			= y;
-
+	y += BIGCHAR_HEIGHT+2;		
+	s_preferences2.scorebox.generic.type			= MTYPE_RADIOBUTTON;
+	s_preferences2.scorebox.generic.name			= "Scorebox:";
+	s_preferences2.scorebox.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_preferences2.scorebox.generic.callback		= Preferences2_Event;
+	s_preferences2.scorebox.generic.statusbar	= Preferences2_StatusBar;
+	s_preferences2.scorebox.generic.id			= ID_SCOREBOX;
+	s_preferences2.scorebox.generic.x			= PREFERENCES_X_POS_1;
+	s_preferences2.scorebox.generic.y			= y;
 	y += BIGCHAR_HEIGHT+2;		
 	s_preferences2.sharedconfig.generic.type = MTYPE_RADIOBUTTON;
 	s_preferences2.sharedconfig.generic.name = "Shared Config:";
@@ -737,7 +736,7 @@ static void Preferences2_MenuInit( void ) {
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.centerprint );	
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.lagometer );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.hitsounds );
-	/*Menu_AddItem( &s_preferences2.menu, &s_preferences2.scorebox );*/
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.scorebox );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.scoreboard );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.accuracy );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.sharedconfig );

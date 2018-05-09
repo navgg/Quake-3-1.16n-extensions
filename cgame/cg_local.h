@@ -814,7 +814,7 @@ typedef struct {
 	cgMedia_t		media;
 
 	//X-MOD: save delag and server info
-	int				sv_fps;
+	int				sv_fps;	
 	//int				sv_maxrate;
 
 	//unlagged - client options

@@ -86,10 +86,6 @@ vmCvar_t	cgx_version;
 vmCvar_t	cgx_last_error;
 vmCvar_t	cgx_r_picmip;
 
-// nemesis compability info
-vmCvar_t	cgx_cgame;
-vmCvar_t	cgx_uinfo;
-
 //unlagged - client options
 vmCvar_t	cg_delag;
 vmCvar_t	cg_cmdTimeNudge;
@@ -296,7 +292,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_drawScoreBox, "cg_drawScoreBox", "1", CVAR_ARCHIVE },
 	{ &cgx_drawAccuracy, "cg_drawAccuracy", "0", CVAR_ARCHIVE },
 	{ &cgx_sharedConfig, "cg_sharedConfig", "0", CVAR_ARCHIVE },
-	{ &cgx_nomip, "cg_nomip", "-1", CVAR_TEMP | CVAR_LATCH },
+	{ &cgx_nomip, "cg_nomip", "-1", CVAR_ARCHIVE | CVAR_LATCH },
 #if CGX_UNLAGGED
 	//unlagged - client options
 	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},	
@@ -332,7 +328,7 @@ cvarTable_t		cvarTable[] = {
 	// g_delag	
 	// fov adjust for widescreen
 	// TODO: 	
-	// cg_profanityFilter 1|0 ?			
+	// cg_chatFilter 1|0 ?			
 
 	// the following variables are created in other parts of the system,
 	// but we also reference them here
@@ -365,15 +361,11 @@ cvarTable_t		cgx_cvarTable_temp[] = {
 	// stored fixed maplist, so if it once was fixed nextime will just read from this list
 	{ &cgx_fixedmaps, "cl_fixedmaps", "", CVAR_ROM | CVAR_ARCHIVE },
 	//mod version
-	{ &cgx_version, "cgx_version", CGX_NAME" "CGX_VERSION" "CGX_DATE, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
+	{ &cgx_version, "cgx_version", CGX_NAME" "CGX_VERSION" "CGX_DATE, CVAR_INIT | CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
 	//for unlagged.c
+	//better not register here or servefs will screw clients sv_fps
 	// this will be automagically copied from the server	
-	{ &sv_fps, "sv_fps", "20", 0 },	
-
-#if CGX_NEMESIS_COMPATIBLE
-	{ &cgx_cgame, "cgame", CGX_NAME" "CGX_VERSION, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
-	{ &cgx_uinfo, "cg_uinfo", "", CVAR_TEMP | CVAR_USERINFO | CVAR_ROM  },
-#endif	
+	//{ &sv_fps, "sv_fps", "20", 0 },
 };
 
 /*
@@ -400,10 +392,9 @@ void CG_RegisterCvars( void ) {
 		trap_Cvar_Register( cv->vmCvar, cv->cvarName,
 			cv->defaultString, cv->cvarFlags );
 	}
-
-#if CGX_NEMESIS_COMPATIBLE
-	trap_Cvar_Set("cg_uinfo", va("%i %i 0", cl_timeNudge.integer, cgx_maxpackets.integer));
-#endif
+	// get sv_fps if server sent it
+	trap_Cvar_VariableStringBuffer("sv_fps", var, sizeof(var));
+	sv_fps.integer = atoi(var);	
 }
 
 /*
