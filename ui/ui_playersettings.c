@@ -56,7 +56,7 @@ static int gamecodetoui[] = {4,2,3,0,5,1,6};
 static int uitogamecode[] = {4,6,2,3,1,5,7};
 
 static const char *handicap_items[] = {
-	"None (100)",
+	"100",
 	"95",
 	"90",
 	"85",
@@ -297,6 +297,24 @@ static void PlayerSettings_SetMenuItems( void ) {
 	s_playersettings.handicap.curvalue = 20 - h / 5;
 }
 
+//X-MOD: lock handicap
+static qboolean handicap_locked = qtrue;
+
+static void UI_Handicap_Action( qboolean result ) {
+	if (!result) {
+		int h;
+		h = Com_Clamp( 5, 100, trap_Cvar_VariableValue("handicap") );
+		s_playersettings.handicap.curvalue = 20 - h / 5;
+		return;
+	}
+	s_playersettings.handicap.generic.callback = NULL;
+	handicap_locked = qfalse;	
+}
+
+static void UI_Handicap_Draw( void ) {
+	UI_DrawProportionalString( SCREEN_WIDTH/2, 356 + PROP_HEIGHT * 0, "WARNING: This will decrease your max hp & damage", UI_CENTER|UI_SMALLFONT, color_yellow );
+	UI_DrawProportionalString( SCREEN_WIDTH/2, 356 + PROP_HEIGHT * 1, "change it if you know what you are doing.", UI_CENTER|UI_SMALLFONT, color_yellow );
+}
 
 /*
 =================
@@ -309,8 +327,10 @@ static void PlayerSettings_MenuEvent( void* ptr, int event ) {
 	}
 
 	switch( ((menucommon_s*)ptr)->id ) {
-	case ID_HANDICAP:
-		trap_Cvar_Set( "handicap", va( "%i", 100 - 25 * s_playersettings.handicap.curvalue ) );
+	case ID_HANDICAP:		
+		if (handicap_locked)
+			UI_ConfirmMenu("ARE YOU SURE?", UI_Handicap_Draw, UI_Handicap_Action);		
+		//trap_Cvar_Set( "handicap", va( "%i", 100 - 25 * s_playersettings.handicap.curvalue ) );
 		break;
 
 	case ID_MODEL:
@@ -383,6 +403,7 @@ static void PlayerSettings_MenuInit( void ) {
 	s_playersettings.handicap.generic.flags		= QMF_NODEFAULTINIT;
 	s_playersettings.handicap.generic.id		= ID_HANDICAP;
 	s_playersettings.handicap.generic.ownerdraw	= PlayerSettings_DrawHandicap;
+	s_playersettings.handicap.generic.callback  = PlayerSettings_MenuEvent;
 	s_playersettings.handicap.generic.x			= 192;
 	s_playersettings.handicap.generic.y			= y;
 	s_playersettings.handicap.generic.left		= 192 - 8;
