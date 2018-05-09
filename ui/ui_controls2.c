@@ -97,6 +97,8 @@ typedef struct
 #define ID_WEAPON10		36
 #define ID_TURRET		37
 #define ID_DECOY		38
+#define ID_AUTORECORD	39
+#define ID_STOORECORD	40
 
 // all others
 #define ID_FREELOOK		34
@@ -196,6 +198,8 @@ typedef struct
 	menuaction_s		turret;
 	menuaction_s		decoy;
 	menuaction_s		screenshot;
+	menuaction_s		autorecord;
+	menuaction_s		stoprecord;
 	menuradiobutton_s	joyenable;
 	menuslider_s		joythreshold;
 	int					section;
@@ -257,6 +261,8 @@ static bind_t g_bindings[] =
 	{"+button5", 		"hook +button5",	ID_WEAPON10,	ANIM_WEAPON10,	K_MOUSE3,		-1,		-1, -1},	
 	{"turret", 			"turret",			ID_TURRET,		ANIM_IDLE,		'n',			-1,		-1, -1},	
 	{"decoy", 			"decoy",			ID_DECOY,		ANIM_IDLE,		'm',			-1,		-1, -1},		
+	{"autorecord", 		"record demo",		ID_AUTORECORD,	ANIM_IDLE,		K_F5,			-1,		-1, -1},		
+	{"stoprecord", 		"stop record",		ID_STOORECORD,	ANIM_IDLE,		K_F6,			-1,		-1, -1},		
 	{(char*)NULL,		(char*)NULL,		0,				0,				-1,				-1,		-1,	-1},
 };
 
@@ -329,11 +335,13 @@ static menucommon_s *g_misc_controls[] = {
 	(menucommon_s *)&s_controls.chat2,
 	(menucommon_s *)&s_controls.chat3,
 	(menucommon_s *)&s_controls.chat4,
-	(menucommon_s *)&s_controls.screenshot,  
+	(menucommon_s *)&s_controls.screenshot,
+	(menucommon_s *)&s_controls.autorecord,
+	(menucommon_s *)&s_controls.stoprecord,
 	(menucommon_s *)&s_controls.kill,
 	(menucommon_s *)&s_controls.hook,   
 	(menucommon_s *)&s_controls.turret,   
-	(menucommon_s *)&s_controls.decoy,   	 
+	(menucommon_s *)&s_controls.decoy,   	 	
 	NULL,
 };
 
@@ -1561,6 +1569,18 @@ static void Controls_MenuInit( void )
 	s_controls.decoy.generic.ownerdraw = Controls_DrawKeyBinding;
 	s_controls.decoy.generic.id        = ID_DECOY;
 
+	s_controls.autorecord.generic.type	     = MTYPE_ACTION;
+	s_controls.autorecord.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
+	s_controls.autorecord.generic.callback  = Controls_ActionEvent;
+	s_controls.autorecord.generic.ownerdraw = Controls_DrawKeyBinding;
+	s_controls.autorecord.generic.id        = ID_AUTORECORD;
+
+	s_controls.stoprecord.generic.type	     = MTYPE_ACTION;
+	s_controls.stoprecord.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
+	s_controls.stoprecord.generic.callback  = Controls_ActionEvent;
+	s_controls.stoprecord.generic.ownerdraw = Controls_DrawKeyBinding;
+	s_controls.stoprecord.generic.id        = ID_STOORECORD;
+
 	s_controls.joyenable.generic.type      = MTYPE_RADIOBUTTON;
 	s_controls.joyenable.generic.flags	   = QMF_SMALLFONT;
 	s_controls.joyenable.generic.x	       = SCREEN_WIDTH/2;
@@ -1648,6 +1668,8 @@ static void Controls_MenuInit( void )
 	Menu_AddItem( &s_controls.menu, &s_controls.hook );
 	Menu_AddItem( &s_controls.menu, &s_controls.turret );
 	Menu_AddItem( &s_controls.menu, &s_controls.decoy );
+	Menu_AddItem( &s_controls.menu, &s_controls.autorecord );
+	Menu_AddItem( &s_controls.menu, &s_controls.stoprecord );
 
 	Menu_AddItem( &s_controls.menu, &s_controls.back );
 

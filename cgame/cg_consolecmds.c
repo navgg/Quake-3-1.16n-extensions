@@ -163,7 +163,7 @@ static consoleCommand_t	commands[] = {
 	{ "loaddefered", CG_LoadDeferredPlayers },	// spelled wrong, but not changing for demo...
 	// X-MOD: save shared config command
 	{ "writesharedconfig", CGX_SaveSharedConfig_f },
-	{ "recordsync", CGX_RecordSync_f },
+	//{ "recordsync", CGX_RecordSync_f },
 	{ "autorecord", CGX_RecordSync_f },	
 	{ "xmod", CGX_Xmod_f },
 };
