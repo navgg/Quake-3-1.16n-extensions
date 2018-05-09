@@ -158,15 +158,13 @@ static void UI_DisplayOptionsMenu_Event( void* ptr, int event ) {
 		break;
 
 	case ID_OVERBRIGHT_BITS:
-		trap_Cvar_SetValue( "r_overbrightbits", displayOptionsInfo.overbrightbits.curvalue );
-		trap_Cvar_SetValue( "r_gamma", 1.0 );
-		trap_Cmd_ExecuteText( EXEC_APPEND, "vid_restart\n" );
+		trap_Cvar_SetValue( "r_overbrightbits", displayOptionsInfo.overbrightbits.curvalue );		
+		trap_Cmd_ExecuteText( EXEC_APPEND, "r_gamma 1; vid_restart; wait 3; ui_display\n" );
 		break;
 
 	case ID_IGNORE_HW_GAMMA:
-		trap_Cvar_SetValue( "r_ignorehwgamma", displayOptionsInfo.ignorehwgamma.curvalue );
-		trap_Cvar_SetValue( "r_gamma", 1.0 );
-		trap_Cmd_ExecuteText( EXEC_APPEND, "vid_restart\n" );
+		trap_Cvar_SetValue( "r_ignorehwgamma", displayOptionsInfo.ignorehwgamma.curvalue );		
+		trap_Cmd_ExecuteText( EXEC_APPEND, "r_gamma 1; vid_restart; wait 3; ui_display\n" );
 		break;
 
 	case ID_DRAWFPS: 		
@@ -421,6 +419,9 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	y = (int)(abs(trap_Cvar_VariableValue("cg_wideScreenFix")) % 4);
 	displayOptionsInfo.widescreenfix.curvalue = y & CGX_WFIX_SCREEN;
 	displayOptionsInfo.widescreenfov.curvalue = y & CGX_WFIX_FOV;
+
+	if (displayOptionsInfo.overbrightbits.curvalue || displayOptionsInfo.ignorehwgamma.curvalue)
+		displayOptionsInfo.brightness.maxvalue = 10;
 
 	fps = trap_Cvar_VariableValue( "com_maxfps" );
 	if (fps <= 62)

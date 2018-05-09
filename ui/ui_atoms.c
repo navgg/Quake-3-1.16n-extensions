@@ -951,6 +951,16 @@ qboolean UI_ConsoleCommand( void ) {
 		return qtrue;
 	}
 
+	if ( Q_stricmp (cmd, "ui_display") == 0 ) {
+		UI_DisplayOptionsMenu();
+		return qtrue;
+	}
+
+	if ( Q_stricmp (cmd, "ui_sound") == 0 ) {
+		UI_SoundOptionsMenu();
+		return qtrue;
+	}
+
 	if ( Q_stricmp (cmd, "ui_teamOrders") == 0 ) {
 		UI_TeamOrdersMenu_f();
 		return qtrue;

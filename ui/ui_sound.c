@@ -116,7 +116,7 @@ static void UI_SoundOptionsMenu_Event( void* ptr, int event ) {
 			trap_Cvar_SetValue( "s_compression", 1 );
 		}
 		UI_ForceMenuOff();
-		trap_Cmd_ExecuteText( EXEC_APPEND, "snd_restart\n" );
+		trap_Cmd_ExecuteText( EXEC_APPEND, "snd_restart; wait 3; ui_sound\n" );
 		break;
 
 	case ID_A3D:
