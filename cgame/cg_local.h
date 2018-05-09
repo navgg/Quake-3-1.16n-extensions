@@ -769,6 +769,8 @@ typedef struct {
 	int				processedSnapshotNum;// the number of snapshots cgame has requested
 
 	qboolean		localServer;		// detected on startup by checking sv_running
+	//X-MOD: pure server
+	qboolean		isPureServer;
 
 	// parsed from serverinfo
 	gametype_t		gametype;

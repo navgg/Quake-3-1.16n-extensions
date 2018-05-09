@@ -43,17 +43,18 @@ fixed showplayerids toggle in menu
 
 0.90b
 
-enemy models now switching when following someone in spectators
-enemy models code optimized and rewritten
-cg_sharedConfig by default is 0
+bright models now switching when following someone in spectators
+bright models code optimized and rewritten
 improved sync with server's sv_fps for unlagged
-for cg_crosshairColor and cg_enemyColors, cg_teamColors can be used words "yellow", "green" etc.
+for crosshair and bright model colors can be used words "red", "yellow" etc.
+cg_sharedConfig by default is 0
+cg_drawPlayerIDs cg_coloredPing removed (added cg_scoreboard 3 (no ids, no ping colors))
 
-added cg_nomip -1|0 (if it's -1 all objects will have r_picmip 0 regardless of current r_picmip settings)
+added cg_nomip -1|0 (-1 - all objects will have r_picmip 0 regardless of current r_picmip)
 added \xmod command for quick info
 added cg_enemyModel_enabled 2, 3, 4
 
-fixed loading of some big maps (using r_vertexLight 1 during loading and switching back to 0)
+fixed loading of some big maps (using r_vertexLight 1 during loading)
 fixed bright models with r_vertexLight 1
-fixed restoring of enemy models after \vid_restart
+fixed restoring of bright models after \vid_restart
 fixed colored hostnames on loading

@@ -409,8 +409,7 @@ void CGX_AutoAdjustNetworkSettings(void) {
 		char buf[10];		
 		
 		//adjust sv_fps for local game
-		if (cgs.localServer) {			
-			sv_fps.integer = cgx_maxfps.integer;
+		if (cgs.localServer) {
 			if (sv_fps.integer < 40)
 				sv_fps.integer = 40;
 			else if (sv_fps.integer > 125)
@@ -784,20 +783,26 @@ static void CGX_RememberBrokenMap() {
 	trap_Cvar_Set("cl_fixedmaps", buf);
 }
 
-//save mapname and try load aganin with fix
-static void CGX_TryLoadingFix() {	
-	qboolean isQ3map = (cgs.mapname_clean[0] == 'q' || cgs.mapname_clean[0] == 'Q') && cgs.mapname_clean[1] == '3';
+qboolean CGX_IsPure() {
+	qboolean isPure;
 	char buf[4];
 
-	if (isQ3map)
-		return;
-
 	trap_Cvar_VariableStringBuffer("sv_pure", buf, sizeof(buf));
-	if (cgs.localServer && atoi(buf)) {
-		if (cgx_networkAdjustments.integer)
-			trap_Cvar_Set("sv_pure", "0");
-		//trap_SendConsoleCommand("vid_restart\n");
+	isPure = atoi(buf);
+	if (cgs.localServer && isPure && cgx_networkAdjustments.integer) {
+		trap_Cvar_Set("sv_pure", "0");
+		return isPure;
+	} else {
+		return cgs.isPureServer;
 	}
+}
+
+//save mapname and try load aganin with fix
+static void CGX_TryLoadingFix() {	
+	qboolean isQ3map = (cgs.mapname_clean[0] == 'q' || cgs.mapname_clean[0] == 'Q') && cgs.mapname_clean[1] == '3';	
+
+	if (isQ3map)
+		return;	
 	
 	CGX_RememberBrokenMap();
 

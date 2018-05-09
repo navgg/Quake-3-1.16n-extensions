@@ -10,6 +10,7 @@ Custom extensions for patching Quake 3 1.16n (beta version)
 
 - requires quake 3 arena version 1.16n
 - to install unzip {X-Mod}.pk3 to baseq3 folder of your quake 3 arena installation path
+- since version 0.80b mod renamed to X-Mod (remove old pak2X.pk3 file if you have it)
 
 ==========================================================================================================
                                                 Features
@@ -21,7 +22,7 @@ Custom extensions for patching Quake 3 1.16n (beta version)
 - extended display menu, brightness options, fps selection, primitives etc.
 - extended network menu, rate options, added packets, snaps etc. (automatic or manual setting options)
 - misc controls added to menu, like kill, screenshot etc.
-- colored crossairs, 39 colors in total
+- colored crossairs, 35 colors in total
 - bright cpm skins for enemies and team with custom coloring
 - cpm hitsounds based on damage dealt
 - draw gun with no bobbing like in cpm

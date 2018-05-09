@@ -342,7 +342,7 @@ static void CG_LoadClientInfo( clientInfo_t *ci ) {
 			if ( !CG_RegisterClientModelname( ci, DEFAULT_MODEL, ci->skinName ) ) {
 				// X-MOD: if DEFAULT_MODEL error appeared during loading 
 				// its probably beacause of MAX_SHADERS hit error try fix load
-				if (!cgx_maploadingfix.integer && cg.loading) {						
+				if (!cgx_maploadingfix.integer && cg.loading && !CGX_IsPure()) {
 					CGX_TryLoadingFix();
 				} else {
 					CG_Error("DEFAULT_MODEL / skin (%s/%s) failed to register",
@@ -353,7 +353,7 @@ static void CG_LoadClientInfo( clientInfo_t *ci ) {
 			if ( !CG_RegisterClientModelname( ci, DEFAULT_MODEL, "default" ) ) {
 				// X-MOD: if DEFAULT_MODEL error appeared during loading 
 				// its probably beacause of MAX_SHADERS hit error try fix load
-				if (!cgx_maploadingfix.integer && cg.loading) {					
+				if (!cgx_maploadingfix.integer && cg.loading && !CGX_IsPure()) {
 					CGX_TryLoadingFix();
 				} else {
 					CG_Error("DEFAULT_MODEL (%s) failed to register", DEFAULT_MODEL);

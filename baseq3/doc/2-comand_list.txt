@@ -4,7 +4,6 @@
 
 cg_wideScreenFix 0|1|2|3 - fix perspective for widescreen 0: no fixes 1: fix only icons 2: fix only fov 3: fix fov and icons
 cg_defaultWeapon 0-9 - default weapon when spawn 0: default 1: gauntlet ...
-cg_drawPlayerIDs 0|1 - show player id in scoreboard
 cg_centerPrintAlpha 1.0-0 - center print transparency
 cg_crosshairColor 0-35 - crosshair color "" - default, 0: black 1: red 2: green etc.
 		or words "green", "red", "yellow", "white", "cyan", "magenta", "blue", "black"
@@ -31,7 +30,7 @@ cg_hitsounds 0|1|2 - 0: default 1: pro mode hi-low 2: low-hi hp hitsounds
 cg_networkAdjustments 0|1|2|3 - 0: off 1: min rate 8000 packets 30 or sv_fps+10 2: packets 40-60 rate min 16000 3: packets 60-100 rate min 25000 packetdup off 
 		(snaps = sv_fps or min 40 in all cases if it's on)
 cg_drawScoreBox 0|1 - display score box in low right corner
-cg_scoreboard 0|1 - scoreboard type 0: default large-small 1: always small
+cg_scoreboard 0|1|2 - scoreboard type 0: default large-small 1: always small 2: quake 3 vanilla (no ids, no ping colors)
 cg_drawAccuracy 0|1 - total weapon accuracy
 cg_sharedConfig 0|1 - fixes problem with saving configs after game exit in 1.16n 
 		(0: off 1: automatically saves q3config.cfg to baseq3 folder after pressing 'leave arena' or 'exit game', 
