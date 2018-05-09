@@ -29,11 +29,11 @@ NETWORK OPTIONS MENU
 #define ID_DELAG			19
 #define	ID_PREDICTION		20
 #define ID_PREDICTITEMS		21
-#define ID_LAGOMETER		22
+//#define ID_LAGOMETER		22
 
 #define ID_BACK				29
 
-#define MAX_INFO_MESSAGES	9
+#define MAX_INFO_MESSAGES	8
 
 static void UI_Network_StatusBar( void *self ) {	
 	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
@@ -45,7 +45,7 @@ static void UI_Network_StatusBar( void *self ) {
 		{ "Sets client site delag if it's available on server", "Recommended on" },
 		{ "Sets prediction method", "Optimized can increase fps if your CPU was bottleneck" },
 		{ "If prediction 'Optimized' is set", "or you have 'false' item pickups then this better off" },
-		{ "Draw ingame lagometer", "" },
+		//{ "Draw ingame lagometer", "" },
 	};
 
 	UIX_CommonStatusBar(self, ID_RATE, MAX_INFO_MESSAGES, info_messages);
@@ -94,13 +94,13 @@ static const char *prediction_items[] = {
 	0
 };
 
-static const char *lagometer_items[] = {
-	"off",
-	"default",
-	"default + ping",
-	"if packetloss",
-	0
-};
+//static const char *lagometer_items[] = {
+//	"off",
+//	"default",
+//	"default + ping",
+//	"if packetloss",
+//	0
+//};
 
 typedef struct {
 	menuframework_s	menu;
@@ -123,7 +123,7 @@ typedef struct {
 	menulist_s		delag;
 	menulist_s		prediction;
 	menuradiobutton_s	predictitems;
-	menulist_s		lagometer;
+	//menulist_s		lagometer;
 
 	menubitmap_s	back;
 } networkOptionsInfo_t;
@@ -239,9 +239,9 @@ static void UI_NetworkOptionsMenu_Event( void* ptr, int event ) {
 		trap_Cvar_SetValue( "cg_predictitems", networkOptionsInfo.predictitems.curvalue );							
 		break;
 
-	case ID_LAGOMETER:
-		trap_Cvar_SetValue( "cg_lagometer", networkOptionsInfo.lagometer.curvalue );
-		break;
+	//case ID_LAGOMETER:
+	//	trap_Cvar_SetValue( "cg_lagometer", networkOptionsInfo.lagometer.curvalue );
+	//	break;
 
 	case ID_BACK:
 		UI_NetworkOptionsMenu_SaveChanges();
@@ -417,18 +417,18 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.predictitems.generic.y			= y;	
 	networkOptionsInfo.predictitems.generic.statusbar	= UI_Network_StatusBar;
 
-	y = 240 + 6 * (BIGCHAR_HEIGHT+2);
-	networkOptionsInfo.lagometer.generic.type		= MTYPE_SPINCONTROL;
-	networkOptionsInfo.lagometer.generic.name		= "Lagometer:";
-	networkOptionsInfo.lagometer.generic.flags		= QMF_PULSEIFFOCUS | QMF_SMALLFONT;
-	networkOptionsInfo.lagometer.generic.x			= 400;
-	networkOptionsInfo.lagometer.generic.callback	= UI_NetworkOptionsMenu_Event;
-	networkOptionsInfo.lagometer.generic.statusbar	= UI_Network_StatusBar;
-	networkOptionsInfo.lagometer.generic.id			= ID_LAGOMETER;
-	networkOptionsInfo.lagometer.generic.y			= y;
-	networkOptionsInfo.lagometer.itemnames			= lagometer_items;
+	//y = 240 + 6 * (BIGCHAR_HEIGHT+2);
+	//networkOptionsInfo.lagometer.generic.type		= MTYPE_SPINCONTROL;
+	//networkOptionsInfo.lagometer.generic.name		= "Lagometer:";
+	//networkOptionsInfo.lagometer.generic.flags		= QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	//networkOptionsInfo.lagometer.generic.x			= 400;
+	//networkOptionsInfo.lagometer.generic.callback	= UI_NetworkOptionsMenu_Event;
+	//networkOptionsInfo.lagometer.generic.statusbar	= UI_Network_StatusBar;
+	//networkOptionsInfo.lagometer.generic.id			= ID_LAGOMETER;
+	//networkOptionsInfo.lagometer.generic.y			= y;
+	//networkOptionsInfo.lagometer.itemnames			= lagometer_items;
 
-	y = 240 - 4 * (BIGCHAR_HEIGHT + 2);
+	y = 240 - 3 * (BIGCHAR_HEIGHT + 2);
 	networkOptionsInfo.adjustments.generic.type = MTYPE_SPINCONTROL;
 	networkOptionsInfo.adjustments.generic.name = "Auto Settings:";
 	networkOptionsInfo.adjustments.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
@@ -465,7 +465,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.delag );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.prediction );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.predictitems );
-	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.lagometer );
+	//Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.lagometer );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.back );
 
 	rate = trap_Cvar_VariableValue( "rate" );
@@ -508,7 +508,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.prediction.curvalue = trap_Cvar_VariableValue("cg_delag_optimizePrediction") != 0;	
 	networkOptionsInfo.adjustments.curvalue = abs((int)trap_Cvar_VariableValue("cg_networkAdjustments") % 4);
 	networkOptionsInfo.predictitems.curvalue = trap_Cvar_VariableValue("cg_predictitems") != 0;
-	networkOptionsInfo.lagometer.curvalue = abs((int)trap_Cvar_VariableValue("cg_lagometer") % 4);
+	//networkOptionsInfo.lagometer.curvalue = abs((int)trap_Cvar_VariableValue("cg_lagometer") % 4);
 
 	UI_NetworkOptionsMenu_CheckGrayed();
 }

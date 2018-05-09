@@ -25,7 +25,7 @@ ADVANCED OPTIONS MENU
 
 #define ID_REWARDS				127
 #define ID_BLOOD				128
-//#define ID_GIBS					129
+#define ID_GIBS					129
 #define ID_CAMERABOB			130
 #define ID_PLAYERIDS			131
 #define ID_FOV					132
@@ -44,7 +44,7 @@ ADVANCED OPTIONS MENU
 #define ID_TEAMCOLORS			145
 #define ID_COLOREDPING			146
 #define ID_DEFAULTWEAPON		147
-//#define ID_LAGOMETER			148
+#define ID_LAGOMETER			148
 #define ID_HITSOUNDS			149
 #define ID_SCOREBOARD			150
 #define ID_ACC					151
@@ -98,7 +98,7 @@ typedef struct {
 	menulist_s			speed;
 	menulist_s			drawgun;
 	menuradiobutton_s	blood;
-	//menuradiobutton_s	gibs;
+	menuradiobutton_s	gibs;
 	menuradiobutton_s	camerabob;
 	menuradiobutton_s	playerids;
 	menuradiobutton_s	draw3dicons;
@@ -119,7 +119,6 @@ typedef struct {
 	menufield_s			enemycolors;	
 	menufield_s			teammodel;
 	menufield_s			teamcolors;	
-	//menuradiobutton_s	dynamiclights;	
 
 	menubitmap_s		back;	
 } preferences_t;
@@ -172,13 +171,13 @@ static const char *defaultweapon_items[] = {
 	0
 };
 
-//static const char *lagometer_items[] = {
-//	"off",
-//	"default",
-//	"default + ping",
-//	"when packetloss",
-//	0
-//};
+static const char *lagometer_items[] = {
+	"off",
+	"default",
+	"default + ping",
+	"when packetloss",
+	0
+};
 
 static const char *hitsounds_items[] = {
 	"default",
@@ -198,7 +197,7 @@ static void Preferences2_SetMenuItems( void ) {
 	s_preferences2.timer.curvalue		= abs((int)trap_Cvar_VariableValue( "cg_drawTimer" ) % 3);
 	s_preferences2.speed.curvalue		= abs((int)trap_Cvar_VariableValue("cg_drawSpeed") % 3);
 	s_preferences2.blood.curvalue		= trap_Cvar_VariableValue( "com_blood" ) != 0;
-	//s_preferences2.gibs.curvalue		= trap_Cvar_VariableValue( "cg_gibs" ) != 0;
+	s_preferences2.gibs.curvalue		= trap_Cvar_VariableValue( "cg_gibs" ) != 0;
 	s_preferences2.playerids.curvalue	= trap_Cvar_VariableValue( "cg_drawPlayerIDs" ) != 0;	
 	s_preferences2.draw3dicons.curvalue	= trap_Cvar_VariableValue( "cg_draw3Dicons" ) != 0;
 	s_preferences2.camerabob.curvalue	= trap_Cvar_VariableValue( "cg_bobup" ) != 0 
@@ -210,7 +209,7 @@ static void Preferences2_SetMenuItems( void ) {
 	s_preferences2.enemytaunt.curvalue = trap_Cvar_VariableValue("cg_noTaunt") == 0;
 	s_preferences2.coloredping.curvalue = trap_Cvar_VariableValue("cg_coloredPing") != 0;	
 	s_preferences2.deafultweapon.curvalue = abs((int)trap_Cvar_VariableValue("cg_defaultWeapon") % (WP_NUM_WEAPONS - 1));
-	/*s_preferences2.lagometer.curvalue = abs((int)trap_Cvar_VariableValue("cg_lagometer") % 4);*/
+	s_preferences2.lagometer.curvalue = abs((int)trap_Cvar_VariableValue("cg_lagometer") % 4);
 	s_preferences2.hitsounds.curvalue = abs((int)trap_Cvar_VariableValue("cg_hitsounds") % 3);
 	
 	s_preferences2.centerprint.curvalue = (int)(trap_Cvar_VariableValue("cg_centerPrintAlpha") * 2) % 3;
@@ -290,9 +289,9 @@ static void Preferences2_Event( void* ptr, int notification ) {
 		trap_Cvar_SetValue( "cg_drawGun", s_preferences2.drawgun.curvalue );
 		break;
 
-	/*case ID_GIBS:
+	case ID_GIBS:
 		trap_Cvar_SetValue( "cg_gibs", s_preferences2.gibs.curvalue );
-		break;*/
+		break;
 
 	case ID_CAMERABOB:
 		if (s_preferences2.camerabob.curvalue) {			
@@ -338,9 +337,9 @@ static void Preferences2_Event( void* ptr, int notification ) {
 		trap_Cvar_SetValue("cg_defaultWeapon", s_preferences2.deafultweapon.curvalue);
 		break;
 		
-	//case ID_LAGOMETER:
-	//	trap_Cvar_SetValue( "cg_lagometer", s_preferences2.lagometer.curvalue );
-	//	break;
+	case ID_LAGOMETER:
+		trap_Cvar_SetValue( "cg_lagometer", s_preferences2.lagometer.curvalue );
+		break;
 
 	case ID_HITSOUNDS:
 		trap_Cvar_SetValue( "cg_hitsounds", s_preferences2.hitsounds.curvalue );
@@ -432,15 +431,15 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.blood.generic.id           = ID_BLOOD;
 	s_preferences2.blood.generic.x	          = PREFERENCES_X_POS_1;
 	s_preferences2.blood.generic.y	          = y;	
-	//y += BIGCHAR_HEIGHT+2;
-	//s_preferences2.gibs.generic.type         = MTYPE_RADIOBUTTON;
-	//s_preferences2.gibs.generic.name	     = "Gibs:";
-	//s_preferences2.gibs.generic.flags	     = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
-	//s_preferences2.gibs.generic.callback     = Preferences2_Event;
-	//s_preferences2.gibs.generic.statusbar	= Preferences2_StatusBar;
-	//s_preferences2.gibs.generic.id           = ID_GIBS;
-	//s_preferences2.gibs.generic.x	         = PREFERENCES_X_POS_1;
-	//s_preferences2.gibs.generic.y	         = y;	
+	y += BIGCHAR_HEIGHT+2;
+	s_preferences2.gibs.generic.type         = MTYPE_RADIOBUTTON;
+	s_preferences2.gibs.generic.name	     = "Gibs:";
+	s_preferences2.gibs.generic.flags	     = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_preferences2.gibs.generic.callback     = Preferences2_Event;
+	s_preferences2.gibs.generic.statusbar	= Preferences2_StatusBar;
+	s_preferences2.gibs.generic.id           = ID_GIBS;
+	s_preferences2.gibs.generic.x	         = PREFERENCES_X_POS_1;
+	s_preferences2.gibs.generic.y	         = y;	
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences2.camerabob.generic.type     = MTYPE_RADIOBUTTON;
 	s_preferences2.camerabob.generic.name	  = "Camera Bobbing:";
@@ -598,16 +597,16 @@ static void Preferences2_MenuInit( void ) {
 	s_preferences2.hitsounds.generic.id = ID_HITSOUNDS;
 	s_preferences2.hitsounds.generic.y = y;
 	s_preferences2.hitsounds.itemnames = hitsounds_items;
-	//y += BIGCHAR_HEIGHT+2;
-	//s_preferences2.lagometer.generic.type = MTYPE_SPINCONTROL;
-	//s_preferences2.lagometer.generic.name = "Lagometer:";
-	//s_preferences2.lagometer.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
-	//s_preferences2.lagometer.generic.x = PREFERENCES_X_POS_2;
-	//s_preferences2.lagometer.generic.callback = Preferences2_Event;
-	//s_preferences2.lagometer.generic.statusbar	= Preferences2_StatusBar;
-	//s_preferences2.lagometer.generic.id = ID_LAGOMETER;
-	//s_preferences2.lagometer.generic.y = y;
-	//s_preferences2.lagometer.itemnames = lagometer_items;
+	y += BIGCHAR_HEIGHT+2;
+	s_preferences2.lagometer.generic.type = MTYPE_SPINCONTROL;
+	s_preferences2.lagometer.generic.name = "Lagometer:";
+	s_preferences2.lagometer.generic.flags = QMF_PULSEIFFOCUS | QMF_SMALLFONT;
+	s_preferences2.lagometer.generic.x = PREFERENCES_X_POS_2;
+	s_preferences2.lagometer.generic.callback = Preferences2_Event;
+	s_preferences2.lagometer.generic.statusbar	= Preferences2_StatusBar;
+	s_preferences2.lagometer.generic.id = ID_LAGOMETER;
+	s_preferences2.lagometer.generic.y = y;
+	s_preferences2.lagometer.itemnames = lagometer_items;
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences2.scoreboard.generic.type = MTYPE_SPINCONTROL;
 	s_preferences2.scoreboard.generic.name = "Scoreboard:";
@@ -699,7 +698,7 @@ static void Preferences2_MenuInit( void ) {
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.speed );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.drawgun );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.blood );
-	//Menu_AddItem( &s_preferences2.menu, &s_preferences2.gibs );
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.gibs );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.camerabob );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.playerids );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.draw3dicons );
@@ -715,7 +714,7 @@ static void Preferences2_MenuInit( void ) {
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.coloredping );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.deafultweapon );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.centerprint );	
-	/*Menu_AddItem( &s_preferences2.menu, &s_preferences2.lagometer );*/
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.lagometer );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.hitsounds );
 	/*Menu_AddItem( &s_preferences2.menu, &s_preferences2.scorebox );*/
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.scoreboard );
