@@ -68,11 +68,8 @@ vmCvar_t	cgx_networkAdjustments;
 vmCvar_t	cgx_drawScoreBox;
 vmCvar_t	cgx_scoreboard;
 vmCvar_t	cgx_drawAccuracy;
-
-vmCvar_t	cgx_sharedConfig;
-vmCvar_t	cgx_maploadingfix;
-vmCvar_t	cgx_fixedmaps;
 vmCvar_t	cgx_nomip;
+vmCvar_t	cgx_sharedConfig;
 
 vmCvar_t	cgx_maxfps;
 vmCvar_t	cgx_maxpackets;
@@ -80,11 +77,6 @@ vmCvar_t	cgx_rate;
 vmCvar_t	cgx_delag;
 
 vmCvar_t	cgx_debug;
-
-// some temp info
-vmCvar_t	cgx_version;
-vmCvar_t	cgx_last_error;
-vmCvar_t	cgx_r_picmip;
 
 //unlagged - client options
 vmCvar_t	cg_delag;
@@ -337,7 +329,7 @@ cvarTable_t		cvarTable[] = {
 #endif
 	{ &cg_paused, "cl_paused", "0", CVAR_ROM },
 	{ &cg_blood, "com_blood", "1", CVAR_ARCHIVE },
-	{ &cg_syncronousClients, "g_syncronousClients", "0", 0 },	// communicated by systeminfo
+	{ &cg_syncronousClients, "g_syncronousClients", "0", 0 },	// communicated by systeminfo	
 };
 
 int		cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
@@ -350,6 +342,16 @@ int		cgx_deadBodyDarkenModificationCount = 1;
 int		cgx_enemyModel_enabledModificationCount = 1;
 int		cgx_fps_modificationCount = 1;
 int		cgx_sharedConfigModificationCount = 1;
+
+// some temp info
+vmCvar_t	cgx_version;
+vmCvar_t	cgx_last_error;
+vmCvar_t	cgx_maploadingfix;
+vmCvar_t	cgx_fixedmaps;
+vmCvar_t	cgx_r_picmip;
+
+vmCvar_t	r_vertexLight;
+vmCvar_t	r_picmip;
 
 cvarTable_t		cgx_cvarTable_temp[] = {
 	//handle map loading errors
@@ -366,6 +368,8 @@ cvarTable_t		cgx_cvarTable_temp[] = {
 	//better not register here or servefs will screw clients sv_fps
 	// this will be automagically copied from the server	
 	//{ &sv_fps, "sv_fps", "20", 0 },
+	{ &r_vertexLight, "r_vertexLight", "0", 0 },	
+	{ &r_picmip, "r_picmip", "0", 0 },
 };
 
 /*
@@ -387,14 +391,16 @@ void CG_RegisterCvars( void ) {
 	trap_Cvar_VariableStringBuffer( "sv_running", var, sizeof( var ) );
 	cgs.localServer = atoi( var );
 
-	//X-MOD: temp table, no update
+	//X-MOD: temp table, no update (only manual with trap_Cvar_Update)
 	for (i = 0, cv = cgx_cvarTable_temp; i < ArrLen(cgx_cvarTable_temp); i++, cv++) {
 		trap_Cvar_Register( cv->vmCvar, cv->cvarName,
 			cv->defaultString, cv->cvarFlags );
 	}
-	// get sv_fps if server sent it
-	trap_Cvar_VariableStringBuffer("sv_fps", var, sizeof(var));
-	sv_fps.integer = atoi(var);	
+
+	sv_fps.integer = 20;
+
+	//save current picmip
+	CGX_SavePicmip();
 }
 
 /*

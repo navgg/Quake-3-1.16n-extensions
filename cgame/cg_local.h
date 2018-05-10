@@ -816,7 +816,7 @@ typedef struct {
 	cgMedia_t		media;
 
 	//X-MOD: save delag and server info
-	int				sv_fps;	
+	//int				sv_fps;	
 	//int				sv_maxrate;
 
 	//unlagged - client options
@@ -880,14 +880,11 @@ extern	vmCvar_t		cgx_networkAdjustments;
 extern	vmCvar_t		cgx_drawScoreBox;
 extern	vmCvar_t		cgx_scoreboard;
 extern	vmCvar_t		cgx_drawAccuracy;
-
-extern	vmCvar_t		cgx_sharedConfig;
-extern	vmCvar_t		cgx_maploadingfix;
 extern	vmCvar_t		cgx_nomip;
+extern	vmCvar_t		cgx_sharedConfig;
 
 extern	vmCvar_t		cgx_maxfps;
 extern	vmCvar_t		cgx_maxpackets;
-//extern	vmCvar_t		cgx_timeNudge;
 extern	vmCvar_t		cgx_delag;
 
 extern	vmCvar_t		cgx_debug;
@@ -895,6 +892,11 @@ extern	vmCvar_t		cgx_debug;
 //some temp info
 extern	vmCvar_t		cgx_version;
 
+extern	vmCvar_t		cgx_maploadingfix;
+extern	vmCvar_t		cgx_r_picmip;
+
+extern	vmCvar_t		r_vertexLight;
+extern	vmCvar_t		r_picmip;
 
 extern	vmCvar_t		cg_centertime;
 extern	vmCvar_t		cg_runpitch;

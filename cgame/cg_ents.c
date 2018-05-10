@@ -662,7 +662,7 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 		cent->currentState.clientNum != cg.predictedPlayerState.clientNum ) {
 		cent->currentState.pos.trType = TR_LINEAR_STOP;
 		cent->currentState.pos.trTime = cg.snap->serverTime;
-		cent->currentState.pos.trDuration = 1000 / cgs.sv_fps;
+		cent->currentState.pos.trDuration = 1000 / sv_fps.integer;
 	}*/
 	//unlagged - timenudge extrapolation
 
@@ -674,12 +674,12 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 			// extrapolate one server frame's worth - this will correct for tiny
 			// visual inconsistencies introduced by backward-reconciling all players
 			// one server frame before running projectiles
-			timeshift = 1000 / cgs.sv_fps;
+			timeshift = 1000 / sv_fps.integer;
 		}
 		// if it's not, and it's not a grenade launcher
 		else if ( cent->currentState.weapon != WP_GRENADE_LAUNCHER ) {
 			// extrapolate based on cg_projectileNudge
-			timeshift = cg_projectileNudge.integer + 1000 / cgs.sv_fps;
+			timeshift = cg_projectileNudge.integer + 1000 / sv_fps.integer;
 		}
 	}
 

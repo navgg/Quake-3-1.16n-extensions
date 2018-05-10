@@ -3,7 +3,6 @@
 #include "cg_local.h"
 
 #define ShaderRGBAFill(a,c)	((a)[0]=(c),(a)[1]=(c),(a)[2]=(c),(a)[3]=(255))
-//#define CGX_IsPMSkin(p) ( p && *(p) == 'p' && *((p)+1) && *((p)+1) == 'm' )
 
 #define XMOD_ANSWER(x) { CG_Printf("^7[^1xmod^7]: ^6%s\n", x); trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND ); }
 
@@ -194,8 +193,6 @@ static void CGX_SetColorInfo(clientInfo_t *info, const char *color) {
 	else if (i = QX_StringToColor(color))
 		color = va("%c%c%c%c", i, i, i, i);			
 
-	//D_Printf(("CGX_SetColorInfo %s\n", color));
-
 	for (i = 0; i < 4; i++) {
 		if (!color[i])
 			return;
@@ -335,7 +332,9 @@ void CGX_SetModelAndSkin(clientInfo_t *ci, qboolean isDeferred, int clientNum) {
 		isSameTeam = cgs.gametype >= GT_TEAM && cgs.clientinfo[cg.clientNum].team == ci->team;
 
 	if (!isSameTeam) {		
-		if (IsSameModel(ci, cg.enemyModel, cg.enemySkin)) {
+		if (IsSameModel(ci, cg.enemyModel, cg.enemySkin)) {			
+			if (cgs.gametype >= GT_TEAM)
+				CGX_SetColorInfo(ci, cgx_enemyColors.string);
 			D_Printf(("^2OK %i\n", clientNum));
 			return;
 		}
@@ -345,6 +344,8 @@ void CGX_SetModelAndSkin(clientInfo_t *ci, qboolean isDeferred, int clientNum) {
 		CGX_SetColorInfo(ci, cgx_enemyColors.string);
 	} else {
 		if (IsSameModel(ci, cg.teamModel, cg.teamSkin)) {
+			if (cgs.gametype >= GT_TEAM)
+				CGX_SetColorInfo(ci, cgx_teamColors.string);
 			D_Printf(("^2OK %i\n", clientNum));
 			return;
 		}
@@ -399,6 +400,7 @@ void CGX_MapRestart() {
 	D_Printf(("^6CGX_MapRestart\n"));
 }
 
+#define NET_Set(x, y) { CG_Printf("Auto: %s %i\n", x, y); trap_Cvar_Set(x, va("%i", y)); }
 void CGX_AutoAdjustNetworkSettings(void) {
 	static int info_showed = 0;
 
@@ -415,8 +417,7 @@ void CGX_AutoAdjustNetworkSettings(void) {
 			else if (sv_fps.integer > 125)
 				sv_fps.integer = 125;
 
-			CG_Printf("Auto: sv_fps %i\n", sv_fps.integer);
-			trap_Cvar_Set("sv_fps", va("%i", sv_fps.integer));
+			NET_Set("sv_fps", sv_fps.integer)
 		
 			return;
 		}
@@ -430,8 +431,8 @@ void CGX_AutoAdjustNetworkSettings(void) {
 			if (cgx_maxpackets.integer < CGX_MIN_MAXPACKETS)
 				i = CGX_MIN_MAXPACKETS;
 			// set it litle more than sv_fps
-			if (cgx_maxpackets.integer < cgs.sv_fps)
-				i = cgs.sv_fps + 10;
+			if (cgx_maxpackets.integer < sv_fps.integer)
+				i = sv_fps.integer + 10;
 		} else if (cgx_networkAdjustments.integer == 2) {
 			k = 2;
 			minRate = 16000;			
@@ -456,41 +457,28 @@ void CGX_AutoAdjustNetworkSettings(void) {
 			if (i < CGX_MIN_MAXPACKETS) i = CGX_MIN_MAXPACKETS;
 			else if (i > CGX_MAX_MAXPACKETS) i = CGX_MAX_MAXPACKETS;
 
-			trap_Cvar_Set("cl_maxpackets", va("%i", i));
-			trap_Print(va("Auto: cl_maxpackets %i\n", i));
+			NET_Set("cl_maxpackets", i)
 		}
 
 		// no sense in snaps > 30 for default quake3.exe set it to sv_fps if possible, otherwise set it to 40 
-		minSnaps = cgs.sv_fps > 20 ? cgs.sv_fps : 40;
+		minSnaps = sv_fps.integer > 20 ? sv_fps.integer : 40;
 
 		// check and set snaps		
 		trap_Cvar_VariableStringBuffer("snaps", buf, sizeof(buf));
 		i = atoi(buf);
 
-		if (i < minSnaps) {
-			trap_Cvar_Set("snaps", va("%i", minSnaps));
-			trap_Print(va("Auto: snaps %i\n", minSnaps));
-		};
+		if (i < minSnaps)
+			NET_Set("snaps", minSnaps)
 
 		// check and set rate
 		trap_Cvar_VariableStringBuffer("rate", buf, sizeof(buf));
 		i = atoi(buf);
 
-		if (i < minRate) {
-			trap_Cvar_Set("rate", va("%i", minRate));
-			trap_Print(va("Auto: rate %i\n", minRate));
-		}
+		if (i < minRate)
+			NET_Set("rate", minRate)
 
-		if (cgx_networkAdjustments.integer == 3) {
-			// check and off packetdup
-			trap_Cvar_VariableStringBuffer("cl_packetdup", buf, sizeof(buf));
-			i = atoi(buf);
-
-			if (i) {
-				trap_Cvar_Set("cl_packetdup", "0");
-				trap_Print("Auto: cl_packetdup 0\n");
-			}
-		}
+		if (cgx_networkAdjustments.integer == 3)
+			NET_Set("cl_packetdup", 0)
 
 		// check time nudge & send hints
 		// if server delaged it's better off
@@ -623,26 +611,8 @@ void CGX_SendModinfo(void) {
 	}
 }
 
-//updates sv_fps if server screwed it with weird values
-//void CGX_Adjust_sv_fps() {
-	//if (cgx_networkAdjustments.integer || !cgs.localServer) {
-	//	int fps = sv_fps.integer;
-	//	if (fps <= 20)
-	//		trap_Cvar_Set("sv_fps", "20");
-	//	else if (fps <= 30)
-	//		trap_Cvar_Set("sv_fps", "30");
-	//	else if (fps <= 40 && fps != 33)
-	//		trap_Cvar_Set("sv_fps", "40");
-	//	else if (fps > 40 && !cgs.localServer)
-	//		trap_Cvar_Set("sv_fps", "40");
-	//}
-//}
-
 // X-MOD: potential fix for q3config saving problem
 void CGX_SaveSharedConfig(qboolean forced) {
-	//adjust sv_fps before saving
-	//CGX_Adjust_sv_fps();
-
 	if (cgx_sharedConfig.integer || forced) {
 		char buf[32];
 		trap_Cvar_VariableStringBuffer("version", buf, 8);
@@ -691,31 +661,22 @@ void CGX_GenerateMapBat(void) {
 	}
 }
 
-//gets picmip and save its value
-int CGX_GetPicmip() {	
-	static int val = -1;
-	if (val == -1) {
-		char buf[4];
-		trap_Cvar_VariableStringBuffer("r_picmip", buf, sizeof(buf));		
-		val = atoi(buf);
-		//save for cg_nomip
-		if (cgx_nomip.integer && val)
-			trap_Cvar_Set("cgx_r_picmip", buf);		
+//save picmip value
+void CGX_SavePicmip() {
+	if (cgx_nomip.integer) {
+		trap_Cvar_Set("cgx_r_picmip", r_picmip.string);
+		trap_Cvar_Update(&cgx_r_picmip);
 	}
-	return val;
 }
 
-static void CGX_NomipStart() {	
-	if (cgx_nomip.integer && CGX_GetPicmip())
+static void CGX_NomipStart() {
+	if (cgx_nomip.integer && r_picmip.integer)
 		trap_Cvar_Set("r_picmip", "0");
 }
 
-static void CGX_NomipEnd() {		
-	if (cgx_nomip.integer && CGX_GetPicmip()) {
-		char buf[4];
-		trap_Cvar_VariableStringBuffer("cgx_r_picmip", buf, sizeof(buf));		
-		trap_Cvar_Set("r_picmip", buf);
-	}
+static void CGX_NomipEnd() {
+	if (cgx_nomip.integer && r_picmip.integer)
+		trap_Cvar_Set("r_picmip", cgx_r_picmip.string);	
 }
 
 static void CGX_IncreaseHunkmegs(int min) {
@@ -724,16 +685,6 @@ static void CGX_IncreaseHunkmegs(int min) {
 
 	if (min > atoi(buf))
 		trap_Cvar_Set("com_hunkMegs", va("%i", min));
-}
-
-qboolean CGX_IsVertexLight() {
-	char buf[4];
-	static int vertexLight = -1;
-	if (vertexLight == -1) {
-		trap_Cvar_VariableStringBuffer("r_vertexLight", buf, sizeof(buf));
-		vertexLight = atoi(buf);
-	}
-	return vertexLight;
 }
 
 // load collision map with last error
@@ -797,31 +748,26 @@ qboolean CGX_IsPure() {
 	}
 }
 
+#define IsQ3Map(x) (x[0] == 'q' || x[0] == 'Q') && x[1] == '3'
 //save mapname and try load aganin with fix
-static void CGX_TryLoadingFix() {	
-	qboolean isQ3map = (cgs.mapname_clean[0] == 'q' || cgs.mapname_clean[0] == 'Q') && cgs.mapname_clean[1] == '3';	
-
-	if (isQ3map)
+static void CGX_TryLoadingFix() {
+	if (IsQ3Map(cgs.mapname_clean))
 		return;	
 	
 	CGX_RememberBrokenMap();
 
-	if (cgs.localServer) {
+	if (cgs.localServer)
 		trap_SendConsoleCommand("vid_restart\n");
-	} else {
-		trap_SendConsoleCommand("reconnect\n");
-	}
+	else
+		trap_SendConsoleCommand("reconnect\n");	
 }
 
 // check known maps and apply loading fix if needed
 static void CGX_CheckKnownMapsForFix() {
-	qboolean isQ3map = (cgs.mapname_clean[0] == 'q' || cgs.mapname_clean[0] == 'Q') && cgs.mapname_clean[1] == '3';
-
-	if (!isQ3map && CGX_IsRememberedMap()) {		
-		trap_Cvar_Set("cgx_fix_mapload", "1");		
-	} else {
+	if (!IsQ3Map(cgs.mapname_clean) && CGX_IsRememberedMap())
+		trap_Cvar_Set("cgx_fix_mapload", "1");
+	else
 		trap_Cvar_Set("cgx_fix_mapload", "0");
-	}
 
 	trap_Cvar_Update(&cgx_maploadingfix);
 }
@@ -836,7 +782,7 @@ static void CGX_LoadWorldMap() {
 	CGX_CheckKnownMapsForFix();
 
 	//trying to apply fix only if vertexlight is off	
-	if (cgx_maploadingfix.integer && !CGX_IsVertexLight()) {
+	if (cgx_maploadingfix.integer && !r_vertexLight.integer) {
 		// load with fix
 		trap_Cvar_Set("r_vertexLight", "1");
 		trap_R_LoadWorldMap(cgs.mapname);
@@ -853,7 +799,7 @@ static void CGX_LoadWorldMap() {
 static void CGX_LoadClientInfo( clientInfo_t *ci ) {
 	CGX_NomipStart();	
 
-	if (CGX_IsVertexLight()) {
+	if (r_vertexLight.integer) {
 		trap_Cvar_Set("r_vertexLight", "0");
 		CG_LoadClientInfo(ci);
 		trap_Cvar_Set("r_vertexLight", "1");
