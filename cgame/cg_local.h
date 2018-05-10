@@ -883,8 +883,8 @@ extern	vmCvar_t		cgx_drawAccuracy;
 extern	vmCvar_t		cgx_nomip;
 extern	vmCvar_t		cgx_sharedConfig;
 
-extern	vmCvar_t		cgx_maxfps;
-extern	vmCvar_t		cgx_maxpackets;
+extern	vmCvar_t		com_maxfps;
+extern	vmCvar_t		cl_maxpackets;
 extern	vmCvar_t		cgx_delag;
 
 extern	vmCvar_t		cgx_debug;
@@ -1005,8 +1005,35 @@ qboolean CG_Cvar_ClampInt( const char *name, vmCvar_t *vmCvar, int min, int max 
 // cgx_extensions.c
 //
 void CGX_SendModinfo(void);
-
 void CGX_SetModelAndSkin(clientInfo_t *ci, qboolean isDeferred, int clientNum);
+
+//void CGX_AutoAdjustNetworkSettings(void);
+//void CGX_CheckChatCommand(const char *str);
+//qboolean CGX_CheckModInfo(const char *str);
+//void CGX_EnemyModelCheck(void);
+//void CGX_GenerateMapBat(void);
+//void CGX_IncreaseHunkmegs(int min);
+//void CGX_Init_enemyAndTeamColors(void);
+//void CGX_Init_enemyModels(void);
+//void CGX_Init_teamModels(void);
+//void CGX_Init_vScreen(void);
+//qboolean CGX_IsPure();
+//void CGX_LoadClientInfo(clientInfo_t *ci );
+//void CGX_LoadCollisionMap();
+//void CGX_LoadWorldMap();
+//void CGX_MapRestart();
+//void CGX_NomipEnd();
+//void CGX_NomipStart();
+//void CGX_SavePicmip();
+//void CGX_SaveSharedConfig(qboolean forced);
+//void CGX_SendModinfo(void);
+//char CGX_ServerNameFixInfoLoad(char *str);
+//void CGX_SetModelAndSkin(clientInfo_t *ci, qboolean isDeferred, int clientNum);
+//void CGX_SyncServer_delagHitscan(const char * info);
+//void CGX_SyncServer_sv_fps(const char *info);
+//void CGX_TrackEnemyModelChanges();
+//void CGX_TryLoadingFix();
+//void CGX_Xmod(char *command);
 
 //
 // cg_main.c

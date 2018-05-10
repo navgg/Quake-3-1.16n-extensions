@@ -71,8 +71,8 @@ vmCvar_t	cgx_drawAccuracy;
 vmCvar_t	cgx_nomip;
 vmCvar_t	cgx_sharedConfig;
 
-vmCvar_t	cgx_maxfps;
-vmCvar_t	cgx_maxpackets;
+vmCvar_t	com_maxfps;
+vmCvar_t	cl_maxpackets;
 vmCvar_t	cgx_rate;
 vmCvar_t	cgx_delag;
 
@@ -303,8 +303,8 @@ cvarTable_t		cvarTable[] = {
 	//unlagged - client options
 #endif
 
-	{ &cgx_maxfps, "com_maxfps", "125", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
-	{ &cgx_maxpackets, "cl_maxpackets", "40", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },				
+	{ &com_maxfps, "com_maxfps", "125", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
+	{ &cl_maxpackets, "cl_maxpackets", "40", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },				
 
 #if CGX_DEBUG
 	{ &cgx_debug, "cgx_debug", "1", CVAR_TEMP },
@@ -399,6 +399,8 @@ void CG_RegisterCvars( void ) {
 
 	sv_fps.integer = 20;
 
+	CG_Printf("%i", ArrLen(g_color_table_ex));
+
 	//save current picmip
 	CGX_SavePicmip();
 }
@@ -448,13 +450,13 @@ void CG_UpdateCvars( void ) {
 		trap_Cvar_Update( cv->vmCvar );
 	}
 
-	if (cgx_maxpackets.integer < CGX_MIN_MAXPACKETS) {
+	if (cl_maxpackets.integer < CGX_MIN_MAXPACKETS) {
 		trap_Print(va("Min cl_maxpackets is %i\n", CGX_MIN_MAXPACKETS));
-		cgx_maxpackets.integer = CGX_MIN_MAXPACKETS;
+		cl_maxpackets.integer = CGX_MIN_MAXPACKETS;
 		trap_Cvar_Set("cl_maxpackets", "30");
 	}
-	if (cgx_maxfps.integer > 500) {
-		cgx_maxfps.integer = 500;
+	if (com_maxfps.integer > 500) {
+		com_maxfps.integer = 500;
 		trap_Print(va("Max com_maxfps is %i\n", 500));
 		trap_Cvar_Set("com_maxfps", "500");
 	}
@@ -472,7 +474,7 @@ void CG_UpdateCvars( void ) {
 		cgx_teamModelModificationCount != cgx_teamModel.modificationCount ||
 		cgx_enemyModel_enabledModificationCount != cgx_enemyModel_enabled.modificationCount) {
 		
-		if (!cgx_enemyModel_enabled.integer && cgx_enemyModel.string[0] != '\0' &&
+		if (!cgx_enemyModel_enabled.integer && cgx_enemyModel.string[0] &&
 			cgx_enemyModel_enabled.modificationCount == cgx_enemyModel_enabledModificationCount) {
 			trap_Cvar_Set("cg_enemyModel_enabled", "1");
 			D_Printf(("^6cg_enemyModel_enabled 1\n"));
@@ -502,8 +504,8 @@ void CG_UpdateCvars( void ) {
 	}
 	
 	//track fps change
-	if (cgx_fps_modificationCount != cgx_maxfps.modificationCount) {
-		cgx_fps_modificationCount = cgx_maxfps.modificationCount;
+	if (cgx_fps_modificationCount != com_maxfps.modificationCount) {
+		cgx_fps_modificationCount = com_maxfps.modificationCount;
 
 		CGX_AutoAdjustNetworkSettings();
 	}
@@ -872,7 +874,7 @@ static void CG_RegisterGraphics( void ) {
 	for (i = 0; i < NUM_CROSSHAIRS; i++) {
 		cgs.media.crosshairShader[i] = trap_R_RegisterShader( va( "gfx/2d/fixed_crosshair%c", 'a' + i ) );
 	}
-	if (cgx_crosshairColor.string[0] == '\0')
+	if (!cgx_crosshairColor.string[0])
 	for (i = 0; i < NUM_CROSSHAIRS; i++) {
 		cgs.media.defaultCrosshair[i] = trap_R_RegisterShader( va( "gfx/2d/crosshair%c", 'a' + i ) );
 	}

@@ -11,7 +11,7 @@
 #define EM_INTERMISSION		4
 
 // instead of modes 1 2 4 6 will be 1 2 3 4
-qboolean EM_Check(int x) {
+static qboolean EM_Check(int x) {
 	int i = cgx_enemyModel_enabled.integer;
 	i = i == 3 ? i = 4 : i == 4 ? i = 6 : i;	
 	return i & x;
@@ -160,11 +160,11 @@ static void CGX_ColorFromChar(char v, byte *color, clientInfo_t *info) {
 			default: v = '7'; break;
 		} 
 	else if (v == '*')
-		v = '0' + (random() * 7);
+		v = '0' + random() * (ArrLen(g_color_table) - 1);
 	else if (v == '.')
-		v = '0' + (random() * 35);
+		v = '0' + random() * (ArrLen(g_color_table_ex) - 1);
 
-	j = (v - '0') % 36;//  for g_color_table_ex
+	j = (v - '0') % ArrLen(g_color_table_ex);//  for g_color_table_ex	
 	//j = ColorIndex(v);// for g_color_table
 	color[0] = g_color_table_ex[j][0] * 255;
 	color[1] = g_color_table_ex[j][1] * 255;
@@ -191,7 +191,7 @@ static void CGX_SetColorInfo(clientInfo_t *info, const char *color) {
 	if (!*color)
 		color = "!!!!";
 	else if (i = QX_StringToColor(color))
-		color = va("%c%c%c%c", i, i, i, i);			
+		color = va("%c%c%c%c", i, i, i, i);
 
 	for (i = 0; i < 4; i++) {
 		if (!color[i])
@@ -233,7 +233,7 @@ void CGX_Init_enemyAndTeamColors(void) {
 
 //restore real model and skin if needed and return result
 #define IsSameModel(x) !Q_stricmp(x->modelName, x->modelNameCopy) && !Q_stricmp(x->skinName, x->skinNameCopy)
-qboolean CGX_RestoreModelAndSkin(clientInfo_t *ci, int clientNum, qboolean isDeferred) {
+static qboolean CGX_RestoreModelAndSkin(clientInfo_t *ci, int clientNum, qboolean isDeferred) {
 	qboolean isSpect = ci->team == TEAM_SPECTATOR && !EM_Check(EM_SPECT);
 	qboolean isPlayer = qfalse;
 	qboolean isPlayerSpect = qfalse;
@@ -272,7 +272,7 @@ qboolean CGX_RestoreModelAndSkin(clientInfo_t *ci, int clientNum, qboolean isDef
 }
 
 
-void CGX_SetModel(clientInfo_t *ci, char *modelName) {
+static void CGX_SetModel(clientInfo_t *ci, char *modelName) {
 	//save copy
 	if (!ci->modelNameCopy[0])
 		Q_strncpyz(ci->modelNameCopy, ci->modelName, sizeof(ci->modelName));
@@ -295,7 +295,7 @@ static qboolean CGX_IsKnownModel(const char *modelName) {
 	return qfalse;	
 }
 
-void CGX_SetPMSkin(clientInfo_t *ci) {
+static void CGX_SetPMSkin(clientInfo_t *ci) {
 	if (!CGX_IsKnownModel(ci->modelName)) {
 		D_Printf(("^3Warning: No PM skin for model %s\n", ci->modelName));
 		Q_strncpyz(ci->modelName, DEFAULT_MODEL, sizeof(ci->modelName));
@@ -304,7 +304,7 @@ void CGX_SetPMSkin(clientInfo_t *ci) {
 	Q_strncpyz(ci->skinName, "pm", sizeof(ci->skinName));		
 }
 
-void CGX_SetSkin(clientInfo_t *ci, char *skinName) {	
+static void CGX_SetSkin(clientInfo_t *ci, char *skinName) {	
 	if (!skinName[0]) //if no skin set pm
 		CGX_SetPMSkin(ci);
 	else if (cgs.gametype < GT_TEAM || !Q_stricmp(skinName, "pm"))
@@ -407,7 +407,7 @@ void CGX_AutoAdjustNetworkSettings(void) {
 	D_Printf(("CGX_AutoAdjustNetworkSettings %i\n", cgx_networkAdjustments.integer));
 
 	if (cgx_networkAdjustments.integer) {
-		int i, minRate, minSnaps, k;
+		int i, minRate = 5000, minSnaps, k;
 		char buf[10];		
 		
 		//adjust sv_fps for local game
@@ -425,28 +425,28 @@ void CGX_AutoAdjustNetworkSettings(void) {
 		i = 0;		
 
 		if (cgx_networkAdjustments.integer == 1) {			
-			minRate = 8000;			
+			minRate = 8000;
 		
 			// if packets < 30 set it to 30
-			if (cgx_maxpackets.integer < CGX_MIN_MAXPACKETS)
+			if (cl_maxpackets.integer < CGX_MIN_MAXPACKETS)
 				i = CGX_MIN_MAXPACKETS;
 			// set it litle more than sv_fps
-			if (cgx_maxpackets.integer < sv_fps.integer)
+			if (cl_maxpackets.integer < sv_fps.integer)
 				i = sv_fps.integer + 10;
 		} else if (cgx_networkAdjustments.integer == 2) {
 			k = 2;
 			minRate = 16000;			
 
 			// if it's something lower than 100 - adjust
-			if (cgx_maxpackets.integer < 100)
-				while ((i = cgx_maxfps.integer / k++) > 60);			
+			if (cl_maxpackets.integer < 100)
+				while ((i = com_maxfps.integer / k++) > 60);			
 		} else if (cgx_networkAdjustments.integer == 3) {
 			k = 1;
 			minRate = 25000;			
 
 			// if it's already 100 skip, lower - adjust
-			if (cgx_maxpackets.integer < 100)
-				while ((i = cgx_maxfps.integer / k++) > 100);
+			if (cl_maxpackets.integer < 100)
+				while ((i = com_maxfps.integer / k++) > 100);
 
 			if (i >= 100)
 				i-=5;
@@ -499,6 +499,59 @@ void CGX_AutoAdjustNetworkSettings(void) {
 			trap_Print("^5Hint: if you have false item pickups (picking up armor or weapon and it's doenst count) because cg_delag_optimizePrediction is set to 1 or you have high ping then try to set cg_predictitems 0\n");
 			info_showed = 2;
 		}		
+	}
+}
+
+void CGX_SyncServer_delagHitscan(const char * info) {
+	int g_delagHitscan;
+	int g_delag;
+	char *g_unlaggedVersion;
+
+	//unlagged - server options
+	// we'll need this for deciding whether or not to predict weapon effects
+	g_delag = atoi( Info_ValueForKey( info, "g_delag" ) );
+	g_delagHitscan = atoi(Info_ValueForKey(info, "g_delagHitscan"));
+	g_unlaggedVersion = Info_ValueForKey(info, "g_unlaggedVersion");
+
+	//2 - bma 3 - nemesis
+	if (cgs.delagHitscan != 2 && cgs.delagHitscan != 3)
+		cgs.delagHitscan = g_delag || g_delagHitscan || (Q_stricmpn("1.2", g_unlaggedVersion, 4) == 0);
+
+	D_Printf(("cgs.delagHitscan '%i'\n", cgs.delagHitscan));
+	if (g_delagHitscan || g_unlaggedVersion[0] != '\0')
+		D_Printf(("g_delagHitscan '%i' g_unlaggedVersion '%s'\n", g_delagHitscan, g_unlaggedVersion));
+	//unlagged - server options	
+
+	// get sv_fps and save for unlagged	
+	D_Printf(("^3g_delag '%i'\n", cgs.delagHitscan));
+}
+
+void CGX_SyncServer_sv_fps(const char *info) {
+	static int old_sv_fps = -1;
+	int i;
+
+	i = atoi(Info_ValueForKey(info, "sv_fps"));
+
+	D_Printf(("^3sv_fps serv '%i' sv_fps client '%i' ", i, sv_fps.integer));
+
+	sv_fps.integer = i;
+
+	if (!sv_fps.integer) {
+		char buf[4];
+		// get sv_fps if server sent it
+		trap_Cvar_VariableStringBuffer("sv_fps", buf, sizeof(buf));
+		sv_fps.integer = atoi(buf);
+		//on some servs fps coming to sv_fps client value, on some stored in server info
+		//try get from server info first, then from client
+		if (!sv_fps.integer)
+			sv_fps.integer = 20;
+	}
+
+	D_Printf(("^3sv_fps final '%i'\n", sv_fps.integer));
+
+	if (sv_fps.integer != old_sv_fps) {
+		old_sv_fps = sv_fps.integer;
+		CGX_AutoAdjustNetworkSettings();		
 	}
 }
 
@@ -594,7 +647,7 @@ void CGX_SendModinfo(void) {
 		//send info about clietn to nemesis servs
 		trap_Cvar_Register(&cgx_cgame, "cgame", CGX_NAME" "CGX_VERSION, CVAR_INIT | CVAR_ROM | CVAR_TEMP | CVAR_USERINFO);		
 		trap_Cvar_Register(&cgx_uinfo, "cg_uinfo", "", CVAR_INIT | CVAR_ROM | CVAR_TEMP | CVAR_USERINFO );
-		trap_Cvar_Set("cg_uinfo", va("%i %i 0", cl_timeNudge.integer, cgx_maxpackets.integer));
+		trap_Cvar_Set("cg_uinfo", va("%i %i 0", cl_timeNudge.integer, cl_maxpackets.integer));
 
 		isNemesisRegistered = qtrue;
 	};
@@ -624,7 +677,7 @@ void CGX_SaveSharedConfig(qboolean forced) {
 
 		trap_Cvar_VariableStringBuffer("fs_game", buf, sizeof(buf));		
 
-		if (buf[0] == '\0') {
+		if (!buf[0]) {
 			trap_Print("Saving shared config... Mod: baseq3\n");
 			trap_SendConsoleCommand("writeconfig q3config.cfg\n");
 		}
@@ -669,17 +722,17 @@ void CGX_SavePicmip() {
 	}
 }
 
-static void CGX_NomipStart() {
+void CGX_NomipStart() {
 	if (cgx_nomip.integer && r_picmip.integer)
 		trap_Cvar_Set("r_picmip", "0");
 }
 
-static void CGX_NomipEnd() {
+void CGX_NomipEnd() {
 	if (cgx_nomip.integer && r_picmip.integer)
 		trap_Cvar_Set("r_picmip", cgx_r_picmip.string);	
 }
 
-static void CGX_IncreaseHunkmegs(int min) {
+void CGX_IncreaseHunkmegs(int min) {
 	char buf[8];
 	trap_Cvar_VariableStringBuffer("com_hunkMegs", buf, sizeof(buf));
 
@@ -688,7 +741,7 @@ static void CGX_IncreaseHunkmegs(int min) {
 }
 
 // load collision map with last error
-static void CGX_LoadCollisionMap() {	
+void CGX_LoadCollisionMap() {	
 	D_Printf(("CGX_LoadCollisionMap\n"));
 	CG_LoadingString( "collision map" );
 
@@ -750,7 +803,7 @@ qboolean CGX_IsPure() {
 
 #define IsQ3Map(x) (x[0] == 'q' || x[0] == 'Q') && x[1] == '3'
 //save mapname and try load aganin with fix
-static void CGX_TryLoadingFix() {
+void CGX_TryLoadingFix() {
 	if (IsQ3Map(cgs.mapname_clean))
 		return;	
 	
@@ -773,7 +826,7 @@ static void CGX_CheckKnownMapsForFix() {
 }
 
 // load world map with last error
-static void CGX_LoadWorldMap() {
+void CGX_LoadWorldMap() {
 	D_Printf(( "^5CGX_LoadWorldMap\n" ));
 	CG_LoadingString(cgs.mapname);
 	trap_Cvar_Set( "cgx_last_error", va( "2 Couldn't load world map: %s", cgs.mapname_clean ) );	
@@ -796,7 +849,7 @@ static void CGX_LoadWorldMap() {
 
 //fix enemymodels with vertex light
 //check vertex light and load client info
-static void CGX_LoadClientInfo( clientInfo_t *ci ) {
+void CGX_LoadClientInfo( clientInfo_t *ci ) {
 	CGX_NomipStart();	
 
 	if (r_vertexLight.integer) {
@@ -811,7 +864,7 @@ static void CGX_LoadClientInfo( clientInfo_t *ci ) {
 }
 
 //safety open file
-int CGX_FOpenFile(char *filename, fileHandle_t *f, fsMode_t mode, int maxSize) {
+static int CGX_FOpenFile(char *filename, fileHandle_t *f, fsMode_t mode, int maxSize) {
 	int len;
 	len = trap_FS_FOpenFile( filename, f, mode );
 
@@ -829,7 +882,7 @@ int CGX_FOpenFile(char *filename, fileHandle_t *f, fsMode_t mode, int maxSize) {
 }
 
 //read all and close
-int CGX_FReadAll(char *filename, char *buffer, int bufsize) {
+static int CGX_FReadAll(char *filename, char *buffer, int bufsize) {
 	int len;
 	fileHandle_t	f;
 
@@ -843,7 +896,7 @@ int CGX_FReadAll(char *filename, char *buffer, int bufsize) {
 }
 
 //small talk
-char* CGX_XmodTalk(char *command) {
+static char* CGX_XmodTalk(char *command) {
 	int i;
 	i = strlen(command);
 	command[i] = ' ';
@@ -873,7 +926,7 @@ char* CGX_XmodTalk(char *command) {
 	return NULL;
 }
 
-void CGX_PrintLine(char c) {
+static void CGX_PrintLine(char c) {
 	int i;	
 	CG_Printf("^%c", c);
 	for(i = 0; i < 20*3/10; i++)
@@ -883,14 +936,14 @@ void CGX_PrintLine(char c) {
 
 //parse info from file
 //format: cmd1 - description1\r\n
-void CGX_ShowHelp(char *filename, char *cmd) {
+static void CGX_ShowHelp(char *filename, char *cmd) {
 	char			buf[1024 * 4];
 	static			qboolean exampleShown;
 
 	//start parse command list if read succesful
 	if (CGX_FReadAll(filename, buf, sizeof(buf))) {
 		int i, j;
-		char *s, *t, *nt;
+		char *s, *t;
 
 		//shift \r\n+two tabs
 		for (i = 1; i < sizeof(buf) - 1; i++) {			
@@ -972,7 +1025,6 @@ void CGX_ShowHelp(char *filename, char *cmd) {
 
 //xmod command
 void CGX_Xmod(char *command) {
-	char* talk;
 	int i;
 
 	if (!Q_stricmp(command, "e ")) {

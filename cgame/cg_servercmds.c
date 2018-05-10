@@ -78,12 +78,8 @@ and whenever the server updates any serverinfo flagged cvars
 ================
 */
 void CG_ParseServerinfo( void ) {
-	static int old_sv_fps = -1;
 	const char	*info;
 	char	*mapname;
-	int g_delagHitscan;
-	int g_delag;
-	char *g_unlaggedVersion;
 
 	info = CG_ConfigString( CS_SERVERINFO );
 	cgs.gametype = atoi( Info_ValueForKey( info, "g_gametype" ) );
@@ -97,46 +93,8 @@ void CG_ParseServerinfo( void ) {
 	Com_sprintf( cgs.mapname, sizeof( cgs.mapname ), "maps/%s.bsp", mapname );
 	Com_sprintf( cgs.mapname_clean, sizeof( cgs.mapname_clean ), "%s", mapname );
 
-	//unlagged - server options
-	// we'll need this for deciding whether or not to predict weapon effects
-	g_delag = atoi( Info_ValueForKey( info, "g_delag" ) );
-	g_delagHitscan = atoi(Info_ValueForKey(info, "g_delagHitscan"));
-	g_unlaggedVersion = Info_ValueForKey(info, "g_unlaggedVersion");
-
-	//2 - bma 3 - nemesis
-	if (cgs.delagHitscan != 2 && cgs.delagHitscan != 3)
-		cgs.delagHitscan = g_delag || g_delagHitscan || (Q_stricmpn("1.2", g_unlaggedVersion, 4) == 0);
-
-	D_Printf(("cgs.delagHitscan '%i'\n", cgs.delagHitscan));
-	if (g_delagHitscan || g_unlaggedVersion[0] != '\0')
-		D_Printf(("g_delagHitscan '%i' g_unlaggedVersion '%s'\n", g_delagHitscan, g_unlaggedVersion));
-	//unlagged - server options
-
-	sv_fps.integer = atoi(Info_ValueForKey(info, "sv_fps"));
-
-	// get sv_fps and save for unlagged	
-	D_Printf(("^3g_delag '%i'\n", cgs.delagHitscan));
-	D_Printf(("^3sv_fps serv '%i' sv_fps client '%i' ", i, sv_fps.integer));
-
-	if (!sv_fps.integer) {
-		char buf[4];
-		// get sv_fps if server sent it
-		trap_Cvar_VariableStringBuffer("sv_fps", buf, sizeof(buf));
-		sv_fps.integer = atoi(buf);
-		//on some servs fps coming to sv_fps client value, on some stored in server info
-		//try get from server info first, then from client
-		if (!sv_fps.integer)
-			sv_fps.integer = 20;
-	}
-	
-	CG_Printf("%i\n", sv_fps.integer);
-
-	D_Printf(("^3sv_fps final '%i'\n", sv_fps.integer));
-
-	if (sv_fps.integer != old_sv_fps) {
-		old_sv_fps = sv_fps.integer;
-		CGX_AutoAdjustNetworkSettings();		
-	}
+	CGX_SyncServer_delagHitscan(info);
+	CGX_SyncServer_sv_fps(info);
 }
 
 /*

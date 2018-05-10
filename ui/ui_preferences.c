@@ -179,7 +179,7 @@ static void Preferences_SetMenuItems( void ) {
 	else if (crosshaircolor = QX_StringToColor(buf))
 		crosshaircolor = ColorIndex(crosshaircolor) + 1;		
 	else
-		crosshaircolor = atoi(buf) % 36 + 1;
+		crosshaircolor = atoi(buf) % ArrLen(g_color_table_ex) + 1;
 
 	s_preferences.crosshaircolor.curvalue = crosshaircolor;
 

@@ -25,7 +25,7 @@
 #define CGX_BP_NUMBER	44	//secret number
 #define CGX_BP_STRING	"44"
 //length of array
-#define ArrLen(x)	sizeof x / sizeof *x
+#define ArrLen(x)	(sizeof x / sizeof *x)
 
 // widescreen fix flags
 #define CGX_WFIX_SCREEN	0x0001
@@ -589,6 +589,9 @@ void	Q_strcat( char *dest, int size, const char *src );
 
 // X-MOD: externsions
 char *QX_trim(char *str);
+//char QX_StringToColor(const char *s);
+//char* QX_GetHostnameSpacesFix(char *string);
+//char *QX_CleanStrHostnameFix( char *string )
 //moved from ai_dmq3.h
 //strstr but case insensitive
 char *stristr(char *str, char *charset);

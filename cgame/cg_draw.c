@@ -683,7 +683,6 @@ CGX_DrawAcc
 */
 static float CGX_DrawAcc( float y ) {
 	char *s;
-	int acc;
 	int i, w;
 	
 	i = cg.snap->ps.persistant[PERS_ACCURACY_SHOTS];
@@ -1980,13 +1979,13 @@ static void CG_DrawCrosshair(void) {
 	
 	// X-MOD: set crosshair color
 	if (cgx_crosshairColor.integer) {	
-		trap_R_SetColor(g_color_table_ex[cgx_crosshairColor.integer % 35]);
+		trap_R_SetColor(g_color_table_ex[cgx_crosshairColor.integer % ArrLen(g_color_table_ex)]);
 	} else if (*cgx_crosshairColor.string) {
 		//try set from string
 		char c = QX_StringToColor(cgx_crosshairColor.string);
 		if (c) {
 			cgx_crosshairColor.integer = ColorIndex(c);			
-			trap_R_SetColor(g_color_table_ex[cgx_crosshairColor.integer % 35]);
+			trap_R_SetColor(g_color_table_ex[cgx_crosshairColor.integer % ArrLen(g_color_table_ex)]);
 		}
 	}
 	// set color based on health
@@ -2013,7 +2012,7 @@ static void CG_DrawCrosshair(void) {
 	y = cg_crosshairY.integer;
 	CG_AdjustFrom640( &x, &y, &w, &h );
 	
-	if (cgx_crosshairColor.string[0] == '\0') {
+	if (!cgx_crosshairColor.string[0]) {
 		int cn = cg_drawCrosshair.integer % NUM_CROSSHAIRS;
 		hShader = cgs.media.defaultCrosshair[cn];
 		if (!hShader) { // lazy load crosshair shader

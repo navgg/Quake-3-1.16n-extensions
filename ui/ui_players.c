@@ -30,7 +30,7 @@ static float		jumpHeight;
 UI_PlayerInfo_SetWeapon
 ===============
 */
-static void UI_PlayerInfo_SetWeapon( playerInfo_t *pi, weapon_t weaponNum ) {
+void UI_PlayerInfo_SetWeapon( playerInfo_t *pi, weapon_t weaponNum ) {
 	gitem_t *	item;
 	char		path[MAX_QPATH];
 
@@ -160,7 +160,7 @@ static void UI_SetLegsAnim( playerInfo_t *pi, int anim ) {
 UI_ForceTorsoAnim
 ===============
 */
-static void UI_ForceTorsoAnim( playerInfo_t *pi, int anim ) {
+void UI_ForceTorsoAnim( playerInfo_t *pi, int anim ) {
 	pi->torsoAnim = ( ( pi->torsoAnim & ANIM_TOGGLEBIT ) ^ ANIM_TOGGLEBIT ) | anim;
 
 	if ( anim == TORSO_GESTURE ) {

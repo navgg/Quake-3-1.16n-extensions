@@ -68,7 +68,6 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 	int				i;
 	centity_t		*cent;
 	entityState_t	*state;
-	clientInfo_t	*cur;	
 
 	cg.snap = snap;	
 

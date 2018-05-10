@@ -316,29 +316,7 @@ static int propMapB[26][3] = {
 #define PROPB_SPACE_WIDTH	12
 #define PROPB_HEIGHT		36
 
-/* X-MOD: commonstatusbar for quick infos */
-static void UIX_CommonStatusBar(void *self, int min, int total, const char* info_messages[][2]) {
-	const char *infomsg, *infomsg2;
-	
-	int id = ((menucommon_s*)self)->id;	
-	if (id >= min && id < min + total) {
-		infomsg = info_messages[id - min][0];
-		infomsg2 = info_messages[id - min][1];
-	} else {
-		infomsg = va("Unknown id %i", id);
-		infomsg2 = "";
-	}
-	
-	if (!infomsg[0])
-		infomsg = va("%i empty", id);
-	
-	if (!infomsg2[0]) {
-		UI_DrawString(SCREEN_WIDTH * 0.50, SCREEN_HEIGHT * 0.94, infomsg, UI_SMALLFONT | UI_CENTER, colorWhite);
-	} else {
-		UI_DrawString(SCREEN_WIDTH * 0.50, SCREEN_HEIGHT * 0.92, infomsg, UI_SMALLFONT|UI_CENTER, colorWhite );
-		UI_DrawString(SCREEN_WIDTH * 0.50, SCREEN_HEIGHT * 0.96, infomsg2, UI_SMALLFONT | UI_CENTER, colorWhite);
-	}
-}
+
 
 /*
 =================

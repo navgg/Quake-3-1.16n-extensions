@@ -146,6 +146,10 @@ SOURCE=.\ui_credits.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\ui_credits2.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\ui_demo2.c
 # End Source File
 # Begin Source File
@@ -199,6 +203,10 @@ SOURCE=.\ui_playersettings.c
 # Begin Source File
 
 SOURCE=.\ui_preferences.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\ui_preferences2.c
 # End Source File
 # Begin Source File
 
@@ -268,6 +276,11 @@ SOURCE=.\ui_teamorders.c
 
 SOURCE=.\ui_video.c
 # End Source File
+# Begin Source File
+
+SOURCE=.\uix_extensions.c
+# End Source File
+
 # End Group
 # Begin Group "Header Files"
 

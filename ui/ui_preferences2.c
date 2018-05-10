@@ -269,7 +269,6 @@ static void Preferences2_SaveChanges( void ) {
 }
 
 static void Preferences2_Event( void* ptr, int notification ) {
-	int fov;
 
 	if( notification != QM_ACTIVATED ) {
 		return;
@@ -388,7 +387,7 @@ static sfxHandle_t Preferences2_MenuKey( int key ) {
 }
 
 static void Preferences2_MenuInit( void ) {
-	int				y, y2, ystart;
+	int				y, ystart;
 
 	memset( &s_preferences2, 0 ,sizeof(preferences_t) );	
 
