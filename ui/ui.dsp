@@ -280,7 +280,6 @@ SOURCE=.\ui_video.c
 
 SOURCE=.\uix_extensions.c
 # End Source File
-
 # End Group
 # Begin Group "Header Files"
 

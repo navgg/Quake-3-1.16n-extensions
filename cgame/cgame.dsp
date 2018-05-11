@@ -143,10 +143,6 @@ SOURCE=.\cg_localents.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\cgx_extensions.c
-# End Source File
-# Begin Source File
-
 SOURCE=.\cg_main.c
 # End Source File
 # Begin Source File
@@ -183,6 +179,10 @@ SOURCE=.\cg_syscalls.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\cg_unlagged.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\cg_view.c
 # End Source File
 # Begin Source File
@@ -191,7 +191,7 @@ SOURCE=.\cg_weapons.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\cg_unlagged.c
+SOURCE=.\cgx_extensions.c
 # End Source File
 # Begin Source File
 

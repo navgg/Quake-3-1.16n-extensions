@@ -61,11 +61,13 @@
 
 //X-MOD: custom color extensions
 #define ShaderRGBACopy(a,b)	((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2],(b)[3]=(255))
-//X-MOD: maxpackets limits
+//X-MOD: limits
 #define CGX_MIN_MAXPACKETS 30
 #define CGX_MAX_MAXPACKETS 125
-//X-MOD: limits
+
 #define CGX_MINHUNKMEGS 112
+#define CGX_MAX_RATE 99999
+#define CGX_MAX_FPS 333
 
 #if CGX_DEBUG 
 #define D_Printf(x) CG_Printf x

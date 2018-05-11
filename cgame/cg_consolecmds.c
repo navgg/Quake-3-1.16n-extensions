@@ -133,6 +133,20 @@ static void CGX_Xmod_f(void) {
 	CGX_Xmod(command);
 }
 
+static void CGX_Download_f(void) {
+	char	name[MAX_QPATH];
+	trap_Args( name, MAX_QPATH );
+	
+	if (!*name) {
+		CG_Printf("usage: download <mapname>\n");
+		return;
+	}
+
+	name[strlen(name) - 1] = 0;
+
+	CGX_GenerateMapBat(name);
+}
+
 typedef struct {
 	char	*cmd;
 	void	(*function)(void);
@@ -163,7 +177,7 @@ static consoleCommand_t	commands[] = {
 	{ "loaddefered", CG_LoadDeferredPlayers },	// spelled wrong, but not changing for demo...
 	// X-MOD: save shared config command
 	{ "writesharedconfig", CGX_SaveSharedConfig_f },
-	//{ "recordsync", CGX_RecordSync_f },
+	{ "download", CGX_Download_f },
 	{ "autorecord", CGX_RecordSync_f },	
 	{ "xmod", CGX_Xmod_f },
 };

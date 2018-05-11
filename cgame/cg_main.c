@@ -73,7 +73,6 @@ vmCvar_t	cgx_sharedConfig;
 
 vmCvar_t	com_maxfps;
 vmCvar_t	cl_maxpackets;
-vmCvar_t	cgx_rate;
 vmCvar_t	cgx_delag;
 
 vmCvar_t	cgx_debug;
@@ -399,8 +398,6 @@ void CG_RegisterCvars( void ) {
 
 	sv_fps.integer = 20;
 
-	CG_Printf("%i", ArrLen(g_color_table_ex));
-
 	//save current picmip
 	CGX_SavePicmip();
 }
@@ -449,16 +446,11 @@ void CG_UpdateCvars( void ) {
 
 		trap_Cvar_Update( cv->vmCvar );
 	}
-
+	//X-MOD: validate maxpackets
 	if (cl_maxpackets.integer < CGX_MIN_MAXPACKETS) {
-		trap_Print(va("Min cl_maxpackets is %i\n", CGX_MIN_MAXPACKETS));
 		cl_maxpackets.integer = CGX_MIN_MAXPACKETS;
-		trap_Cvar_Set("cl_maxpackets", "30");
-	}
-	if (com_maxfps.integer > 500) {
-		com_maxfps.integer = 500;
-		trap_Print(va("Max com_maxfps is %i\n", 500));
-		trap_Cvar_Set("com_maxfps", "500");
+		CG_Printf("Min cl_maxpackets is %i\n", CGX_MIN_MAXPACKETS);
+		trap_Cvar_Set("cl_maxpackets", va("%i", CGX_MIN_MAXPACKETS));
 	}
 
 	// check for modications here
@@ -503,9 +495,9 @@ void CG_UpdateCvars( void ) {
 		D_Printf(("^6CG_UpdateCvars value changed\n"));
 	}
 	
-	//track fps change
+	//track fps change & validate
 	if (cgx_fps_modificationCount != com_maxfps.modificationCount) {
-		cgx_fps_modificationCount = com_maxfps.modificationCount;
+		cgx_fps_modificationCount = com_maxfps.modificationCount;		
 
 		CGX_AutoAdjustNetworkSettings();
 	}

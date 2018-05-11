@@ -5,7 +5,7 @@
 cg_wideScreenFix 0|1|2|3 - fix perspective for widescreen 0: no fixes 1: fix only icons 2: fix only fov 3: fix fov and icons
 cg_defaultWeapon 0-9 - default weapon when spawn 0: default 1: gauntlet ...
 cg_centerPrintAlpha 1.0-0 - center print transparency
-cg_crosshairColor 0-35 - crosshair color "" - default, 0: black 1: red 2: green etc.
+cg_crosshairColor 0-35 - crosshair color "" - default, 0: black 1: red 2: green etc. 
 		or words "green", "red", "yellow", "white", "cyan", "magenta", "blue", "black"
 cg_drawSpeed 0|1|2 - speedometer 0: off 1: top corner 2: center screen
 cg_deadBodyDarken 0|1|2|3 - pm skins becomes gray after death 0: off 1: Just grey 2: BT709 Greyscale 3: Y-Greyscale (PAL/NTSC)
@@ -13,15 +13,15 @@ cg_chatSound 0|1|2 - chat beep sound 0: off 1: on 2: only team
 cg_noTaunt 0|1 - enemy taunt sound
 cg_nomip -1|0 - if it's -1 all objects will have r_picmip 0 regardless of current r_picmip settings
 cg_drawGun 0|1|2 - 0: no gun 1: bobbing gun 2: static gun no bobbing
-cg_enemyModel "" - forcing enemy model "keel/pm", "thankjr" etc. if it's empty and cg_enemyModel_enabled = 1 then
+cg_enemyModel "" - forcing enemy model "keel/pm", "thankjr" etc. if it's empty and cg_enemyModel_enabled = 1 then 
 		it will get pm skins for current player model eg. player model visor/blue it will make him visor/pm + specified colors
 cg_enemyColors "" - use "green", "red", "yellow", "white", "cyan", "magenta", "blue", "black" 
-		or following pattern "1234" 1-rail 2-head 3-torso 4-legs (colors from 0 to 7 or any letter for extended color table,
+		or following pattern "1234" 1-rail 2-head 3-torso 4-legs (colors from 0 to 7 or any letter for extended color table, 
 		special symbols ? - color depending on team (1 - red, 4 - blue, 2- ffa), ! - same as ? but use specific rail color of client, 
 		* - random color 0-7, . - random extended color 0-35)
-cg_enemyModel_enabled 0|1 - enemy model on\off 0: off 1: on(spectators off, intermission on)
-		2: on+spectators on+intermission on
-		3: on+spectators off+intermission off
+cg_enemyModel_enabled 0|1 - enemy model on\off 0: off 1: on(spectators off, intermission on) 
+		2: on+spectators on+intermission on 
+		3: on+spectators off+intermission off 
 		4: on+spectators on+intermission off
 cg_teamModel "" - same as cg_enemyModel but for team
 cg_teamColors "" - same as cg_enemyColors but for team
@@ -38,7 +38,9 @@ cg_sharedConfig 0|1 - fixes problem with saving configs after game exit in 1.16n
 writesharedconfig - writes q3config.cfg to baseq3 folder (command do the following 
 		"writeconfig ..\\baseq3\\q3config.cfg" - if playing on modded server,
 		"writeconfig q3config.cfg" - if playing on default quake 3 server)
-autorecord - start record demo (command do the following "g_syncronousClients 1; record <demoname>; g_syncronousClients 0")
+autorecord - start record demo (command do the following "g_syncronousClients 1; record <demoname>; g_syncronousClients 0") 
 		to stop record type \stoprecord to play type \demo <demoname>
 colorlist - 0: black, 1: red, 2: green, 3: yellow, 4: blue  5: cyan, 6: magenta, 7: white
+download - generates download_map.bat script in quake 3 game folder for specified map, 
+		run this script to download map from web
 xmod - quick info & help on mod commands, usage \xmod <command>

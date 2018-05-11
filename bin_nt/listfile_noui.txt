@@ -4,4 +4,7 @@ vm\cgame.qvm
 icons\*
 scripts\crosshair.shader
 scripts\players.shader
+scripts\13box.arena
+levelshots\
+maps\
 default.cfg

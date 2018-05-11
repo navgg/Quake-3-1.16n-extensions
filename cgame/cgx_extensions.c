@@ -400,27 +400,47 @@ void CGX_MapRestart() {
 	D_Printf(("^6CGX_MapRestart\n"));
 }
 
+static qboolean CGX_ValidateFPS(void) {
+	if (!com_maxfps.integer) {
+		trap_Cvar_Set("com_maxfps", "125");		
+		return qfalse;
+	} else if (com_maxfps.integer > CGX_MAX_FPS) {
+		com_maxfps.integer = CGX_MAX_FPS;		
+		CG_Printf("Max com_maxfps is %i\n", CGX_MAX_FPS);
+		trap_Cvar_Set("com_maxfps", va("%i", CGX_MAX_FPS));		
+		return qfalse;
+	}
+
+	return qtrue;
+}
+
 #define NET_Set(x, y) { CG_Printf("Auto: %s %i\n", x, y); trap_Cvar_Set(x, va("%i", y)); }
+static void CGX_Auto_sv_fps(void) {
+	if (sv_fps.integer < 40)
+		sv_fps.integer = 40;
+	else if (sv_fps.integer > 125)
+		sv_fps.integer = 125;
+
+	NET_Set("sv_fps", sv_fps.integer)
+}
+
 void CGX_AutoAdjustNetworkSettings(void) {
 	static int info_showed = 0;
 
 	D_Printf(("CGX_AutoAdjustNetworkSettings %i\n", cgx_networkAdjustments.integer));
 
 	if (cgx_networkAdjustments.integer) {
-		int i, minRate = 5000, minSnaps, k;
-		char buf[10];		
+		int i, minRate, minSnaps, k;
+		char buf[10];
 		
 		//adjust sv_fps for local game
 		if (cgs.localServer) {
-			if (sv_fps.integer < 40)
-				sv_fps.integer = 40;
-			else if (sv_fps.integer > 125)
-				sv_fps.integer = 125;
-
-			NET_Set("sv_fps", sv_fps.integer)
-		
+			CGX_Auto_sv_fps();
 			return;
 		}
+
+		if (!CGX_ValidateFPS())
+			return;
 
 		i = 0;		
 
@@ -440,7 +460,7 @@ void CGX_AutoAdjustNetworkSettings(void) {
 			// if it's something lower than 100 - adjust
 			if (cl_maxpackets.integer < 100)
 				while ((i = com_maxfps.integer / k++) > 60);			
-		} else if (cgx_networkAdjustments.integer == 3) {
+		} else {
 			k = 1;
 			minRate = 25000;			
 
@@ -473,9 +493,11 @@ void CGX_AutoAdjustNetworkSettings(void) {
 		// check and set rate
 		trap_Cvar_VariableStringBuffer("rate", buf, sizeof(buf));
 		i = atoi(buf);
-
+		
 		if (i < minRate)
 			NET_Set("rate", minRate)
+		else if (i > CGX_MAX_RATE) // no point in more than 25k rate, just for beautiful adjust in playerlist
+			NET_Set("rate", CGX_MAX_RATE)
 
 		if (cgx_networkAdjustments.integer == 3)
 			NET_Set("cl_packetdup", 0)
@@ -692,25 +714,40 @@ void CGX_SaveSharedConfig(qboolean forced) {
 }
 
 // generate script to open url to worldspawn to download map
-void CGX_GenerateMapBat(void) {
+void CGX_GenerateMapBat(char *map) {
 	fileHandle_t f;
+	char	path[1024];
+	trap_Cvar_VariableStringBuffer("fs_basepath", path, sizeof(path));
 
-	trap_Print("Generating "CGX_MAPBAT"...");
+	trap_Print("Generating "CGX_MAPBAT"...\n");
 
 	trap_FS_FOpenFile("..\\"CGX_MAPBAT, &f, FS_WRITE);
 
 	if (f) {
-		char *buf;		
+		char *buf;
+		qboolean answer = qfalse;
 
 		/*buf = va("echo \"Download .pk3 file and put in baseq3 game folder\"\r\nexplorer \""CGX_MAPURL"%s/\"\r\npause",
 		cgs.mapname_clean);		*/
-		buf = va("explorer \""CGX_MAPURL"%s/\"", cgs.mapname_clean);
+		if (!*map)
+			map = cgs.mapname_clean;
+		else
+			answer = qtrue;
+
+		buf = va("explorer \""CGX_MAPURL"%s/\"", map);
 		trap_FS_Write(buf, strlen(buf), f);
 
 		trap_FS_FCloseFile(f);
+
+		trap_Print(CGX_MAPBAT" generated successfully\n");
+
+		if (answer) {			
+			XMOD_ANSWER(va("Open folder %s", path));
+			XMOD_ANSWER("And start ^2"CGX_MAPBAT);
+		}
 	}
 	else {
-		trap_Print("WARNING: Couldn't open a file "CGX_MAPBAT);
+		trap_Print("^1Couldn't open a file "CGX_MAPBAT"\n");
 	}
 }
 

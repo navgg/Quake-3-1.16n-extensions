@@ -1,0 +1,28 @@
+_______________
+test_bigbox CTF
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+Game			: Quake 3 Arena
+Map Title		: test_bigbox CTF (by sst13)
+Map Filename		: 13box.bsp
+Relase Date		: 23. March 2009
+
+Author			: Stefan Scholz "aka sst13 / [FDK]Railraver"
+e-Mail			: sst13@gmx.de
+Author Homepage		: http://www.sst13.de
+
+Description		: CTF version of test_bigbox
+
+Player			: 2-8
+Gametypes		: CTF
+Botsupport		: Yes
+
+New Textures		: No
+New Shaders		: No
+New Sounds		: No
+New Models		: No
+
+Editor(s) used		: Q3Radiant v2.02 , Q3Map Explorer, q3map2 v2.5.14
+Compile Machine		: 1800+GHz with 1GB RAM
+Compile Time		: 3 sec
+
+Credits			: id Software, PQ Editig Forum, all Quake Zockers...

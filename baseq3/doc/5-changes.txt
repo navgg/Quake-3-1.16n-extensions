@@ -61,4 +61,6 @@ fixed colored hostnames on loading
 
 ...
 
+added \download <mapname> (generates download_map.bat in quake3 game folder)
+
 fixed enemy colors restoring after team changing
