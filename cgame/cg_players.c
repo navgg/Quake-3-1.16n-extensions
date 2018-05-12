@@ -651,7 +651,7 @@ void CG_NewClientInfo( int clientNum ) {
 	//sett models and skins
 	if (cgx_enemyModel_enabled.integer && cg.clientNum != clientNum && cgs.gametype != GT_SINGLE_PLAYER) {
 		D_Printf(("^5CG_NewClientInfo '%i' '%s'\n", clientNum, configstring));
-		CGX_EnemyModelCheck(&newInfo, qfalse, clientNum);
+		CGX_CheckEnemyModel(&newInfo, qfalse, clientNum);
 	}
 
 	// scan for an existing clientinfo that matches this modelname

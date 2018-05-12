@@ -472,9 +472,8 @@ void CG_UpdateCvars( void ) {
 			D_Printf(("^6cg_enemyModel_enabled 1\n"));
 		}
 		else {
-			CGX_Init_enemyModels();
-			CGX_Init_teamModels();
-			CGX_EnemyModelCheckAll();
+			CGX_Init_enemyModels();			
+			CGX_CheckEnemyModelAll();
 			D_Printf(("^6CG_UpdateCvars value changed\n"));
 		}
 
@@ -1087,7 +1086,6 @@ void CG_Init( int serverMessageNum, int serverCommandSequence ) {
 	cg.oldTeam = -1;
 	
 	CGX_Init_enemyModels();
-	CGX_Init_teamModels();
 	CGX_Init_vScreen();
 
 	// get the gamestate from the client system
@@ -1156,8 +1154,6 @@ void CG_Shutdown( void ) {
 			trap_Cvar_Set("r_vertexLight", "0");
 		CGX_IncreaseHunkmegs(CGX_MINHUNKMEGS); // prolly hunkmegs		
 	}
-
-	//CGX_SaveSharedConfig();
 
 	// some mods may need to do cleanup work here,
 	// like closing files or archiving session data

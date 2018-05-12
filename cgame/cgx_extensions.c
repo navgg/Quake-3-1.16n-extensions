@@ -24,6 +24,7 @@ static qboolean EM_Check(int x) {
 	return i & x;
 }
 
+//init virtual screen for widescreen or 4:3
 void CGX_Init_vScreen(void) {	
 	// get the rendering configuration from the client system
 	trap_GetGlconfig( &cgs.glconfig );
@@ -58,56 +59,38 @@ void CGX_Init_vScreen(void) {
 	D_Printf(("CGX_Init_vScreen %ix%i cgx_wideScreenFix %i\n", vScreen.width, SCREEN_HEIGHT, cgx_wideScreenFix.integer));	
 }
 
-void CGX_Init_enemyModels(void) {
+static void CGX_ParseEnemyModelSetting(char *modelDest, char *skinDest, char *cvarStr) {
 	char modelStr[MAX_QPATH];
 	char *slash;	
 
-	if (cgs.gametype == GT_SINGLE_PLAYER)
-		return;
-
-	Q_strncpyz(modelStr, cgx_enemyModel.string, sizeof(modelStr));
+	Q_strncpyz(modelStr, cvarStr, sizeof modelStr);
 
 	slash = strchr( modelStr, '/' );
 	if ( !slash ) {
 		// modelName didn not include a skin name				
-		Q_strncpyz(cg.enemySkin, "", sizeof(cg.enemySkin));
+		Q_strncpyz(skinDest, "", sizeof modelStr);
 	} else {		
-		Q_strncpyz(cg.enemySkin, slash + 1, sizeof(cg.enemySkin));
+		Q_strncpyz(skinDest, slash + 1, sizeof modelStr);
 		// truncate modelName
 		*slash = 0;
 	}
 
-	Q_strncpyz(cg.enemyModel, modelStr, sizeof(cg.enemyModel));	
-
-	D_Printf(("CGX_Init_enemyModels cg.enemyModel: %s cg.enemySkin: %s\n", cg.enemyModel, cg.enemySkin));
+	Q_strncpyz(modelDest, modelStr, sizeof modelStr);	
 }
 
-void CGX_Init_teamModels(void) {
-	char modelStr[MAX_QPATH];
-	char *slash;	
-
+//init cg.enemyModel cg.teamModel & skin values
+void CGX_Init_enemyModels(void) {
 	if (cgs.gametype == GT_SINGLE_PLAYER)
 		return;
 
-	Q_strncpyz(modelStr, cgx_teamModel.string, sizeof(modelStr));
-
-	slash = strchr( modelStr, '/' );
-	if ( !slash ) {
-		// modelName didn not include a skin name		
-		Q_strncpyz(cg.teamSkin, "", sizeof(cg.teamSkin));
-	} else {		
-		Q_strncpyz(cg.teamSkin, slash + 1, sizeof(cg.teamSkin));
-		// truncate modelName
-		*slash = 0;
-	}
-
-	Q_strncpyz(cg.teamModel, modelStr, sizeof(cg.teamModel));	
-
-	D_Printf(("CGX_Init_teamModels cg.teamModel: %s cg.teamSkin: %s\n", cg.teamModel, cg.teamSkin));
+	CGX_ParseEnemyModelSetting(cg.enemyModel, cg.enemySkin, cgx_enemyModel.string);
+	CGX_ParseEnemyModelSetting(cg.teamModel, cg.teamSkin, cgx_teamModel.string);
+	D_Printf(("cg.enemyModel: %s cg.enemySkin: %s\n", cg.enemyModel, cg.enemySkin));
+	D_Printf(("cg.teamModel: %s cg.teamSkin: %s\n", cg.teamModel, cg.teamSkin));
 }
 
-//checks enemy models of all clients
-void CGX_EnemyModelCheckAll(void) {
+//checks enemy models of all clients and loads if needed
+void CGX_CheckEnemyModelAll(void) {
 	int		i;
 	clientInfo_t	*ci;
 
@@ -124,7 +107,7 @@ void CGX_EnemyModelCheckAll(void) {
 	//change models and skins if needed or restore
 	for ( i = 0, ci = cgs.clientinfo ; i < cgs.maxclients ; i++, ci++ )
 		if (ci->infoValid) {
-			CGX_EnemyModelCheck(ci, qtrue, i);
+			CGX_CheckEnemyModel(ci, qtrue, i);
 			CGX_SetSkinColors(ci);
 		}
 	
@@ -210,6 +193,8 @@ static void CGX_SetColorInfo(clientInfo_t *info, const char *color) {
 		for (i = 0; i < 3; i++)
 			info->color[i] = (float)info->colors[0][i] / 255.0f;
 	}
+
+	D_Printf(("^6Colors\n"));
 }
 
 //sets skin color for client
@@ -223,8 +208,6 @@ void CGX_SetSkinColors(clientInfo_t *ci) {
 		CGX_SetColorInfo(ci, cgx_enemyColors.string);
 	else
 		CGX_SetColorInfo(ci, cgx_teamColors.string);
-
-	D_Printf(("^6Colors\n"));
 }
 
 //restore real model and skin if needed and return result
@@ -330,11 +313,10 @@ static qboolean CGX_SetModelAndSkin(clientInfo_t *ci, qboolean isDeferred, int c
 }
 
 //checks and sets enemymodel or restores real
-void CGX_EnemyModelCheck(clientInfo_t *ci, qboolean isDeferred, int clientNum) {	
+void CGX_CheckEnemyModel(clientInfo_t *ci, qboolean isDeferred, int clientNum) {	
 	// skip emtpy clientInfo 
 	if (!ci->modelName[0] || !ci->skinName[0]) {
 		D_Printf(("^7Skip '%i' '%s' '%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->infoValid, ci->deferred));
-		return;
 	} else {
 		qboolean isSpect = ci->team == TEAM_SPECTATOR && !EM_Check(EM_SPECT);
 		qboolean isPlayer = qfalse;
@@ -372,20 +354,20 @@ void CGX_TrackEnemyModelChanges() {
 		cg.clientNum = cg.snap->ps.clientNum;
 		cg.oldTeam = cgs.clientinfo[cg.clientNum].team;
 				
-		CGX_EnemyModelCheckAll();
+		CGX_CheckEnemyModelAll();
 		D_Printf(("^6cg.clientNum %i\n", cg.clientNum));
 	} // track team change
 	else if (cg.oldTeam != cgs.clientinfo[cg.clientNum].team) {
 		cg.oldTeam = cgs.clientinfo[cg.clientNum].team;
 
-		CGX_EnemyModelCheckAll();
+		CGX_CheckEnemyModelAll();
 		D_Printf(("^6TEAM CHANGED!\n"));
 	} //track intermission change
 	else if (cg.snap->ps.pm_type == PM_INTERMISSION && !cg.clientIntermission &&
 		EM_Check(EM_INTERMISSION)) {
 		cg.clientIntermission = qtrue;
 
-		CGX_EnemyModelCheckAll();
+		CGX_CheckEnemyModelAll();
 		D_Printf(("^6PM_INTERMISSION!\n"));
 	}
 }
@@ -397,7 +379,7 @@ void CGX_MapRestart() {
 
 	// X-MOD: send modinfo
 	CGX_SendModinfo();	
-	CGX_EnemyModelCheckAll();	
+	CGX_CheckEnemyModelAll();	
 	D_Printf(("^6CGX_MapRestart\n"));
 }
 
@@ -425,6 +407,7 @@ static void CGX_Auto_sv_fps(void) {
 	NET_Set("sv_fps", sv_fps.integer)
 }
 
+//validate and adjust client network settings
 void CGX_AutoAdjustNetworkSettings(void) {
 	static int info_showed = 0;
 
@@ -894,7 +877,7 @@ void CGX_LoadClientInfo( clientInfo_t *ci ) {
 	CGX_NomipEnd();
 }
 
-//safety open file
+//safety open file, -1 unlim size
 static int CGX_FOpenFile(char *filename, fileHandle_t *f, fsMode_t mode, int maxSize) {
 	int len;
 	len = trap_FS_FOpenFile( filename, f, mode );
@@ -1060,7 +1043,7 @@ void CGX_Xmod(char *command) {
 
 	if (!Q_stricmp(command, "e ")) {
 		XMOD_ANSWER("checking enemy models...");
-		CGX_EnemyModelCheckAll();
+		CGX_CheckEnemyModelAll();
 		return;
 	} 
 
