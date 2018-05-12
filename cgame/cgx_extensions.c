@@ -815,7 +815,7 @@ qboolean CGX_IsPure() {
 	}
 }
 
-#define IsQ3Map(x) (x[0] == 'q' || x[0] == 'Q') && x[1] == '3'
+#define IsQ3Map(x) ((x[0] == 'q' || x[0] == 'Q') && x[1] == '3')
 //save mapname and try load aganin with fix
 void CGX_TryLoadingFix() {
 	if (IsQ3Map(cgs.mapname_clean))
