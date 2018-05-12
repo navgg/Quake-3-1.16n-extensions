@@ -159,8 +159,13 @@ void CG_DrawInformation( void ) {
 	//X-MOD: draw version
 	{
 		vec4_t	xmodcol = { 1.0f, 0.1f, 0.1f, CGX_BP_NUMBER / 55.0f };
-		UI_DrawProportionalString(vScreen.width - 8, SCREEN_HEIGHT - SMALLCHAR_HEIGHT - 8, CGX_NAME" "CGX_VERSION, 
+		UI_DrawProportionalString(vScreen.width - 8, SCREEN_HEIGHT - SMALLCHAR_HEIGHT - 8, CGX_NAME" "CGX_VERSION,
 			UI_RIGHT | UI_SMALLFONT, xmodcol);
+#ifdef CGX_WIN 
+		{ vec4_t vercol = { 0.1f, 1.0f, 0.1f, CGX_BP_NUMBER };
+		UI_DrawProportionalString(vScreen.width - 8, SCREEN_HEIGHT - SMALLCHAR_HEIGHT - 8, "     "" "CGX_VERSION,
+			UI_RIGHT | UI_SMALLFONT | UI_PULSE, vercol); }
+#endif
 	}
 
 	// draw the icons of thiings as they are loaded
@@ -186,7 +191,7 @@ void CG_DrawInformation( void ) {
 		char col;
 		// server hostname
 		s = Info_ValueForKey( info, "sv_hostname" );
-		col = CGX_ServerNameFixInfoLoad(s);
+		col = CGX_ServerNameFixInfoLoad((char*)s);
 		UI_DrawProportionalString( vScreen.hwidth, y, s,
 			UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, g_color_table[ColorIndex(col)] );
 		y += PROP_HEIGHT;

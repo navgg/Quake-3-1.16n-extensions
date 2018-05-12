@@ -10,8 +10,8 @@
 #define	Q3_VERSION		"Q3 1.16n"
 // X-MOD constants
 #define CGX_NAME		"X-Mod"
-#define CGX_VERSION		"0.91b"
-#define CGX_DATE		"May 09 2018" //__DATE__ not working with dd/mm/yyyy format
+#define CGX_VERSION		"0.92b"
+#define CGX_DATE		"12 May 2018" //__DATE__ not working with dd/mm/yyyy format
 #define CGX_DEBUG		0
 #define	CGX_UNLAGGED	1//0 not wokring
 #define CGX_NOGHOST_COMPATIBLE CVAR_USERINFO
@@ -34,6 +34,14 @@
 //unlagged - lag simulation #2
 #define MAX_LATENT_CMDS 64
 //unlagged - lag simulation #2
+
+#if !defined(Q3_VM) && defined(_WIN32)
+#define CGX_WIN
+#define CGX_SYSTEM	"Win"
+#else
+#define CGX_SYSTEM	"Qvm"
+#endif
+#define CGX_FULLVER		CGX_NAME" "CGX_VERSION" "CGX_SYSTEM
 
 //#define MISSION_PACK
 
@@ -589,9 +597,9 @@ void	Q_strcat( char *dest, int size, const char *src );
 
 // X-MOD: externsions
 char *QX_trim(char *str);
-//char QX_StringToColor(const char *s);
-//char* QX_GetHostnameSpacesFix(char *string);
-//char *QX_CleanStrHostnameFix( char *string )
+char QX_StringToColor(const char *s);
+char* QX_GetHostnameSpacesFix(char *string);
+//char *QX_CleanStrHostnameFix(const char *string);
 //moved from ai_dmq3.h
 //strstr but case insensitive
 char *stristr(char *str, char *charset);

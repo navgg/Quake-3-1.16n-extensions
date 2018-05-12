@@ -1009,9 +1009,9 @@ void UI_Init( void ) {
 	if (i == 300)
 		trap_Cmd_ExecuteText(EXEC_APPEND, "uix_cinematicplayed -1\n");
 	else if (i == 200)
-		trap_Cmd_ExecuteText(EXEC_APPEND, "uix_cinematicplayed -1; levelselect\n");
+		trap_Cmd_ExecuteText(EXEC_APPEND, "uix_cinematicplayed -1; wait 3; levelselect\n");
 	else if (i >= 100)
-		trap_Cmd_ExecuteText(EXEC_APPEND, va("uix_cinematicplayed -1; ui_cinematics %iq\n", i - 100));	
+		trap_Cmd_ExecuteText(EXEC_APPEND, va("uix_cinematicplayed -1; wait 3; ui_cinematics %iq\n", i - 100));	
 }
 
 /*

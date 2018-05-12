@@ -275,6 +275,12 @@ extern char	*ui_medalPicNames[];
 extern char	*ui_medalSounds[];
 
 //
+// uix_extensions.c
+//
+
+void UIX_CommonStatusBar(void *self, int min, int total, const char* info_messages[][2]);
+
+//
 // ui_mfield.c
 //
 extern void			MField_Clear( mfield_t *edit );

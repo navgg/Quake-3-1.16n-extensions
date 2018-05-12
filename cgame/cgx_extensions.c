@@ -10,38 +10,19 @@
 #define EM_SPECT			2
 #define EM_INTERMISSION		4
 
+static void CGX_Delay( int msec ) {
+	CG_Printf( "Delay for %i start...\n", msec );
+	msec += trap_Milliseconds();	
+	while (msec > trap_Milliseconds());
+	CG_Printf( "Delay end\n" );
+}
+
 // instead of modes 1 2 4 6 will be 1 2 3 4
 static qboolean EM_Check(int x) {
 	int i = cgx_enemyModel_enabled.integer;
 	i = i == 3 ? i = 4 : i == 4 ? i = 6 : i;	
 	return i & x;
 }
-
-static char *known_models[] = {
-	"anarki",
-	"biker",
-	"bitterman",
-	"bones",
-	"crash",
-	"doom",
-	"grunt",
-	"hunter",
-	"keel",
-	"klesk",
-	"lucy",
-	"major",
-	"mynx",
-	"orbb",
-	"ranger",
-	"razor",
-	"sarge",
-	"slash",
-	"sorlag",
-	"tankjr",
-	"uriel",
-	"visor",
-	"xaero"
-};
 
 void CGX_Init_vScreen(void) {	
 	// get the rendering configuration from the client system
@@ -74,7 +55,7 @@ void CGX_Init_vScreen(void) {
 	vScreen.width48 = vScreen.width - 48;
 	vScreen.width5 = vScreen.width - 5;
 
-	D_Printf(("CGX_Init_vScreen %fx%f cgx_wideScreenFix %d\n", vScreen.width, SCREEN_HEIGHT, cgx_wideScreenFix.integer));	
+	D_Printf(("CGX_Init_vScreen %ix%i cgx_wideScreenFix %i\n", vScreen.width, SCREEN_HEIGHT, cgx_wideScreenFix.integer));	
 }
 
 void CGX_Init_enemyModels(void) {
@@ -125,28 +106,44 @@ void CGX_Init_teamModels(void) {
 	D_Printf(("CGX_Init_teamModels cg.teamModel: %s cg.teamSkin: %s\n", cg.teamModel, cg.teamSkin));
 }
 
-void CGX_EnemyModelCheck(void) {
+//checks enemy models of all clients
+void CGX_EnemyModelCheckAll(void) {
 	int		i;
 	clientInfo_t	*ci;
+
+	if (cgs.gametype == GT_SINGLE_PLAYER)
+		return;
 
 	if (cg.clientNum == -1) {
 		D_Printf(("^1CGX_EnemyModelCheck before clientNum init\n"));
 		return;
 	}
 
-	if (cgs.gametype == GT_SINGLE_PLAYER)
-		return;
-
 	D_Printf(("CGX_EnemyModelCheck %i\n", cg.clientNum));	
 
 	//change models and skins if needed or restore
 	for ( i = 0, ci = cgs.clientinfo ; i < cgs.maxclients ; i++, ci++ )
-		if (ci->infoValid)
-			CGX_SetModelAndSkin(ci, qtrue, i);
+		if (ci->infoValid) {
+			CGX_EnemyModelCheck(ci, qtrue, i);
+			CGX_SetSkinColors(ci);
+		}
 	
 	D_Printf(("CG_LoadDeferredPlayers\n"));
 
 	CG_LoadDeferredPlayers();
+}
+
+//sets skin colors for all clients
+void CGX_SetSkinColorsAll(void) {
+	int i;
+	clientInfo_t *ci;
+
+	if (cgs.gametype == GT_SINGLE_PLAYER)		
+		return;
+
+	for (i = 0, ci = cgs.clientinfo; i < cgs.maxclients; i++, ci++)
+		if (cg.clientNum != i && ci->infoValid)
+			CGX_SetSkinColors(ci);
 }
 
 static void CGX_ColorFromChar(char v, byte *color, clientInfo_t *info) {
@@ -215,70 +212,38 @@ static void CGX_SetColorInfo(clientInfo_t *info, const char *color) {
 	}
 }
 
-void CGX_Init_enemyAndTeamColors(void) {
-	int i;
-	clientInfo_t *ci;
+//sets skin color for client
+void CGX_SetSkinColors(clientInfo_t *ci) {
+	qboolean isSameTeam = qfalse;	
 
-	if (cg.oldTeam == TEAM_SPECTATOR || cgs.gametype == GT_SINGLE_PLAYER)		
-		return;
+	if (cg.clientNum >= 0)
+		isSameTeam = cgs.gametype >= GT_TEAM && cgs.clientinfo[cg.clientNum].team == ci->team;
 
-	for (i = 0, ci = cgs.clientinfo; i < cgs.maxclients; i++, ci++)
-		if (cg.clientNum == i)
-			continue;
-		else if (cgs.gametype < GT_TEAM || ci->team != cgs.clientinfo[cg.clientNum].team)
-			CGX_SetColorInfo(ci, cgx_enemyColors.string);
-		else
-			CGX_SetColorInfo(ci, cgx_teamColors.string);
+	if (!isSameTeam)
+		CGX_SetColorInfo(ci, cgx_enemyColors.string);
+	else
+		CGX_SetColorInfo(ci, cgx_teamColors.string);
+
+	D_Printf(("^6Colors\n"));
 }
 
 //restore real model and skin if needed and return result
 #define IsSameModel(x) !Q_stricmp(x->modelName, x->modelNameCopy) && !Q_stricmp(x->skinName, x->skinNameCopy)
-static qboolean CGX_RestoreModelAndSkin(clientInfo_t *ci, int clientNum, qboolean isDeferred) {
-	qboolean isSpect = ci->team == TEAM_SPECTATOR && !EM_Check(EM_SPECT);
-	qboolean isPlayer = qfalse;
-	qboolean isPlayerSpect = qfalse;
-
-	//skip emtpy models
-	if (!ci->modelName[0]) {
-		D_Printf(("^1SKIP %i\n", clientNum));
+static qboolean CGX_RestoreModelAndSkin(clientInfo_t *ci, qboolean isDeferred) {
+	if (IsSameModel(ci))		
 		return qfalse;
-	}
 
-	if (cg.clientNum >= 0) {		
-		isPlayerSpect = cgs.clientinfo[cg.clientNum].team == TEAM_SPECTATOR && !EM_Check(EM_SPECT);
-		isPlayer = cg.clientNum == clientNum;
-	}
+	Q_strncpyz(ci->modelName, ci->modelNameCopy, sizeof(ci->modelName));
+	Q_strncpyz(ci->skinName, ci->skinNameCopy, sizeof(ci->skinName));
 
-	//if disabled or its spect or it's own model or player is in spect
-	if (!cgx_enemyModel_enabled.integer || isSpect || isPlayerSpect || isPlayer || 
-		cg.clientIntermission) {
-		if (IsSameModel(ci)) {
-			D_Printf(("^3OK %i\n", clientNum));
-			return qtrue;
-		}
+	Vector4Copy(ci->colorCopy, ci->color);
 
-		Q_strncpyz(ci->modelName, ci->modelNameCopy, sizeof(ci->modelName));
-		Q_strncpyz(ci->skinName, ci->skinNameCopy, sizeof(ci->skinName));
+	ci->deferred = isDeferred;
 
-		Vector4Copy(ci->colorCopy, ci->color);
-
-		ci->deferred = isDeferred;
-
-		D_Printf(("^3Restore '%i' '%s/%s' '%s/%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->modelNameCopy, ci->skinNameCopy, ci->infoValid, ci->deferred));
-		return qtrue;
-	}
-
-	return qfalse;
+	return qtrue;
 }
 
-
 static void CGX_SetModel(clientInfo_t *ci, char *modelName) {
-	//save copy
-	if (!ci->modelNameCopy[0])
-		Q_strncpyz(ci->modelNameCopy, ci->modelName, sizeof(ci->modelName));
-	if (!ci->skinNameCopy[0])
-		Q_strncpyz(ci->skinNameCopy, ci->skinName, sizeof(ci->skinName));
-
 	//if model not specified get from copy
 	if (!modelName[0])
 		Q_strncpyz(ci->modelName, ci->modelNameCopy, sizeof(ci->modelName));		
@@ -287,6 +252,31 @@ static void CGX_SetModel(clientInfo_t *ci, char *modelName) {
 }
 
 static qboolean CGX_IsKnownModel(const char *modelName) {
+	static char *known_models[] = {
+		"anarki",
+		"biker",
+		"bitterman",
+		"bones",
+		"crash",
+		"doom",
+		"grunt",
+		"hunter",
+		"keel",
+		"klesk",
+		"lucy",
+		"major",
+		"mynx",
+		"orbb",
+		"ranger",
+		"razor",
+		"sarge",
+		"slash",
+		"sorlag",
+		"tankjr",
+		"uriel",
+		"visor",
+		"xaero"
+	};
 	int i;
 	for (i = 0; i < ArrLen(known_models); i++)
 		if (Q_stricmp(modelName, known_models[i]) == 0)
@@ -312,52 +302,63 @@ static void CGX_SetSkin(clientInfo_t *ci, char *skinName) {
 	// if gametype is not team\ctf or skin pm set it, otherwise red\blue will be used 
 }
 
-#undef IsSameModel
-#define IsSameModel(x, y, z) (!Q_stricmp(x->modelName, y) && !Q_stricmp(x->skinName, z)) || \
+#define IsSameModel2(x, y, z) (!Q_stricmp(x->modelName, y) && !Q_stricmp(x->skinName, z)) || \
  (!*y && !Q_stricmp(x->modelName, x->modelNameCopy) && !Q_stricmp(x->skinName, "pm"))
-void CGX_SetModelAndSkin(clientInfo_t *ci, qboolean isDeferred, int clientNum) {	
-	qboolean isSameTeam = qfalse;	
-
-	// skip emtpy clientInfo 
-	if (!ci->modelName[0]) {
-		D_Printf(("^1Skip '%i' '%s' '%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->infoValid, ci->deferred));
-		return;
-	}
-
-	//if model was restored then exit
-	if (CGX_RestoreModelAndSkin(ci, clientNum, isDeferred))
-		return;
+static qboolean CGX_SetModelAndSkin(clientInfo_t *ci, qboolean isDeferred, int clientNum) {
+	qboolean isSameTeam = qfalse;
 
 	if (cg.clientNum >= 0)
 		isSameTeam = cgs.gametype >= GT_TEAM && cgs.clientinfo[cg.clientNum].team == ci->team;
-
-	if (!isSameTeam) {		
-		if (IsSameModel(ci, cg.enemyModel, cg.enemySkin)) {			
-			if (cgs.gametype >= GT_TEAM)
-				CGX_SetColorInfo(ci, cgx_enemyColors.string);
-			D_Printf(("^2OK %i\n", clientNum));
-			return;
-		}
+		
+	if (!isSameTeam) {
+		if (IsSameModel2(ci, cg.enemyModel, cg.enemySkin))
+			return qfalse;
 
 		CGX_SetModel(ci, cg.enemyModel);
 		CGX_SetSkin(ci, cg.enemySkin);
-		CGX_SetColorInfo(ci, cgx_enemyColors.string);
 	} else {
-		if (IsSameModel(ci, cg.teamModel, cg.teamSkin)) {
-			if (cgs.gametype >= GT_TEAM)
-				CGX_SetColorInfo(ci, cgx_teamColors.string);
-			D_Printf(("^2OK %i\n", clientNum));
-			return;
-		}
+		if (IsSameModel2(ci, cg.teamModel, cg.teamSkin))
+			return qfalse;
 
 		CGX_SetModel(ci, cg.teamModel);
 		CGX_SetSkin(ci, cg.teamSkin);
-		CGX_SetColorInfo(ci, cgx_teamColors.string);
 	}
 
 	ci->deferred = isDeferred;
-	
-	D_Printf(("^2Set '%i' '%s/%s' '%s/%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->modelNameCopy, ci->skinNameCopy, ci->infoValid, ci->deferred));
+
+	return qtrue;
+}
+
+//checks and sets enemymodel or restores real
+void CGX_EnemyModelCheck(clientInfo_t *ci, qboolean isDeferred, int clientNum) {	
+	// skip emtpy clientInfo 
+	if (!ci->modelName[0] || !ci->skinName[0]) {
+		D_Printf(("^7Skip '%i' '%s' '%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->infoValid, ci->deferred));
+		return;
+	} else {
+		qboolean isSpect = ci->team == TEAM_SPECTATOR && !EM_Check(EM_SPECT);
+		qboolean isPlayer = qfalse;
+		qboolean isPlayerSpect = qfalse;
+
+		if (cg.clientNum >= 0) {		
+			isPlayerSpect = cgs.clientinfo[cg.clientNum].team == TEAM_SPECTATOR && !EM_Check(EM_SPECT);
+			isPlayer = cg.clientNum == clientNum;
+		}
+
+		if (!cgx_enemyModel_enabled.integer || isSpect || isPlayerSpect || isPlayer || cg.clientIntermission) {
+			if (CGX_RestoreModelAndSkin(ci, isDeferred)) {
+				D_Printf(("^3Restore '%i' '%s/%s' '%s/%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->modelNameCopy, ci->skinNameCopy, ci->infoValid, ci->deferred));				
+			} else {
+				D_Printf(("^3OK %i\n", clientNum));
+			}
+		} else {
+			if (CGX_SetModelAndSkin(ci, isDeferred, clientNum)) {
+				D_Printf(("^2Set '%i' '%s/%s' '%s/%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->modelNameCopy, ci->skinNameCopy, ci->infoValid, ci->deferred));
+			} else {
+				D_Printf(("^2OK %i\n", clientNum));
+			}
+		}
+	}
 }
 
 // tracking changes, only after cg.snap received
@@ -371,20 +372,20 @@ void CGX_TrackEnemyModelChanges() {
 		cg.clientNum = cg.snap->ps.clientNum;
 		cg.oldTeam = cgs.clientinfo[cg.clientNum].team;
 				
-		CGX_EnemyModelCheck();
+		CGX_EnemyModelCheckAll();
 		D_Printf(("^6cg.clientNum %i\n", cg.clientNum));
 	} // track team change
 	else if (cg.oldTeam != cgs.clientinfo[cg.clientNum].team) {
 		cg.oldTeam = cgs.clientinfo[cg.clientNum].team;
 
-		CGX_EnemyModelCheck();
+		CGX_EnemyModelCheckAll();
 		D_Printf(("^6TEAM CHANGED!\n"));
 	} //track intermission change
 	else if (cg.snap->ps.pm_type == PM_INTERMISSION && !cg.clientIntermission &&
 		EM_Check(EM_INTERMISSION)) {
 		cg.clientIntermission = qtrue;
 
-		CGX_EnemyModelCheck();
+		CGX_EnemyModelCheckAll();
 		D_Printf(("^6PM_INTERMISSION!\n"));
 	}
 }
@@ -396,7 +397,7 @@ void CGX_MapRestart() {
 
 	// X-MOD: send modinfo
 	CGX_SendModinfo();	
-	CGX_EnemyModelCheck();	
+	CGX_EnemyModelCheckAll();	
 	D_Printf(("^6CGX_MapRestart\n"));
 }
 
@@ -600,17 +601,10 @@ void CGX_CheckChatCommand(const char *str) {
 			tens = seconds / 10;
 			seconds -= tens * 10;
 
-			trap_SendConsoleCommand(va("say ^7"CGX_NAME" v"CGX_VERSION" (%i:%i%i)\n", mins, tens, seconds));
+			trap_SendConsoleCommand(va("say ^7"CGX_FULLVER" (%i:%i%i)\n", mins, tens, seconds));
 		}
 	} 
 }
-
-//static void CGX_Delay( int msec ) {
-//	CG_Printf( "Delay for %i start...\n", msec );
-//	msec += trap_Milliseconds();	
-//	while (msec > trap_Milliseconds());
-//	CG_Printf( "Delay end\n" );
-//}
 
 // check for unlagged enabled\disabled for bma\nms
 // send modinfo in initialsnapshot and check result here
@@ -667,7 +661,7 @@ void CGX_SendModinfo(void) {
 #if CGX_NEMESIS_COMPATIBLE
 	if (isNemesis && !isNemesisRegistered) {
 		//send info about clietn to nemesis servs
-		trap_Cvar_Register(&cgx_cgame, "cgame", CGX_NAME" "CGX_VERSION, CVAR_INIT | CVAR_ROM | CVAR_TEMP | CVAR_USERINFO);		
+		trap_Cvar_Register(&cgx_cgame, "cgame", CGX_FULLVER, CVAR_INIT | CVAR_ROM | CVAR_TEMP | CVAR_USERINFO);		
 		trap_Cvar_Register(&cgx_uinfo, "cg_uinfo", "", CVAR_INIT | CVAR_ROM | CVAR_TEMP | CVAR_USERINFO );
 		trap_Cvar_Set("cg_uinfo", va("%i %i 0", cl_timeNudge.integer, cl_maxpackets.integer));
 
@@ -1066,7 +1060,7 @@ void CGX_Xmod(char *command) {
 
 	if (!Q_stricmp(command, "e ")) {
 		XMOD_ANSWER("checking enemy models...");
-		CGX_EnemyModelCheck();
+		CGX_EnemyModelCheckAll();
 		return;
 	} 
 

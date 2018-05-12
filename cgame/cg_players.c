@@ -411,7 +411,7 @@ static void CG_CopyClientInfoModel( clientInfo_t *from, clientInfo_t *to ) {
 	memcpy( to->animations, from->animations, sizeof( to->animations ) );
 	memcpy( to->sounds, from->sounds, sizeof( to->sounds ) );
 
-	//CG_Printf("CG_CopyClientInfoModel '%s' -> '%s' '%s' -> '%s'\n", from->modelName, to->modelName, from->skinName, to->skinName);	
+	D_Printf(("CG_CopyClientInfoModel '%s' -> '%s' '%s' -> '%s'\n", from->modelName, to->modelName, from->skinName, to->skinName));
 }
 
 /*
@@ -645,15 +645,13 @@ void CG_NewClientInfo( int clientNum ) {
 	//save original models
 	Q_strncpyz( newInfo.skinNameCopy, newInfo.skinName, sizeof( newInfo.skinName ) );
 	Q_strncpyz( newInfo.modelNameCopy, newInfo.modelName, sizeof( newInfo.modelName ) );	
+
 	//save original railgun
 	VectorCopy(newInfo.color, newInfo.colorCopy);
-	//change models and skins if needed or restore
-	//CG_Printf("ni '%i' '%s' '%s' '%i' '%i'\n", clientNum, newInfo.modelName, newInfo.skinName, newInfo.infoValid, newInfo.deferred);
-	//CG_Printf("ci '%i' '%s' '%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->infoValid, ci->deferred);
+	//sett models and skins
 	if (cgx_enemyModel_enabled.integer && cg.clientNum != clientNum && cgs.gametype != GT_SINGLE_PLAYER) {
-		//D_Printf(("CG_NewClientInfo %i\n", clientNum));
 		D_Printf(("^5CG_NewClientInfo '%i' '%s'\n", clientNum, configstring));
-		CGX_SetModelAndSkin(&newInfo, qfalse, clientNum);
+		CGX_EnemyModelCheck(&newInfo, qfalse, clientNum);
 	}
 
 	// scan for an existing clientinfo that matches this modelname
@@ -687,6 +685,9 @@ void CG_NewClientInfo( int clientNum ) {
 	// replace whatever was there with the new one
 	newInfo.infoValid = qtrue;
 	*ci = newInfo;
+
+	//X-MOD: set color info, only here works fine in win32
+	CGX_SetSkinColors(ci);
 }
 
 /*

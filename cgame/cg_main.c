@@ -362,7 +362,7 @@ cvarTable_t		cgx_cvarTable_temp[] = {
 	// stored fixed maplist, so if it once was fixed nextime will just read from this list
 	{ &cgx_fixedmaps, "cl_fixedmaps", "", CVAR_ROM | CVAR_ARCHIVE },
 	//mod version
-	{ &cgx_version, "cgx_version", CGX_NAME" "CGX_VERSION" "CGX_DATE, CVAR_INIT | CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
+	{ &cgx_version, "cgx_version", CGX_FULLVER" "CGX_DATE, CVAR_INIT | CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
 	//for unlagged.c
 	//better not register here or servefs will screw clients sv_fps
 	// this will be automagically copied from the server	
@@ -474,7 +474,7 @@ void CG_UpdateCvars( void ) {
 		else {
 			CGX_Init_enemyModels();
 			CGX_Init_teamModels();
-			CGX_EnemyModelCheck();
+			CGX_EnemyModelCheckAll();
 			D_Printf(("^6CG_UpdateCvars value changed\n"));
 		}
 
@@ -491,7 +491,7 @@ void CG_UpdateCvars( void ) {
 		cgx_teamColorsModificationCount = cgx_teamColors.modificationCount;
 		cgx_deadBodyDarkenModificationCount = cgx_deadBodyDarken.modificationCount;		
 
-		CGX_Init_enemyAndTeamColors();	
+		CGX_SetSkinColorsAll();	
 		D_Printf(("^6CG_UpdateCvars value changed\n"));
 	}
 	
@@ -1150,7 +1150,7 @@ void CG_Shutdown( void ) {
 	D_Printf(("cgx_last_error %s\n", cgx_last_error));
 
 	if (cgx_last_error[0] == '1') {// error during loading collision map
-		CGX_GenerateMapBat();
+		CGX_GenerateMapBat("");
 	} else if (cgx_last_error[0] == '2') { // error during loadworld map
 		if (cgx_maploadingfix.integer)
 			trap_Cvar_Set("r_vertexLight", "0");

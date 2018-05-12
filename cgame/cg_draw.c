@@ -703,7 +703,7 @@ static float CGX_DrawAcc( float y ) {
 #if CGX_DEBUG
 static float CG_DrawFreeMem(float y) {
 	char *s;
-	int i, w;
+	int  w;
 
 	s = va("Mem: %i Mb", trap_MemoryRemaining() / 1024 / 1024);
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;	
@@ -1003,14 +1003,12 @@ static void CG_DrawUpperRight( void ) {
 	if (cgx_debug.integer > 1) {
 		y = CGX_DrawDebugInfo(y);
 	}
+
+	y = CG_DrawFreeMem(y);
 #endif
 	if ( cg_drawAttacker.integer ) {
 		y = CG_DrawAttacker( y );
 	}
-
-#if CGX_DEBUG
-	y = CG_DrawFreeMem(y);
-#endif
 }
 
 /*

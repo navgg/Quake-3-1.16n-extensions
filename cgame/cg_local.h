@@ -1006,36 +1006,39 @@ qboolean CG_Cvar_ClampInt( const char *name, vmCvar_t *vmCvar, int min, int max 
 //
 // cgx_extensions.c
 //
-void CGX_SendModinfo(void);
-void CGX_SetModelAndSkin(clientInfo_t *ci, qboolean isDeferred, int clientNum);
-
-//void CGX_AutoAdjustNetworkSettings(void);
-//void CGX_CheckChatCommand(const char *str);
-//qboolean CGX_CheckModInfo(const char *str);
-//void CGX_EnemyModelCheck(void);
-//void CGX_GenerateMapBat(void);
-//void CGX_IncreaseHunkmegs(int min);
-//void CGX_Init_enemyAndTeamColors(void);
-//void CGX_Init_enemyModels(void);
-//void CGX_Init_teamModels(void);
-//void CGX_Init_vScreen(void);
-//qboolean CGX_IsPure();
-//void CGX_LoadClientInfo(clientInfo_t *ci );
-//void CGX_LoadCollisionMap();
-//void CGX_LoadWorldMap();
-//void CGX_MapRestart();
-//void CGX_NomipEnd();
-//void CGX_NomipStart();
-//void CGX_SavePicmip();
-//void CGX_SaveSharedConfig(qboolean forced);
 //void CGX_SendModinfo(void);
-//char CGX_ServerNameFixInfoLoad(char *str);
 //void CGX_SetModelAndSkin(clientInfo_t *ci, qboolean isDeferred, int clientNum);
-//void CGX_SyncServer_delagHitscan(const char * info);
-//void CGX_SyncServer_sv_fps(const char *info);
-//void CGX_TrackEnemyModelChanges();
-//void CGX_TryLoadingFix();
-//void CGX_Xmod(char *command);
+
+void CG_LoadClientInfo( clientInfo_t *ci );
+
+qboolean CGX_IsPure();
+qboolean CGX_CheckModInfo(const char *str);
+void CGX_CheckChatCommand(const char *str);
+void CGX_AutoAdjustNetworkSettings(void);
+void CGX_EnemyModelCheckAll(void);
+void CGX_GenerateMapBat(char *map);
+void CGX_IncreaseHunkmegs(int min);
+void CGX_SetSkinColors(clientInfo_t *ci);
+void CGX_SetSkinColorsAll(void);
+void CGX_Init_enemyModels(void);
+void CGX_Init_teamModels(void);
+void CGX_Init_vScreen(void);
+void CGX_LoadClientInfo(clientInfo_t *ci );
+void CGX_LoadCollisionMap();
+void CGX_LoadWorldMap();
+void CGX_MapRestart();
+void CGX_NomipEnd();
+void CGX_NomipStart();
+void CGX_SavePicmip();
+void CGX_SaveSharedConfig(qboolean forced);
+void CGX_SendModinfo(void);
+char CGX_ServerNameFixInfoLoad(char *str);
+void CGX_EnemyModelCheck(clientInfo_t *ci, qboolean isDeferred, int clientNum);
+void CGX_SyncServer_delagHitscan(const char * info);
+void CGX_SyncServer_sv_fps(const char *info);
+void CGX_TrackEnemyModelChanges();
+void CGX_TryLoadingFix();
+void CGX_Xmod(char *command);
 
 //
 // cg_main.c
