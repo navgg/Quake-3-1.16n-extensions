@@ -98,11 +98,11 @@ void CGX_CheckEnemyModelAll(void) {
 		return;
 
 	if (cg.clientNum == -1) {
-		D_Printf(("^1CGX_EnemyModelCheck before clientNum init\n"));
+		D_Printf(("^CGX_CheckEnemyModelAll before clientNum init\n"));
 		return;
 	}
 
-	D_Printf(("CGX_EnemyModelCheck %i\n", cg.clientNum));	
+	D_Printf(("CGX_CheckEnemyModelAll %i\n", cg.clientNum));	
 
 	//change models and skins if needed or restore
 	for ( i = 0, ci = cgs.clientinfo ; i < cgs.maxclients ; i++, ci++ )
@@ -280,9 +280,9 @@ static void CGX_SetPMSkin(clientInfo_t *ci) {
 static void CGX_SetSkin(clientInfo_t *ci, char *skinName) {	
 	if (!skinName[0]) //if no skin set pm
 		CGX_SetPMSkin(ci);
-	else if (cgs.gametype < GT_TEAM || !Q_stricmp(skinName, "pm"))
-		Q_strncpyz(ci->skinName, skinName, sizeof(ci->skinName));
-	// if gametype is not team\ctf or skin pm set it, otherwise red\blue will be used 
+	else/* if (cgs.gametype < GT_TEAM || !Q_stricmp(skinName, "pm"))*/ //doesnt work
+		Q_strncpyz(ci->skinName, skinName, sizeof(ci->skinName)); //set whatever specified
+	/// if gametype is not team\ctf or skin pm set it, otherwise red\blue will be used 
 }
 
 #define IsSameModel2(x, y, z) (!Q_stricmp(x->modelName, y) && !Q_stricmp(x->skinName, z)) || \
@@ -704,8 +704,6 @@ void CGX_GenerateMapBat(char *map) {
 		char *buf;
 		qboolean answer = qfalse;
 
-		/*buf = va("echo \"Download .pk3 file and put in baseq3 game folder\"\r\nexplorer \""CGX_MAPURL"%s/\"\r\npause",
-		cgs.mapname_clean);		*/
 		if (!*map)
 			map = cgs.mapname_clean;
 		else
