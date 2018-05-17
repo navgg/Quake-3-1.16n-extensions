@@ -733,7 +733,9 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	}
 
 	//X-MOD: track enemy model changes here, since cg.snap received
-	CGX_TrackEnemyModelChanges();
+	if (cgx_enemyModel_enabled.integer)
+		CGX_TrackEnemyModelChanges();
+
 
 	// let the client system know what our weapon and zoom settings are
 	trap_SetUserCmdValue( cg.weaponSelect, cg.zoomSensitivity );

@@ -1006,8 +1006,6 @@ qboolean CG_Cvar_ClampInt( const char *name, vmCvar_t *vmCvar, int min, int max 
 //
 // cgx_extensions.c
 //
-//void CGX_SendModinfo(void);
-//void CGX_SetModelAndSkin(clientInfo_t *ci, qboolean isDeferred, int clientNum);
 
 void CG_LoadClientInfo( clientInfo_t *ci );
 

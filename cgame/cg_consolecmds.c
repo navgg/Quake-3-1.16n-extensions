@@ -6,7 +6,6 @@
 #include "cg_local.h"
 
 
-
 void CG_TargetCommand_f( void ) {
 	int		targetNum;
 	char	test[4];
@@ -116,7 +115,7 @@ static void CG_TellAttacker_f( void ) {
 }
 
 static void CGX_SaveSharedConfig_f( void ) {
-	CGX_SaveSharedConfig(qfalse);	
+	CGX_SaveSharedConfig(qtrue);	
 }
 
 static void CGX_RecordSync_f( void ) {
@@ -136,7 +135,7 @@ static void CGX_Xmod_f(void) {
 static void CGX_Download_f(void) {
 	char	name[MAX_QPATH];
 	trap_Args( name, MAX_QPATH );
-	
+
 	if (!*name) {
 		CG_Printf("usage: download <mapname>\n");
 		return;
@@ -144,7 +143,8 @@ static void CGX_Download_f(void) {
 
 	name[strlen(name) - 1] = 0;
 
-	CGX_GenerateMapBat(name);
+	CGX_DownloadMap(name);
+}
 }
 
 typedef struct {

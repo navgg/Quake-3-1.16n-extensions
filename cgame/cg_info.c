@@ -132,6 +132,15 @@ void CG_DrawInformation( void ) {
 	qhandle_t	levelshot;
 	qhandle_t	detail;
 	char		buf[1024];	
+#ifdef CGX_WIN
+	static vec4_t x_vercol = { 0.1, 1.0, 0.1, CGX_BP_NUMBER / 55.0 };
+	qboolean	x_effect = qtrue;
+	#define x_pulse UI_PULSE
+#else
+	static vec4_t x_vercol = { 1.0, 1.0, 0.1, CGX_BP_NUMBER / 55.0 };
+	#define	x_effect qtrue
+	#define x_pulse 0
+#endif
 
 	info = CG_ConfigString( CS_SERVERINFO );
 	sysInfo = CG_ConfigString( CS_SYSTEMINFO );
@@ -139,12 +148,17 @@ void CG_DrawInformation( void ) {
 	s = Info_ValueForKey( info, "mapname" );
 	levelshot = trap_R_RegisterShaderNoMip( va( "levelshots/%s.tga", s ) );
 	if ( !levelshot ) {
+#ifdef CGX_WIN
+		levelshot = trap_R_RegisterShaderNoMip( "menuback" );
+		x_effect = qfalse;
+#else
 		levelshot = trap_R_RegisterShaderNoMip( "menu/art/unknownmap" );
+#endif
 	}
 	trap_R_SetColor( NULL );	
 	
 	//X-MOD: loading effect
-	if (vScreen.width != SCREEN_WIDTH) {
+	if (vScreen.width != SCREEN_WIDTH && x_effect) {
 		vec4_t		color = { 0.1, 0.1, 0.1, 0.1 };	
 		CG_DrawPic(-vScreen.width*2, -SCREEN_HEIGHT*2, vScreen.width*4, SCREEN_HEIGHT*4, levelshot);
 		CG_FillRect(0, 0, vScreen.width, SCREEN_HEIGHT, color);
@@ -158,13 +172,17 @@ void CG_DrawInformation( void ) {
 
 	//X-MOD: draw version
 	{
-		vec4_t	xmodcol = { 1.0f, 0.1f, 0.1f, CGX_BP_NUMBER / 55.0f };
-		UI_DrawProportionalString(vScreen.width - 8, SCREEN_HEIGHT - SMALLCHAR_HEIGHT - 8, CGX_NAME" "CGX_VERSION,
-			UI_RIGHT | UI_SMALLFONT, xmodcol);
+		vec4_t	x_modcol = { 1.0, 0.1, 0.1, CGX_BP_NUMBER / 55.0 };
+		int sw = strlen(CGX_NAME) * SMALLCHAR_WIDTH;
+		UI_DrawProportionalString(vScreen.width - 4 - sw * 2, SCREEN_HEIGHT - SMALLCHAR_HEIGHT - 8, CGX_NAME,
+			UI_RIGHT | UI_SMALLFONT | x_pulse, x_modcol);
+
+		UI_DrawProportionalString(vScreen.width - 8, SCREEN_HEIGHT - SMALLCHAR_HEIGHT - 8, CGX_VERSION,
+			UI_RIGHT | UI_SMALLFONT | x_pulse, x_vercol); 
+
+		//col_cycle(x_vercol, 0.075);
+		//draw download info
 #ifdef CGX_WIN 
-		{ vec4_t vercol = { 0.1f, 1.0f, 0.1f, CGX_BP_NUMBER };
-		UI_DrawProportionalString(vScreen.width - 8, SCREEN_HEIGHT - SMALLCHAR_HEIGHT - 8, "     "" "CGX_VERSION,
-			UI_RIGHT | UI_SMALLFONT | UI_PULSE, vercol); }
 #endif
 	}
 

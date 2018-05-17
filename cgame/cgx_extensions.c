@@ -236,30 +236,9 @@ static void CGX_SetModel(clientInfo_t *ci, char *modelName) {
 
 static qboolean CGX_IsKnownModel(const char *modelName) {
 	static char *known_models[] = {
-		"anarki",
-		"biker",
-		"bitterman",
-		"bones",
-		"crash",
-		"doom",
-		"grunt",
-		"hunter",
-		"keel",
-		"klesk",
-		"lucy",
-		"major",
-		"mynx",
-		"orbb",
-		"ranger",
-		"razor",
-		"sarge",
-		"slash",
-		"sorlag",
-		"tankjr",
-		"uriel",
-		"visor",
-		"xaero"
-	};
+		"anarki", "biker", "bitterman", "bones", "crash", "doom", "grunt", "hunter",
+		"keel", "klesk", "lucy", "major", "mynx", "orbb", "ranger", "razor", "sarge",
+		"slash", "sorlag", "tankjr", "uriel", "visor", "xaero" };
 	int i;
 	for (i = 0; i < ArrLen(known_models); i++)
 		if (Q_stricmp(modelName, known_models[i]) == 0)
@@ -345,10 +324,6 @@ void CGX_CheckEnemyModel(clientInfo_t *ci, qboolean isDeferred, int clientNum) {
 
 // tracking changes, only after cg.snap received
 void CGX_TrackEnemyModelChanges() {
-	// if it's disabled skip
-	if (!cgx_enemyModel_enabled.integer)
-		return;
-
 	// track client num change
 	if (cg.clientNum != cg.snap->ps.clientNum) {
 		cg.clientNum = cg.snap->ps.clientNum;
@@ -709,7 +684,7 @@ void CGX_GenerateMapBat(char *map) {
 		else
 			answer = qtrue;
 
-		buf = va("explorer \""CGX_MAPURL"%s/\"", map);
+		buf = va("explorer \""CGX_MAPURL"%s/\"\ndel "CGX_MAPBAT, map);
 		trap_FS_Write(buf, strlen(buf), f);
 
 		trap_FS_FCloseFile(f);
@@ -724,6 +699,13 @@ void CGX_GenerateMapBat(char *map) {
 	else {
 		trap_Print("^1Couldn't open a file "CGX_MAPBAT"\n");
 	}
+}
+
+void CGX_DownloadMap(char *name) {	
+#ifdef CGX_WIN
+#else
+	CGX_GenerateMapBat(name);
+#endif
 }
 
 //save picmip value
@@ -764,7 +746,7 @@ void CGX_LoadCollisionMap() {
 
 //cheks saved map string
 static qboolean CGX_IsRememberedMap() {
-	char buf[MAX_CVAR_VALUE_STRING];
+	char buf[MAX_INFO_VALUE];
 	char *s, *t;
 
 	trap_Cvar_VariableStringBuffer("cl_fixedmaps", buf, sizeof(buf));
@@ -785,7 +767,7 @@ static qboolean CGX_IsRememberedMap() {
 
 //saves mapname to memory
 static void CGX_RememberBrokenMap() {
-	char buf[MAX_CVAR_VALUE_STRING];
+	char buf[MAX_INFO_VALUE];
 	int i;
 
 	if (CGX_IsRememberedMap())
@@ -977,9 +959,9 @@ static void CGX_ShowHelp(char *filename, char *cmd) {
 					break;
 				*s++ = 0;
 				//print found info
-				CG_Printf("%25s", t);
+				CG_Printf("%-25s", t);
 				if (!(s = strchr(s, '\n')))
-					break;		
+					break;
 				s++;
 			}			
 			trap_Print("\n");
@@ -993,7 +975,8 @@ static void CGX_ShowHelp(char *filename, char *cmd) {
 			}
 		} else {// find info abt command						
 			for (t = buf, i = 0; *t; t++) {
-				t = stristr(t, cmd);				
+				if (!(t = stristr(t, cmd)))
+					break;
 				if (*(t - 1) == '\n') {			
 					s = strchr(t, '-');
 					//if '-' in text find next

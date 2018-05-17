@@ -166,8 +166,8 @@ static char *aimnames[] = {
 #define RAILCTFNAMES_SIZE sizeof(railctfnames) / sizeof(railctfnames[0])
 #define AIMNAMES_SIZE sizeof(aimnames) / sizeof(aimnames[0])
 
-#define CGX_CREDITS_END 6726
-#define DEFAULT_YSTEP 0.4f
+#define CGX_CREDITS_END 6826
+#define DEFAULT_YSTEP 0.406f
 
 typedef struct {
 	menuframework_s	menu;
@@ -394,7 +394,7 @@ static void UI_CreditMenu2_Draw( void ) {
 
 	DRAW_WSTEP1("")
 	//DRAW_WSTEP1("")
-	//DRAW_WSTEP1("")
+	DRAW_WSTEP1("")
 	DRAW_WSTEP1("")
 	DRAW_WSTEP1("")
 	DRAW_RSTEP1("Special thanks to")
@@ -414,7 +414,9 @@ static void UI_CreditMenu2_Draw( void ) {
 	DRAW_WSTEP1("Challenge World & The ProMode Team")	
 	DRAW_WSTEP1("for CPMA")
 	DRAW_WSTEP1("sst13")
-	DRAW_WSTEP1("for 13box map")
+	DRAW_WSTEP1("for cool maps")
+	DRAW_WSTEP1("q3df.org")
+	DRAW_WSTEP1("for worldspawn archive")
 	DRAW_WSTEP1("Id Software")
 	DRAW_WSTEP1("for Awesome Game")
 	DRAW_WSTEP1("Sonic Mayhem")
