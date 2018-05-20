@@ -565,6 +565,10 @@ void CG_NewClientInfo( int clientNum ) {
 	v = Info_ValueForKey( configstring, "c1" );
 	CG_ColorFromString( v, newInfo.color );
 
+	//add 1 to c1 since in 1.16 no c2
+	if (*v) ((char*)v)[0]++;
+	CG_ColorFromString( v, newInfo.color2 );
+
 	// bot skill
 	v = Info_ValueForKey( configstring, "skill" );
 	newInfo.botSkill = atoi( v );

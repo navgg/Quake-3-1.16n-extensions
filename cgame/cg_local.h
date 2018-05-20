@@ -68,6 +68,12 @@
 #define CGX_MINHUNKMEGS 112
 #define CGX_MAX_RATE 99999
 #define CGX_MAX_FPS 333
+//cg_weaponEffects
+#define WE_RAIL32		1
+#define	WE_RAILSIMPLE	2
+#define	WE_PLASMA32		4
+#define	WE_LG32			8
+#define	WE_ROCKET32		16
 
 #if CGX_DEBUG 
 #define D_Printf(x) CG_Printf x
@@ -269,6 +275,7 @@ typedef struct {
 	int				botSkill;		// 0 = not bot, 1-5 = bot
 
 	vec3_t			color;
+	vec3_t			color2;
 
 	int				score;			// updated by score servercmds
 	int				location;		// location index for team mode
@@ -882,6 +889,7 @@ extern	vmCvar_t		cgx_networkAdjustments;
 extern	vmCvar_t		cgx_drawScoreBox;
 extern	vmCvar_t		cgx_scoreboard;
 extern	vmCvar_t		cgx_drawAccuracy;
+extern	vmCvar_t		cgx_weaponEffects;
 extern	vmCvar_t		cgx_nomip;
 extern	vmCvar_t		cgx_sharedConfig;
 
@@ -1192,6 +1200,24 @@ void	CG_ImpactMark( qhandle_t markShader,
 				    float r, float g, float b, float a, 
 					qboolean alphaFade, 
 					float radius, qboolean temporary );
+
+//
+// cg_particles.c
+//
+
+void	CG_ClearParticles (void);
+void	CG_AddParticles (void);
+void	CG_ParticleSnow (qhandle_t pshader, vec3_t origin, vec3_t origin2, int turb, float range, int snum);
+void	CG_ParticleSmoke (qhandle_t pshader, centity_t *cent);
+void	CG_AddParticleShrapnel (localEntity_t *le);
+void	CG_ParticleSnowFlurry (qhandle_t pshader, centity_t *cent);
+void	CG_ParticleBulletDebris (vec3_t	org, vec3_t vel, int duration);
+void	CG_ParticleSparks (vec3_t org, vec3_t vel, int duration, float x, float y, float speed);
+void	CG_ParticleDust (centity_t *cent, vec3_t origin, vec3_t dir);
+void	CG_ParticleMisc (qhandle_t pshader, vec3_t origin, int size, int duration, float alpha);
+void	CG_ParticleExplosion (char *animStr, vec3_t origin, vec3_t vel, int duration, int sizeStart, int sizeEnd);
+extern qboolean		initparticles;
+int CG_NewParticleArea ( int num );
 
 //
 // cg_localents.c

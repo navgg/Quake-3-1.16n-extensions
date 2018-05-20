@@ -32,6 +32,9 @@ cg_networkAdjustments 0|1|2|3 - 0: off 1: min rate 8000 packets 30 or sv_fps+10 
 cg_drawScoreBox 0|1 - display score box in low right corner
 cg_scoreboard 0|1|2 - scoreboard type 0: default large-small 1: always small 2: quake 3 vanilla (no ids, no ping colors)
 cg_drawAccuracy 0|1 - total weapon accuracy
+cg_weaponEffects 0-32 - 0: off 1: railbeam + spin 2: simple railbeam 
+		4: plasma 8: lightning 16: rocket explosion (all effects from 1.32) 
+		additive value eg. 10=rail+lg, 26=rail+lg+rocket etc.
 cg_sharedConfig 0|1 - fixes problem with saving configs after game exit in 1.16n 
 		(0: off 1: automatically saves q3config.cfg to baseq3 folder after pressing 'leave arena' or 'exit game', 
 		to save manually use command \writesharedconfig)
@@ -40,7 +43,7 @@ writesharedconfig - writes q3config.cfg to baseq3 folder (command do the followi
 		"writeconfig q3config.cfg" - if playing on default quake 3 server)
 autorecord - start record demo (command do the following "g_syncronousClients 1; record <demoname>; g_syncronousClients 0") 
 		to stop record type \stoprecord to play type \demo <demoname>
-colorlist - 0: black, 1: red, 2: green, 3: yellow, 4: blue  5: cyan, 6: magenta, 7: white
-download - generates download_map.bat script in quake 3 game folder for specified map, 
+download - generates script in quake 3 game folder for specified map, 
 		run this script to download map from web
+colorlist - 0: black, 1: red, 2: green, 3: yellow, 4: blue  5: cyan, 6: magenta, 7: white
 xmod - quick info & help on mod commands, usage \xmod <command>

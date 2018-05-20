@@ -68,6 +68,7 @@ vmCvar_t	cgx_networkAdjustments;
 vmCvar_t	cgx_drawScoreBox;
 vmCvar_t	cgx_scoreboard;
 vmCvar_t	cgx_drawAccuracy;
+vmCvar_t	cgx_weaponEffects;
 vmCvar_t	cgx_nomip;
 vmCvar_t	cgx_sharedConfig;
 
@@ -282,6 +283,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_scoreboard, "cg_scoreboard", "0", CVAR_ARCHIVE },
 	{ &cgx_drawScoreBox, "cg_drawScoreBox", "1", CVAR_ARCHIVE },
 	{ &cgx_drawAccuracy, "cg_drawAccuracy", "0", CVAR_ARCHIVE },
+	{ &cgx_weaponEffects, "cg_weaponEffects", "8", CVAR_ARCHIVE },
 	{ &cgx_sharedConfig, "cg_sharedConfig", "0", CVAR_ARCHIVE },
 	{ &cgx_nomip, "cg_nomip", "-1", CVAR_ARCHIVE | CVAR_LATCH },
 #if CGX_UNLAGGED
@@ -983,6 +985,9 @@ static void CG_RegisterGraphics( void ) {
 		cgs.gameModels[i] = trap_R_RegisterModel( modelName );
 		D_Printf(("^6cgs.gameModels %i %s\n", i, modelName));		
 	}
+
+	if (cgx_weaponEffects.integer)
+		CG_ClearParticles ();
 
 	CGX_NomipEnd();
 }

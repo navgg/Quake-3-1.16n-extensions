@@ -10,6 +10,8 @@
 #define EM_SPECT			2
 #define EM_INTERMISSION		4
 
+#define trap_Cvar_Get(x,y) trap_Cvar_VariableStringBuffer(x, y, sizeof y)
+
 static void CGX_Delay( int msec ) {
 	CG_Printf( "Delay for %i start...\n", msec );
 	msec += trap_Milliseconds();	
@@ -443,14 +445,14 @@ void CGX_AutoAdjustNetworkSettings(void) {
 		minSnaps = sv_fps.integer > 20 ? sv_fps.integer : 40;
 
 		// check and set snaps		
-		trap_Cvar_VariableStringBuffer("snaps", buf, sizeof(buf));
+		trap_Cvar_Get("snaps", buf);
 		i = atoi(buf);
 
 		if (i < minSnaps)
 			NET_Set("snaps", minSnaps)
 
 		// check and set rate
-		trap_Cvar_VariableStringBuffer("rate", buf, sizeof(buf));
+		trap_Cvar_Get("rate", buf);
 		i = atoi(buf);
 		
 		if (i < minRate)
@@ -520,7 +522,7 @@ void CGX_SyncServer_sv_fps(const char *info) {
 	if (!sv_fps.integer) {
 		char buf[4];
 		// get sv_fps if server sent it
-		trap_Cvar_VariableStringBuffer("sv_fps", buf, sizeof(buf));
+		trap_Cvar_Get("sv_fps", buf);
 		sv_fps.integer = atoi(buf);
 		//on some servs fps coming to sv_fps client value, on some stored in server info
 		//try get from server info first, then from client
@@ -642,14 +644,14 @@ void CGX_SendModinfo(void) {
 void CGX_SaveSharedConfig(qboolean forced) {
 	if (cgx_sharedConfig.integer || forced) {
 		char buf[32];
-		trap_Cvar_VariableStringBuffer("version", buf, 8);
+		trap_Cvar_Get("version", buf);
 
-		if (Q_stricmp(buf, "Q3 1.16") != 0) {
+		if (!stristr(buf, "1.16")) {
 			trap_Print(va("Version %s skip shared config save\n", buf));
 			return;
 		}
 
-		trap_Cvar_VariableStringBuffer("fs_game", buf, sizeof(buf));		
+		trap_Cvar_Get("fs_game", buf);		
 
 		if (!buf[0]) {
 			trap_Print("Saving shared config... Mod: baseq3\n");
@@ -668,8 +670,8 @@ void CGX_SaveSharedConfig(qboolean forced) {
 // generate script to open url to worldspawn to download map
 void CGX_GenerateMapBat(char *map) {
 	fileHandle_t f;
-	char	path[1024];
-	trap_Cvar_VariableStringBuffer("fs_basepath", path, sizeof(path));
+	char	path[MAX_INFO_VALUE];
+	trap_Cvar_Get("fs_basepath", path);
 
 	trap_Print("Generating "CGX_MAPBAT"...\n");
 
@@ -684,7 +686,7 @@ void CGX_GenerateMapBat(char *map) {
 		else
 			answer = qtrue;
 
-		buf = va("explorer \""CGX_MAPURL"%s/\"\ndel "CGX_MAPBAT, map);
+		buf = va("explorer \""CGX_MAPURL"%s/\"\ndel \"%%~f0\"", map);
 		trap_FS_Write(buf, strlen(buf), f);
 
 		trap_FS_FCloseFile(f);
@@ -728,7 +730,7 @@ void CGX_NomipEnd() {
 
 void CGX_IncreaseHunkmegs(int min) {
 	char buf[8];
-	trap_Cvar_VariableStringBuffer("com_hunkMegs", buf, sizeof(buf));
+	trap_Cvar_Get("com_hunkMegs", buf);
 
 	if (min > atoi(buf))
 		trap_Cvar_Set("com_hunkMegs", va("%i", min));
@@ -749,7 +751,7 @@ static qboolean CGX_IsRememberedMap() {
 	char buf[MAX_INFO_VALUE];
 	char *s, *t;
 
-	trap_Cvar_VariableStringBuffer("cl_fixedmaps", buf, sizeof(buf));
+	trap_Cvar_Get("cl_fixedmaps", buf);
 
 	for (t = s = buf; *t; t = s ) {
 		s = strchr(s, ' ');
@@ -773,7 +775,7 @@ static void CGX_RememberBrokenMap() {
 	if (CGX_IsRememberedMap())
 		return;	
 
-	trap_Cvar_VariableStringBuffer("cl_fixedmaps", buf, sizeof(buf));
+	trap_Cvar_Get("cl_fixedmaps", buf);
 
 	i = strlen(buf);
 	Com_sprintf(buf + i, sizeof(buf) - i, "%s ", cgs.mapname_clean);
@@ -785,7 +787,7 @@ qboolean CGX_IsPure() {
 	qboolean isPure;
 	char buf[4];
 
-	trap_Cvar_VariableStringBuffer("sv_pure", buf, sizeof(buf));
+	trap_Cvar_Get("sv_pure", buf);
 	isPure = atoi(buf);
 	if (cgs.localServer && isPure && cgx_networkAdjustments.integer) {
 		trap_Cvar_Set("sv_pure", "0");
@@ -1018,6 +1020,7 @@ static void CGX_ShowHelp(char *filename, char *cmd) {
 	}
 }
 
+#define help_file "doc\\2-comand_list.txt"
 //xmod command
 void CGX_Xmod(char *command) {
 	int i;
@@ -1039,7 +1042,7 @@ void CGX_Xmod(char *command) {
 	if (!Q_stricmp(command, "version")) {
 		XMOD_ANSWER(cgx_version.string);
 	} else if (!Q_stricmp(command, "help")) {
-		CGX_ShowHelp("doc\\2-comand_list.txt", "");
+		CGX_ShowHelp(help_file, "");
 	} else if (stristr(command, "8ball")) {
 		char *balls[] = {
 			"listen to your heart",
@@ -1052,7 +1055,7 @@ void CGX_Xmod(char *command) {
 	} else if (!Q_stricmp(command, "coin")) {
 		XMOD_ANSWER(rand() % 100 >= 50 ? "true": "false");
 	} else {
-		CGX_ShowHelp("doc\\2-comand_list.txt", command);
+		CGX_ShowHelp(help_file, command);
 	}
 }
 

@@ -61,6 +61,10 @@ fixed colored hostnames on loading
 
 ...
 
-added \download <mapname> (generates download_map.bat in quake3 game folder)
+added \download <mapname> (generates script in quake3 game folder to download map)
+added \cg_weaponEffects 0-32 0: off 1: railbeam + spin 2: simple railbeam 
+	4: plasma 8: lightning 16: rocket explosion (all effects from 1.32)
+	additive value eg. 10=rail+lg, 26=rail+lg+rocket etc.
 
 fixed enemy colors restoring after team changing
+fixed cg_nomip for weapon models\effects
