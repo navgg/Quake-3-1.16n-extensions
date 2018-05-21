@@ -356,6 +356,15 @@ vmCvar_t	cgx_r_picmip;
 vmCvar_t	r_vertexLight;
 vmCvar_t	r_picmip;
 
+vmCvar_t	cgx_downloadedbytes;
+vmCvar_t	cgx_totalbytes;
+vmCvar_t	cgx_downloadname;
+vmCvar_t	cgx_dl_host;
+vmCvar_t	cgx_dl_page;
+vmCvar_t	cgx_dl_page;
+vmCvar_t	cgx_dl_dynb;
+vmCvar_t	cgx_dl_tobaseq3;
+
 cvarTable_t		cgx_cvarTable_temp[] = {
 	//handle map loading errors
 	{ &cgx_last_error, "cgx_last_error", "", CVAR_TEMP | CVAR_ROM },
@@ -373,6 +382,15 @@ cvarTable_t		cgx_cvarTable_temp[] = {
 	//{ &sv_fps, "sv_fps", "20", 0 },
 	{ &r_vertexLight, "r_vertexLight", "0", 0 },	
 	{ &r_picmip, "r_picmip", "0", 0 },
+
+	//for downloader
+	{ &cgx_downloadedbytes, "cgx_downloadedbytes", "", CVAR_TEMP | CVAR_ROM },
+	{ &cgx_totalbytes, "cgx_totalbytes", "", CVAR_TEMP | CVAR_ROM },
+	{ &cgx_downloadname, "cgx_downloadname", "", CVAR_TEMP | CVAR_ROM },
+	{ &cgx_dl_dynb, "cgx_dl_dynb", "1", CVAR_TEMP },
+	{ &cgx_dl_host, "cgx_dl_host", "ws.q3df.org", CVAR_TEMP },
+	{ &cgx_dl_page, "cgx_dl_page", "/maps/download/%s", CVAR_TEMP },
+	{ &cgx_dl_tobaseq3, "cgx_dl_tobaseq3", "1", CVAR_TEMP },
 };
 
 /*

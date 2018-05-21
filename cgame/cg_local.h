@@ -902,12 +902,21 @@ extern	vmCvar_t		cgx_debug;
 
 //some temp info
 extern	vmCvar_t		cgx_version;
+extern	vmCvar_t		cgx_last_error;
 
 extern	vmCvar_t		cgx_maploadingfix;
 extern	vmCvar_t		cgx_r_picmip;
 
 extern	vmCvar_t		r_vertexLight;
 extern	vmCvar_t		r_picmip;
+
+extern	vmCvar_t		cgx_downloadedbytes;
+extern	vmCvar_t		cgx_totalbytes;
+extern	vmCvar_t		cgx_downloadname;
+extern	vmCvar_t		cgx_dl_host;
+extern	vmCvar_t		cgx_dl_page;
+extern	vmCvar_t		cgx_dl_dynb;
+extern	vmCvar_t		cgx_dl_tobaseq3;
 
 extern	vmCvar_t		cg_centertime;
 extern	vmCvar_t		cg_runpitch;
@@ -1046,6 +1055,7 @@ void CGX_SyncServer_sv_fps(const char *info);
 void CGX_TrackEnemyModelChanges();
 void CGX_TryLoadingFix();
 void CGX_Xmod(char *command);
+void CGX_DownloadMap(char *name, qboolean end_load);
 void CGX_ChatFilter(char *str);
 
 //

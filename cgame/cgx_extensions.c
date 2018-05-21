@@ -12,6 +12,8 @@
 
 #define trap_Cvar_Get(name,v) trap_Cvar_VariableStringBuffer(name, v, sizeof v)
 
+#define dl_tempname	"{X-Mod}download.tmp"
+
 //file i/o
 static int CGX_FCopy(char *filename, char *dest);
 static qboolean CGX_FExists(char* filename);
@@ -68,6 +70,8 @@ void CGX_Init_vScreen(void) {
 
 	D_Printf(("CGX_Init_vScreen %ix%i cgx_wideScreenFix %i\n", vScreen.width, SCREEN_HEIGHT, cgx_wideScreenFix.integer));	
 }
+
+#pragma region Xmod enemy models
 
 static void CGX_ParseEnemyModelSetting(char *modelDest, char *skinDest, char *cvarStr) {
 	char modelStr[MAX_QPATH];
@@ -357,6 +361,9 @@ void CGX_TrackEnemyModelChanges() {
 	}
 }
 
+#pragma endregion
+
+//extended map restart
 void CGX_MapRestart() {
 	D_Printf(("^1CGX_MapRestart\n"));
 
@@ -367,6 +374,8 @@ void CGX_MapRestart() {
 	CGX_CheckEnemyModelAll();	
 	D_Printf(("^6CGX_MapRestart\n"));
 }
+
+#pragma region auto network settings
 
 static qboolean CGX_ValidateFPS(void) {
 	if (!com_maxfps.integer) {
@@ -546,6 +555,8 @@ void CGX_SyncServer_sv_fps(const char *info) {
 	}
 }
 
+#pragma endregion
+
 //check message for special commands
 #define CHECK_INTERVAL	15000 //msec
 void CGX_CheckChatCommand(const char *str) {
@@ -684,6 +695,68 @@ void CGX_SaveSharedConfig(qboolean forced) {
 	}
 }
 
+static char* CGX_GetQuakeStartPars(char *map, char *fs_game, char* custom) {
+	char *q3pars;
+
+	if (cgs.localServer) {
+		if (cgs.gametype == GT_SINGLE_PLAYER)
+			q3pars = va("+set sv_pure 0 +set fs_game \"%s\" %s +spmap %s", fs_game, custom, map);
+		else {
+			char bot_enable[256];
+			trap_Cvar_Get("bot_enable", bot_enable);
+			//if botenable off restart with its off
+			if (!atoi(bot_enable) && !*custom)
+				custom = "+set bot_enable 0";
+			q3pars = va("+set sv_pure 0 +set fs_game \"%s\" %s +map %s", fs_game, custom, map);
+		}
+	} else {
+		char servaddr[128];
+		trap_Cvar_Get("cl_currentServerAddress", servaddr);
+
+		q3pars = *servaddr ? va("+connect %s", servaddr) : "";
+	}
+
+	return q3pars;
+}
+
+//read bat, insert params and save
+void CGX_GenerateMapBat2(char *map) {
+	char txt[1024*3];
+	char *mod = "baseq3";
+	int res;
+
+	if (!cgx_dl_tobaseq3.integer) {
+		char fs_game[256];
+		trap_Cvar_Get("fs_game", fs_game);
+		mod = *fs_game ? fs_game : "baseq3";		
+	}
+
+	if (res = CGX_FReadAll("win\\download_map.bat", txt, sizeof txt)) {
+		char page[1024];
+		char *script;
+
+		Com_sprintf(page, sizeof page, cgx_dl_page.string, map);
+
+		/*set "map=%s"
+		set "mod=%s"
+		set "tmp=%s"
+		set "host=%s"
+		set "page=%s"
+		set "pars=%s"*/
+		script = va(txt, map, mod, dl_tempname,
+			cgx_dl_host.string, page, CGX_GetQuakeStartPars(map, mod, "+set bot_enable 0"));
+
+		if (res = CGX_FWriteAll("..\\"CGX_MAPBAT, script, strlen(script))) {
+			char	path[MAX_INFO_VALUE];
+			trap_Cvar_Get("fs_basepath", path);
+
+			trap_Print(CGX_MAPBAT" generated successfully\n");
+			XMOD_ANSWER(va("Open folder %s", path));
+			XMOD_ANSWER("And start ^2"CGX_MAPBAT);
+		}
+	}
+}
+
 // generate script to open url to worldspawn to download map
 void CGX_GenerateMapBat(char *map) {
 	fileHandle_t f;
@@ -720,12 +793,43 @@ void CGX_GenerateMapBat(char *map) {
 	}
 }
 
-void CGX_DownloadMap(char *name) {	
+#ifdef CGX_WIN
+
+//#define	CGX_DLURL		"http://ws.q3df.org/maps/download/"
+//for URLDownloadToFile
+//#include <urlmon.h>
+//#pragma comment(lib, "urlmon.lib")
+//static void CGX_DownloadSync(char *name) {
+//	char *url, *filePath;
+//	char basepath[1024];
+//	int res;
+//
+//	trap_Cvar_Get("fs_basepath", basepath);
+//
+//	url = va(CGX_DLURL"%s/", name);
+//	filePath = va("%s\\%s\\map-%s.pk3", basepath, "baseq3", name);
+//
+//	CG_Printf("Attempting to download %s\nTo: %s\n", name, filePath);
+//	CG_Printf("From: %s\n", CGX_DLURL);
+//
+//	if (res = URLDownloadToFile(NULL, url, filePath, 0, NULL)) {
+//		CG_Printf("^1Error during download %s\n", name);
+//	} else {
+//		XMOD_ANSWER(va("Map %s dowloaded successfuly", name));
+//	}
+//}
+
+#endif
+
+//download map and load after
+void CGX_DownloadMap(char *name, qboolean end_load) {	
 #ifdef CGX_WIN
 #else
-	CGX_GenerateMapBat(name);
+	CGX_GenerateMapBat2(name);
 #endif
 }
+
+#pragma region cg_nomip
 
 //save picmip value
 void CGX_SavePicmip() {
@@ -744,6 +848,10 @@ void CGX_NomipEnd() {
 	if (cgx_nomip.integer && r_picmip.integer)
 		trap_Cvar_Set("r_picmip", cgx_r_picmip.string);	
 }
+
+#pragma endregion
+
+#pragma region map lodading fix
 
 void CGX_IncreaseHunkmegs(int min) {
 	char buf[8];
@@ -860,6 +968,8 @@ void CGX_LoadWorldMap() {
 	trap_Cvar_Set( "cgx_last_error", "" );
 }
 
+#pragma endregion
+
 //fix enemymodels with vertex light
 //check vertex light and load client info
 void CGX_LoadClientInfo( clientInfo_t *ci ) {
@@ -876,6 +986,7 @@ void CGX_LoadClientInfo( clientInfo_t *ci ) {
 	CGX_NomipEnd();
 }
 
+#pragma region Xmod command
 
 //small talk
 static char* CGX_XmodTalk(char *command) {
@@ -1044,6 +1155,8 @@ void CGX_Xmod(char *command) {
 		CGX_ShowHelp(help_file, command);
 	}
 }
+
+#pragma endregion
 
 //clears sv_hostname from ^. and returns color if ^^.. was used
 char CGX_ServerNameFixInfoLoad(char *str) {

@@ -138,16 +138,22 @@ static void CGX_Xmod_f(void) {
 
 static void CGX_Download_f(void) {
 	char	name[MAX_QPATH];
-	trap_Args( name, MAX_QPATH );
+	qboolean end_load = qfalse;
 
-	if (!*name) {
+	if (trap_Argc() < 2) {
 		CG_Printf("usage: download <mapname>\n");
 		return;
 	}
 
-	name[strlen(name) - 1] = 0;
+	trap_Argv(1, name, MAX_QPATH );
 
-	CGX_DownloadMap(name);
+	if (trap_Argc() > 2) {
+		char	str[16];
+		trap_Argv(2, str, 16);
+		end_load = atoi(str) ? qtrue : qfalse;
+	}
+
+	CGX_DownloadMap(name, end_load);
 }
 }
 
