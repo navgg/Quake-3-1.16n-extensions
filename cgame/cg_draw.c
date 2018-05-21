@@ -218,7 +218,13 @@ void CG_DrawHead( float x, float y, float w, float h, int clientNum, vec3_t head
 	// if they are deferred, draw a cross out
 	if ( ci->deferred ) {
 		CG_DrawPic( x, y, w, h, cgs.media.deferShader );
+	} 
+#if CGX_FREEZE
+	else if (Q_Isfreeze(clientNum)) {
+		CG_DrawPic(x, y, w, h, cgs.media.noammoShader);
 	}
+#endif//freeze
+
 }
 
 /*
@@ -936,6 +942,12 @@ static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
 				xx = x + w - TINYCHAR_WIDTH;
 			}
 			for (j = 0; j < PW_NUM_POWERUPS; j++) {
+#if CGX_FREEZE//freeze
+				if ( Q_Isfreeze( ci - cgs.clientinfo ) ) {
+					CG_DrawPic( xx, y, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, cgs.media.noammoShader );
+					break;
+				}
+#endif//freeze
 				if (ci->powerups & (1 << j)) {
 					gitem_t	*item;
 
@@ -2043,6 +2055,15 @@ static void CG_ScanForCrosshairEntity( void ) {
 	CG_Trace( &trace, start, vec3_origin, vec3_origin, end, 
 		cg.snap->ps.clientNum, CONTENTS_SOLID|CONTENTS_BODY );
 	if ( trace.entityNum >= MAX_CLIENTS ) {
+#if CGX_FREEZE
+		entityState_t	*es;
+
+		es = &cg_entities[ trace.entityNum ].currentState;
+		if ( es->powerups & ( 1 << PW_QUAD ) || es->powerups & ( 1 << PW_BATTLESUIT ) ) { //noghost using quad, default freezetag battlesuit
+			cg.crosshairClientNum = es->otherEntityNum;
+			cg.crosshairClientTime = cg.time;
+		}
+#endif //freeze
 		return;
 	}
 
@@ -2111,7 +2132,11 @@ CG_DrawSpectator
 */
 static void CG_DrawSpectator(void) {
 	CG_DrawBigString(vScreen.hwidth - 9 * 8, 440, "SPECTATOR", 1.0F);
+#if CGX_FREEZE
+	if ( cgs.gametype == GT_TOURNAMENT || Q_Isfreeze( cg.snap->ps.clientNum ) ) {
+#else
 	if ( cgs.gametype == GT_TOURNAMENT ) {
+#endif//freeze
 		CG_DrawBigString(vScreen.hwidth - 15 * 8, 460, "waiting to play", 1.0F);
 	}
 	if ( cgs.gametype == GT_TEAM || cgs.gametype == GT_CTF ) {

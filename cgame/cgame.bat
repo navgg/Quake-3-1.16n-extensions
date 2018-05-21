@@ -60,6 +60,8 @@ set cc=lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\
 @if errorlevel 1 goto quit
 %cc% ../cg_unlagged.c
 @if errorlevel 1 goto quit
+%cc% ../cg_freeze.c
+@if errorlevel 1 goto quit
 
 q3asm -f ../cgame
 

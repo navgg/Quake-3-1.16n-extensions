@@ -1440,16 +1440,21 @@ Adds a piece with modifications or duplications for powerups
 Also called by CG_Missile for quad rockets, but nobody can tell...
 ===============
 */
-void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, int team ) {
-
+#define powerups state->powerups
+void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int team ) {
 	if ( powerups & ( 1 << PW_INVIS ) ) {
 		ent->customShader = cgs.media.invisShader;
 		trap_R_AddRefEntityToScene( ent );
 	} else {
 		trap_R_AddRefEntityToScene( ent );
 
-		if ( powerups & ( 1 << PW_QUAD ) ) 
+		if ( powerups & ( 1 << PW_QUAD ) )  //default freeze tag - battlesuit, noghost - quad
 		{
+#if CGX_FREEZE
+			if ( !state->weapon )
+				ent->customShader = cgs.media.freezeShader;
+			else
+#endif//freeze
 			if (team == TEAM_RED)
 				ent->customShader = cgs.media.redQuadShader;
 			else
@@ -1463,11 +1468,60 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, int team ) {
 			}
 		}
 		if ( powerups & ( 1 << PW_BATTLESUIT ) ) {
+#if CGX_FREEZE
+			if ( !state->weapon )
+				ent->customShader = cgs.media.freezeShader;
+			else
+#endif//freeze
 			ent->customShader = cgs.media.battleSuitShader;
 			trap_R_AddRefEntityToScene( ent );
 		}
 	}
 }
+#undef powerups
+
+#if CGX_FREEZE
+/*
+===============
+CG_BreathPuffs
+===============
+*/
+static void CG_BreathPuffs( centity_t *cent, refEntity_t *head) {
+	clientInfo_t *ci;
+	vec3_t up, origin;
+	int contents;
+
+	ci = &cgs.clientinfo[ cent->currentState.number ];
+
+	if ( cent->currentState.number == cg.snap->ps.clientNum && !cg.renderingThirdPerson) {
+		return;
+	}
+	if ( cent->currentState.eFlags & EF_DEAD ) {
+		return;
+	}
+	//freeze
+	if ( !cent->currentState.weapon ) {
+		return;
+	}
+	//freeze
+	contents = trap_CM_PointContents( head->origin, 0 );
+	if ( contents & ( CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA ) ) {
+		return;
+	}
+	if ( ci->breathPuffTime > cg.time ) {
+		return;
+	}
+
+	VectorSet( up, 0, 0, 8 );
+	VectorMA(head->origin, 8, head->axis[0], origin);
+	VectorMA(origin, -4, head->axis[2], origin);
+	CG_SmokePuff( origin, up, 16, 
+		1, 1, 1, 0.66f,
+		1500, cg.time, LEF_PUFF_DONT_SCALE, cgs.media.shotgunSmokePuffShader );
+	ci->breathPuffTime = cg.time + 2000;
+}
+
+#endif
 
 /*
 ===============
@@ -1555,7 +1609,7 @@ void CG_Player( centity_t *cent ) {
 	else
 		ShaderRGBACopy(ci->colors[3], legs.shaderRGBA);	
 
-	CG_AddRefEntityWithPowerups( &legs, cent->currentState.powerups, ci->team );
+	CG_AddRefEntityWithPowerups( &legs, &cent->currentState, ci->team );
 
 	// if the model failed, allow the default nullmodel to be displayed
 	if (!legs.hModel) {
@@ -1585,7 +1639,7 @@ void CG_Player( centity_t *cent ) {
 	else 
 		ShaderRGBACopy(ci->colors[2], torso.shaderRGBA);	
 
-	CG_AddRefEntityWithPowerups( &torso, cent->currentState.powerups, ci->team );
+	CG_AddRefEntityWithPowerups( &torso, &cent->currentState, ci->team );
 
 	//
 	// add the head
@@ -1609,7 +1663,12 @@ void CG_Player( centity_t *cent ) {
 	else 
 		ShaderRGBACopy(ci->colors[1], head.shaderRGBA);
 
-	CG_AddRefEntityWithPowerups( &head, cent->currentState.powerups, ci->team );
+	CG_AddRefEntityWithPowerups( &head, &cent->currentState, ci->team );
+
+#if CGX_FREEZE
+	if (cg_enableBreath.integer)
+		CG_BreathPuffs( cent, &head );
+#endif
 
 	//
 	// add the gun / barrel / flash

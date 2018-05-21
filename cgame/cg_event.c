@@ -120,6 +120,11 @@ static void CG_Obituary( entityState_t *ent ) {
 	case MOD_TRIGGER_HURT:
 		message = "was in the wrong place";
 		break;
+#if CGX_FREEZE
+	case MOD_UNKNOWN:
+		CG_BodyObituary( ent, targetName );
+		return;
+#endif//freeze
 	default:
 		message = NULL;
 		break;

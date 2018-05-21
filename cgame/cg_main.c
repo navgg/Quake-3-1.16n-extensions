@@ -175,6 +175,10 @@ vmCvar_t	cg_deferPlayers;
 vmCvar_t	cg_drawTeamOverlay;
 vmCvar_t	cg_teamOverlayUserinfo;
 
+#if CGX_FREEZE
+vmCvar_t	cg_enableBreath;
+#endif
+
 
 typedef struct {
 	vmCvar_t	*vmCvar;
@@ -248,6 +252,14 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_tracerLength, "cg_tracerlength", "100", CVAR_CHEAT },
 	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "40", 0 },
 	{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", CVAR_CHEAT },
+	//wtf?
+	//	/*freeze
+	//	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "40", CVAR_CHEAT },
+	//	{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", CVAR_CHEAT },
+	//	freeze*/
+	//{ &cg_thirdPersonRange, "cg_thirdPersonRange", "40", 0 },
+	//{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", 0 },
+	//	//freeze
 	{ &cg_thirdPerson, "cg_thirdPerson", "0", 0 },
 	{ &cg_teamChatTime, "cg_teamChatTime", "3000", CVAR_ARCHIVE  },
 	{ &cg_teamChatHeight, "cg_teamChatHeight", "0", CVAR_ARCHIVE  },
@@ -294,7 +306,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},	
 	{ &cg_projectileNudge, "cg_delag_projectileNudge", "0", CVAR_ARCHIVE },
 	{ &cg_optimizePrediction, "cg_delag_optimizePrediction", "0", CVAR_ARCHIVE },
-	{ &cg_cmdTimeNudge, "cg_delag_cmdTimeNudge", "0", CVAR_ARCHIVE },
+	{ &cg_cmdTimeNudge, "cg_delag_cmdTimeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
 	{ &cg_delag_interp32, "cg_delag_interp32", "1", CVAR_TEMP },
 
 	{ &cl_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},
@@ -306,6 +318,9 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_plOut, "cg_plOut", "0", CVAR_CHEAT },
 #endif
 	//unlagged - client options
+#endif
+#if CGX_FREEZE
+	{ &cg_enableBreath, "cg_enableBreath", "0", CVAR_TEMP },
 #endif
 
 	{ &com_maxfps, "com_maxfps", "125", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
@@ -921,6 +936,11 @@ static void CG_RegisterGraphics( void ) {
 		cgs.media.friendShader = trap_R_RegisterShader( "sprites/foe" );
 		cgs.media.redQuadShader = trap_R_RegisterShader("powerups/blueflag" );
 		cgs.media.teamStatusBar = trap_R_RegisterShader( "gfx/2d/colorbar.tga" );
+
+#if CGX_FREEZE
+		cgs.media.freezeShader = trap_R_RegisterShader( "freezeShader" );
+		cgs.media.freezeMarkShader = trap_R_RegisterShader( "freezeMarkShader" );
+#endif //freeze
 	}
 
 	cgs.media.armorModel = trap_R_RegisterModel( "models/powerups/armor/armor_yel.md3" );

@@ -38,6 +38,8 @@ cg_weaponEffects 0-32 - 0: off 1: railbeam + spin 2: simple railbeam
 cg_sharedConfig 0|1 - fixes problem with saving configs after game exit in 1.16n 
 		(0: off 1: automatically saves q3config.cfg to baseq3 folder after pressing 'leave arena' or 'exit game', 
 		to save manually use command \writesharedconfig)
+cg_chatFilter 0|1 - on/off fixes chat spoofing bug on client
+cg_enableBreath 0|1 - show breath puffs from players (freeze tag command, for ambiance)
 writesharedconfig - writes q3config.cfg to baseq3 folder (command do the following 
 		"writeconfig ..\\baseq3\\q3config.cfg" - if playing on modded server,
 		"writeconfig q3config.cfg" - if playing on default quake 3 server)

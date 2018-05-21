@@ -92,6 +92,9 @@
     <ClCompile Include="cg_weapons.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cg_freeze.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\game\bg_public.h">

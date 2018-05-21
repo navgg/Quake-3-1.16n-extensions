@@ -324,6 +324,10 @@ typedef struct {
 	//X-MOD: model colors for pm skins	
 	byte			colors[4][3];
 	byte			darkenColors[4][3];
+
+#if CGX_FREEZE
+	int				breathPuffTime;
+#endif
 } clientInfo_t;
 
 
@@ -650,6 +654,11 @@ typedef struct {
 	qhandle_t	burnMarkShader;
 	qhandle_t	holeMarkShader;
 	qhandle_t	energyMarkShader;
+
+#if CGX_FREEZE
+	qhandle_t	freezeShader;
+	qhandle_t	freezeMarkShader;
+#endif//freeze
 
 	// powerup shaders
 	qhandle_t	quadShader;
@@ -1022,6 +1031,15 @@ void CG_AddBoundingBox( centity_t *cent );
 qboolean CG_Cvar_ClampInt( const char *name, vmCvar_t *vmCvar, int min, int max );
 //unlagged - cg_unlagged.c
 
+#if CGX_FREEZE
+extern	vmCvar_t	cg_enableBreath;
+
+void CG_Drop_f( void );
+void CG_BodyObituary( entityState_t *ent, char *targetName );
+qboolean Q_Isfreeze( int clientNum );
+void CG_AddGib( localEntity_t *le );
+#endif//freeze
+
 //
 // cgx_extensions.c
 //
@@ -1139,7 +1157,7 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team );
 //
 void CG_Player( centity_t *cent );
 void CG_ResetPlayerEntity( centity_t *cent );
-void CG_AddRefEntityWithPowerups( refEntity_t *ent, int powerups, int team );
+void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int team );
 void CG_NewClientInfo( int clientNum );
 sfxHandle_t	CG_CustomSound( int clientNum, const char *soundName );
 

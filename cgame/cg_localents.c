@@ -139,6 +139,12 @@ void CG_FragmentBounceMark( localEntity_t *le, trace_t *trace ) {
 	if ( le->leMarkType == LEMT_BLOOD ) {
 
 		radius = 16 + (rand()&31);
+
+#if CGX_FREEZE
+		if ( le->refEntity.customShader == cgs.media.freezeShader )
+			CG_ImpactMark( cgs.media.freezeMarkShader, trace->endpos, trace->plane.normal, random() * 360, 1, 1, 1, 1, qtrue, radius, qfalse );
+		else
+#endif//freeze
 		CG_ImpactMark( cgs.media.bloodMarkShader, trace->endpos, trace->plane.normal, random()*360,
 			1,1,1,1, qtrue, radius, qfalse );
 	}
@@ -234,9 +240,15 @@ void CG_AddFragment( localEntity_t *le ) {
 			le->refEntity.renderfx |= RF_LIGHTING_ORIGIN;
 			oldZ = le->refEntity.origin[2];
 			le->refEntity.origin[2] -= 16 * ( 1.0 - (float)t / SINK_TIME );
+#if CGX_FREEZE
+			CG_AddGib( le );
+#endif //freeze
 			trap_R_AddRefEntityToScene( &le->refEntity );
 			le->refEntity.origin[2] = oldZ;
 		} else {
+#if CGX_FREEZE
+			CG_AddGib( le );
+#endif //freeze
 			trap_R_AddRefEntityToScene( &le->refEntity );
 		}
 
@@ -258,6 +270,10 @@ void CG_AddFragment( localEntity_t *le ) {
 			BG_EvaluateTrajectory( &le->angles, cg.time, angles );
 			AnglesToAxis( angles, le->refEntity.axis );
 		}
+
+#if CGX_FREEZE
+		CG_AddGib( le );
+#endif //freeze
 
 		trap_R_AddRefEntityToScene( &le->refEntity );
 
@@ -285,6 +301,10 @@ void CG_AddFragment( localEntity_t *le ) {
 
 	// reflect the velocity on the trace plane
 	CG_ReflectVelocity( le, &trace );
+
+#if CGX_FREEZE
+	CG_AddGib( le );
+#endif //freeze
 
 	trap_R_AddRefEntityToScene( &le->refEntity );
 }

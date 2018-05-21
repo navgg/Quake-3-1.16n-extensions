@@ -224,6 +224,9 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 
 	// add the "ready" marker for intermission exiting
 	if ( cg.snap->ps.stats[ STAT_CLIENTS_READY ] & ( 1 << score->client ) ) {
+#if CGX_FREEZE//freeze
+		if ( !Q_Isfreeze( score->client ) )
+#endif//freeze
 		CG_DrawBigStringColor( iconx, y, "READY", color );
 	}
 }

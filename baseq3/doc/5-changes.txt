@@ -59,13 +59,14 @@ fixed bright models with r_vertexLight 1
 fixed restoring of bright models after \vid_restart
 fixed colored hostnames on loading
 
-...
+0.92b
 
 added \cg_chatFilter 1|0 - fixes chat spoofing bug on client
 added \download <mapname> (generates script in quake3 game folder to download map)
-added \cg_weaponEffects 0-32 0: off 1: railbeam + spin 2: simple railbeam 
+added \cg_weaponEffects 0-32 0: off 1: railbeam+spin 2: simple railbeam 
 	4: plasma 8: lightning 16: rocket explosion (all effects from 1.32)
 	additive value eg. 10=rail+lg, 26=rail+lg+rocket etc.
+added freeze tag client (freeze shaders\names, cg_enableBreath etc.)
 
-fixed enemy colors restoring after team changing
+fixed enemy colors restore after team change
 fixed cg_nomip for weapon models\effects

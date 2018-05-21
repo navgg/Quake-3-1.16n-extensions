@@ -153,6 +153,7 @@
     <ClCompile Include="cg_effects.c" />
     <ClCompile Include="cg_ents.c" />
     <ClCompile Include="cg_event.c" />
+    <ClCompile Include="cg_freeze.c" />
     <ClCompile Include="cg_info.c" />
     <ClCompile Include="cg_localents.c" />
     <ClCompile Include="cg_main.c" />

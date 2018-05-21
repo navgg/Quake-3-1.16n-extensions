@@ -189,6 +189,10 @@ static consoleCommand_t	commands[] = {
 	{ "download", CGX_Download_f },
 	{ "autorecord", CGX_RecordSync_f },	
 	{ "xmod", CGX_Xmod_f },
+
+#if CGX_FREEZE//freeze
+	{ "drop", CG_Drop_f },
+#endif//freeze
 };
 
 
@@ -256,4 +260,7 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand ("players");
 	trap_AddCommand ("playerlist");
 	trap_AddCommand ("stats");	
+#if CGX_FREEZE//freeze
+	trap_AddCommand( "ready" );
+#endif//freeze
 }

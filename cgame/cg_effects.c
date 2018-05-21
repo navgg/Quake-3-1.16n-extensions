@@ -270,6 +270,10 @@ CG_LaunchGib
 void CG_LaunchGib( vec3_t origin, vec3_t velocity, qhandle_t hModel ) {
 	localEntity_t	*le;
 	refEntity_t		*re;
+#if CGX_FREEZE
+	int	num;
+	centity_t	*cent;
+#endif//freeze
 
 	le = CG_AllocLocalEntity();
 	re = &le->refEntity;
@@ -291,6 +295,16 @@ void CG_LaunchGib( vec3_t origin, vec3_t velocity, qhandle_t hModel ) {
 
 	le->leBounceSoundType = LEBS_BLOOD;
 	le->leMarkType = LEMT_BLOOD;
+#if CGX_FREEZE
+	for ( num = 0; num < cg.snap->numEntities; num++ ) {
+		cent = &cg_entities[ cg.snap->entities[ num ].number ];
+		if ( cent->currentState.eventParm != 255 ) continue;
+		if ( VectorCompare( cent->lerpOrigin, origin ) ) {
+			re->customShader = cgs.media.freezeShader;
+			break;
+		}
+	}
+#endif//freeze
 }
 
 /*
