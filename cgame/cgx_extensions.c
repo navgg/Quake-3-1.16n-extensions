@@ -12,6 +12,14 @@
 
 #define trap_Cvar_Get(name,v) trap_Cvar_VariableStringBuffer(name, v, sizeof v)
 
+//file i/o
+static int CGX_FCopy(char *filename, char *dest);
+static qboolean CGX_FExists(char* filename);
+static int CGX_FSize(char *filename);
+static int CGX_FOpenFile(char *filename, fileHandle_t *f, fsMode_t mode, int maxSize);
+static int CGX_FReadAll(char *filename, char *buffer, int bufsize);
+static qboolean CGX_FWriteAll(char *filename, char *buffer, int bufsize);
+
 static void CGX_Delay( int msec ) {
 	CG_Printf( "Delay for %i start...\n", msec );
 	msec += trap_Milliseconds();	
@@ -868,37 +876,6 @@ void CGX_LoadClientInfo( clientInfo_t *ci ) {
 	CGX_NomipEnd();
 }
 
-//safety open file, -1 unlim size
-static int CGX_FOpenFile(char *filename, fileHandle_t *f, fsMode_t mode, int maxSize) {
-	int len;
-	len = trap_FS_FOpenFile( filename, f, mode );
-
-	if ( len <= 0 ) {
-		trap_Print( va( S_COLOR_RED "file not found: %s\n", filename ) );
-		return 0;
-	}
-	if ( len >= maxSize && maxSize != -1) {
-		trap_Print( va( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, maxSize ) );
-		trap_FS_FCloseFile( *f );
-		return 0;
-	}
-
-	return len;
-}
-
-//read all and close
-static int CGX_FReadAll(char *filename, char *buffer, int bufsize) {
-	int len;
-	fileHandle_t	f;
-
-	if (len = CGX_FOpenFile(filename, &f, FS_READ, bufsize)) {
-		trap_FS_Read(buffer, len, f);
-		trap_FS_FCloseFile(f);
-		buffer[len] = 0;
-	}
-
-	return len;
-}
 
 //small talk
 static char* CGX_XmodTalk(char *command) {
@@ -1087,4 +1064,109 @@ char CGX_ServerNameFixInfoLoad(char *str) {
 	return COLOR_WHITE;	
 }
 
+#pragma region Xmod I/O
 
+//safety open file, -1 unlim size
+static int CGX_FOpenFile(char *filename, fileHandle_t *f, fsMode_t mode, int maxSize) {
+	int len;
+	len = trap_FS_FOpenFile( filename, f, mode );
+
+	if ( len <= 0 ) {
+		trap_Print( va( S_COLOR_RED "file not found: %s\n", filename ) );
+		return 0;
+	}
+	if ( len >= maxSize && maxSize != -1) {
+		trap_Print( va( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, maxSize ) );
+		trap_FS_FCloseFile( *f );
+		return 0;
+	}
+
+	return len;
+}
+
+//read all and close
+static int CGX_FReadAll(char *filename, char *buffer, int bufsize) {
+	int len;
+	fileHandle_t	f;
+
+	if (len = CGX_FOpenFile(filename, &f, FS_READ, bufsize)) {
+		trap_FS_Read(buffer, len, f);
+		trap_FS_FCloseFile(f);
+		buffer[len] = 0;
+	}
+
+	return len;
+}
+
+//wirte all and close
+static qboolean CGX_FWriteAll(char *filename, char *buffer, int bufsize) {
+	fileHandle_t f;
+
+	trap_FS_FOpenFile(filename, &f, FS_WRITE);
+
+	if (f) {
+		trap_FS_Write(buffer, bufsize, f);
+		trap_FS_FCloseFile(f);
+		return qtrue;
+	}
+
+	return qfalse;
+}
+
+//get file size
+static int CGX_FSize(char* filename) {
+	fileHandle_t f;
+	int size;
+	if (size = CGX_FOpenFile(filename, &f, FS_READ, -1)) {
+		trap_FS_FCloseFile(f);
+		return size;
+	}
+
+	return 0;
+}
+
+//check if file exists
+static qboolean CGX_FExists(char* filename) {
+	return CGX_FSize(filename) ? qtrue : qfalse;
+}
+
+//copy file
+static int CGX_FCopy(char *filename, char *dest) {
+	int len;
+	fileHandle_t	f1, f2;
+
+	if (len = CGX_FOpenFile(filename, &f1, FS_READ, -1)) {
+		char			buf[1024 * 8];
+		int read = 0;
+		int bytesleft = 0;
+
+		trap_FS_FOpenFile(dest, &f2, FS_WRITE);
+
+		if (!f2) {
+			CG_Printf("^1Couldn't open %s to write", dest);
+			trap_FS_FCloseFile(f2);
+			return 0;
+		}
+
+		bytesleft = len;
+
+		while (bytesleft > 0) {
+			read = sizeof buf;
+
+			if (read > bytesleft)
+				read = bytesleft;
+
+			trap_FS_Read(buf, read, f1);
+			trap_FS_Write(buf, read, f2);
+
+			bytesleft -= read;
+		}
+
+		trap_FS_FCloseFile(f1);
+		trap_FS_FCloseFile(f2);
+	}
+
+	return len;
+}
+
+#pragma endregion
