@@ -167,7 +167,7 @@ static char *aimnames[] = {
 #define RAILCTFNAMES_SIZE sizeof(railctfnames) / sizeof(railctfnames[0])
 #define AIMNAMES_SIZE sizeof(aimnames) / sizeof(aimnames[0])
 
-#define CGX_CREDITS_END 6859 //~33.4 one line in credits
+#define CGX_CREDITS_END 6879
 #define DEFAULT_YSTEP 0.406f
 
 typedef struct {
@@ -414,6 +414,8 @@ static void UI_CreditMenu2_Draw( void ) {
 	DRAW_WSTEP1("for Unlagged 2.01")
 	DRAW_WSTEP1("Challenge World & The ProMode Team")	
 	DRAW_WSTEP1("for CPMA")
+	DRAW_WSTEP1("Darrell \"Doolittle\" Bircsak")
+	DRAW_WSTEP1("for freeze tag")
 	DRAW_WSTEP1("sst13")
 	DRAW_WSTEP1("for cool maps")
 	DRAW_WSTEP1("q3df.org")
@@ -468,7 +470,7 @@ static void UI_CreditMenu2_Draw( void ) {
 	//DRAW_WSTEP1("Biz Assist and id Mom:")
 	//DRAW_WSTEP1("Donna Jackson")
 
-	y += 380;	
+	y += 345;
 
 	UI_DrawProportionalString( 320, y, "QUAKE III ARENA", UI_CENTER|UI_GIANTFONT|UI_PULSE, color_red );	
 

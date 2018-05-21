@@ -1,6 +1,5 @@
-#if CGX_FREEZE
 #include "cg_local.h"
-
+#if CGX_FREEZE
 void CG_Drop_f( void ) {
 	char	command[ 128 ];
 	char	message[ 128 ];
