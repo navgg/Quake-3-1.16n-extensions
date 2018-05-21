@@ -155,7 +155,6 @@ static void CGX_Download_f(void) {
 
 	CGX_DownloadMap(name, end_load);
 }
-}
 
 typedef struct {
 	char	*cmd;

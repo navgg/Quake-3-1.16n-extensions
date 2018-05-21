@@ -823,6 +823,11 @@ void CGX_GenerateMapBat(char *map) {
 
 //download map and load after
 void CGX_DownloadMap(char *name, qboolean end_load) {	
+	if (CGX_FExists(va("maps\\%s.bsp", name))) {
+		XMOD_ANSWER(va("You have map %s already", name));
+		return;
+	}
+
 #ifdef CGX_WIN
 #else
 	CGX_GenerateMapBat2(name);
