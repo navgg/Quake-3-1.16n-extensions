@@ -71,6 +71,7 @@ vmCvar_t	cgx_drawAccuracy;
 vmCvar_t	cgx_weaponEffects;
 vmCvar_t	cgx_nomip;
 vmCvar_t	cgx_sharedConfig;
+vmCvar_t	cgx_chatFilter;
 
 vmCvar_t	com_maxfps;
 vmCvar_t	cl_maxpackets;
@@ -286,6 +287,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_weaponEffects, "cg_weaponEffects", "8", CVAR_ARCHIVE },
 	{ &cgx_sharedConfig, "cg_sharedConfig", "0", CVAR_ARCHIVE },
 	{ &cgx_nomip, "cg_nomip", "-1", CVAR_ARCHIVE | CVAR_LATCH },
+	{ &cgx_chatFilter, "cg_chatFilter", "1", CVAR_ARCHIVE },
 #if CGX_UNLAGGED
 	//unlagged - client options
 	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},	
@@ -320,8 +322,6 @@ cvarTable_t		cvarTable[] = {
 	// unlagged
 	// g_delag	
 	// fov adjust for widescreen
-	// TODO: 	
-	// cg_chatFilter 1|0 ?			
 
 	// the following variables are created in other parts of the system,
 	// but we also reference them here

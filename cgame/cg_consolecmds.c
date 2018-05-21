@@ -115,7 +115,11 @@ static void CG_TellAttacker_f( void ) {
 }
 
 static void CGX_SaveSharedConfig_f( void ) {
-	CGX_SaveSharedConfig(qtrue);	
+	char arg[32];
+	qboolean force = qfalse;
+	trap_Args(arg, 32);
+
+	CGX_SaveSharedConfig(!Q_stricmp(arg, "ui ") ? qfalse: qtrue);	
 }
 
 static void CGX_RecordSync_f( void ) {

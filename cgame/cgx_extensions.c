@@ -10,7 +10,7 @@
 #define EM_SPECT			2
 #define EM_INTERMISSION		4
 
-#define trap_Cvar_Get(x,y) trap_Cvar_VariableStringBuffer(x, y, sizeof y)
+#define trap_Cvar_Get(name,v) trap_Cvar_VariableStringBuffer(name, v, sizeof v)
 
 static void CGX_Delay( int msec ) {
 	CG_Printf( "Delay for %i start...\n", msec );
@@ -564,6 +564,15 @@ void CGX_CheckChatCommand(const char *str) {
 			trap_SendConsoleCommand(va("say ^7"CGX_FULLVER" (%i:%i%i)\n", mins, tens, seconds));
 		}
 	} 
+}
+
+//fiter chat
+void CGX_ChatFilter(char *str) {
+	char *c;
+
+	//fix \r bug in chat
+	for (c = str; *c; c++)
+		if (*c == '\r') *c = '.';
 }
 
 // check for unlagged enabled\disabled for bma\nms

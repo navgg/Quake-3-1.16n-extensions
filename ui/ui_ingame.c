@@ -71,7 +71,7 @@ static void InGame_QuitAction( qboolean result ) {
 	if( !result ) {
 		return;
 	}
-	trap_Cmd_ExecuteText(EXEC_NOW, "writesharedconfig\n");
+	trap_Cmd_ExecuteText(EXEC_NOW, "writesharedconfig ui\n");
 
 	UI_PopMenu();
 	UI_CreditMenu();

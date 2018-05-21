@@ -19,6 +19,7 @@ static char *sodmodgaNames[] = {
 	"Alex",
 	"BOND",
 	"Comrade",
+	"Danger",
 	"DEADPOOL",
 	"Fish",
 	"GRAZ1",
@@ -166,7 +167,7 @@ static char *aimnames[] = {
 #define RAILCTFNAMES_SIZE sizeof(railctfnames) / sizeof(railctfnames[0])
 #define AIMNAMES_SIZE sizeof(aimnames) / sizeof(aimnames[0])
 
-#define CGX_CREDITS_END 6826
+#define CGX_CREDITS_END 6859 //~33.4 one line in credits
 #define DEFAULT_YSTEP 0.406f
 
 typedef struct {

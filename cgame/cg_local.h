@@ -892,6 +892,7 @@ extern	vmCvar_t		cgx_drawAccuracy;
 extern	vmCvar_t		cgx_weaponEffects;
 extern	vmCvar_t		cgx_nomip;
 extern	vmCvar_t		cgx_sharedConfig;
+extern	vmCvar_t		cgx_chatFilter;
 
 extern	vmCvar_t		com_maxfps;
 extern	vmCvar_t		cl_maxpackets;
@@ -1044,6 +1045,7 @@ void CGX_SyncServer_sv_fps(const char *info);
 void CGX_TrackEnemyModelChanges();
 void CGX_TryLoadingFix();
 void CGX_Xmod(char *command);
+void CGX_ChatFilter(char *str);
 
 //
 // cg_main.c

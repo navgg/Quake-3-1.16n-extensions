@@ -61,6 +61,7 @@ fixed colored hostnames on loading
 
 ...
 
+added \cg_chatFilter 1|0 - fixes chat spoofing bug on client
 added \download <mapname> (generates script in quake3 game folder to download map)
 added \cg_weaponEffects 0-32 0: off 1: railbeam + spin 2: simple railbeam 
 	4: plasma 8: lightning 16: rocket explosion (all effects from 1.32)
