@@ -84,6 +84,7 @@ vmCvar_t	cg_delag;
 vmCvar_t	cg_cmdTimeNudge;
 vmCvar_t	cg_projectileNudge;
 vmCvar_t	cg_optimizePrediction;
+vmCvar_t	cg_delag_interp32;
 vmCvar_t	cl_timeNudge;
 vmCvar_t	sv_fps;
 #if CGX_DEBUG
@@ -294,6 +295,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_projectileNudge, "cg_delag_projectileNudge", "0", CVAR_ARCHIVE },
 	{ &cg_optimizePrediction, "cg_delag_optimizePrediction", "0", CVAR_ARCHIVE },
 	{ &cg_cmdTimeNudge, "cg_delag_cmdTimeNudge", "0", CVAR_ARCHIVE },
+	{ &cg_delag_interp32, "cg_delag_interp32", "1", CVAR_TEMP },
 
 	{ &cl_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},
 #if CGX_DEBUG

@@ -995,6 +995,7 @@ extern	vmCvar_t		cg_delag;
 extern	vmCvar_t		cg_cmdTimeNudge;
 extern	vmCvar_t		cg_projectileNudge;
 extern	vmCvar_t		cg_optimizePrediction;
+extern	vmCvar_t		cg_delag_interp32;
 extern	vmCvar_t		cl_timeNudge;
 extern	vmCvar_t		sv_fps;
 #if CGX_DEBUG
