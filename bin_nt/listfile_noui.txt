@@ -7,4 +7,10 @@ scripts\players.shader
 scripts\13box.arena
 levelshots\
 maps\
+win\
+scripts\lightningnew.shader
+gfx\misc\lightning3new.jpg
+gfx\misc\lightning3newnpm.jpg
+scripts\explode1.shader
+sprites\*
 default.cfg
