@@ -1174,7 +1174,7 @@ static void CG_TrailItem( centity_t *cent, qhandle_t hModel ) {
 CG_PlayerPowerups
 ===============
 */
-static void CG_PlayerPowerups( centity_t *cent ) {
+static void CG_PlayerPowerups( centity_t *cent, int weapon, team_t team ) {
 	int		powerups;
 
 	powerups = cent->currentState.powerups;
@@ -1184,6 +1184,14 @@ static void CG_PlayerPowerups( centity_t *cent ) {
 
 	// quad gives a dlight
 	if ( powerups & ( 1 << PW_QUAD ) ) {
+#if CGX_FREEZE //X-Mod: fix glow for teams
+		if ( !weapon ) {
+			if (team == TEAM_RED)
+				trap_R_AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 1.0, 0.2, 0.2 );
+			else
+				trap_R_AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 0.2, 0.2, 1 );
+		} else
+#endif//freeze
 		trap_R_AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 0.2, 0.2, 1 );
 	}
 
@@ -1569,7 +1577,7 @@ void CG_Player( centity_t *cent ) {
 		 &torso.oldframe, &torso.frame, &torso.backlerp );
 
 	// add powerups floating behind the player
-	CG_PlayerPowerups( cent );
+	CG_PlayerPowerups( cent , cent->currentState.weapon, ci->team );
 
 	// add the talk baloon or disconnect icon
 	CG_PlayerSprites( cent );
