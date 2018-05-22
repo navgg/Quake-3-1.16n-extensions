@@ -579,8 +579,6 @@ void CG_RegisterWeapon( int weaponNum ) {
 		CG_Error( "Couldn't find weapon %i", weaponNum );
 	}
 
-	CGX_NomipStart();
-
 	CG_RegisterItemVisuals( item - bg_itemlist );
 
 	// load cmodel before model so filecache works
@@ -735,8 +733,6 @@ void CG_RegisterWeapon( int weaponNum ) {
 		weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/rocket/rocklf1a.wav" );
 		break;
 	}
-
-	CGX_NomipEnd();
 }
 
 /*
