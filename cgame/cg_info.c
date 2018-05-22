@@ -173,8 +173,8 @@ void CG_DrawInformation( void ) {
 	//X-MOD: draw version
 	{
 		vec4_t	x_modcol = { 1.0, 0.1, 0.1, CGX_BP_NUMBER / 55.0 };
-		int sw = strlen(CGX_NAME) * SMALLCHAR_WIDTH;
-		UI_DrawProportionalString(vScreen.width - 4 - sw * 2, SCREEN_HEIGHT - SMALLCHAR_HEIGHT - 8, CGX_NAME,
+		int sw = (strlen(CGX_NAME) +  strlen(CGX_VERSION)) * SMALLCHAR_WIDTH;
+		UI_DrawProportionalString(vScreen.width - 4 - sw, SCREEN_HEIGHT - SMALLCHAR_HEIGHT - 8, CGX_NAME,
 			UI_RIGHT | UI_SMALLFONT | x_pulse, x_modcol);
 
 		UI_DrawProportionalString(vScreen.width - 8, SCREEN_HEIGHT - SMALLCHAR_HEIGHT - 8, CGX_VERSION,

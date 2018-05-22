@@ -71,3 +71,7 @@ added interpolation part from 1.32 for unlagged 2.01 (cg_delag_interp32 1|0 temp
 fixed enemy colors restore after team change
 fixes chat spoofing bug on client (cg_chatFilter 1|0 - on\off)
 fixed display of frozen players names in freeze tag
+
+0.92.1b
+
+fix for RE_AddPolyToScene in ffa mode with com_blood 1
