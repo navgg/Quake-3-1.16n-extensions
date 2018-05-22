@@ -49,3 +49,4 @@ download - generates script in quake 3 game folder for specified map,
 		run this script to download map from web
 colorlist - 0: black, 1: red, 2: green, 3: yellow, 4: blue  5: cyan, 6: magenta, 7: white
 xmod - quick info & help on mod commands, usage \xmod <command>
+

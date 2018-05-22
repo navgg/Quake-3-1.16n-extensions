@@ -1,3 +1,5 @@
+//Freeze Tag is Copyright 1998, 2001, 2002 by Darrell Bircsak
+
 #include "cg_local.h"
 #if CGX_FREEZE
 void CG_Drop_f( void ) {

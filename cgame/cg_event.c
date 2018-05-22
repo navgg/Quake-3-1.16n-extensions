@@ -120,10 +120,10 @@ static void CG_Obituary( entityState_t *ent ) {
 	case MOD_TRIGGER_HURT:
 		message = "was in the wrong place";
 		break;
-#if CGX_FREEZE
-	case MOD_UNKNOWN:
-		CG_BodyObituary( ent, targetName );
-		return;
+#if CGX_FREEZE //in 1.16n seems not working, at least in noghost freeze
+	//case MOD_UNKNOWN:
+	//	CG_BodyObituary( ent, targetName );
+	//	return;
 #endif//freeze
 	default:
 		message = NULL;

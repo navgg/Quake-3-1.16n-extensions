@@ -6,4 +6,6 @@ X-Mod - (c) 2018 NaViGaToR (322)
 Unlagged 2.01 - (c) 2006 Neil “haste” Toronto
 13box - (c) 2009 sst13
 CPMA - (c) 2000-2010 Challenge World, (c) 2016-2018 The ProMode Team
+Freeze Tag - (ñ) 1998, 2001, 2002 by Darrell Bircsak
 Quake 3 Arena - (c) 1999-2005 Id Software
+
