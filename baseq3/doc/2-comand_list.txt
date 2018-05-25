@@ -40,6 +40,8 @@ cg_sharedConfig 0|1 - fixes problem with saving configs after game exit in 1.16n
 		to save manually use command \writesharedconfig)
 cg_chatFilter 0|1 - on/off fixes chat spoofing bug on client
 cg_enableBreath 0|1 - show breath puffs from players (freeze tag command, for ambiance)
+cg_killbeep 0-7 - plays a sound after kill 0: Off 1: Ting 2: Tink 3: Dramatic 4: Voosh 
+		5: Drum 6: Bang 7: Ding 8: ChaChing
 writesharedconfig - writes q3config.cfg to baseq3 folder (command do the following 
 		"writeconfig ..\\baseq3\\q3config.cfg" - if playing on modded server,
 		"writeconfig q3config.cfg" - if playing on default quake 3 server)

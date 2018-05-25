@@ -16,6 +16,8 @@ SOUND OPTIONS MENU
 #define ART_FRAMER			"menu/art/frame1_r"
 #define ART_BACK0			"menu/art/back_0"
 #define ART_BACK1			"menu/art/back_1"
+#define ART_ACCEPT0			"menu/art/accept_0"
+#define ART_ACCEPT1			"menu/art/accept_1"
 
 #define ID_GRAPHICS			10
 #define ID_DISPLAY			11
@@ -26,16 +28,18 @@ SOUND OPTIONS MENU
 #define ID_QUALITY			16
 #define ID_A3D				17
 #define ID_COMPRESSION		18
-#define ID_BACK				19
+#define ID_KILLBEEP			19
+#define ID_BACK				20
 
-#define MAX_INFO_MESSAGES	5
+#define MAX_INFO_MESSAGES	6
 static void UI_Sound_StatusBar( void *self ) {	
 	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
 		{ "Controls sound effects volume", "" },
 		{ "Controls ingame music volume", "" },
 		{ "Sets sound quality, recommended 'High'", "" },
 		{ "This setting removed in latest Quake 3", "Recommended 'Off'" },
-		{ "Sound compression", "Removed in latest Quake 3, Recommended 'Off'" }
+		{ "Sound compression", "Removed in latest Quake 3, Recommended 'Off'" },
+		{ "Sets sound beep after killing an enemy", "" }
 	};
 
 	UIX_CommonStatusBar(self, ID_EFFECTSVOLUME, MAX_INFO_MESSAGES, info_messages);
@@ -43,6 +47,19 @@ static void UI_Sound_StatusBar( void *self ) {
 
 static const char *quality_items[] = {
 	"Low", "High", 0
+};
+
+static const char *killbeep_items[] = {
+	"Off",
+	"Ting",
+	"Tink",
+	"Dramatic",
+	"Voosh",
+	"Drum",
+	"Bang",
+	"Ding",
+	"Cha-Ching!",
+	0
 };
 
 typedef struct {
@@ -62,8 +79,13 @@ typedef struct {
 	menulist_s			quality;
 	menuradiobutton_s	compression;
 	menuradiobutton_s	a3d;
+	menulist_s			killbeep;
+	int					killpeep_initial;
+
+	sfxHandle_t			killbeep_sounds[8];
 
 	menubitmap_s		back;
+	menubitmap_s		apply;
 } soundOptionsInfo_t;
 
 static soundOptionsInfo_t	soundOptionsInfo;
@@ -134,12 +156,37 @@ static void UI_SoundOptionsMenu_Event( void* ptr, int event ) {
 		soundOptionsInfo.quality.curvalue = !trap_Cvar_VariableValue( "s_compression" ) && trap_Cvar_VariableValue( "s_khz" ) >= 22;		
 		break;
 
+	case ID_KILLBEEP:
+		trap_Cvar_SetValue( "cg_killBeep", soundOptionsInfo.killbeep.curvalue );
+
+		if (soundOptionsInfo.killbeep.curvalue)
+			trap_S_StartLocalSound(soundOptionsInfo.killbeep_sounds[soundOptionsInfo.killbeep.curvalue % 8], CHAN_LOCAL);
+
+		if (trap_Cvar_VariableValue("cl_paused")) {
+			soundOptionsInfo.apply.generic.flags |= QMF_HIDDEN | QMF_INACTIVE;
+			if (soundOptionsInfo.killpeep_initial != soundOptionsInfo.killbeep.curvalue && soundOptionsInfo.killbeep.curvalue)
+				soundOptionsInfo.apply.generic.flags &= ~(QMF_HIDDEN | QMF_INACTIVE);
+		}
+		break;
+
 	case ID_BACK:
 		UI_PopMenu();
 		break;
 	}
 }
 
+/*
+=================
+SoundOptions_ApplyChanges
+=================
+*/
+static void SoundOptions_ApplyChanges( void *unused, int notification )
+{
+	if (notification != QM_ACTIVATED)
+		return;
+
+	trap_Cmd_ExecuteText( EXEC_APPEND, "snd_restart\n" );
+}
 
 /*
 ===============
@@ -274,6 +321,17 @@ static void UI_SoundOptionsMenu_Init( void ) {
 	soundOptionsInfo.a3d.generic.y				= y;
 	soundOptionsInfo.a3d.generic.statusbar		= UI_Sound_StatusBar;
 
+	y += BIGCHAR_HEIGHT+2;
+	soundOptionsInfo.killbeep.generic.type		= MTYPE_SPINCONTROL;
+	soundOptionsInfo.killbeep.generic.name		= "Kill beep:";
+	soundOptionsInfo.killbeep.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	soundOptionsInfo.killbeep.generic.callback	= UI_SoundOptionsMenu_Event;
+	soundOptionsInfo.killbeep.generic.id		= ID_KILLBEEP;
+	soundOptionsInfo.killbeep.generic.x			= 400;
+	soundOptionsInfo.killbeep.generic.y			= y;
+	soundOptionsInfo.killbeep.itemnames			= killbeep_items;
+	soundOptionsInfo.killbeep.generic.statusbar	= UI_Sound_StatusBar;
+
 	soundOptionsInfo.back.generic.type			= MTYPE_BITMAP;
 	soundOptionsInfo.back.generic.name			= ART_BACK0;
 	soundOptionsInfo.back.generic.flags			= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -284,6 +342,16 @@ static void UI_SoundOptionsMenu_Init( void ) {
 	soundOptionsInfo.back.width					= 128;
 	soundOptionsInfo.back.height				= 64;
 	soundOptionsInfo.back.focuspic				= ART_BACK1;
+
+	soundOptionsInfo.apply.generic.type     = MTYPE_BITMAP;
+	soundOptionsInfo.apply.generic.name     = ART_ACCEPT0;
+	soundOptionsInfo.apply.generic.flags    = QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_HIDDEN|QMF_INACTIVE;
+	soundOptionsInfo.apply.generic.callback = SoundOptions_ApplyChanges;
+	soundOptionsInfo.apply.generic.x        = 640;
+	soundOptionsInfo.apply.generic.y        = 480-64;
+	soundOptionsInfo.apply.width  		    = 128;
+	soundOptionsInfo.apply.height  			= 64;
+	soundOptionsInfo.apply.focuspic         = ART_ACCEPT1;
 
 	Menu_AddItem( &soundOptionsInfo.menu, ( void * ) &soundOptionsInfo.banner );
 	Menu_AddItem( &soundOptionsInfo.menu, ( void * ) &soundOptionsInfo.framel );
@@ -297,13 +365,17 @@ static void UI_SoundOptionsMenu_Init( void ) {
 	Menu_AddItem( &soundOptionsInfo.menu, ( void * ) &soundOptionsInfo.quality );
 	Menu_AddItem( &soundOptionsInfo.menu, ( void * ) &soundOptionsInfo.a3d );
 	Menu_AddItem( &soundOptionsInfo.menu, ( void * ) &soundOptionsInfo.compression );
+	Menu_AddItem( &soundOptionsInfo.menu, ( void * ) &soundOptionsInfo.killbeep );
 	Menu_AddItem( &soundOptionsInfo.menu, ( void * ) &soundOptionsInfo.back );
+	Menu_AddItem( &soundOptionsInfo.menu, ( void * ) &soundOptionsInfo.apply );
 
 	soundOptionsInfo.sfxvolume.curvalue = trap_Cvar_VariableValue( "s_volume" ) * 10;
 	soundOptionsInfo.musicvolume.curvalue = trap_Cvar_VariableValue( "s_musicvolume" ) * 10;
 	soundOptionsInfo.quality.curvalue = !trap_Cvar_VariableValue( "s_compression" ) && trap_Cvar_VariableValue( "s_khz" ) >= 22;
 	soundOptionsInfo.compression.curvalue = trap_Cvar_VariableValue( "s_compression" );
 	soundOptionsInfo.a3d.curvalue = (int)trap_Cvar_VariableValue( "s_usingA3D" );
+	soundOptionsInfo.killbeep.curvalue = (int)trap_Cvar_VariableValue( "cg_killBeep" ) % 9;
+	soundOptionsInfo.killpeep_initial = soundOptionsInfo.killbeep.curvalue;
 }
 
 
@@ -313,10 +385,17 @@ UI_SoundOptionsMenu_Cache
 ===============
 */
 void UI_SoundOptionsMenu_Cache( void ) {
+	int i;
+
 	trap_R_RegisterShaderNoMip( ART_FRAMEL );
 	trap_R_RegisterShaderNoMip( ART_FRAMER );
 	trap_R_RegisterShaderNoMip( ART_BACK0 );
 	trap_R_RegisterShaderNoMip( ART_BACK1 );
+	trap_R_RegisterShaderNoMip( ART_ACCEPT0 );
+	trap_R_RegisterShaderNoMip( ART_ACCEPT1 );
+
+	for (i = 0; i < ArrLen(soundOptionsInfo.killbeep_sounds); i++)
+		soundOptionsInfo.killbeep_sounds[i] = trap_S_RegisterSound(va("sound/feedback/impact%i.wav", i));
 }
 
 

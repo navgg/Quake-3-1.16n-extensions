@@ -240,12 +240,13 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 			if (cgx_hitsounds.integer > 1) // reversed: higher damage - higher tone
 				index = 3 - index;
 
-			trap_S_StartLocalSound(cgs.media.hitSounds[index], CHAN_LOCAL_SOUND);
+			//X-mod: changed to CHAN_LOCAL from CHAN_LOCAL_SOUND, seems that channel is free in game
+			trap_S_StartLocalSound(cgs.media.hitSounds[index], CHAN_LOCAL);
 		} else {
-			trap_S_StartLocalSound(cgs.media.hitSound, CHAN_LOCAL_SOUND);
+			trap_S_StartLocalSound(cgs.media.hitSound, CHAN_LOCAL);
 		}
 	} else if ( ps->persistant[PERS_HITS] < ops->persistant[PERS_HITS] ) {
-		trap_S_StartLocalSound( cgs.media.hitTeamSound, CHAN_LOCAL_SOUND );
+		trap_S_StartLocalSound( cgs.media.hitTeamSound, CHAN_LOCAL );
 	}
 
 	// health changes of more than -1 should make pain sounds

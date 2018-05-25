@@ -677,7 +677,7 @@ static float CGX_DrawSpeedMeter(float y) {
 	}
 	else {
 		/* center of screen */
-		CG_DrawBigString(vScreen.hwidth - w / 2, 260, s, 0.5f);
+		CG_DrawBigString(vScreen.hwidth - w / 2, 255, s, 0.5f);
 		return y;
 	}
 }

@@ -188,8 +188,10 @@ static void CG_Obituary( entityState_t *ent ) {
 			s = va("You fragged %s", targetName );
 		}
 		CG_CenterPrint( s, SCREEN_HEIGHT * 0.25, BIGCHAR_WIDTH );
-
 		// print the text message as well
+		// X-mod: play QL kill sound
+		if (cgx_killBeep.integer)
+			trap_S_StartLocalSound(cgs.media.killBeep, CHAN_LOCAL);
 	}
 
 	// check for double client messages

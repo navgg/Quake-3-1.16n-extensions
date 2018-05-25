@@ -738,6 +738,8 @@ typedef struct {
 	sfxHandle_t oneFragSound;
 	//X-MOD: pro mode sounds
 	sfxHandle_t hitSounds[4];
+	// ql kill beep
+	sfxHandle_t killBeep;
 
 	sfxHandle_t hitSound;
 	sfxHandle_t hitTeamSound;
@@ -902,6 +904,7 @@ extern	vmCvar_t		cgx_weaponEffects;
 extern	vmCvar_t		cgx_nomip;
 extern	vmCvar_t		cgx_sharedConfig;
 extern	vmCvar_t		cgx_chatFilter;
+extern	vmCvar_t		cgx_killBeep;
 
 extern	vmCvar_t		com_maxfps;
 extern	vmCvar_t		cl_maxpackets;

@@ -72,6 +72,7 @@ vmCvar_t	cgx_weaponEffects;
 vmCvar_t	cgx_nomip;
 vmCvar_t	cgx_sharedConfig;
 vmCvar_t	cgx_chatFilter;
+vmCvar_t	cgx_killBeep;
 
 vmCvar_t	com_maxfps;
 vmCvar_t	cl_maxpackets;
@@ -301,6 +302,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_sharedConfig, "cg_sharedConfig", "0", CVAR_ARCHIVE },
 	{ &cgx_nomip, "cg_nomip", "-1", CVAR_ARCHIVE | CVAR_LATCH },
 	{ &cgx_chatFilter, "cg_chatFilter", "1", CVAR_ARCHIVE },
+	{ &cgx_killBeep, "cg_killBeep", "0", CVAR_ARCHIVE | CVAR_LATCH },
 #if CGX_UNLAGGED
 	//unlagged - client options
 	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},	
@@ -826,6 +828,9 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.sfx_railg = trap_S_RegisterSound ("sound/weapons/railgun/railgf1a.wav");
 	cgs.media.sfx_rockexp = trap_S_RegisterSound ("sound/weapons/rocket/rocklx1a.wav");
 	cgs.media.sfx_plasmaexp = trap_S_RegisterSound ("sound/weapons/plasma/plasmx1a.wav");
+
+	if (cgx_killBeep.integer)
+		cgs.media.killBeep = trap_S_RegisterSound (va("sound/feedback/impact%i.wav", cgx_killBeep.integer % 8));
 }
 
 

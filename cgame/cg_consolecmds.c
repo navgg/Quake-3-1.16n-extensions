@@ -156,6 +156,24 @@ static void CGX_Download_f(void) {
 	CGX_DownloadMap(name, end_load);
 }
 
+static void CGX_Pk3list_f(void) {
+	trap_SendConsoleCommand("dir . pk3\n");
+}
+
+
+static char CGX_RandChar() {
+	char res;
+	do res = 32 + rand() % 58;
+	while (res == '%' || (res >= 39 && res <= 63));
+	return res;
+}
+
+#define rc CGX_RandChar()
+static void CGX_RageQuit_f(void) {
+	trap_SendConsoleCommand(va("say %c%c%c%c%c%c%c%c%c%c%c%c%c!!!; wait 300; disconnet; quit;\n", rc, rc, rc, rc, rc, rc, rc, rc, rc, rc, rc, rc, rc));
+}
+#undef rc
+
 typedef struct {
 	char	*cmd;
 	void	(*function)(void);
@@ -189,6 +207,8 @@ static consoleCommand_t	commands[] = {
 	{ "download", CGX_Download_f },
 	{ "autorecord", CGX_RecordSync_f },	
 	{ "xmod", CGX_Xmod_f },
+	{ "pk3list", CGX_Pk3list_f },
+	{ "ragequit", CGX_RageQuit_f },
 
 #if CGX_FREEZE//freeze
 	{ "drop", CG_Drop_f },

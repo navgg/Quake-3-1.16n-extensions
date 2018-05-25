@@ -75,3 +75,8 @@ fixed display of frozen players names in freeze tag
 0.92.1b
 
 fix for RE_AddPolyToScene in ffa mode with com_blood 1
+
+...
+
+added missing crash taunt
+added \cg_killBeep 0-8 killing sounds from quake live
