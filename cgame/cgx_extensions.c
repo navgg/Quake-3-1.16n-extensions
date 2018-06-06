@@ -29,13 +29,6 @@ static void CGX_Delay( int msec ) {
 	CG_Printf( "Delay end\n" );
 }
 
-// instead of modes 1 2 4 6 will be 1 2 3 4
-static qboolean EM_Check(int x) {
-	int i = cgx_enemyModel_enabled.integer;
-	i = i == 3 ? i = 4 : i == 4 ? i = 6 : i;	
-	return i & x;
-}
-
 //init virtual screen for widescreen or 4:3
 void CGX_Init_vScreen(void) {	
 	// get the rendering configuration from the client system
@@ -72,6 +65,13 @@ void CGX_Init_vScreen(void) {
 }
 
 #pragma region Xmod enemy models
+
+// instead of modes 1 2 4 6 will be 1 2 3 4
+static qboolean EM_Check( int x ) {
+	int i = cgx_enemyModel_enabled.integer;
+	i = i == 3 ? i = 4 : i == 4 ? i = 6 : i;
+	return i & x;
+}
 
 static void CGX_ParseEnemyModelSetting(char *modelDest, char *skinDest, char *cvarStr) {
 	char modelStr[MAX_QPATH];
@@ -594,6 +594,129 @@ void CGX_ChatFilter(char *str) {
 		if (*c == '\r') *c = '.';
 }
 
+#pragma region Chat Tokens
+
+// helpers for chat tokens
+static char *team_names[] = { "Free", "Red", "Blue", "Spectator" };
+static char team_cols[] = { COLOR_YELLOW, COLOR_RED, COLOR_BLUE, COLOR_WHITE };
+static int intlen( int i ) {
+	int l = 0;
+	do { i /= 10; l++; } while (i);
+	return l;
+}
+static char col_i( int i ) {
+	if (i >= 100) return COLOR_WHITE;
+	if (i >= 66) return COLOR_GREEN;
+	if (i >= 33) return COLOR_YELLOW;
+	return COLOR_RED;
+}
+static char col_i2( int i ) {
+	if (i >= 100) return COLOR_WHITE;
+	return COLOR_YELLOW;
+}
+
+#define cgx_token_fmt(x,len) \
+*c = '%'; *(c + 1) = 's'; \
+pos = c - res; \
+res = va( res, x ); \
+c = res + pos + len - 1;
+#define cgx_add_i(x) Com_sprintf(val, sizeof val, "%i^%c", x, chatcol); cgx_token_fmt(val, intlen(x) + 2); //2 - chatcol len
+#define cgx_add_s(x) Com_sprintf(val, sizeof val, "%s^%c", x, chatcol); cgx_token_fmt(val, strlen(x) + 2);
+#define cgx_add_powerup(x) Com_sprintf(val, sizeof val, "%i^%c ", x, chatcol); cgx_token_fmt(val, intlen(x) + 2 + 1);
+#define cgx_add_col_hp(x) Com_sprintf(val, sizeof val, "^%c%i^%c", col_i(x), x, chatcol); cgx_token_fmt(val, intlen(x) + 2 + 2); //2 - col_i len
+#define cgx_add_col_armor(x) Com_sprintf(val, sizeof val, "^%c%i^%c", col_i2(x), x, chatcol); cgx_token_fmt(val, intlen(x) + 2 + 2);
+#define cgx_add_col_team(c,x) Com_sprintf(val, sizeof val, "^%c%s^%c", c, x, chatcol); cgx_token_fmt(val, strlen(x) + 2 + 2);
+
+//check string for chat tokens and replace them with info if necessary
+char *CGX_CheckChatTokens( char *message, char chatcol ) {
+	char *res, *c;
+
+	//if following someone skip checks
+	if (cg.snap->ps.pm_flags & PMF_FOLLOW)
+		return message;
+
+	//process tokens
+	for (res = c = message; *c; c++) {
+		if (*c != '#')
+			continue;
+		if (!*(c + 1) || !*(c + 2))
+			break;
+		if (!Q_isalpha( *(c + 2) )) {
+			int pos;
+			char val[128];
+			playerState_t *ps = &cg.snap->ps;
+			clientInfo_t *ci = &cgs.clientinfo[ps->clientNum];			
+
+			switch (*(c + 1)) {
+				case 'h': cgx_add_i( ps->stats[STAT_HEALTH] ); break;
+				case 'a': cgx_add_i( ps->stats[STAT_ARMOR] ); break;
+				case 'H': cgx_add_col_hp( ps->stats[STAT_HEALTH] ); break;
+				case 'A': cgx_add_col_armor( ps->stats[STAT_ARMOR] ); break;
+				case 'n': cgx_add_s( ci->name ); break;
+				case 's': cgx_add_i( ci->score ); break;
+				case 't': cgx_add_s( team_names[ci->team] ); break;
+				case 'T': cgx_add_col_team( team_cols[ci->team], team_names[ci->team] ); break;
+				case 'i': cgx_add_s( bg_itemlist[cg.itemPickup].pickup_name ); break;
+				case 'x': cgx_add_s( cgs.clientinfo[CG_CrosshairPlayer()].name ); break;
+				case 'l': cgx_add_s( cgs.clientinfo[CG_LastAttacker()].name ); break;
+				case 'k': cgx_add_s( cg.killerName ); break;
+				case 'u':
+				case 'U': {
+					char p[1024];
+					int i;
+					qboolean colorful = Q_isupper( *(c + 1) );
+
+					for (p[0] = 0, i = 0; i < PW_NUM_POWERUPS; i++)
+						if (ci->powerups & (1 << i)) {
+							int pl = strlen( p );
+
+							if (colorful) {
+								char col;
+								switch (i) {
+								case PW_BLUEFLAG:
+								case PW_INVIS: col = COLOR_BLUE; break;
+								case PW_REDFLAG:
+								case PW_REGEN: col = COLOR_RED; break;
+								case PW_QUAD: col = COLOR_CYAN; break;
+								case PW_HASTE:
+								case PW_BATTLESUIT: col = COLOR_YELLOW; break;
+								case PW_FLIGHT: col = COLOR_MAGENTA; break;
+								default: col = chatcol; break; }
+
+								Com_sprintf( p + pl, sizeof p - pl, "^%c%s^%c, ", col, bg_itemlist[27 + i].pickup_name, chatcol );
+							}
+							else {
+								Com_sprintf( p + pl, sizeof p - pl, "%s, ", bg_itemlist[27 + i].pickup_name );
+							}
+						}
+
+					i = strlen( p );
+
+					if (!i) {
+						cgx_add_s( "" )
+					} else {
+						p[i - 2] = 0;
+						cgx_add_s( p )
+					}
+				} break;
+				case 'L': {
+					char *p = (char*)CG_ConfigString( CS_LOCATIONS + ci->location );
+					if (!p || !*p)
+						p = "unknown";
+
+					cgx_add_s( p );
+				} break;
+			}
+		}
+	}
+
+	return res;
+}
+
+#pragma endregion
+
+#pragma region Modinfo
+
 // check for unlagged enabled\disabled for bma\nms
 // send modinfo in initialsnapshot and check result here
 static int cgx_modinfosend = 0;
@@ -667,6 +790,8 @@ void CGX_SendModinfo(void) {
 		D_Printf(("modinfo not sent\n"));
 	}
 }
+
+#pragma endregion
 
 // X-MOD: potential fix for q3config saving problem
 void CGX_SaveSharedConfig(qboolean forced) {
@@ -1035,7 +1160,7 @@ static void CGX_PrintLine(char c) {
 //parse info from file
 //format: cmd1 - description1\r\n
 static void CGX_ShowHelp(char *filename, char *cmd) {
-	char			buf[1024 * 4];
+	char			buf[1024 * 8];
 	static			qboolean exampleShown;
 
 	//start parse command list if read succesful

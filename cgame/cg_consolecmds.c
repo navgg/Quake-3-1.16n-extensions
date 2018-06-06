@@ -174,6 +174,28 @@ static void CGX_RageQuit_f(void) {
 }
 #undef rc
 
+static void CGX_Say_f( void ) {
+	char message[128];
+	char *res;
+
+	trap_Args( message, 128 );
+
+	res = CGX_CheckChatTokens( message, COLOR_GREEN );
+
+	trap_SendClientCommand( va( "say %s\n", res ) );
+}
+
+static void CGX_SayTeam_f( void ) {
+	char message[128];
+	char *res;
+
+	trap_Args( message, 128 );
+
+	res = CGX_CheckChatTokens( message, COLOR_CYAN );
+
+	trap_SendClientCommand( va( "say_team %s\n", res ) );
+}
+
 typedef struct {
 	char	*cmd;
 	void	(*function)(void);
@@ -209,6 +231,8 @@ static consoleCommand_t	commands[] = {
 	{ "xmod", CGX_Xmod_f },
 	{ "pk3list", CGX_Pk3list_f },
 	{ "ragequit", CGX_RageQuit_f },
+	{ "say", CGX_Say_f },
+	{ "say_team", CGX_SayTeam_f },
 
 #if CGX_FREEZE//freeze
 	{ "drop", CG_Drop_f },
@@ -261,8 +285,8 @@ void CG_InitConsoleCommands( void ) {
 	// forwarded to the server after they are not recognized locally
 	//
 	trap_AddCommand ("kill");
-	trap_AddCommand ("say");
-	trap_AddCommand ("say_team");
+	//trap_AddCommand ("say");
+	//trap_AddCommand ("say_team");
 	trap_AddCommand ("give");
 	trap_AddCommand ("god");
 	trap_AddCommand ("notarget");

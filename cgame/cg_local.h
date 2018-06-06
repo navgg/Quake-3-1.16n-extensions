@@ -1078,6 +1078,7 @@ void CGX_TryLoadingFix();
 void CGX_Xmod(char *command);
 void CGX_DownloadMap(char *name, qboolean end_load);
 void CGX_ChatFilter(char *str);
+char *CGX_CheckChatTokens(char *message, char chatcol);
 
 //
 // cg_main.c

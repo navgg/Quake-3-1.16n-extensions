@@ -80,3 +80,6 @@ fix for RE_AddPolyToScene in ffa mode with com_blood 1
 
 added missing crash taunt
 added \cg_killBeep 0-8 killing sounds from quake live
+added chat tokes: #n - your player name, #s - score, #t/#T - team, #h/#H - health, #a/#A - armor,
+#i - last item you picked up, #l - last attacker, #x - name of player in crosshair, 
+#k - name of killer, #L - location, #u/#U - powerups (+flag) (#T/#H/#A/#U - for colrful display)

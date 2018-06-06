@@ -50,5 +50,15 @@ autorecord - start record demo (command do the following "g_syncronousClients 1;
 download - generates script in quake 3 game folder for specified map, 
 		run this script to download map from web
 colorlist - 0: black, 1: red, 2: green, 3: yellow, 4: blue  5: cyan, 6: magenta, 7: white
+chattokens - #n - your player name, 
+		#s - score, #t/#T - team, 
+		#h - health, #a/#A - armor, 
+		#i - last item you picked up, 
+		#l - last attacker, 
+		#x - name of player in crosshair, 
+		#k - name of killer, 
+		#L - location 
+		#u/#U - powerups (+flag)
+		(#T/#H/#A/#U - for colrful display)
 xmod - quick info & help on mod commands, usage \xmod <command>
 
