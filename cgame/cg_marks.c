@@ -373,6 +373,9 @@ void CG_ClearParticles (void)
 {
 	int		i;
 
+	if (!(cgx_weaponEffects.integer & WE_ROCKET32)) //only rocket using particles
+		return;
+
 	memset( particles, 0, sizeof(particles) );
 
 	free_particles = &particles[0];

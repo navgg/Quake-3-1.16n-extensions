@@ -93,6 +93,7 @@ void CG_ParseServerinfo( void ) {
 	Com_sprintf( cgs.mapname, sizeof( cgs.mapname ), "maps/%s.bsp", mapname );
 	Com_sprintf( cgs.mapname_clean, sizeof( cgs.mapname_clean ), "%s", mapname );
 
+	//sync server params
 	CGX_SyncServer_delagHitscan(info);
 	CGX_SyncServer_sv_fps(info);
 }
@@ -307,8 +308,7 @@ static void CG_MapRestart( void ) {
 
 	CG_InitLocalEntities();
 	CG_InitMarkPolys();
-	if (cgx_weaponEffects.integer)
-		CG_ClearParticles ();
+	CG_ClearParticles();
 
 	// make sure the "3 frags left" warnings play again
 	cg.fraglimitWarnings = 0;

@@ -1031,8 +1031,7 @@ static void CG_RegisterGraphics( void ) {
 		D_Printf(("^6cgs.gameModels %i %s\n", i, modelName));		
 	}
 
-	if (cgx_weaponEffects.integer)
-		CG_ClearParticles ();
+	CG_ClearParticles();
 
 	CGX_NomipEnd();
 }
