@@ -911,7 +911,14 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin ) {
 	}
 
 	// FIXME: crouch
-	muzzlePoint[2] += DEFAULT_VIEWHEIGHT;
+	// X-Mod: fixed
+	{
+		int anim = cent->currentState.legsAnim & ~ANIM_TOGGLEBIT;
+		if (anim == LEGS_WALKCR || anim == LEGS_IDLECR)
+			muzzlePoint[2] += CROUCH_VIEWHEIGHT;
+		else
+			muzzlePoint[2] += DEFAULT_VIEWHEIGHT;
+	}
 
 	VectorMA( muzzlePoint, 14, forward, muzzlePoint );
 
