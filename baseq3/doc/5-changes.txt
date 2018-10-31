@@ -76,13 +76,13 @@ fixed display of frozen players names in freeze tag
 
 fix for RE_AddPolyToScene in ffa mode with com_blood 1
 
-...
+0.93b
 
 added missing crash taunt
-added \cg_killBeep 0-8 killing sounds from quake live
 added chat tokes: #n - your player name, #s - score, #t/#T - team, #h/#H - health, #a/#A - armor,
 #i - last item you picked up, #l - last attacker, #x - name of player in crosshair, 
 #k - name of killer, #L - location, #u/#U - powerups (+flag) (#T/#H/#A/#U - for colrful display)
+added \cg_killBeep 0-8 killing sounds from quake live (quakelive default: 7)
 
 fixed lightning muzzle point when crouch
-fixed other player noclip on noghost servers with dmflags 4096 (walking through players smootly now)
+fixed other player noclip on noghost servers with dmflags 4096 (walking through players smooth now)
