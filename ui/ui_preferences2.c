@@ -195,13 +195,14 @@ static const char *scoreboar_items[] = {
 	"default",
 	"always small",
 	"vanilla Q3",
+	"nemesis",
 	0
 };
 
 static void Preferences2_SetMenuItems( void ) {
 	s_preferences2.rewards.curvalue		= trap_Cvar_VariableValue( "cg_drawRewards" ) != 0;
-	s_preferences2.timer.curvalue		= abs((int)trap_Cvar_VariableValue( "cg_drawTimer" ) % 3);
-	s_preferences2.speed.curvalue		= abs((int)trap_Cvar_VariableValue("cg_drawSpeed") % 3);
+	s_preferences2.timer.curvalue		= abs((int)trap_Cvar_VariableValue( "cg_drawTimer" ) % ArrLen(timer_items));
+	s_preferences2.speed.curvalue		= abs((int)trap_Cvar_VariableValue("cg_drawSpeed") % ArrLen(speed_items));
 	s_preferences2.blood.curvalue		= trap_Cvar_VariableValue( "com_blood" ) != 0;
 	s_preferences2.gibs.curvalue		= trap_Cvar_VariableValue( "cg_gibs" ) != 0;
 	//s_preferences2.playerids.curvalue	= trap_Cvar_VariableValue( "cg_drawPlayerIDs" ) != 0;	
@@ -215,16 +216,16 @@ static void Preferences2_SetMenuItems( void ) {
 	s_preferences2.enemytaunt.curvalue = trap_Cvar_VariableValue("cg_noTaunt") == 0;
 	//s_preferences2.coloredping.curvalue = trap_Cvar_VariableValue("cg_coloredPing") != 0;	
 	s_preferences2.deafultweapon.curvalue = abs((int)trap_Cvar_VariableValue("cg_defaultWeapon") % (WP_NUM_WEAPONS - 1));
-	s_preferences2.lagometer.curvalue = abs((int)trap_Cvar_VariableValue("cg_lagometer") % 4);
-	s_preferences2.hitsounds.curvalue = abs((int)trap_Cvar_VariableValue("cg_hitsounds") % 3);
+	s_preferences2.lagometer.curvalue = abs((int)trap_Cvar_VariableValue("cg_lagometer") % ArrLen(lagometer_items));
+	s_preferences2.hitsounds.curvalue = abs((int)trap_Cvar_VariableValue("cg_hitsounds") % ArrLen(hitsounds_items));
 	
 	s_preferences2.centerprint.curvalue = (int)(trap_Cvar_VariableValue("cg_centerPrintAlpha") * 2) % 3;
-	s_preferences2.drawgun.curvalue = (int)trap_Cvar_VariableValue("cg_drawGun") % 3;
+	s_preferences2.drawgun.curvalue = (int)trap_Cvar_VariableValue("cg_drawGun") % ArrLen(drawgun_items);
 
-	s_preferences2.scoreboard.curvalue = abs((int)trap_Cvar_VariableValue("cg_scoreboard") % 3);
+	s_preferences2.scoreboard.curvalue = abs((int)trap_Cvar_VariableValue("cg_scoreboard") % ArrLen(scoreboar_items));
 	s_preferences2.accuracy.curvalue = trap_Cvar_VariableValue("cg_drawAccuracy") != 0;
 	s_preferences2.scorebox.curvalue = trap_Cvar_VariableValue("cg_drawScoreBox") != 0;
-	s_preferences2.sharedconfig.curvalue		= trap_Cvar_VariableValue("cg_sharedConfig") != 0;
+	s_preferences2.sharedconfig.curvalue = trap_Cvar_VariableValue("cg_sharedConfig") != 0;
 
 	trap_Cvar_VariableStringBuffer("cg_fov", s_preferences2.fov.field.buffer, sizeof(s_preferences2.fov.field.buffer));
 	trap_Cvar_VariableStringBuffer("cg_zoomfov", s_preferences2.zoomfov.field.buffer, sizeof(s_preferences2.zoomfov.field.buffer));

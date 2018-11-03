@@ -660,6 +660,13 @@ typedef struct {
 	qhandle_t	freezeMarkShader;
 #endif//freeze
 
+	// Nemesis -  New media 
+	//qhandle_t	teamIconRed;
+	//qhandle_t	teamIconBlue;
+	qhandle_t	scoreBarRed;
+	qhandle_t	scoreBarBlue;
+	// End
+
 	// powerup shaders
 	qhandle_t	quadShader;
 	qhandle_t	redQuadShader;
@@ -1042,6 +1049,9 @@ void CG_BodyObituary( entityState_t *ent, char *targetName );
 qboolean Q_Isfreeze( int clientNum );
 void CG_AddGib( localEntity_t *le );
 #endif//freeze
+
+// cg_scoreboard_nemesis.c
+qboolean CG_DrawOSPScoreboard( void );
 
 //
 // cgx_extensions.c

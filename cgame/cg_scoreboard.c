@@ -52,7 +52,7 @@
 static qboolean localClient; // true if local client has been displayed
 
 
-							 /*
+/*
 =================
 CG_DrawScoreboard
 =================
@@ -142,7 +142,7 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 
 	// X-MOD: draw player ID
 
-	if (cgx_scoreboard.integer < 2) {		
+	if (cgx_scoreboard.integer != 2) {		
 		float color[4];
 		color[0] = color[1] = color[2] = 1.0f;
 		Com_sprintf(string, sizeof(string), "%3i", score->client);
@@ -159,7 +159,7 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 	}
 
 	// X-MOD: color ping
-	if (cgx_scoreboard.integer > 1)
+	if (cgx_scoreboard.integer == 2)
 		pingCol = ColorIndex(COLOR_WHITE);
 	else if (score->ping <= 50)
 		pingCol = ColorIndex(COLOR_WHITE);
@@ -266,12 +266,12 @@ static int CG_TeamScoreboard( int y, team_t team, float fade, int maxClients, in
 
 /*
 =================
-CG_DrawScoreboard
+CG_DrawNormalScoreboard
 
 Draw the normal in-game scoreboard
 =================
 */
-qboolean CG_DrawScoreboard( void ) {
+qboolean CG_DrawNormalScoreboard( void ) {
 	int		x, y, w, i, n1, n2;
 	float	fade;
 	float	*fadeColor;
@@ -360,7 +360,7 @@ qboolean CG_DrawScoreboard( void ) {
 	y = SB_TOP;
 
 	// If there are more than SB_MAXCLIENTS_NORMAL, use the interleaved scores
-	if (cg.numScores > SB_MAXCLIENTS_NORMAL || cgx_scoreboard.integer == 1) {
+	if (cg.numScores > SB_MAXCLIENTS_NORMAL || cgx_scoreboard.integer == 1 || cgx_scoreboard.integer == 3) {
 		maxClients = SB_MAXCLIENTS_INTER;
 		lineHeight = SB_INTER_HEIGHT;
 		topBorderSize = 8;
@@ -428,6 +428,30 @@ qboolean CG_DrawScoreboard( void ) {
 	}
 
 	return qtrue;
+}
+
+/*
+=================
+CG_DrawScoreboard
+
+Draw specified scoreboard
+=================
+*/
+qboolean CG_DrawScoreboard( void ) {
+	if (cgx_scoreboard.integer == 3) {
+		if (!cgs.media.scoreBarRed)
+			cgs.media.scoreBarRed = trap_R_RegisterShader( "scoreboard_bar_red" );
+		if (!cgs.media.scoreBarBlue)
+			cgs.media.scoreBarBlue = trap_R_RegisterShader( "scoreboard_bar_blue" );
+		//if (!cgs.media.teamIconRed)
+		//	cgs.media.teamIconRed = trap_R_RegisterShader( "team_red_icon" );
+		//if (!cgs.media.teamIconBlue)
+		//	cgs.media.teamIconBlue = trap_R_RegisterShader( "team_blue_icon" );
+
+		return CG_DrawOSPScoreboard();
+	} else {
+		return CG_DrawNormalScoreboard();
+	}
 }
 
 //================================================================================
