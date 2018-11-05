@@ -122,7 +122,7 @@ void CGX_CheckEnemyModelAll(void) {
 	for ( i = 0, ci = cgs.clientinfo ; i < cgs.maxclients ; i++, ci++ )
 		if (ci->infoValid) {
 			CGX_CheckEnemyModel(ci, qtrue, i);
-			CGX_SetSkinColors(ci);
+			CGX_SetSkinColors(ci, i);
 		}
 	
 	D_Printf(("CG_LoadDeferredPlayers\n"));
@@ -139,8 +139,8 @@ void CGX_SetSkinColorsAll(void) {
 		return;
 
 	for (i = 0, ci = cgs.clientinfo; i < cgs.maxclients; i++, ci++)
-		if (cg.clientNum != i && ci->infoValid)
-			CGX_SetSkinColors(ci);
+		if (ci->infoValid)
+			CGX_SetSkinColors(ci, i);
 }
 
 static void CGX_ColorFromChar(char v, byte *color, clientInfo_t *info) {
@@ -175,14 +175,14 @@ static byte CGX_RGBToGray(byte *c) {
 	}
 }
 
-static void CGX_SetColorInfo(clientInfo_t *info, const char *color) {	
+static void CGX_SetColorInfo(clientInfo_t *info, const char *color, int clientNum) {
 	int i;
 
-	// if skin is not pm skip
-	if (Q_stricmp(info->skinName, "pm"))
+	// if skin is not pm skip and no color is set
+	if (Q_stricmp(info->skinName, "pm") && !*color)
 		return;
 
-	if (!*color)
+	if (!*color || !cgx_enemyModel_enabled.integer)
 		color = "!!!!";
 	else if (i = QX_StringToColor(color))
 		color = va("%c%c%c%c", i, i, i, i);
@@ -201,7 +201,7 @@ static void CGX_SetColorInfo(clientInfo_t *info, const char *color) {
 	}	
 
 	// copy rail color
-	if (color[0] == '!') {
+	if (color[0] == '!' || cg.clientNum == clientNum) {
 		VectorCopy(info->colorCopy, info->color);
 	} else {
 		for (i = 0; i < 3; i++)
@@ -212,16 +212,16 @@ static void CGX_SetColorInfo(clientInfo_t *info, const char *color) {
 }
 
 //sets skin color for client
-void CGX_SetSkinColors(clientInfo_t *ci) {
+void CGX_SetSkinColors(clientInfo_t *ci, int clientNum) {
 	qboolean isSameTeam = qfalse;	
 
 	if (cg.clientNum >= 0)
 		isSameTeam = cgs.gametype >= GT_TEAM && cgs.clientinfo[cg.clientNum].team == ci->team;
 
 	if (!isSameTeam)
-		CGX_SetColorInfo(ci, cgx_enemyColors.string);
+		CGX_SetColorInfo(ci, cgx_enemyColors.string, clientNum);
 	else
-		CGX_SetColorInfo(ci, cgx_teamColors.string);
+		CGX_SetColorInfo(ci, cgx_teamColors.string, clientNum );
 }
 
 //restore real model and skin if needed and return result

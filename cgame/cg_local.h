@@ -1066,7 +1066,7 @@ void CGX_AutoAdjustNetworkSettings(void);
 void CGX_CheckEnemyModelAll(void);
 void CGX_GenerateMapBat(char *map);
 void CGX_IncreaseHunkmegs(int min);
-void CGX_SetSkinColors(clientInfo_t *ci);
+void CGX_SetSkinColors(clientInfo_t *ci, int clientNum);
 void CGX_SetSkinColorsAll(void);
 void CGX_Init_enemyModels(void);
 void CGX_Init_vScreen(void);

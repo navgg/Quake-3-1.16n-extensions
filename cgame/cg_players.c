@@ -633,7 +633,7 @@ void CG_NewClientInfo( int clientNum ) {
 		slash = strchr( newInfo.modelName, '/' );
 		if ( !slash ) {
 			// modelName didn not include a skin name			
-			if (cg.clientNum != cg.clientNum) {
+			if (cg.clientNum != clientNum) {
 				//fix model sarge/default in team game
 				if (cgs.gametype >= GT_TEAM && newInfo.team == TEAM_RED)
 					Q_strncpyz( newInfo.skinName, "red", sizeof( newInfo.skinName ) );
@@ -697,7 +697,7 @@ void CG_NewClientInfo( int clientNum ) {
 	*ci = newInfo;
 
 	//X-MOD: set color info, only here works fine in win32
-	CGX_SetSkinColors(ci);
+	CGX_SetSkinColors(ci, clientNum);
 }
 
 /*

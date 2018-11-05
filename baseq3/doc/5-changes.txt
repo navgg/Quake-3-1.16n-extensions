@@ -90,3 +90,6 @@ fixed other player noclip on noghost servers with dmflags 4096 (walking through 
 0.94b
 
 added nemesis scoreboard (cg_scoreboard 3)
+added cg_teamColors & cg_enemyColors support for custom bright skins
+
+fixed rail color restore for player after cg_enemyModel enable\disable toggle
