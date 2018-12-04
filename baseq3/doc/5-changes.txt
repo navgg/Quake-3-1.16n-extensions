@@ -93,3 +93,4 @@ added nemesis scoreboard (cg_scoreboard 3)
 added cg_teamColors & cg_enemyColors support for custom bright skins
 
 fixed rail color restore for player after cg_enemyModel enable\disable toggle
+fixed playback of fall sound when player/enemy is dead
