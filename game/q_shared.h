@@ -10,8 +10,8 @@
 #define	Q3_VERSION		"Q3 1.16n"
 // X-MOD constants
 #define CGX_NAME		"X-Mod"
-#define CGX_VERSION		"0.93b"
-#define CGX_DATE		"22 May 2018" //__DATE__ not working with dd/mm/yyyy format
+#define CGX_VERSION		"0.94b"
+#define CGX_DATE		"03 Nov 2018" //__DATE__ not working with dd/mm/yyyy format
 #define CGX_DEBUG		0
 #define	CGX_UNLAGGED	1//0 not wokring
 #define CGX_FREEZE		1

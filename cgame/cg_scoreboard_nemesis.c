@@ -54,6 +54,29 @@ void CG_DrawBorder( int x, int y, int w, int h, int size, const float *borderCol
 }
 
 /*
+=====================
+CG_DrawWidthGauge
+=====================
+*/
+void CG_DrawWidthGauge( int x, int y, int width, int height, vec4_t color, int value, qboolean reverse ) {
+
+	int shadedWidth;
+
+	shadedWidth = (width * value) / 100;
+
+	trap_R_SetColor( color );
+
+	if (!reverse) {
+		CG_DrawPic( x, y, shadedWidth, height, cgs.media.whiteShader );
+	}
+	else {
+		CG_DrawPic( x + width - shadedWidth, y, shadedWidth, height, cgs.media.whiteShader );
+	}
+
+	trap_R_SetColor( NULL );
+}
+
+/*
 ================
 CG_DrawTeamBackground2
 Nemesis - Function modified quite a bit for scoreboard, team colors, hud, etc.

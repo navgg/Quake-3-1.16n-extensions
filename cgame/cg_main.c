@@ -80,6 +80,9 @@ vmCvar_t	cgx_delag;
 
 vmCvar_t	cgx_debug;
 
+//nemesis
+vmCvar_t	cg_teamInfoType;
+
 //unlagged - client options
 vmCvar_t	cg_delag;
 vmCvar_t	cg_cmdTimeNudge;
@@ -272,7 +275,8 @@ cvarTable_t		cvarTable[] = {
 #if CGX_DEBUG
 	{ &cg_stats, "cg_stats", "0", 0 },
 #endif
-
+	//nemesis
+	{ &cg_teamInfoType, "cg_teamInfoType", "2", CVAR_ARCHIVE },
 	// X-MOD: extended cgx commands
 
 	{ &cgx_wideScreenFix, "cg_wideScreenFix", "3", CVAR_ARCHIVE },
