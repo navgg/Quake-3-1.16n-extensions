@@ -342,7 +342,8 @@ static void UI_CreditMenu2_Draw( void ) {
 	DRAW_WSTEP1("")
 	DRAW_WSTEP1("")
 	DRAW_RSTEP1("Thanks to")
-	DRAW_WSTEP1("Sodmod.ga community")
+	DRAW_WSTEP1("Sodmod.ml community")
+	DRAW_WSTEP1("Ex sodmod.ga" )
 	DRAW_WSTEP1("")
 
 	for (i = 0; i < SODNAMES_SIZE; i++) {		
