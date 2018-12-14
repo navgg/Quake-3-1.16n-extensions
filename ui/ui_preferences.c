@@ -114,13 +114,13 @@ static const char *crosshair_colors[] =
 	"cyan",
 	"magenta",		
 	"white",
-	"8",
-	"9",
-	"10",
-	"11",
-	"12",
-	"13",
-	"14",
+	"olive",
+	"maroon",
+	"purple",
+	"teal",
+	"office green",
+	"navy blue",
+	"coral red",
 	"15",
 	"16",
 	"17",
@@ -142,8 +142,21 @@ static const char *crosshair_colors[] =
 	"33",
 	"34",
 	"35",	
+	"36",
+	"37",
+	"38",
 	0
 };
+
+//"orange-red",
+//"dark orange",
+//"orange",
+//"green-yellow",
+//"chartreuse",
+//"green 1",
+//"spring green 1",
+//"spring green 2",
+//"green-cyan",
 
 static const char *crosshairsize_items[] =
 {

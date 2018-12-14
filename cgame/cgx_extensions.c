@@ -187,6 +187,15 @@ static void CGX_SetColorInfo(clientInfo_t *info, const char *color, int clientNu
 	else if (i = QX_StringToColor(color))
 		color = va("%c%c%c%c", i, i, i, i);
 
+	i = strlen( color );
+		
+	if (i < 4) {
+		i = (atoi( color ) + '0' + ArrLen( g_color_table_ex )) % 255;
+		color = va( "%c%c%c%c", (char)i, (char)i, (char)i, (char)i );
+	}
+
+	D_Printf(("CGX_SetColorInfo %s\n", color));
+
 	for (i = 0; i < 4; i++) {
 		if (!color[i])
 			return;

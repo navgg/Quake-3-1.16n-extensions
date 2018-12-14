@@ -93,6 +93,8 @@ added cg_teamColors & cg_enemyColors support for custom bright skins
 added nemesis scoreboard (cg_scoreboard 3)
 added cg_drawCrosshairNames 2,3,4 (2: draws player name + id above crosshair, 3: draws player name in nemesis style, 4: nemesis style + id)
 added cg_teamInfoType 0,1,2 (if cg_drawCrosshairNames 3 or 4 then it sets nemesis team info draw style, 0: name only, 1: name, health & armor as text, 2: name, health & armor using bars)
+added 3 magenta colors for crosshairs and enemy models, total 39 now
+added ability to set cg_enemyColors/cg_teamColors from 0 to 39 (for example cg_enemyColors 1 will set '1111', 10 will set 'aaaa' and so on)
 
 fixed rail color restore for player after cg_enemyModel enable\disable toggle
 fixed playback of fall sound when player/enemy is dead
