@@ -76,7 +76,7 @@ typedef struct {
 	menuradiobutton_s	brass;
 	menuradiobutton_s	wallmarks;
 	menuradiobutton_s	dynamiclights;
-	menuradiobutton_s	identifytarget;
+	menulist_s			identifytarget;
 	menuradiobutton_s	highqualitysky;
 	menuradiobutton_s	synceveryframe;
 	menuradiobutton_s	forcemodel;
@@ -155,6 +155,13 @@ static const char *crosshairsize_items[] =
 	0
 };
 
+static const char *drawnames_items[] = {
+	"off",
+	"default",
+	"name + id",
+	0
+};
+
 static void Preferences_SetMenuItems( void ) {
 	char buf[32];
 	
@@ -162,7 +169,7 @@ static void Preferences_SetMenuItems( void ) {
 	s_preferences.simpleitems.curvalue		= trap_Cvar_VariableValue( "cg_simpleItems" ) != 0;
 	s_preferences.brass.curvalue			= trap_Cvar_VariableValue( "cg_brassTime" ) != 0;
 	s_preferences.wallmarks.curvalue		= trap_Cvar_VariableValue( "cg_marks" ) != 0;
-	s_preferences.identifytarget.curvalue	= trap_Cvar_VariableValue( "cg_drawCrosshairNames" ) != 0;
+	s_preferences.identifytarget.curvalue	= (int)trap_Cvar_VariableValue( "cg_drawCrosshairNames" ) % ArrLen(drawnames_items);
 	s_preferences.dynamiclights.curvalue	= trap_Cvar_VariableValue( "r_dynamiclight" ) != 0;
 	s_preferences.highqualitysky.curvalue	= trap_Cvar_VariableValue ( "r_fastsky" ) == 0;
 	s_preferences.synceveryframe.curvalue	= trap_Cvar_VariableValue( "r_finish" ) != 0;
@@ -454,7 +461,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.dynamiclights.generic.statusbar   = UI_Preferences_StatusBar;
 
 	y += BIGCHAR_HEIGHT+2;
-	s_preferences.identifytarget.generic.type     = MTYPE_RADIOBUTTON;
+	s_preferences.identifytarget.generic.type     = MTYPE_SPINCONTROL;
 	s_preferences.identifytarget.generic.name	  = "Identify Target:";
 	s_preferences.identifytarget.generic.flags    = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
 	s_preferences.identifytarget.generic.callback = Preferences_Event;
@@ -462,6 +469,8 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.identifytarget.generic.x	      = PREFERENCES_X_POS;
 	s_preferences.identifytarget.generic.y	      = y;
 	s_preferences.identifytarget.generic.statusbar   = UI_Preferences_StatusBar;
+	s_preferences.identifytarget.itemnames        = drawnames_items;
+
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.highqualitysky.generic.type     = MTYPE_RADIOBUTTON;

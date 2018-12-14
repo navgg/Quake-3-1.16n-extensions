@@ -2114,7 +2114,11 @@ static void CG_DrawCrosshairNames( void ) {
 		return;
 	}
 
-	name = cgs.clientinfo[ cg.crosshairClientNum ].name;
+	if (cg_drawCrosshairNames.integer == 2)
+		name = va("%s ^7%i", cgs.clientinfo[cg.crosshairClientNum].name, cg.crosshairClientNum);
+	else
+		name = cgs.clientinfo[cg.crosshairClientNum].name;
+
 	w = CG_DrawStrlen( name ) * BIGCHAR_WIDTH;
 	CG_DrawBigString( vScreen.hwidth - w / 2, 170, name, color[3] * 0.5f );
 
