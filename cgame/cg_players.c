@@ -684,7 +684,8 @@ void CG_NewClientInfo( int clientNum ) {
 			}
 			// if we are low on memory, leave them with this model
 			if ( forceDefer ) {
-				CG_Printf( "Memory is low.  Using deferred model.\n" );
+				CG_Printf( "Memory is low.  Using deferred model. Set higher ^3com_hunkmegs^7 and restart game. Min: 112 Max: 256\n" );
+				CGX_IncreaseHunkmegs( CGX_MINHUNKMEGS );
 				newInfo.deferred = qfalse;
 			}
 		} else {
@@ -719,7 +720,8 @@ void CG_LoadDeferredPlayers( void ) {
 		if ( ci->infoValid && ci->deferred ) {
 			// if we are low on memory, leave it deferred
 			if ( trap_MemoryRemaining() < 4000000 ) {
-				CG_Printf( "Memory is low.  Using deferred model.\n" );
+				CG_Printf( "Memory is low.  Using deferred model. Set higher ^3com_hunkmegs^7 and restart game. Min: 112 Max: 256\n" );
+				CGX_IncreaseHunkmegs( CGX_MINHUNKMEGS );
 				ci->deferred = qfalse;
 				continue;
 			}
