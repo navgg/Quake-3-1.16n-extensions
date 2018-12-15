@@ -182,7 +182,7 @@ static void CGX_SetColorInfo(clientInfo_t *info, const char *color, int clientNu
 	if (Q_stricmp(info->skinName, "pm") && !*color)
 		return;
 
-	if (!*color || !cgx_enemyModel_enabled.integer)
+	if (!*color || !cgx_enemyModel_enabled.integer || cgs.clientinfo[cg.clientNum].team == TEAM_SPECTATOR)
 		color = "!!!!";
 	else if (i = QX_StringToColor(color))
 		color = va("%c%c%c%c", i, i, i, i);
