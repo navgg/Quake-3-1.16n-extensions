@@ -81,6 +81,16 @@
 #define D_Printf(x)
 #endif
 
+
+//X-mod: known server mods
+typedef enum {
+	SM_UNDEFINED,
+	SM_DEFAULT,
+	SM_NOGHOST,
+	SM_NEMESIS,
+	SM_BMA
+} cgxServerMod_t;
+
 typedef enum {
 	FOOTSTEP_NORMAL,
 	FOOTSTEP_BOOT,
@@ -845,6 +855,8 @@ typedef struct {
 	//X-MOD: save delag and server info
 	//int				sv_fps;	
 	//int				sv_maxrate;
+	char			gamename[MAX_QPATH];
+	cgxServerMod_t	serverMod;
 
 	//unlagged - client options
 	// this will be set to the server's g_delagHitscan
@@ -1084,8 +1096,7 @@ void CGX_SaveSharedConfig(qboolean forced);
 void CGX_SendModinfo(void);
 char CGX_ServerNameFixInfoLoad(char *str);
 void CGX_CheckEnemyModel(clientInfo_t *ci, qboolean isDeferred, int clientNum);
-void CGX_SyncServer_delagHitscan(const char * info);
-void CGX_SyncServer_sv_fps(const char *info);
+void CGX_SyncServerParams(const char *info);
 void CGX_TrackEnemyModelChanges();
 void CGX_TryLoadingFix();
 void CGX_Xmod(char *command);

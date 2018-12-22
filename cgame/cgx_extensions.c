@@ -564,6 +564,24 @@ void CGX_SyncServer_sv_fps(const char *info) {
 	}
 }
 
+void CGX_SyncServerParams(const char *info) {
+	CGX_SyncServer_delagHitscan( info );
+	CGX_SyncServer_sv_fps( info );
+
+	Q_strncpyz( cgs.gamename, Info_ValueForKey( info, "gamename" ), sizeof( cgs.gamename ) );
+
+	if (cgs.serverMod == SM_UNDEFINED) {
+		if (!Q_stricmp( cgs.gamename, "NoGhost" ))
+			cgs.serverMod = SM_NOGHOST;
+		else if (!Q_stricmp( cgs.gamename, "Nemesis" ))
+			cgs.serverMod = SM_NEMESIS;
+		else if (cgs.gamename[0] == 'B' && cgs.gamename[1] == 'M' && cgs.gamename[2] == 'A')
+			cgs.serverMod = SM_BMA;
+		else
+			cgs.serverMod = SM_DEFAULT;
+	}
+}
+
 #pragma endregion
 
 //check message for special commands
@@ -762,7 +780,6 @@ vmCvar_t	cgx_uinfo;
 
 // send modinfo if gamename nemesis or bma
 void CGX_SendModinfo(void) {
-	const char	*info;
 	char	*gamename;
 	qboolean isNemesis = qfalse, isBMA = qfalse;
 	static qboolean isNemesisRegistered = qfalse;
@@ -770,13 +787,10 @@ void CGX_SendModinfo(void) {
 	if (cg.intermissionStarted || cgs.delagHitscan == 1)
 		return;
 
-	info = CG_ConfigString( CS_SERVERINFO );
-	gamename = Info_ValueForKey(info, "gamename");
+	D_Printf(("gamename %s\n", cgs.gamename));
 
-	D_Printf(("gamename %s\n", gamename));
-
-	isNemesis = !Q_stricmp(gamename, "Nemesis");
-	isBMA = gamename[0] == 'B' && gamename[1] == 'M' && gamename[2] == 'A';
+	isNemesis = cgs.serverMod == SM_NEMESIS;
+	isBMA = cgs.serverMod == SM_BMA;
 
 #if CGX_NEMESIS_COMPATIBLE
 	if (isNemesis && !isNemesisRegistered) {

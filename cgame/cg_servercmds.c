@@ -94,10 +94,8 @@ void CG_ParseServerinfo( void ) {
 	Com_sprintf( cgs.mapname_clean, sizeof( cgs.mapname_clean ), "%s", mapname );
 
 	//sync server params
-	CGX_SyncServer_delagHitscan(info);
-	CGX_SyncServer_sv_fps(info);
+	CGX_SyncServerParams(info);
 }
-
 /*
 ==================
 CG_ParseWarmup
