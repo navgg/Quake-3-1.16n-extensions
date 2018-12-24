@@ -2318,6 +2318,8 @@ static void CG_DrawIntermission( void ) {
 
 	cg.scoreFadeTime = cg.time;
 	CG_DrawScoreboard();
+
+	CG_statsWindow();
 }
 
 /*
@@ -2507,6 +2509,9 @@ static void CG_Draw2D( void ) {
 	if ( cg_draw2D.integer == 0 ) {
 		return;
 	}
+
+	// OSP window style engine
+	CG_windowDraw();
 
 	if ( cg.snap->ps.pm_type == PM_INTERMISSION ) {
 		CG_DrawIntermission();

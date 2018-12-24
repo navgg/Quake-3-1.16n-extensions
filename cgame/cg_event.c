@@ -130,6 +130,9 @@ static void CG_Obituary( entityState_t *ent ) {
 		break;
 	}
 
+	//nemesis/OSP calc stats
+	CGX_UpdateKillsDeathsStats( mod, target, attacker );
+
 	if (attacker == target) {
 		gender = ci->gender;
 		switch (mod) {
@@ -577,6 +580,8 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			}
 			item = &bg_itemlist[ index ];
 
+			CGX_UpdateItemPickupStats( es, item );
+
 			// powerups and team items will have a separate global sound, this one
 			// will be played at prediction time
 			if ( item->giType == IT_POWERUP || item->giType == IT_TEAM) {
@@ -861,9 +866,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	case EV_OBITUARY:
 		DEBUGNAME("EV_OBITUARY");
-#if !CGX_DEBUG
 		CG_Obituary( es );
-#endif
 		break;
 
 	//

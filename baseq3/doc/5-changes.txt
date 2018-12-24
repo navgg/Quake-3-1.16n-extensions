@@ -89,6 +89,7 @@ fixed other player noclip on noghost servers with dmflags 4096 (walking through 
 
 0.94b
 
+added osp client stats, shows after match (can be binded by \bind <key> +cstats)
 added cg_teamColors & cg_enemyColors support for custom bright skins
 added nemesis scoreboard (cg_scoreboard 3)
 added cg_drawCrosshairNames 2,3,4 (2: draws player name + id above crosshair, 3: draws player name in nemesis style, 4: nemesis style + id)

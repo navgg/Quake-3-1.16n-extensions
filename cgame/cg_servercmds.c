@@ -317,6 +317,11 @@ static void CG_MapRestart( void ) {
 	//X-MOD: map restart
 	CGX_MapRestart();
 
+	//nemesis/osp reset stats
+	memset( &stats, 0, sizeof( stats ) );
+
+	CG_statsWindowFree( WFX_SCROLLLEFT );
+
 	cgs.voteTime = 0;
 
 	CG_StartMusic();

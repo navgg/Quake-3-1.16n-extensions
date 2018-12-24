@@ -196,6 +196,17 @@ static void CGX_SayTeam_f( void ) {
 	trap_SendClientCommand( va( "say_team %s\n", res ) );
 }
 
+// nemesis/OSP client statistics window 
+static void CG_drawstatsWindow( void ) {
+	if (!cg.intermissionStarted)
+		CG_statsWindow();
+}
+
+static void CG_removestatsWindow( void ) {
+	if (!cg.intermissionStarted)
+		CG_statsWindowFree( 0 );
+}
+
 typedef struct {
 	char	*cmd;
 	void	(*function)(void);
@@ -237,6 +248,10 @@ static consoleCommand_t	commands[] = {
 #if CGX_FREEZE//freeze
 	{ "drop", CG_Drop_f },
 #endif//freeze
+
+	//nemesis/OSP
+	{ "+cstats", CG_drawstatsWindow },
+	{ "-cstats", CG_removestatsWindow },
 };
 
 

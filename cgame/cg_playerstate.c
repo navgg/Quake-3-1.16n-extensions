@@ -383,6 +383,8 @@ void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops ) {
 	if ( cg.snap->ps.pm_type != PM_INTERMISSION 
 		&& ps->persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
 		CG_CheckLocalSounds( ps, ops );
+
+		CGX_UpdateDamageStats( ps, ops );
 	}
 
 	// check for going low on ammo

@@ -81,6 +81,106 @@
 #define D_Printf(x)
 #endif
 
+// OSP Window Engine
+#define MAX_WINDOW_COUNT		10
+#define MAX_WINDOW_LINES		64
+
+#define MAX_STRINGS				80
+#define MAX_STRING_POOL_LENGTH	128
+
+#define WINDOW_FONTWIDTH	8		// For non-true-type: width to scale from
+#define WINDOW_FONTHEIGHT	8		// For non-true-type: height to scale from
+
+#define WID_NONE			0x00	// General window
+#define WID_STATS			0x01	// Stats (reusable due to scroll effect)
+#define WID_ACC				0x02	// Accuracy window
+#define WID_MOTD			0x04	// MOTD
+#define	WID_SPEC			0x08	// Spectator window
+#define WID_INTERM			0x10	// Intermission copyright
+
+#define WFX_TEXTSIZING		0x0001	// Size the window based on text/font setting
+#define WFX_FLASH			0x0002	// Alternate between bg and b2 every half second
+#define WFX_TRUETYPE		0x0004	// Use truetype fonts for text
+// These need to be last
+#define WFX_FADEIN			0x0010	// Fade the window in (and back out when closing)
+#define WFX_SCROLLUP		0x0020	// Scroll window up from the bottom (and back down when closing)
+#define WFX_SCROLLDOWN		0x0040	// Scroll window down from the top (and back up when closing)
+#define WFX_SCROLLLEFT		0x0080	// Scroll window in from the left (and back right when closing)
+#define WFX_SCROLLRIGHT		0x0100	// Scroll window in from the right (and back left when closing)
+
+#define WSTATE_COMPLETE		0x00	// Window is up with startup effects complete
+#define WSTATE_START		0x01	// Window is "initializing" w/effects
+#define WSTATE_SHUTDOWN		0x02	// Window is shutting down with effects
+#define WSTATE_OFF			0x04	// Window is completely shutdown
+
+typedef struct {
+	vec4_t colorBorder;			// Window border color
+	vec4_t colorBackground;		// Window fill color
+	vec4_t colorBackground2;	// Window fill color2 (for flashing)
+	int curX;					// Scrolling X position
+	int curY;					// Scrolling Y position
+	int effects;				// Window effects
+	int flashMidpoint;			// Flashing transition point (in ms)
+	int flashPeriod;			// Background flashing period (in ms)
+	int fontHeight;				// For non-truetype font drawing
+	float fontScaleX;			// Font scale factor
+	float fontScaleY;			// Font scale factor
+	int fontWidth;				// For non-truetype font drawing
+	float h;					// Height
+	int	id;						// Window ID for special handling (i.e. stats, motd, etc.)
+	qboolean inuse;				// Activity flag
+	int lineCount;				// Number of lines to display
+	int lineHeight[MAX_WINDOW_LINES];	// Height property for each line
+	char *lineText[MAX_WINDOW_LINES];	// Text info
+	int targetTime;				// Time to complete any defined effect
+	int state;					// Current state of the window
+	int time;					// Current window time
+	float w;					// Width
+	float x;					// Target x-coordinate
+								//    negative values will align the window from the right minus the (window width + offset(x))
+	float y;					// Target y-coordinate
+								//    negative values will align the window from the bottom minus the (window height + offset(y))
+} cg_window_t;
+
+typedef struct {
+	qboolean fActive;
+	char str[MAX_STRING_POOL_LENGTH];
+} cg_string_t;
+
+typedef struct {
+	int				activeWindows[MAX_WINDOW_COUNT];	// List of active windows
+	int				numActiveWindows;					// Number of active windows in use
+	cg_window_t	window[MAX_WINDOW_COUNT];			// Static allocation of all windows
+} cg_windowHandler_t;
+
+// client side calculated statistics
+typedef struct {
+	int	weaponHits[WP_NUM_WEAPONS - 1];
+	int weaponShots[WP_NUM_WEAPONS - 1];
+	int weaponKills[WP_NUM_WEAPONS - 1];
+	int weaponDeaths[WP_NUM_WEAPONS - 1];
+
+	int suicides;
+
+	int	lastWeaponHit;
+	int	lastWeaponShot;
+
+	int armorTotal;
+	int armorRA;
+	int armorYA;
+
+	int healthTotal;
+	int healthMH;
+
+	int damageGiven;
+	int damageReceived;
+
+	//int flagsCaptured;
+	//int flagsReturned;
+	//int flagTime;
+} clientStats_t;
+
+//OSP end
 
 //X-mod: known server mods
 typedef enum {
@@ -584,6 +684,12 @@ typedef struct {
 	playerState_t savedPmoveStates[NUM_SAVED_STATES];
 	int			stateHead, stateTail;
 	//unlagged - optimized prediction
+
+	// OSP Window Engine
+	cg_string_t			aStringPool[MAX_STRINGS];
+	cg_window_t			*specWindow, *statsWindow, *intermWindow;
+	cg_window_t			*windowCurrent;			// Current window to update.. a bit of a hack :p
+	cg_windowHandler_t	winHandler;
 } cg_t;
 
 
@@ -898,6 +1004,9 @@ extern	weaponInfo_t	cg_weapons[MAX_WEAPONS];
 extern	itemInfo_t		cg_items[MAX_ITEMS];
 extern	markPoly_t		cg_markPolys[MAX_MARK_POLYS];
 
+//osp stats
+extern	clientStats_t	stats;
+
 extern  vmCvar_t		cgx_wideScreenFix;
 //extern  vmCvar_t		cgx_drawPlayerIDs;
 extern	vmCvar_t		cgx_enemyModel;
@@ -1067,6 +1176,8 @@ void CG_AddGib( localEntity_t *le );
 
 // cg_scoreboard_nemesis.c
 qboolean CG_DrawOSPScoreboard( void );
+void CG_statsWindow( void );
+void CG_statsWindowFree( int weffects );
 
 //
 // cgx_extensions.c

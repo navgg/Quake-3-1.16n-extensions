@@ -358,6 +358,10 @@ void CGX_TrackEnemyModelChanges() {
 	else if (cg.oldTeam != cgs.clientinfo[cg.clientNum].team) {
 		cg.oldTeam = cgs.clientinfo[cg.clientNum].team;
 
+		//clear stats if it's real player switch
+		if (!(cg.snap->ps.pm_flags & PMF_FOLLOW))
+			memset( &stats, 0, sizeof( stats ) );
+
 		CGX_CheckEnemyModelAll();
 		D_Printf(("^6TEAM CHANGED!\n"));
 	} //track intermission change

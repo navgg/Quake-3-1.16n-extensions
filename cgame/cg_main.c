@@ -47,6 +47,9 @@ centity_t			cg_entities[MAX_GENTITIES];
 weaponInfo_t		cg_weapons[MAX_WEAPONS];
 itemInfo_t			cg_items[MAX_ITEMS];
 
+//OSP stats
+clientStats_t		stats;
+
 vmCvar_t	cgx_wideScreenFix;
 //vmCvar_t	cgx_drawPlayerIDs;
 vmCvar_t	cgx_enemyModel;
