@@ -749,8 +749,8 @@ char *CGX_CheckChatTokens( char *message, char chatcol ) {
 static int cgx_modinfosend = 0;
 qboolean CGX_CheckModInfo(const char *str) {
 	int i;
-	// if 1sec passed after sending then don't check
-	if (cg.time - cgx_modinfosend > 1000)
+	// if 30sec passed after sending then don't check
+	if (cg.time - cgx_modinfosend > 30000)
 		return qtrue;
 
 	i = strlen(str);
