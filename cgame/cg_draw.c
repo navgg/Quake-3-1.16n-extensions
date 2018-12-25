@@ -2131,11 +2131,6 @@ static void CG_DrawCrosshairNamesNemesis( void ) {
 	ci = &cgs.clientinfo[cg.crosshairClientNum];
 	name = ci->name;
 
-	if (cg_drawCrosshairNames.integer == 4)
-		name = va( "%s ^7%i", ci->name, cg.crosshairClientNum );
-	else
-		name = ci->name;
-
 	w = CG_DrawStrlen( name ) * nameWidth;
 	CG_DrawStringExt( vScreen.hwidth - w / 2, startY, name, drawColor, qfalse, qfalse, nameWidth, nameHeight, 0 );
 
@@ -2208,6 +2203,45 @@ static void CG_DrawCrosshairNamesNemesis( void ) {
 	trap_R_SetColor( NULL );
 }
 
+//osp like bar draw
+void CGX_DrawHPArmorBar( int startY, int value, int maxValue, float alpha ) {
+	const int barHeight = 2;
+	const int barWidth = 100;
+	int index;
+	int barValue = (value > maxValue) ? maxValue : value;
+	int startX = vScreen.hwidth - barWidth / 2;
+	vec4_t color, shadow;
+
+	if (value > 100)
+		index = 7;
+	else if (value >= 75)
+		index = 2;
+	else if (value > 25)
+		index = 3;
+	else
+		index = 1;
+
+	Vector4Copy( g_color_table_ex[index], color );
+	Vector4Copy( g_color_table_ex[0], shadow );
+
+	color[3] *= alpha;
+	shadow[3] *= alpha;
+
+	CG_DrawWidthGauge( startX + 1,
+		startY + 1,
+		barWidth,
+		barHeight,
+		shadow,
+		barValue, qfalse );
+
+	CG_DrawWidthGauge( startX,
+		startY,
+		barWidth,
+		barHeight,
+		color,
+		barValue, qfalse );
+}
+
 /*
 =====================
 CG_DrawCrosshairNames
@@ -2217,6 +2251,8 @@ static void CG_DrawCrosshairNames( void ) {
 	float		*color;
 	char		*name;
 	float		w;
+	clientInfo_t *ci;
+	static int ft = 0;
 
 	if ( !cg_drawCrosshair.integer ) {
 		return;
@@ -2228,7 +2264,7 @@ static void CG_DrawCrosshairNames( void ) {
 		return;
 	}
 
-	if (cg_drawCrosshairNames.integer > 2) {
+	if (cg_drawCrosshairNames.integer == 2) {
 		CG_DrawCrosshairNamesNemesis();
 		return;
 	}
@@ -2243,13 +2279,36 @@ static void CG_DrawCrosshairNames( void ) {
 		return;
 	}
 
-	if (cg_drawCrosshairNames.integer == 2)
-		name = va("%s ^7%i", cgs.clientinfo[cg.crosshairClientNum].name, cg.crosshairClientNum);
+	ci = &cgs.clientinfo[cg.crosshairClientNum];
+
+	if (cg_drawCrosshairNames.integer == -1)
+		name = va("%s ^7%i", ci->name, cg.crosshairClientNum);
 	else
-		name = cgs.clientinfo[cg.crosshairClientNum].name;
+		name = ci->name;
 
 	w = CG_DrawStrlen( name ) * BIGCHAR_WIDTH;
-	CG_DrawBigString( vScreen.hwidth - w / 2, 170, name, color[3] * 0.5f );
+	color[3] *= 0.5f;
+	CG_DrawBigString( vScreen.hwidth - w / 2, 170, name, color[3] );
+
+	if (cg_teamInfoType.integer) {
+		const int startY = 170 + BIGCHAR_HEIGHT + 2;
+		clientInfo_t *ourCi = &cgs.clientinfo[cg.clientNum];
+
+		if (ourCi->team == ci->team &&
+			(ourCi->team == TEAM_RED || ourCi->team == TEAM_BLUE) && ci->health > 0) {
+
+			if (cg_teamInfoType.integer == 1) {
+				// draw as text
+				char *s = va( "%i / %i", ci->health, ci->armor );
+				w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
+				CG_DrawStringExt( vScreen.hwidth - w / 2, startY, s, color, qfalse, qtrue, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT / 2, 0 );
+			} else if (cg_teamInfoType.integer == 2) {
+				// draw as bars
+				CGX_DrawHPArmorBar( startY, ci->health, 100, color[3] );
+				CGX_DrawHPArmorBar( startY + 3, ci->armor, 100, color[3] );
+			}
+		}
+	}
 
 	trap_R_SetColor( NULL );
 }

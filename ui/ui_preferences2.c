@@ -195,7 +195,7 @@ static const char *scoreboar_items[] = {
 	"default",
 	"always small",
 	"vanilla Q3",
-	"nemesis",
+	"nemesis/osp",
 	0
 };
 

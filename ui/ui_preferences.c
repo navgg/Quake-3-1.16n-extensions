@@ -171,9 +171,7 @@ static const char *crosshairsize_items[] =
 static const char *drawnames_items[] = {
 	"off",
 	"default",
-	"default + id",
-	"nemesis",
-	"nemesis + id",
+	"nemesis/osp",
 	0
 };
 

@@ -279,7 +279,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_stats, "cg_stats", "0", 0 },
 #endif
 	//nemesis
-	{ &cg_teamInfoType, "cg_teamInfoType", "2", CVAR_ARCHIVE },
+	{ &cg_teamInfoType, "cg_teamInfoType", "1", CVAR_ARCHIVE },
 	// X-MOD: extended cgx commands
 
 	{ &cgx_wideScreenFix, "cg_wideScreenFix", "3", CVAR_ARCHIVE },
