@@ -351,7 +351,8 @@ void CGX_TrackEnemyModelChanges() {
 	if (cg.clientNum != cg.snap->ps.clientNum) {
 		cg.clientNum = cg.snap->ps.clientNum;
 		cg.oldTeam = cgs.clientinfo[cg.clientNum].team;
-				
+
+		if (cgx_enemyModel_enabled.integer)
 		CGX_CheckEnemyModelAll();
 		D_Printf(("^6cg.clientNum %i\n", cg.clientNum));
 	} // track team change
@@ -362,6 +363,7 @@ void CGX_TrackEnemyModelChanges() {
 		if (!(cg.snap->ps.pm_flags & PMF_FOLLOW))
 			memset( &stats, 0, sizeof( stats ) );
 
+		if (cgx_enemyModel_enabled.integer)
 		CGX_CheckEnemyModelAll();
 		D_Printf(("^6TEAM CHANGED!\n"));
 	} //track intermission change
@@ -369,6 +371,7 @@ void CGX_TrackEnemyModelChanges() {
 		EM_Check(EM_INTERMISSION)) {
 		cg.clientIntermission = qtrue;
 
+		if (cgx_enemyModel_enabled.integer)
 		CGX_CheckEnemyModelAll();
 		D_Printf(("^6PM_INTERMISSION!\n"));
 	}
@@ -383,8 +386,9 @@ void CGX_MapRestart() {
 	cg.clientIntermission = qfalse;
 
 	// X-MOD: send modinfo
-	CGX_SendModinfo();	
-	CGX_CheckEnemyModelAll();	
+	CGX_SendModinfo();
+	if (cgx_enemyModel_enabled.integer)
+		CGX_CheckEnemyModelAll();	
 	D_Printf(("^6CGX_MapRestart\n"));
 }
 
@@ -575,14 +579,16 @@ void CGX_SyncServerParams(const char *info) {
 	Q_strncpyz( cgs.gamename, Info_ValueForKey( info, "gamename" ), sizeof( cgs.gamename ) );
 
 	if (cgs.serverMod == SM_UNDEFINED) {
-		if (!Q_stricmp( cgs.gamename, "NoGhost" ))
+		if (!Q_stricmp( cgs.gamename, "NoGhost" )) {
 			cgs.serverMod = SM_NOGHOST;
-		else if (!Q_stricmp( cgs.gamename, "Nemesis" ))
+			//cgs.isFreezTag = atoi( Info_ValueForKey( info, "g_gameMod" ) ) == 1;
+		} else if (!Q_stricmp( cgs.gamename, "Nemesis" )) {
 			cgs.serverMod = SM_NEMESIS;
-		else if (cgs.gamename[0] == 'B' && cgs.gamename[1] == 'M' && cgs.gamename[2] == 'A')
+		} else if (cgs.gamename[0] == 'B' && cgs.gamename[1] == 'M' && cgs.gamename[2] == 'A') {
 			cgs.serverMod = SM_BMA;
-		else
+		} else {
 			cgs.serverMod = SM_DEFAULT;
+		}
 	}
 }
 

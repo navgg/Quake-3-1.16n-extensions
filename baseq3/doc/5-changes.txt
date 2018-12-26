@@ -69,7 +69,7 @@ added stuff from freeze tag (freeze shaders, cg_enableBreath etc.)
 added interpolation part from 1.32 for unlagged 2.01 (cg_delag_interp32 1|0 temp cvar)
 
 fixed enemy colors restore after team change
-fixes chat spoofing bug on client (cg_chatFilter 1|0 - on\off)
+fixed chat spoofing bug on client (cg_chatFilter 1|0 - on\off)
 fixed display of frozen players names in freeze tag
 
 0.92.1b
@@ -92,8 +92,8 @@ fixed other player noclip on noghost servers with dmflags 4096 (walking through 
 added osp client stats, shows after match (can be binded by \bind <key> +cstats)
 added cg_teamColors & cg_enemyColors support for custom bright skins
 added nemesis scoreboard (cg_scoreboard 3)
-added cg_drawCrosshairNames 2,3,4 (2: draws player name + id above crosshair, 3: draws player name in nemesis style, 4: nemesis style + id)
-added cg_teamInfoType 0,1,2 (if cg_drawCrosshairNames 3 or 4 then it sets nemesis team info draw style, 0: name only, 1: name, health & armor as text, 2: name, health & armor using bars)
+added cg_drawCrosshairNames 2 (draws player name in nemesis/osp style)
+added cg_teamInfoType 0,1,2 (sets team info draw style above crosshair 0: off, 1: hp & armor as text, 2: hp & armor as bars) teamoverlay must be enabled
 added 3 magenta colors for crosshairs and enemy models, total 39 now
 added ability to set cg_enemyColors/cg_teamColors from 0 to 39 (for example cg_enemyColors 1 will set '1111', 10 will set 'aaaa' and so on)
 

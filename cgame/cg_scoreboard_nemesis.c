@@ -1514,7 +1514,10 @@ void CGX_UpdateItemPickupStats( entityState_t *es, gitem_t *item ) {
 }
 
 void CGX_UpdateDamageStats( playerState_t *ps, playerState_t *ops ) {
-	if (cg.snap->ps.pm_flags & PMF_FOLLOW && ps->persistant[PERS_TEAM] != ops->persistant[PERS_TEAM])
+	if (cg.snap->ps.pm_flags & PMF_FOLLOW)
+		return;
+
+	if (ps->persistant[PERS_TEAM] != ops->persistant[PERS_TEAM])
 		return;
 	
 	if (ps->persistant[PERS_HITS] > ops->persistant[PERS_HITS]) {
