@@ -194,7 +194,7 @@ static void CG_Obituary( entityState_t *ent ) {
 		// print the text message as well
 		// X-mod: play QL kill sound
 		if (cgx_killBeep.integer)
-			trap_S_StartLocalSound(cgs.media.killBeep, CHAN_LOCAL);
+			trap_S_StartLocalSound(cgs.media.killBeep, CHAN_LOCAL_SOUND);
 	}
 
 	// check for double client messages
