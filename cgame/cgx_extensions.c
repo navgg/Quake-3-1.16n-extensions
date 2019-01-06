@@ -90,6 +90,9 @@ static void CGX_ParseEnemyModelSetting(char *modelDest, char *skinDest, char *cv
 	}
 
 	Q_strncpyz(modelDest, modelStr, sizeof modelStr);	
+
+	if (!*skinDest && modelDest[0] == '*')//all default
+		Q_strncpyz(skinDest, "*", sizeof modelStr);
 }
 
 //init cg.enemyModel cg.teamModel & skin values
@@ -251,7 +254,7 @@ static qboolean CGX_RestoreModelAndSkin(clientInfo_t *ci, qboolean isDeferred) {
 
 static void CGX_SetModel(clientInfo_t *ci, char *modelName) {
 	//if model not specified get from copy
-	if (!modelName[0])
+	if (!modelName[0] || modelName[0] == '*')
 		Q_strncpyz(ci->modelName, ci->modelNameCopy, sizeof(ci->modelName));		
 	else
 		Q_strncpyz(ci->modelName, modelName, sizeof(ci->modelName));
@@ -282,7 +285,9 @@ static void CGX_SetPMSkin(clientInfo_t *ci) {
 static void CGX_SetSkin(clientInfo_t *ci, char *skinName) {	
 	if (!skinName[0]) //if no skin set pm
 		CGX_SetPMSkin(ci);
-	else/* if (cgs.gametype < GT_TEAM || !Q_stricmp(skinName, "pm"))*/ //doesnt work
+	else if (skinName[0] == '*')
+		Q_strncpyz(ci->skinName, ci->skinNameCopy, sizeof(ci->skinName));
+	else /* if (cgs.gametype < GT_TEAM || !Q_stricmp(skinName, "pm"))*/ //doesnt work
 		Q_strncpyz(ci->skinName, skinName, sizeof(ci->skinName)); //set whatever specified
 	/// if gametype is not team\ctf or skin pm set it, otherwise red\blue will be used 
 }
