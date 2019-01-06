@@ -260,7 +260,18 @@ static void CGX_SetModel(clientInfo_t *ci, char *modelName) {
 		Q_strncpyz(ci->modelName, modelName, sizeof(ci->modelName));
 }
 
-static qboolean CGX_IsKnownModel(const char *modelName) {
+//check skin existence
+static qboolean CGX_IsSkinExists(const char *model, const char *skin) {
+	fileHandle_t f;
+
+	if (trap_FS_FOpenFile(va("models\\players\\%s\\head_%s.skin", model, skin), &f, FS_READ) <= 0)
+		return qfalse;
+
+	trap_FS_FCloseFile(f);
+	return qtrue;
+}
+
+static int CGX_IsKnownModel(const char *modelName) {
 	static char *known_models[] = {
 		"anarki", "biker", "bitterman", "bones", "crash", "doom", "grunt", "hunter",
 		"keel", "klesk", "lucy", "major", "mynx", "orbb", "ranger", "razor", "sarge",
@@ -268,18 +279,26 @@ static qboolean CGX_IsKnownModel(const char *modelName) {
 	int i;
 	for (i = 0; i < ArrLen(known_models); i++)
 		if (Q_stricmp(modelName, known_models[i]) == 0)
-			return qtrue;	
+			return 1;
 
-	return qfalse;	
+	if (CGX_IsSkinExists(modelName, "bright"))//quake live
+		return 2;
+	if (CGX_IsSkinExists(modelName, "pm"))
+		return 1;
+
+	return 0;	
 }
 
 static void CGX_SetPMSkin(clientInfo_t *ci) {
-	if (!CGX_IsKnownModel(ci->modelName)) {
-		D_Printf(("^3Warning: No PM skin for model %s\n", ci->modelName));
+	int r = CGX_IsKnownModel(ci->modelName);
+	if (r == 0) {
+		CG_Printf(CGX_NAME": Bright skin not found for model %s. Using %s model\n", ci->modelName, DEFAULT_MODEL);
 		Q_strncpyz(ci->modelName, DEFAULT_MODEL, sizeof(ci->modelName));
 	}
-
-	Q_strncpyz(ci->skinName, "pm", sizeof(ci->skinName));		
+	if (r == 2)
+		Q_strncpyz(ci->skinName, "bright", sizeof(ci->skinName));
+	else
+		Q_strncpyz(ci->skinName, "pm", sizeof(ci->skinName));
 }
 
 static void CGX_SetSkin(clientInfo_t *ci, char *skinName) {	
@@ -288,7 +307,12 @@ static void CGX_SetSkin(clientInfo_t *ci, char *skinName) {
 	else if (skinName[0] == '*')
 		Q_strncpyz(ci->skinName, ci->skinNameCopy, sizeof(ci->skinName));
 	else /* if (cgs.gametype < GT_TEAM || !Q_stricmp(skinName, "pm"))*/ //doesnt work
-		Q_strncpyz(ci->skinName, skinName, sizeof(ci->skinName)); //set whatever specified
+		if (CGX_IsSkinExists(ci->modelName, skinName)) {
+			Q_strncpyz(ci->skinName, skinName, sizeof(ci->skinName)); //set whatever specified if skin exists
+		} else {
+			CG_Printf(CGX_NAME": %s skin not found for model %s. Using %s skin\n", skinName, ci->modelName, ci->skinNameCopy);
+			Q_strncpyz(ci->skinName, ci->skinNameCopy, sizeof(ci->skinName)); //set copied backup
+		}
 	/// if gametype is not team\ctf or skin pm set it, otherwise red\blue will be used 
 }
 
@@ -1353,11 +1377,11 @@ static int CGX_FOpenFile(char *filename, fileHandle_t *f, fsMode_t mode, int max
 	len = trap_FS_FOpenFile( filename, f, mode );
 
 	if ( len <= 0 ) {
-		trap_Print( va( S_COLOR_RED "file not found: %s\n", filename ) );
+		trap_Print( va( S_COLOR_YELLOW "File not found: %s\n", filename ) );
 		return 0;
 	}
 	if ( len >= maxSize && maxSize != -1) {
-		trap_Print( va( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, maxSize ) );
+		trap_Print( va( S_COLOR_RED "File too large: %s is %i, max allowed is %i", filename, len, maxSize ) );
 		trap_FS_FCloseFile( *f );
 		return 0;
 	}
