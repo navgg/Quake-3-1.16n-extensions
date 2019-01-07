@@ -637,6 +637,25 @@ static void CG_InterpolateEntityPosition( centity_t *cent ) {
 
 }
 
+//X-Mod: 1.16 method
+static void CG_CalcEntityLerpPositions116(centity_t *cent) {
+	if ( cent->interpolate && cent->currentState.pos.trType == TR_INTERPOLATE ) {
+		CG_InterpolateEntityPosition( cent );
+		return;
+	}
+
+	// just use the current frame and evaluate as best we can
+	BG_EvaluateTrajectory( &cent->currentState.pos, cg.time, cent->lerpOrigin );
+	BG_EvaluateTrajectory( &cent->currentState.apos, cg.time, cent->lerpAngles );
+
+	// adjust for riding a mover if it wasn't rolled into the predicted
+	// player state
+	if ( cent != &cg.predictedPlayerEntity ) {
+		CG_AdjustPositionForMover( cent->lerpOrigin, cent->currentState.groundEntityNum, 
+			cg.snap->serverTime, cg.time, cent->lerpOrigin );
+	}
+}
+
 /*
 ===============
 CG_CalcEntityLerpPositions
@@ -665,35 +684,35 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 	*/
 	//unlagged - smooth clients #2
 
+	if (!cg_delag_interp32.integer) {
+		CG_CalcEntityLerpPositions116( cent );
+		return;
+	}
+
 	if ( cent->interpolate && cent->currentState.pos.trType == TR_INTERPOLATE ) {
 		CG_InterpolateEntityPosition( cent );
-		//CG_Printf("^");
 		return;
 	}	
 
-	if (cg_delag_interp32.integer) {
-		//1.32 stuff (seems this fixing next part of code from unlagged)
-		// first see if we can interpolate between two snaps for
-		// linear extrapolated clients
-		if (cent->interpolate && cent->currentState.pos.trType == TR_LINEAR_STOP &&
-			cent->currentState.number < MAX_CLIENTS) {
-			CG_InterpolateEntityPosition(cent);
-			//CG_Printf(".", cent->currentState.number);
-			return;
-		}
+	//1.32 stuff (seems this fixing next part of code from unlagged)
+	// first see if we can interpolate between two snaps for
+	// linear extrapolated clients
+	if (cent->interpolate && cent->currentState.pos.trType == TR_LINEAR_STOP &&
+		cent->currentState.number < MAX_CLIENTS) {
+		CG_InterpolateEntityPosition(cent);
+		return;
+	}
 
-		//X-MOD: this part of code makes everything worse, probably because of 1.16n (but with that part of code from 1.32 seems it's working correct now)
-		//unlagged - timenudge extrapolation
-		// interpolating failed (probably no nextSnap), so extrapolate
-		// this can also happen if the teleport bit is flipped, but that
-		// won't be noticeable
-		if (cent->currentState.number < MAX_CLIENTS &&
-			cent->currentState.clientNum != cg.predictedPlayerState.clientNum) {
-			cent->currentState.pos.trType = TR_LINEAR_STOP;
-			cent->currentState.pos.trTime = cg.snap->serverTime;
-			cent->currentState.pos.trDuration = 1000 / sv_fps.integer;
-			//CG_Printf("Z", cent->currentState.number);
-		}
+	//X-MOD: this part of code makes everything worse, probably because of 1.16n (but with that part of code from 1.32 seems it's working correct now)
+	//unlagged - timenudge extrapolation
+	// interpolating failed (probably no nextSnap), so extrapolate
+	// this can also happen if the teleport bit is flipped, but that
+	// won't be noticeable
+	if (cent->currentState.number < MAX_CLIENTS &&
+		cent->currentState.clientNum != cg.predictedPlayerState.clientNum) {
+		cent->currentState.pos.trType = TR_LINEAR_STOP;
+		cent->currentState.pos.trTime = cg.snap->serverTime;
+		cent->currentState.pos.trDuration = 1000 / sv_fps.integer;
 	}
 	//unlagged - timenudge extrapolation
 
@@ -715,8 +734,6 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 	}
 
 	// just use the current frame and evaluate as best we can
-		/*BG_EvaluateTrajectory( &cent->currentState.pos, cg.time, cent->lerpOrigin );
-		BG_EvaluateTrajectory( &cent->currentState.apos, cg.time, cent->lerpAngles );*/
 	BG_EvaluateTrajectory( &cent->currentState.pos, cg.time + timeshift, cent->lerpOrigin );
 	BG_EvaluateTrajectory( &cent->currentState.apos, cg.time + timeshift, cent->lerpAngles );
 
