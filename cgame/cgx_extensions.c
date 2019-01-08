@@ -30,24 +30,26 @@ static void CGX_Delay( int msec ) {
 }
 
 //init virtual screen for widescreen or 4:3
-void CGX_Init_vScreen(void) {	
+void CGX_Init_vScreen(void) {
+	const float baseAspect = 0.75f; // 3/4
+	float aspect;
 	// get the rendering configuration from the client system
 	trap_GetGlconfig( &cgs.glconfig );
 
+	aspect = (float)cgs.glconfig.vidWidth / (float)cgs.glconfig.vidHeight;
+
 	// X-MOD: init virtual screen sizes for wide screen fix
 	
-	if ( (cgx_wideScreenFix.integer & CGX_WFIX_SCREEN) && cgs.glconfig.vidWidth * 480 > cgs.glconfig.vidHeight * 640 ) {
-		vScreen.width = (float)cgs.glconfig.vidWidth / (float)cgs.glconfig.vidHeight * 480.0f;		 				 				
-		vScreen.offsetx = (vScreen.width - 640) / 2.0f;
+	if ( (cgx_wideScreenFix.integer & CGX_WFIX_SCREEN) && cgs.glconfig.vidWidth * SCREEN_HEIGHT > cgs.glconfig.vidHeight * SCREEN_WIDTH ) {
+		vScreen.width = aspect * (float)SCREEN_HEIGHT;
+		vScreen.offsetx = (vScreen.width - SCREEN_WIDTH) / 2.0f;
 	} else {
-		vScreen.width = 640;						
+		vScreen.width = SCREEN_WIDTH;						
 		vScreen.offsetx = 0;
 	}	
 
-	vScreen.ratiox = (float)vScreen.width / 640.0f;
-
 	vScreen.hwidth = vScreen.width / 2;
-	vScreen.hheight = SCREEN_HEIGHT / 2;
+	vScreen.fovaspect = baseAspect * aspect;
 
 	cgs.screenXScale = (float)cgs.glconfig.vidWidth / (float)vScreen.width;
 	cgs.screenYScale = (float)cgs.glconfig.vidHeight / (float)SCREEN_HEIGHT; 

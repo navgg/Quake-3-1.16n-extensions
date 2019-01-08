@@ -105,5 +105,8 @@ fixed check for unlagged on nemesis/bma servers
 
 added cg_teamModel "*" (if enemymodels enabled this value sets default skins for team, not bright pm skins, 
 	also can be used as "*/mysuperskin" or "bitterman/*", same for cg_enemyModel)
+added support for quakelive bright skins
 
 fixed sometimes missing cg_killbeep sounds
+
+minor optimizations

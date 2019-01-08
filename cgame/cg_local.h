@@ -970,15 +970,15 @@ typedef struct {
 	//unlagged - client options
 } cgs_t;
 
+//X-Mod: virtual screen sizes
+//height not used, its constant 480
 typedef struct {
 	int 			width;
 	int 			hwidth;
 	
-	//int 			height; //SCREEN_HEIGHT used
-	int 			hheight;
-	
-	float			ratiox;	
 	int				offsetx;
+	float			fovaspect;
+} vScreen_t;
 
 	int				sbheadx;
 	int				sbarmorx;
