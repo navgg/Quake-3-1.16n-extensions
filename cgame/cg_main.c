@@ -459,8 +459,8 @@ void CG_UpdateCvars( void ) {
 	int			i;
 	cvarTable_t	*cv;	
 
-#if CGX_UNLAGGED
 	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
+#if CGX_UNLAGGED
 		//unlagged - client options
 		// clamp the value between 0 and 999
 		// negative values would suck - people could conceivably shoot other
@@ -472,8 +472,9 @@ void CG_UpdateCvars( void ) {
 		// do anything more than -50 or 50 (actually the numbers are probably
 		// closer to -30 and 30, but 50 is nice and round-ish)
 		// might as well not feed the myth, eh?
+		// X-Mod: limit to -20 and 20 like in quake live
 		else if ( cv->vmCvar == &cl_timeNudge ) {
-			CG_Cvar_ClampInt( cv->cvarName, cv->vmCvar, -50, 50 );
+			CG_Cvar_ClampInt( cv->cvarName, cv->vmCvar, -20, 20 );
 		}
 #if CGX_DEBUG
 		// don't let this go too high - no point
