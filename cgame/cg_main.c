@@ -301,7 +301,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_crosshairColor, "cg_crosshairColor", "", CVAR_ARCHIVE },
 	{ &cgx_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
 	//{ &cgx_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },
-	{ &cgx_networkAdjustments, "cg_networkAdjustments", "1", CVAR_ARCHIVE },
+	{ &cgx_networkAdjustments, "cg_autoNetworkSettings", "1", CVAR_ARCHIVE },
 	{ &cgx_scoreboard, "cg_scoreboard", "0", CVAR_ARCHIVE },
 	{ &cgx_drawScoreBox, "cg_drawScoreBox", "1", CVAR_ARCHIVE },
 	{ &cgx_drawAccuracy, "cg_drawAccuracy", "0", CVAR_ARCHIVE },

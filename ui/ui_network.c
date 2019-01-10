@@ -214,7 +214,7 @@ static void UI_NetworkOptionsMenu_Event( void* ptr, int event ) {
 		break;
 	
 	case ID_AUTOADJ:
-		trap_Cvar_SetValue( "cg_networkAdjustments", networkOptionsInfo.adjustments.curvalue );
+		trap_Cvar_SetValue( "cg_autoNetworkSettings", networkOptionsInfo.adjustments.curvalue );
 		UI_NetworkOptionsMenu_CheckGrayed();
 		break;
 
@@ -506,7 +506,7 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.packetdup.curvalue = trap_Cvar_VariableValue("cl_packetdup") != 0;
 	networkOptionsInfo.delag.curvalue = trap_Cvar_VariableValue("cg_delag") != 0;	
 	networkOptionsInfo.prediction.curvalue = trap_Cvar_VariableValue("cg_delag_optimizePrediction") != 0;	
-	networkOptionsInfo.adjustments.curvalue = abs((int)trap_Cvar_VariableValue("cg_networkAdjustments") % 4);
+	networkOptionsInfo.adjustments.curvalue = abs((int)trap_Cvar_VariableValue("cg_autoNetworkSettings") % 4);
 	networkOptionsInfo.predictitems.curvalue = trap_Cvar_VariableValue("cg_predictitems") != 0;
 	//networkOptionsInfo.lagometer.curvalue = abs((int)trap_Cvar_VariableValue("cg_lagometer") % 4);
 

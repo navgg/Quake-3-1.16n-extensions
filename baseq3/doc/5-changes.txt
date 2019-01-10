@@ -103,12 +103,15 @@ fixed check for unlagged on nemesis/bma servers
 
 0.95b
 
-added cg_teamModel "*" (if enemymodels enabled this value sets default skins for team, not bright pm skins, 
-	also can be used as "*/mysuperskin" or "bitterman/*", same for cg_enemyModel)
+cl_timeNudge limit set -20 to 20
+renamed cg_networkAdjustments to cg_autoNetworkSettings
+
+added cg_teamModel "*" (if enemymodels enabled this value sets default red/blue skins for team, 
+	can be used as "*/mysuperskin" or "bitterman/*", same for cg_enemyModel)
 added support for quakelive bright skins
 
 fixed sometimes missing cg_killbeep sounds
-fixed extra damage given and received calc
+fixed damage given and received calc
 fixed flag draw with cg_drawIcons 0
 
 minor optimizations

@@ -236,7 +236,7 @@ cvarTable_t		cvarTable[] = {
 	{ &uix_crosshairColor, "cg_crosshairColor", "", CVAR_ARCHIVE },	
 	{ &uix_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
 	//{ &uix_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },	
-	{ &uix_networkAdjustments, "cg_networkAdjustments", "1", CVAR_ARCHIVE },
+	{ &uix_networkAdjustments, "cg_autoNetworkSettings", "1", CVAR_ARCHIVE },
 	{ &uix_scoreboard, "cg_scoreboard", "0", CVAR_ARCHIVE },
 	{ &uix_drawScoreBox, "cg_drawScoreBox", "1", CVAR_ARCHIVE },
 	{ &uix_sharedConfig, "cg_sharedConfig", "0", CVAR_ARCHIVE },

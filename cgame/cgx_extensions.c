@@ -535,18 +535,18 @@ void CGX_AutoAdjustNetworkSettings(void) {
 			info_showed = 1;
 		}*/ 
 
-		if (cl_timeNudge.integer < -15 && !info_showed) {
-			trap_Print("^5Hint: cl_timeNudge below -15 is quite useless, set it only if you really need it and know what you are doing\n");
-			info_showed = 1;
-		} else if (cl_timeNudge.integer > 0 && !info_showed) {
-			trap_Print("^5Hint: cl_timeNudge above 0 gives rendering delay in milliseonds, set it only if you really need it (mostly if your connection is not stable)\n");
-			info_showed = 1;
-		}
+		//if (cl_timeNudge.integer < -15 && !info_showed) {
+		//	trap_Print("^5Hint: cl_timeNudge below -15 is quite useless, set it only if you really need it and know what you are doing\n");
+		//	info_showed = 1;
+		//} else if (cl_timeNudge.integer > 0 && !info_showed) {
+		//	trap_Print("^5Hint: cl_timeNudge above 0 gives rendering delay in milliseonds, set it only if you really need it (mostly if your connection is not stable)\n");
+		//	info_showed = 1;
+		//}
 
-		if (cg_optimizePrediction.integer && cg_predictItems.integer && info_showed <= 1) {
+/*		if (cg_optimizePrediction.integer && cg_predictItems.integer && info_showed <= 1) {
 			trap_Print("^5Hint: if you have false item pickups (picking up armor or weapon and it's doenst count) because cg_delag_optimizePrediction is set to 1 or you have high ping then try to set cg_predictitems 0\n");
 			info_showed = 2;
-		}		
+		}	*/	
 	}
 }
 
