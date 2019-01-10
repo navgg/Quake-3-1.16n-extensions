@@ -109,5 +109,6 @@ added support for quakelive bright skins
 
 fixed sometimes missing cg_killbeep sounds
 fixed extra damage given and received calc
+fixed flag draw with cg_drawIcons 0
 
 minor optimizations

@@ -132,7 +132,7 @@ static void CG_Draw3DModel( float x, float y, float w, float h, qhandle_t model,
 	refdef_t		refdef;
 	refEntity_t		ent;	
 	
-	if ( !cg_draw3dIcons.integer || !cg_drawIcons.integer ) {
+	if ( !cg_draw3dIcons.integer || (!cg_drawIcons.integer && model != cgs.media.redFlagModel && model != cgs.media.blueFlagModel)) {
 		return;
 	}
 
@@ -262,7 +262,7 @@ void CG_DrawFlagModel( float x, float y, float w, float h, int team ) {
 		CG_Draw3DModel( x, y, w, h, 
 			team == TEAM_RED ? cgs.media.redFlagModel : cgs.media.blueFlagModel, 
 			0, origin, angles );
-	} else if ( cg_drawIcons.integer ) {
+	} else /*if ( cg_drawIcons.integer )*/ {
 		gitem_t *item = BG_FindItemForPowerup( team == TEAM_RED ? PW_REDFLAG : PW_BLUEFLAG );
 
 		CG_DrawPic( x, y, w, h, cg_items[ ITEM_INDEX(item) ].icon );
