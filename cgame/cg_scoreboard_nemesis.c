@@ -1521,15 +1521,22 @@ void CGX_UpdateDamageStats( playerState_t *ps, playerState_t *ops ) {
 		return;
 	
 	if (ps->persistant[PERS_HITS] > ops->persistant[PERS_HITS]) {
-		D_Printf( ("Damaged ^3%i\n", ps->persistant[PERS_HITS] - ops->persistant[PERS_HITS]) );
-		stats.damageGiven += ps->persistant[PERS_HITS] - ops->persistant[PERS_HITS];
+		int given = ps->persistant[PERS_HITS] - ops->persistant[PERS_HITS];
+		if (given > ops->stats[STAT_HEALTH])
+			given = ops->stats[STAT_HEALTH];
+		D_Printf( ("Damaged ^3%i (%i)\n", given, ps->persistant[PERS_HITS] - ops->persistant[PERS_HITS]) );
+		stats.damageGiven += given;
 	}
 
 	if (ps->stats[STAT_HEALTH] < ops->stats[STAT_HEALTH]) {
 		int received = ops->stats[STAT_HEALTH] - ps->stats[STAT_HEALTH];
 
 		if (!(received == 1 && ps->stats[STAT_HEALTH] >= 100)) {
-			D_Printf( ("Health -^3%i\n", received) );
+			if (received > ops->stats[STAT_HEALTH])
+				received = ops->stats[STAT_HEALTH];
+			if (received < 0)
+				received = 0;
+			D_Printf( ("Health -^3%i (%i)\n", received, ops->stats[STAT_HEALTH] - ps->stats[STAT_HEALTH]) );
 			stats.damageReceived += received;
 		}
 	} else if (ps->stats[STAT_HEALTH] > ops->stats[STAT_HEALTH] && ops->stats[STAT_HEALTH] > 0) {

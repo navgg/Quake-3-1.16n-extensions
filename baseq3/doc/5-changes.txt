@@ -108,5 +108,6 @@ added cg_teamModel "*" (if enemymodels enabled this value sets default skins for
 added support for quakelive bright skins
 
 fixed sometimes missing cg_killbeep sounds
+fixed extra damage given and received calc
 
 minor optimizations
