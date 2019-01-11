@@ -2084,125 +2084,6 @@ static void CG_ScanForCrosshairEntity( void ) {
 }
 
 
-/*
-=====================
-CG_DrawCrosshairNamesNemesis
-=====================
-*/
-static void CG_DrawCrosshairNamesNemesis( void ) {
-	float *color;
-	char *name;
-	float w;
-	clientInfo_t *ourCi;
-	clientInfo_t *ci;
-	char *s;
-	vec4_t drawColor;
-
-	// drawing constants
-	const int startY = 170;
-	const int nameWidth = 10;
-	const int nameHeight = 10;
-
-	if (!cg_drawCrosshair.integer) {
-		return;
-	}
-	if (!cg_drawCrosshairNames.integer) {
-		return;
-	}
-	if (cg.renderingThirdPerson) {
-		return;
-	}
-
-	// scan the known entities to see if the crosshair is sighted on one
-	CG_ScanForCrosshairEntity();
-
-	// draw the name of the player being looked at
-	color = CG_FadeColor( cg.crosshairClientTime, 1000 );
-	if (!color) {
-		trap_R_SetColor( NULL );
-		return;
-	}
-
-	drawColor[0] = colorWhite[0];
-	drawColor[1] = colorWhite[1];
-	drawColor[2] = colorWhite[2];
-	drawColor[3] = color[3] * 0.5f;
-
-	ci = &cgs.clientinfo[cg.crosshairClientNum];
-	name = ci->name;
-
-	w = CG_DrawStrlen( name ) * nameWidth;
-	CG_DrawStringExt( vScreen.hwidth - w / 2, startY, name, drawColor, qfalse, qfalse, nameWidth, nameHeight, 0 );
-
-	if (cg_teamInfoType.integer != 0) {
-		ourCi = &cgs.clientinfo[cg.clientNum];
-
-		if (ourCi->team == ci->team &&
-			(ourCi->team == TEAM_RED || ourCi->team == TEAM_BLUE) &&
-			ci->health > 0) {
-
-			CG_FillRect( vScreen.hwidth - w / 2, startY + nameHeight + 2, w, 1, drawColor );
-
-			if (cg_teamInfoType.integer == 1) {
-				// draw as text
-				s = va( "%i / %i", ci->health, ci->armor );
-				w = CG_DrawStrlen( s ) * 7;
-				CG_DrawStringExt( vScreen.hwidth - w / 2, startY + nameHeight + 4, s, drawColor, qfalse, qfalse, 7, 7, 0 );
-
-			}
-			else if (cg_teamInfoType.integer == 2) {
-				// draw with gauges
-				static float bar_colors[3][4] = {
-					{ 0.0f, 1.0f, 0.0f, 0.9f },  // green
-					{ 1.0f, 0.9f, 0.0f, 0.9f },  // amber
-					{ 1.0f, 0.0f, 0.0f, 0.9f }   // red
-				};
-				int index, barHealth, barArmor;
-				int barHeight = 2;
-				int barWidth = 100;
-
-				if (ci->health >= 75) {
-					index = 0;
-				}
-				else if (ci->health > 25) {
-					index = 1;
-				}
-				else {
-					index = 2;
-				}
-
-				barHealth = (ci->health > 100) ? 100 : ci->health;
-				CG_DrawWidthGauge( vScreen.hwidth - barWidth / 2,
-					startY + nameHeight + 4,
-					barWidth,
-					barHeight,
-					bar_colors[index],
-					barHealth, qfalse );
-
-				if (ci->armor >= 75) {
-					index = 0;
-				}
-				else if (ci->armor > 25) {
-					index = 1;
-				}
-				else {
-					index = 2;
-				}
-
-				barArmor = (ci->armor > 100) ? 100 : ci->armor;
-				CG_DrawWidthGauge( vScreen.hwidth - barWidth / 2,
-					startY + nameHeight + 7,
-					barWidth,
-					barHeight,
-					bar_colors[index],
-					barArmor, qfalse );
-			}
-		}
-	}
-
-	trap_R_SetColor( NULL );
-}
-
 //osp like bar draw
 void CGX_DrawHPArmorBar( int startY, int value, int maxValue, float alpha ) {
 	const int barHeight = 2;
@@ -2264,11 +2145,6 @@ static void CG_DrawCrosshairNames( void ) {
 		return;
 	}
 
-	if (cg_drawCrosshairNames.integer == 2) {
-		CG_DrawCrosshairNamesNemesis();
-		return;
-	}
-
 	// scan the known entities to see if the crosshair is sighted on one
 	CG_ScanForCrosshairEntity();
 
@@ -2281,28 +2157,29 @@ static void CG_DrawCrosshairNames( void ) {
 
 	ci = &cgs.clientinfo[cg.crosshairClientNum];
 
-	if (cg_drawCrosshairNames.integer == -1)
+	if (cg_drawCrosshairNames.integer & 32)
 		name = va("%s ^7%i", ci->name, cg.crosshairClientNum);
 	else
 		name = ci->name;
 
-	w = CG_DrawStrlen( name ) * BIGCHAR_WIDTH;
 	color[3] *= 0.5f;
-	CG_DrawBigString( vScreen.hwidth - w / 2, 170, name, color[3] );
 
-	if (cg_teamInfoType.integer) {
-		const int startY = 170 + BIGCHAR_HEIGHT + 2;
+	w = CG_DrawStrlen(name) * hud.big_char_w;
+	CG_DrawBigString2(vScreen.hwidth - w / 2, 170, name, color[3]);
+
+	if (cg_drawCrosshairNames.integer < 3 && ci->health > 0) {
+		int startY = 170 + hud.big_char_w + 2;
 		clientInfo_t *ourCi = &cgs.clientinfo[cg.clientNum];
 
 		if (ourCi->team == ci->team &&
-			(ourCi->team == TEAM_RED || ourCi->team == TEAM_BLUE) && ci->health > 0) {
+			(ourCi->team == TEAM_RED || ourCi->team == TEAM_BLUE)) {
 
-			if (cg_teamInfoType.integer == 1) {
+			if (cg_drawCrosshairNames.integer == 1) {
 				// draw as text
 				char *s = va( "%i / %i", ci->health, ci->armor );
-				w = CG_DrawStrlen( s ) * SMALLCHAR_WIDTH;
-				CG_DrawStringExt( vScreen.hwidth - w / 2, startY, s, color, qfalse, qtrue, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT / 2, 0 );
-			} else if (cg_teamInfoType.integer == 2) {
+				w = CG_DrawStrlen( s ) * TINYCHAR_WIDTH;
+				CG_DrawStringExt( vScreen.hwidth - w / 2, startY, s, color, qfalse, qtrue, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0 );
+			} else if (cg_drawCrosshairNames.integer == 2) {
 				// draw as bars
 				CGX_DrawHPArmorBar( startY, ci->health, 100, color[3] );
 				CGX_DrawHPArmorBar( startY + 3, ci->armor, 100, color[3] );

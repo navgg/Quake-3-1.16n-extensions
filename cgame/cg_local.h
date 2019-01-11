@@ -1058,9 +1058,6 @@ extern	vmCvar_t		cgx_dl_page;
 extern	vmCvar_t		cgx_dl_dynb;
 extern	vmCvar_t		cgx_dl_tobaseq3;
 
-//nemesis
-extern	vmCvar_t		cg_teamInfoType;
-
 extern	vmCvar_t		cg_centertime;
 extern	vmCvar_t		cg_runpitch;
 extern	vmCvar_t		cg_runroll;

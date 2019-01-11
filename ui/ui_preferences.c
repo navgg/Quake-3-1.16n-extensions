@@ -49,7 +49,7 @@ static void UI_Preferences_StatusBar( void *self ) {
 		{ "Toggles ejecting brass", "" },
 		{ "Toggles display of marks on walls", "Turning off may increase FPS in some cases" },
 		{ "Renders realtime dynamic lights", "Turning off may increase FPS on some PC" },
-		{ "Display target name above crosshair", "" },
+		{ "Display target name above crosshair", "To show team info 'teamoverlay' must be enabled" },
 		{ "V-Sync (Vertical synchronization)", "Strongly recommended 'Off'" },
 		{ "Forces all player models to be same", "All enemies in game will be using player's model" },
 		{ "Sets team overlay draw position", "" },
@@ -170,8 +170,9 @@ static const char *crosshairsize_items[] =
 
 static const char *drawnames_items[] = {
 	"off",
-	"default",
-	"nemesis/osp",
+	"name+team info text",
+	"name+team info bars",
+	"name only Vanilla Q3",
 	0
 };
 
