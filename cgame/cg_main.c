@@ -40,6 +40,7 @@ int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int a
 }
 
 vScreen_t			vScreen;
+xhud_t				hud;
 
 cg_t				cg;
 cgs_t				cgs;
@@ -364,6 +365,7 @@ int		cgx_deadBodyDarkenModificationCount = 1;
 int		cgx_enemyModel_enabledModificationCount = 1;
 int		cgx_fps_modificationCount = 1;
 int		cgx_sharedConfigModificationCount = 1;
+int		cgx_draw2DModificationCount = 1;
 
 // some temp info
 vmCvar_t	cgx_version;
@@ -499,8 +501,10 @@ void CG_UpdateCvars( void ) {
 
 	// check for modications here
 	// X-MOD: reinit vScreen if value changed
-	if (cgx_wideScreenFixmodificationCount != cgx_wideScreenFix.modificationCount) {
+	if (cgx_wideScreenFixmodificationCount != cgx_wideScreenFix.modificationCount ||
+		cgx_draw2DModificationCount != cg_draw2D.modificationCount) {
 		cgx_wideScreenFixmodificationCount = cgx_wideScreenFix.modificationCount;
+		cgx_draw2DModificationCount = cg_draw2D.modificationCount;
 		CGX_Init_vScreen();
 		D_Printf(("^6CG_UpdateCvars value changed\n"));
 	}
@@ -1114,6 +1118,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence ) {
 	memset( cg_items, 0, sizeof(cg_items) );
 	
 	memset( &vScreen, 0, sizeof( vScreen ) );
+	memset( &hud, 0, sizeof( hud ) );
 
 	cgs.processedSnapshotNum = serverMessageNum;
 	cgs.serverCommandSequence = serverCommandSequence;

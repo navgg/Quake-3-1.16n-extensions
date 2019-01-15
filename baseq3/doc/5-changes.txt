@@ -118,6 +118,7 @@ renamed cg_networkAdjustments to cg_autoNetworkSettings
 added cg_teamModel "*" (if enemymodels enabled this value sets default red/blue skins for team, 
   can be used as "*/mysuperskin" or "bitterman/*", same for cg_enemyModel)
 added support for quakelive bright skins
+added huds, change with cg_draw2D 1,2,3 (1: default, 2: compact, 3: vanilla Q3)
 
 fixed damage given and received calc
 fixed flag draw with cg_drawIcons 0

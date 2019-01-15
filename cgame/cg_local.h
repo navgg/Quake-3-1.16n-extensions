@@ -192,6 +192,13 @@ typedef enum {
 } cgxServerMod_t;
 
 typedef enum {
+	HUD_NODRAW,
+	HUD_DEFAULT,
+	HUD_COMPACT,
+	HUD_VANILLAQ3,
+} hudType_t;
+
+typedef enum {
 	FOOTSTEP_NORMAL,
 	FOOTSTEP_BOOT,
 	FOOTSTEP_FLESH,
@@ -980,22 +987,50 @@ typedef struct {
 	float			fovaspect;
 } vScreen_t;
 
+//X-Mod: hud constant coords storage
+typedef struct {
 	int				sbheadx;
 	int				sbarmorx;
 	int				sbammox;
 	int				sbflagx;
-	int				sbhealth;
+	int				sbhealth_tx;
+
+	int				sby;//screen_height - icon_size
+
+	int				sbteambg_y;//team background
+
+	int				sbarmor_tx;
+	int				sbammo_tx;
 
 	int				width48;
 	int				width5;
 
-	/*float			fov_x;
-	float			fov_y;*/
-} vScreen_t;
+	int				small_char_w;
+	int				big_char_w;
+	int				giant_char_w;
+
+	int				icon_size;
+	int				head_size;//head icon
+	int				weap_icon_s;//weapon icon size
+	int				weap_icon_s2;
+	int				weap_icon_sub;
+	int				weap_y;
+	int				weap_text_y;
+
+	int				char_width;
+
+	int				lagometer_x;
+	int				lagometer_y;
+
+	int				cofs;//compact hud offset
+
+	int				score_yofs;
+} xhud_t;
 
 //==============================================================================
 
 extern  vScreen_t		vScreen;
+extern  xhud_t			hud;
 
 extern	cgs_t			cgs;
 extern	cg_t			cg;
@@ -1258,6 +1293,8 @@ void CG_DrawStringExt( int x, int y, const char *string, const float *setColor,
 		qboolean forceColor, qboolean shadow, int charWidth, int charHeight, int maxChars );
 void CG_DrawBigString( int x, int y, const char *s, float alpha );
 void CG_DrawBigStringColor( int x, int y, const char *s, vec4_t color );
+void CG_DrawBigString2( int x, int y, const char *s, float alpha );
+void CG_DrawBigStringColor2( int x, int y, const char *s, vec4_t color );
 void CG_DrawSmallString( int x, int y, const char *s, float alpha );
 void CG_DrawSmallStringColor( int x, int y, const char *s, vec4_t color );
 

@@ -1328,8 +1328,8 @@ void CG_DrawWeaponSelect( void ) {
 		}
 	}
 
-	x = vScreen.hwidth - count * 20;
-	y = 380;
+	x = vScreen.hwidth - count * (hud.weap_icon_s2 / 2);
+	y = hud.weap_y;
 
 	for ( i = 1 ; i < 16 ; i++ ) {
 		if ( !( bits & ( 1 << i ) ) ) {
@@ -1339,31 +1339,31 @@ void CG_DrawWeaponSelect( void ) {
 		CG_RegisterWeapon( i );
 
 		// draw weapon icon
-		CG_DrawPic( x, y, 32, 32, cg_weapons[i].weaponIcon );
+		CG_DrawPic( x, y, hud.weap_icon_s, hud.weap_icon_s, cg_weapons[i].weaponIcon );
 
 		// draw selection marker
 		if ( i == cg.weaponSelect ) {
-			CG_DrawPic( x-4, y-4, 40, 40, cgs.media.selectShader );
+			CG_DrawPic( x-hud.weap_icon_sub, y-hud.weap_icon_sub, hud.weap_icon_s2, hud.weap_icon_s2, cgs.media.selectShader );
 		}
 
 		// no ammo cross on top
 		if ( !cg.snap->ps.ammo[ i ] ) {
-			CG_DrawPic( x, y, 32, 32, cgs.media.noammoShader );
+			CG_DrawPic( x, y, hud.weap_icon_s, hud.weap_icon_s, cgs.media.noammoShader );
 		}
 
-		x += 40;
+		x += hud.weap_icon_s2;
 	}
 
 	// draw the selected name
 	if ( cg_weapons[ cg.weaponSelect ].item ) {
 		name = cg_weapons[ cg.weaponSelect ].item->pickup_name;
 		if ( name ) {
-			w = CG_DrawStrlen( name ) * BIGCHAR_WIDTH;
+			w = CG_DrawStrlen( name ) * hud.big_char_w;
 			x = ( vScreen.width - w ) / 2;
-			CG_DrawBigStringColor(x, y - 22, name, color);
+			CG_DrawBigStringColor2(x, y - hud.weap_text_y, name, color);
 		}
 	}
-
+	
 	trap_R_SetColor( NULL );
 }
 

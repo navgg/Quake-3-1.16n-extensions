@@ -29,6 +29,87 @@ static void CGX_Delay( int msec ) {
 	CG_Printf( "Delay end\n" );
 }
 
+#define XM_SMALLCHAR_WIDTH  6
+#define XM_BIGCHAR_WIDTH	12
+#define XM_GIANT_WIDTH		24
+#define	XM_CHAR_WIDTH		28
+#define XM_ICON_SIZE		36
+
+//init hud constant coords
+static void CGX_Init_HUD(void) {
+	hud.sbammox = CHAR_WIDTH * 3 + TEXT_ICON_SPACE + vScreen.offsetx;
+	hud.sbheadx = 185 + CHAR_WIDTH * 3 + TEXT_ICON_SPACE + vScreen.offsetx;
+	hud.sbflagx = 185 + CHAR_WIDTH * 3 + TEXT_ICON_SPACE + ICON_SIZE + vScreen.offsetx;
+	hud.sbarmorx = 370 + CHAR_WIDTH * 3 + TEXT_ICON_SPACE + vScreen.offsetx;
+	hud.sbammo_tx = vScreen.offsetx;
+	hud.sbhealth_tx = 185 + vScreen.offsetx;
+	hud.sbarmor_tx = 370 + vScreen.offsetx;
+
+	hud.width48 = vScreen.width - 48;
+	hud.width5 = vScreen.width - 5;
+
+	if (cg_draw2D.integer == HUD_COMPACT) {
+		hud.icon_size = XM_ICON_SIZE;
+		hud.small_char_w = XM_SMALLCHAR_WIDTH;
+		hud.big_char_w = XM_BIGCHAR_WIDTH;
+		hud.giant_char_w = XM_GIANT_WIDTH;
+		hud.weap_icon_s = 24;
+		hud.weap_icon_s2 = 30;
+		hud.weap_icon_sub = 3;
+		hud.weap_text_y = 16;
+//		hud.weap_y = 405;
+		hud.char_width = XM_CHAR_WIDTH;
+		hud.head_size = XM_ICON_SIZE;
+
+		hud.cofs = ICON_SIZE - XM_ICON_SIZE;
+		hud.sbammo_tx += hud.cofs;
+		hud.sbarmor_tx += hud.cofs;
+		hud.sbhealth_tx += hud.cofs;
+		hud.sbflagx -= hud.cofs;
+	} else {
+		hud.icon_size = ICON_SIZE;
+		hud.small_char_w = SMALLCHAR_WIDTH;
+		hud.big_char_w = BIGCHAR_WIDTH;
+		hud.giant_char_w = GIANT_WIDTH;
+		hud.weap_icon_s = 32;
+		hud.weap_icon_s2 = 40;
+		hud.weap_icon_sub = 4;
+		hud.weap_text_y = 22;
+		//hud.weap_y = 380;
+		hud.char_width = CHAR_WIDTH;
+		hud.head_size = ICON_SIZE;
+	}
+
+	if (cg_draw2D.integer == HUD_VANILLAQ3) {
+		hud.head_size *= 1.25f;
+		hud.score_yofs = BIGCHAR_HEIGHT + 8;
+		hud.weap_y = 380;
+	} else {
+		int ox = 0;
+
+		if (cg_draw2D.integer == HUD_DEFAULT) {
+			ox = 7;
+		} else if (cg_draw2D.integer == HUD_COMPACT) {
+			ox = 14;
+		}
+
+		hud.sbarmorx += ox * 2;
+		hud.sbarmor_tx += ox * 2;
+		hud.sbflagx += ox;
+		hud.sbhealth_tx += ox;
+		hud.sbheadx += ox;
+
+		hud.score_yofs = BIGCHAR_HEIGHT + 4;
+		hud.weap_y = SCREEN_HEIGHT - hud.head_size - hud.weap_icon_s2 - hud.weap_icon_sub;
+	}
+
+	hud.sby = SCREEN_HEIGHT - hud.icon_size;
+	hud.sbteambg_y = SCREEN_HEIGHT - hud.head_size;
+
+	hud.lagometer_x = vScreen.width - hud.icon_size;
+	hud.lagometer_y = SCREEN_HEIGHT - hud.icon_size;
+}
+
 //init virtual screen for widescreen or 4:3
 void CGX_Init_vScreen(void) {
 	const float baseAspect = 0.75f; // 3/4
@@ -54,14 +135,7 @@ void CGX_Init_vScreen(void) {
 	cgs.screenXScale = (float)cgs.glconfig.vidWidth / (float)vScreen.width;
 	cgs.screenYScale = (float)cgs.glconfig.vidHeight / (float)SCREEN_HEIGHT; 
 
-	vScreen.sbheadx = 185 + CHAR_WIDTH * 3 + TEXT_ICON_SPACE + vScreen.offsetx;
-	vScreen.sbarmorx = (370 + CHAR_WIDTH * 3 + TEXT_ICON_SPACE) + vScreen.offsetx;
-	vScreen.sbammox = (CHAR_WIDTH * 3 + TEXT_ICON_SPACE) + vScreen.offsetx;
-	vScreen.sbflagx = 185 + CHAR_WIDTH * 3 + TEXT_ICON_SPACE + ICON_SIZE + vScreen.offsetx;
-	vScreen.sbhealth = 185 + vScreen.offsetx;	
-
-	vScreen.width48 = vScreen.width - 48;
-	vScreen.width5 = vScreen.width - 5;
+	CGX_Init_HUD();
 
 	D_Printf(("CGX_Init_vScreen %ix%i cgx_wideScreenFix %i\n", vScreen.width, SCREEN_HEIGHT, cgx_wideScreenFix.integer));	
 }

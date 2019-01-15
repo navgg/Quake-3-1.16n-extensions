@@ -1355,10 +1355,10 @@ void CG_statsWindow( void ) {
 	sw->fontScaleY = 0.9f;
 	sw->x = 10;
 	
-	sw->y = 330 - (weaponCount * (WINDOW_FONTHEIGHT + 3) * sw->fontScaleY);
+	sw->y = hud.sbteambg_y - 90 - (weaponCount * (WINDOW_FONTHEIGHT + 3) * sw->fontScaleY);
 	
 	if (interMission)
-		sw->y += 60;
+		sw->y += hud.head_size;
 
 	sw->flashPeriod = 700;
 	sw->flashMidpoint = sw->flashPeriod * 0.5f;

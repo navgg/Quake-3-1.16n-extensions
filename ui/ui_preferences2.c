@@ -50,10 +50,11 @@ ADVANCED OPTIONS MENU
 #define ID_ACC					151
 #define ID_SCOREBOX				152
 #define ID_SHAREDCONFIG			153
+#define	ID_HUD					154
 
 #define ID_BACK					190
 
-#define MAX_INFO_MESSAGES		27
+#define MAX_INFO_MESSAGES		28
 static void Preferences2_StatusBar( void *self ) {	
 	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
 		{ "Toggles display ingame rewards", "On screen center - Excellent, Impressive etc."},
@@ -85,6 +86,7 @@ static void Preferences2_StatusBar( void *self ) {
 		{ "Toggles display total weapon accuracy", ""},
 		{ "Toggles display of scorebox in right lower corner", ""},
 		{ "Toggles auto saving q3config.cfg into baseq3 folder", "Fixes problems of not saving config after game exit"},
+		{ "Sets HUD type", "HP/Armor/Ammo indicators size and etc."}
 	};
 
 	UIX_CommonStatusBar(self, ID_REWARDS, MAX_INFO_MESSAGES, info_messages);
@@ -112,6 +114,7 @@ typedef struct {
 	menuradiobutton_s	scorebox;
 	menuradiobutton_s	accuracy;
 	menuradiobutton_s	sharedconfig;
+	menulist_s			hud;
 	menulist_s			scoreboard;
 	menulist_s			centerprint;
 	menulist_s			deafultweapon;
@@ -199,7 +202,16 @@ static const char *scoreboar_items[] = {
 	0
 };
 
+static const char *hud_items[] = {
+	"default",
+	"compact",
+	"vanilla Q3",
+	0
+};
+
 static void Preferences2_SetMenuItems( void ) {
+	s_preferences2.hud.curvalue		= (int)trap_Cvar_VariableValue( "cg_draw2D" ) % ArrLen(hud_items) - 1;
+
 	s_preferences2.rewards.curvalue		= trap_Cvar_VariableValue( "cg_drawRewards" ) != 0;
 	s_preferences2.timer.curvalue		= abs((int)trap_Cvar_VariableValue( "cg_drawTimer" ) % ArrLen(timer_items));
 	s_preferences2.speed.curvalue		= abs((int)trap_Cvar_VariableValue("cg_drawSpeed") % ArrLen(speed_items));
@@ -368,6 +380,10 @@ static void Preferences2_Event( void* ptr, int notification ) {
 		trap_Cvar_SetValue("cg_sharedConfig", s_preferences2.sharedconfig.curvalue);
 		break;
 
+	case ID_HUD:
+		trap_Cvar_SetValue("cg_draw2D", s_preferences2.hud.curvalue + 1);
+		break;
+
 	case ID_BACK:
 		Preferences2_SaveChanges();
 		UI_PopMenu();
@@ -423,6 +439,16 @@ static void Preferences2_MenuInit( void ) {
 
 	ystart = 144 - BIGCHAR_HEIGHT * 3;
 	y = ystart;
+
+	s_preferences2.hud.generic.type       = MTYPE_SPINCONTROL;
+	s_preferences2.hud.generic.name	      = "HUD:";
+	s_preferences2.hud.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_preferences2.hud.generic.callback   = Preferences2_Event;
+	s_preferences2.hud.generic.statusbar  = Preferences2_StatusBar;
+	s_preferences2.hud.generic.id         = ID_HUD;
+	s_preferences2.hud.generic.x	      = PREFERENCES_X_POS - 40;
+	s_preferences2.hud.generic.y	      = ystart - BIGCHAR_HEIGHT + 2;
+	s_preferences2.hud.itemnames		  = hud_items;
 
 	y += BIGCHAR_HEIGHT + 2;
 	s_preferences2.rewards.generic.type       = MTYPE_RADIOBUTTON;
@@ -713,6 +739,7 @@ static void Preferences2_MenuInit( void ) {
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.framel );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.framer );
 
+	Menu_AddItem( &s_preferences2.menu, &s_preferences2.hud );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.rewards );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.timer );
 	Menu_AddItem( &s_preferences2.menu, &s_preferences2.speed );
