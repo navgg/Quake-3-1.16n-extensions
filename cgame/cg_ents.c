@@ -668,48 +668,31 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 	int timeshift = 0;
 	//unlagged - projectile nudge
 
-	//1.32 stuff
-	//unlagged - smooth clients #2
-	// this is done server-side now - cg_smoothClients is undefined
-	// players will always be TR_INTERPOLATE
-	/*
-	// if this player does not want to see extrapolated players
-	if ( !cg_smoothClients.integer ) {
-	// make sure the clients use TR_INTERPOLATE
-		if ( cent->currentState.number < MAX_CLIENTS ) {
-			cent->currentState.pos.trType = TR_INTERPOLATE;
-			cent->nextState.pos.trType = TR_INTERPOLATE;
-		}
-	}
-	*/
-	//unlagged - smooth clients #2
-
 	if (!cg_delag_interp32.integer) {
 		CG_CalcEntityLerpPositions116( cent );
 		return;
 	}
 
+	//1.32 stuff
 	if ( cent->interpolate && cent->currentState.pos.trType == TR_INTERPOLATE ) {
 		CG_InterpolateEntityPosition( cent );
 		return;
-	}	
+	}
 
-	//1.32 stuff (seems this fixing next part of code from unlagged)
 	// first see if we can interpolate between two snaps for
 	// linear extrapolated clients
-	if (cent->interpolate && cent->currentState.pos.trType == TR_LINEAR_STOP &&
+	if ( cent->interpolate && cent->currentState.pos.trType == TR_LINEAR_STOP &&
 		cent->currentState.number < MAX_CLIENTS) {
-		CG_InterpolateEntityPosition(cent);
+		CG_InterpolateEntityPosition( cent );
 		return;
 	}
 
-	//X-MOD: this part of code makes everything worse, probably because of 1.16n (but with that part of code from 1.32 seems it's working correct now)
 	//unlagged - timenudge extrapolation
 	// interpolating failed (probably no nextSnap), so extrapolate
 	// this can also happen if the teleport bit is flipped, but that
 	// won't be noticeable
-	if (cent->currentState.number < MAX_CLIENTS &&
-		cent->currentState.clientNum != cg.predictedPlayerState.clientNum) {
+	if ( cent->currentState.number < MAX_CLIENTS &&
+		cent->currentState.clientNum != cg.predictedPlayerState.clientNum ) {
 		cent->currentState.pos.trType = TR_LINEAR_STOP;
 		cent->currentState.pos.trTime = cg.snap->serverTime;
 		cent->currentState.pos.trDuration = 1000 / sv_fps.integer;
@@ -759,7 +742,7 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 	// player state
 	if ( cent != &cg.predictedPlayerEntity ) {
 		CG_AdjustPositionForMover( cent->lerpOrigin, cent->currentState.groundEntityNum, 
-		cg.snap->serverTime, cg.time, cent->lerpOrigin );
+			cg.snap->serverTime, cg.time, cent->lerpOrigin );
 	}
 }
 
