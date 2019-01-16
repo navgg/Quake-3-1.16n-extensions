@@ -3,6 +3,7 @@ cg_main
 cgx_extensions
 cg_unlagged
 cg_freeze
+cg_zeffects
 ..\cg_syscalls
 cg_consolecmds
 cg_draw

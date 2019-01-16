@@ -383,6 +383,11 @@ static void CG_RocketTrail( centity_t *ent, const weaponInfo_t *wi ) {
 		return;
 	}
 
+	if (wi->item->giTag != WP_GRENADE_LAUNCHER) {
+		if (cgx_weaponEffects.integer & WE_Z_ROCKET_TRAIL)
+			CG_ParticleSparkTrail(lastPos, origin);
+	}
+
 	for ( ; t <= ent->trailTime ; t += step ) {
 		BG_EvaluateTrajectory( &es->pos, t, lastPos );
 
@@ -414,6 +419,19 @@ static void CG_PlasmaTrail( centity_t *cent, const weaponInfo_t *wi ) {
 	int				t, startTime, step;
 
 	float	waterScale = 1.0f;
+
+	if (cgx_weaponEffects.integer & WE_Z_PLASMA_TRAIL) {
+		vec3_t lastPos, newPos;
+
+		BG_EvaluateTrajectory(&cent->currentState.pos, cent->trailTime, lastPos);
+		BG_EvaluateTrajectory(&cent->currentState.pos, cg.time, newPos);
+
+		CG_ParticlePlasmaTrail(cent, lastPos, newPos);
+
+		cent->trailTime = cg.time;
+
+		return;
+	}
 
 	if ( /*cg_noProjectileTrail.integer ||*/ (cgx_weaponEffects.integer & WE_PLASMA32) == 0) {
 		return;
@@ -960,6 +978,9 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin ) {
 		angles[2] = rand() % 360;
 		AnglesToAxis( angles, beam.axis );
 		trap_R_AddRefEntityToScene( &beam );
+
+		if (cgx_weaponEffects.integer & WE_Z_LG_SPARKS)
+			CG_LightningSpark(beam.origin, dir);
 	}
 }
 
@@ -1631,6 +1652,8 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir ) {
 		}
 		mark = cgs.media.holeMarkShader;
 		radius = 12;
+		if (cgx_weaponEffects.integer & WE_Z_LG_SPARKS)
+			CG_LightningSpark(origin, dir);
 		break;
 	case WP_GRENADE_LAUNCHER:
 		mod = cgs.media.dishFlashModel;
@@ -1640,6 +1663,8 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir ) {
 		radius = 64;
 		light = 300;
 		isSprite = qtrue;
+		if (cgx_weaponEffects.integer & WE_Z_EXPLOSIONS)
+			CG_ParticleExplosionZE(origin);
 		break;
 	case WP_ROCKET_LAUNCHER:
 		mod = cgs.media.dishFlashModel;
@@ -1660,6 +1685,8 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir ) {
 
 			CG_ParticleExplosion( "explode1", sprOrg, sprVel, 1400, 20, 30 );
 		}
+		if (cgx_weaponEffects.integer & WE_Z_EXPLOSIONS)
+			CG_ParticleExplosionZE(origin);
 		break;
 	case WP_RAILGUN:
 		mod = cgs.media.ringFlashModel;
@@ -1689,6 +1716,8 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir ) {
 		mark = cgs.media.bulletMarkShader;
 		sfx = 0;
 		radius = 4;
+		if (cgx_weaponEffects.integer & WE_Z_BULLET_SPARKS)
+			CG_BulletSpark(origin, dir);
 		break;
 
 	case WP_MACHINEGUN:
@@ -1706,6 +1735,8 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir ) {
 		}
 
 		radius = 8;
+		if (cgx_weaponEffects.integer & WE_Z_BULLET_SPARKS)
+			CG_BulletSpark(origin, dir);
 		break;
 	}
 

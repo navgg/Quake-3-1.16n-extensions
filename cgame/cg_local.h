@@ -69,11 +69,19 @@
 #define CGX_MAX_RATE 99999
 #define CGX_MAX_FPS 333
 //cg_weaponEffects
-#define WE_RAIL32		1
-#define	WE_RAILSIMPLE	2
-#define	WE_PLASMA32		4
-#define	WE_LG32			8
-#define	WE_ROCKET32		16
+#define WE_RAIL32				1
+#define WE_RAILSIMPLE			2
+#define WE_PLASMA32				4
+#define WE_LG32					8
+#define WE_ROCKET32				16
+#define WE_Z_EXPLOSIONS			32
+#define WE_Z_BULLET_SPARKS		64
+#define WE_Z_LG_SPARKS			128
+#define WE_Z_ROCKET_TRAIL		256
+#define WE_Z_PLASMA_TRAIL		512
+
+//try to register shader only if it's null
+#define trap_LazyRegisterShader(x,s) if (!x) x = trap_R_RegisterShader(s)
 
 #if CGX_DEBUG 
 #define D_Printf(x) CG_Printf x
@@ -347,6 +355,9 @@ typedef struct localEntity_s {
 	int				endTime;
 
 	float			lifeRate;			// 1.0 / (endTime - startTime)
+
+	int				gravity;			// z-effects weapons effects
+	int				customGravity;		// z-effects weapons effects
 
 	trajectory_t	pos;
 	trajectory_t	angles;
@@ -783,6 +794,9 @@ typedef struct {
 	qhandle_t	freezeMarkShader;
 #endif//freeze
 
+	// z-effects
+	qhandle_t	blueSpark;
+
 	// Nemesis -  New media 
 	//qhandle_t	teamIconRed;
 	//qhandle_t	teamIconBlue;
@@ -1210,6 +1224,13 @@ void CG_AddGib( localEntity_t *le );
 qboolean CG_DrawOSPScoreboard( void );
 void CG_statsWindow( void );
 void CG_statsWindowFree( int weffects );
+
+// cg_zeffects.c
+void CG_ParticlePlasmaTrail( centity_t *cent, vec3_t start, vec3_t end );
+void CG_ParticleSparkTrail( vec3_t start, vec3_t end );
+void CG_LightningSpark( vec3_t origin, vec3_t dir );
+void CG_BulletSpark( vec3_t origin, vec3_t dir );
+void CG_ParticleExplosionZE( vec3_t origin );
 
 //
 // cgx_extensions.c

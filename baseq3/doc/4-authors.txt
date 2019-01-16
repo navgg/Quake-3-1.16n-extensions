@@ -14,5 +14,6 @@ CPMA - (c) 2000-2010 Challenge World, (c) 2016-2018 The ProMode Team
 Freeze Tag - (ñ) 1998, 2001, 2002 by Darrell Bircsak
 Nemesis - (c) 2005 Cyrus and Wonkey
 OSP - (c) 2003 Jason "Rhea" Keimig and Team
+z-effects (c) 2001-2002 Randall "Ravenant" Piatek, Matt McChesney
 Quake 3 Arena - (c) 1999-2005 Id Software
 
