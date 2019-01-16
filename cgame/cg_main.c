@@ -316,7 +316,7 @@ cvarTable_t		cvarTable[] = {
 	//unlagged - client options
 	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},	
 	{ &cg_projectileNudge, "cg_delag_projectileNudge", "0", CVAR_ARCHIVE },
-	{ &cg_optimizePrediction, "cg_delag_optimizePrediction", "0", CVAR_ARCHIVE },
+	{ &cg_optimizePrediction, "cg_delag_optimizePrediction", "1", CVAR_ARCHIVE },
 	{ &cg_cmdTimeNudge, "cg_delag_cmdTimeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
 	{ &cg_delag_interp32, "cg_delag_interp32", "1", CVAR_TEMP },
 	{ &cg_delag_predict32, "cg_delag_predict32", "1", CVAR_TEMP },

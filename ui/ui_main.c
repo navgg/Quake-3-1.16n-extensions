@@ -245,9 +245,9 @@ cvarTable_t		cvarTable[] = {
 	{ &uix_nomip, "cg_nomip", "-1", CVAR_ARCHIVE | CVAR_LATCH },
 
 #if CGX_UNLAGGED
-	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},	
+	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE },	
 	{ &cg_projectileNudge, "cg_delag_projectileNudge", "0", CVAR_ARCHIVE },
-	{ &cg_optimizePrediction, "cg_delag_optimizePrediction", "0", CVAR_ARCHIVE },
+	{ &cg_optimizePrediction, "cg_delag_optimizePrediction", "1", CVAR_ARCHIVE },
 #endif
 
 	// some quake3 not initialized variables
