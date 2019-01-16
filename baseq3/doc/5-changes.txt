@@ -114,6 +114,7 @@ removed cg_teamInfoType, use cg_drawCrosshairNames insed.
 removed draw play names in nemesis/osp style
 cl_timeNudge limit set -20 to 20
 renamed cg_networkAdjustments to cg_autoNetworkSettings
+1.32 rail effect overrides simple rail
 
 added cg_teamModel "*" (if enemymodels enabled this value sets default red/blue skins for team, 
   can be used as "*/mysuperskin" or "bitterman/*", same for cg_enemyModel)
