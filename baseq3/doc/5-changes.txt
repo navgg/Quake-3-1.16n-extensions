@@ -129,5 +129,6 @@ added player movement prediction from 1.32 with pmove_fixed, pmove_msec, pmove_a
 fixed damage given and received calc
 fixed flag draw with cg_drawIcons 0
 fixed sometimes missing cg_killbeep sounds
+fixed 1.32 rail dissapear on long distance
 
 minor optimizations

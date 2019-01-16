@@ -165,6 +165,7 @@ static void CG_RailTrail32 (clientInfo_t *ci, vec3_t start, vec3_t end) {
 
 	localEntity_t *le;
 	refEntity_t   *re;
+	int spacing, time;
 
 #define RADIUS   4
 #define ROTATION 1
@@ -174,6 +175,14 @@ static void CG_RailTrail32 (clientInfo_t *ci, vec3_t start, vec3_t end) {
 	VectorCopy (start, move);
 	VectorSubtract (end, start, vec);
 	len = VectorNormalize (vec);
+	//X-Mod: fix instant dissapear on long distance, it happens because too many disc entities spawned. if rail long - spawn less
+	if (len >= 2000) {
+		spacing = SPACING * len / 1000;
+		time = 400;
+	} else {
+		spacing = SPACING;
+		time = 600;
+	}
 	PerpendicularVector(temp, vec);
 	for (i = 0 ; i < 36; i++) {
 		RotatePointAroundVector(axis[i], vec, temp, i * 10);//banshee 2.4 was 10
@@ -208,7 +217,7 @@ static void CG_RailTrail32 (clientInfo_t *ci, vec3_t start, vec3_t end) {
 
 	VectorMA(move, 20, vec, move);
 	VectorCopy(move, next_move);
-	VectorScale (vec, SPACING, vec);
+	VectorScale (vec, spacing, vec);
 
 	//if (cgx_weaponEffects.integer & WE_RAILSIMPLE) {
 	//	// nudge down a bit so it isn't exactly in center
@@ -219,15 +228,15 @@ static void CG_RailTrail32 (clientInfo_t *ci, vec3_t start, vec3_t end) {
 	skip = -1;
 
 	j = 18;
-	for (i = 0; i < len; i += SPACING) {
+	for (i = 0; i < len; i += spacing) {
 		if (i != skip) {
-			skip = i + SPACING;
+			skip = i + spacing;
 			le = CG_AllocLocalEntity();
 			re = &le->refEntity;
 			le->leFlags = LEF_PUFF_DONT_SCALE;
 			le->leType = LE_MOVE_SCALE_FADE;
 			le->startTime = cg.time;
-			le->endTime = cg.time + (i>>1) + 600;
+			le->endTime = cg.time + (i>>1) + time;
 			le->lifeRate = 1.0 / (le->endTime - le->startTime);
 
 			re->shaderTime = cg.time / 1000.0f;
