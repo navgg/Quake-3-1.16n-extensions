@@ -551,7 +551,7 @@ void CGX_AutoAdjustNetworkSettings(void) {
 			if (cl_maxpackets.integer < CGX_MIN_MAXPACKETS)
 				i = CGX_MIN_MAXPACKETS;
 			// set it litle more than sv_fps
-			if (cl_maxpackets.integer < sv_fps.integer)
+			if (cl_maxpackets.integer <= sv_fps.integer)
 				i = sv_fps.integer + 10;
 		} else if (cgx_networkAdjustments.integer == 2) {
 			k = 2;
