@@ -1185,6 +1185,10 @@ extern	vmCvar_t		cg_paused;
 extern	vmCvar_t		cg_blood;
 extern	vmCvar_t		cg_predictItems;
 extern	vmCvar_t		cg_deferPlayers;
+//1.32
+extern	vmCvar_t		pmove_fixed;
+extern	vmCvar_t		pmove_msec;
+extern	vmCvar_t		pmove_accurate;
 
 //extern	pmove_t			cg_pmove;
 
@@ -1194,6 +1198,7 @@ extern	vmCvar_t		cg_cmdTimeNudge;
 extern	vmCvar_t		cg_projectileNudge;
 extern	vmCvar_t		cg_optimizePrediction;
 extern	vmCvar_t		cg_delag_interp32;
+extern	vmCvar_t		cg_delag_predict32;
 extern	vmCvar_t		cl_timeNudge;
 extern	vmCvar_t		sv_fps;
 #if CGX_DEBUG

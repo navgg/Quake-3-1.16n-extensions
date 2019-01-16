@@ -1838,6 +1838,7 @@ void PmoveSingle (pmove_t *pmove) {
 	PM_WaterEvents();
 
 	// snap some parts of playerstate to save network bandwidth
+	if ( !pmove->pmove_accurate)
 	SnapVector( pm->ps->velocity );
 }
 
@@ -1876,4 +1877,52 @@ void Pmove (pmove_t *pmove) {
 		PmoveSingle( pmove );
 	}
 
+}
+
+/*
+================
+Pmove32
+Can be called by either the server or the client
+X-Mod: 1.32 Pmove
+================
+*/
+void Pmove32 (pmove_t *pmove) {
+	int			finalTime;
+
+	finalTime = pmove->cmd.serverTime;
+
+	if ( finalTime < pmove->ps->commandTime ) {
+		return;	// should not happen
+	}
+
+	if ( finalTime > pmove->ps->commandTime + 1000 ) {
+		pmove->ps->commandTime = finalTime - 1000;
+	}
+
+	//pmove->ps->pmove_framecount = (pmove->ps->pmove_framecount+1) & ((1<<PS_PMOVEFRAMECOUNTBITS)-1);
+
+	// chop the move up if it is too long, to prevent framerate
+	// dependent behavior
+	while ( pmove->ps->commandTime != finalTime ) {
+		int		msec;
+
+		msec = finalTime - pmove->ps->commandTime;
+
+		if ( pmove->pmove_fixed ) {
+			if ( msec > pmove->pmove_msec ) {
+				msec = pmove->pmove_msec;
+			}
+		}
+		else {
+			if ( msec > 66 ) {
+				msec = 66;
+			}
+		}
+		pmove->cmd.serverTime = pmove->ps->commandTime + msec;
+		PmoveSingle( pmove );
+
+		if ( pmove->ps->pm_flags & PMF_JUMP_HELD ) {
+			pmove->cmd.upmove = 20;
+		}
+	}
 }

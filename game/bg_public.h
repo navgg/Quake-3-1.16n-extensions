@@ -144,6 +144,12 @@ typedef struct {
 
 	float		xyspeed;
 
+	//1.32
+	// for fixed msec Pmove
+	int			pmove_fixed;
+	int			pmove_msec;
+	int			pmove_accurate;
+
 	// callbacks to test the world
 	// these will be different functions during game and cgame
 	void		(*trace)( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask );
@@ -153,6 +159,7 @@ typedef struct {
 // if a full pmove isn't done on the client, you can just update the angles
 void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd );
 void Pmove (pmove_t *pmove);
+void Pmove32 (pmove_t *pmove);
 
 //===================================================================================
 
@@ -512,6 +519,9 @@ qboolean	BG_CanItemBeGrabbed( const entityState_t *ent, const playerState_t *ps 
 #define	DF_NO_FALLING			8
 #define DF_FIXED_FOV			16
 #define	DF_NO_FOOTSTEPS			32
+
+#define DF_FTAG_NO_PLAYERCLIP	512
+#define	DF_NG_NOOTHERPLAYERCLIP 4096
 
 // content masks
 #define	MASK_ALL				(-1)

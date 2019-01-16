@@ -122,6 +122,8 @@ added support for quakelive bright skins
 added huds, change with cg_draw2D 1,2,3 (1: default, 2: compact, 3: vanilla Q3)
 added z-effects (cg_weaponEffects 32, 64, 128, 256, 512, sum for multimple effects, -1 set all)
   32: explosions, 64: bullet sparks, 128: lg sparks, 256: rocket trail, 512: plasma trail
+added player movement prediction from 1.32 with pmove_fixed, pmove_msec, pmove_accurate
+  should be smoother on noghost servers and etc. (cg_delag_predict32 1|0 on\off, by default always on)
 
 fixed damage given and received calc
 fixed flag draw with cg_drawIcons 0
