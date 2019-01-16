@@ -1718,10 +1718,13 @@ static void CG_DrawDisconnect( void ) {
 		return;
 	}
 
-	x = hud.width48;
-	y = SCREEN_HEIGHT - 48;
-
-	CG_DrawPic( x, y, 48, 48, trap_R_RegisterShader("gfx/2d/net.tga" ) );
+	x = hud.lagometer_x;
+	y = hud.lagometer_y;
+	{
+		static qhandle_t net;
+		trap_LazyRegisterShader(net, "gfx/2d/net.tga");
+		CG_DrawPic(x, y, hud.icon_size, hud.icon_size, net);
+	}
 }
 
 
