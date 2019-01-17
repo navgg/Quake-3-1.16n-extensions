@@ -1602,6 +1602,12 @@ static float CGX_DrawDebugInfo( float y ) {
 	char		*s;
 	int			w;		
 
+	s = va("ENTS: %i", cg.entities);
+	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
+	CG_DrawBigString( hud.width5 - w, y + 2, s, 1.0F);	
+	y += BIGCHAR_HEIGHT + 4;
+
+#if 0
 	s = va("CI: %i", cg.connectionInterrupteds);
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 	CG_DrawBigString( hud.width5 - w, y + 2, s, 1.0F);	
@@ -1635,8 +1641,9 @@ static float CGX_DrawDebugInfo( float y ) {
 	s = va("T: %i", cg.time);
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 	CG_DrawBigString( hud.width5 - w, y + 2, s, 1.0F);	
-
-	return y + BIGCHAR_HEIGHT + 4;
+	y += +BIGCHAR_HEIGHT + 4;
+#endif
+	return y;
 }
 #endif
 /*

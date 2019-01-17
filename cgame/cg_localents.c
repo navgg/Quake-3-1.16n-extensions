@@ -41,7 +41,9 @@ void CG_FreeLocalEntity( localEntity_t *le ) {
 	if ( !le->prev ) {
 		CG_Error( "CG_FreeLocalEntity: not active" );
 	}
-
+#if CGX_DEBUG
+	cg.entities--;
+#endif
 	// remove from the doubly linked active list
 	le->prev->next = le->next;
 	le->next->prev = le->prev;
@@ -71,7 +73,9 @@ localEntity_t	*CG_AllocLocalEntity( void ) {
 	cg_freeLocalEntities = cg_freeLocalEntities->next;
 
 	memset( le, 0, sizeof( *le ) );
-
+#if CGX_DEBUG
+	cg.entities++;
+#endif
 	// link into the active list
 	le->next = cg_activeLocalEntities.next;
 	le->prev = &cg_activeLocalEntities;

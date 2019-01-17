@@ -695,6 +695,9 @@ typedef struct {
 	int			rateDelayedTotal;	
 	
 	int			connectionInterrupteds;
+#if CGX_DEBUG
+	int			entities;
+#endif
 
 	//unlagged - optimized prediction
 	int			lastPredictedCommand;
