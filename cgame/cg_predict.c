@@ -892,15 +892,6 @@ void CG_PredictPlayerState( void ) {
 
 	// fire events and other transition triggered things
 	CG_TransitionPlayerState( &cg.predictedPlayerState, &oldPlayerState );
-
-#if CGX_DEBUG
-	if ( cg_showmiss.integer ) {
-		if (cg.eventSequence > cg.predictedPlayerState.eventSequence) {
-			CG_Printf("WARNING: double event\n");
-			cg.eventSequence = cg.predictedPlayerState.eventSequence;
-		}
-	}
-#endif
 }
 
 /*

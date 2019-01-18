@@ -1012,11 +1012,11 @@ static void CG_DrawUpperRight( void ) {
 #endif
 
 #if CGX_DEBUG
-	if (cgx_debug.integer > 1) {
+	if (cgx_debug.integer) {
 		y = CGX_DrawDebugInfo(y);
-	}
 
-	y = CG_DrawFreeMem(y);
+		y = CG_DrawFreeMem(y);
+	}
 #endif
 	if ( cg_drawAttacker.integer ) {
 		y = CG_DrawAttacker( y );
@@ -1551,6 +1551,8 @@ lagometer_t		lagometer;
 static void CGX_UpdateNetworkStats(snapshot_t *snap) {
 	static int pingTotal, pingCount, oldSnapshotCount;
 
+	lagometer.snapshotCount++;
+
 	//skip in intermission and skip localserver
 	if (cg.intermissionStarted || cgs.localServer)
 		return;	
@@ -1607,42 +1609,43 @@ static float CGX_DrawDebugInfo( float y ) {
 	CG_DrawBigString( hud.width5 - w, y + 2, s, 1.0F);	
 	y += BIGCHAR_HEIGHT + 4;
 
-#if 0
-	s = va("CI: %i", cg.connectionInterrupteds);
-	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-	CG_DrawBigString( hud.width5 - w, y + 2, s, 1.0F);	
-	y += BIGCHAR_HEIGHT + 4;
+	if (cgx_debug.integer & 2) {
+		s = va("CI: %i", cg.connectionInterrupteds);
+		w = CG_DrawStrlen(s) * BIGCHAR_WIDTH;
+		CG_DrawBigString(hud.width5 - w, y + 2, s, 1.0F);
+		y += BIGCHAR_HEIGHT + 4;
 
-	s = va("LSN: %i", cg.latestSnapshotNum);
-	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-	CG_DrawBigString( hud.width5 - w, y + 2, s, 1.0F);	
-	y += BIGCHAR_HEIGHT + 4;
+		s = va("LSN: %i", cg.latestSnapshotNum);
+		w = CG_DrawStrlen(s) * BIGCHAR_WIDTH;
+		CG_DrawBigString(hud.width5 - w, y + 2, s, 1.0F);
+		y += BIGCHAR_HEIGHT + 4;
 
-	s = va("LSC: %i", lagometer.snapshotCount);
-	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-	CG_DrawBigString( hud.width5 - w, y + 2, s, 1.0F);	
-	y += BIGCHAR_HEIGHT + 4;
+		s = va("LSC: %i", lagometer.snapshotCount);
+		w = CG_DrawStrlen(s) * BIGCHAR_WIDTH;
+		CG_DrawBigString(hud.width5 - w, y + 2, s, 1.0F);
+		y += BIGCHAR_HEIGHT + 4;
 
-	s = va("PING: %i", cg.meanPing);
-	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-	CG_DrawBigString( hud.width5 - w, y + 2, s, 1.0F);
-	y += BIGCHAR_HEIGHT + 4;
+		s = va("PING: %i", cg.meanPing);
+		w = CG_DrawStrlen(s) * BIGCHAR_WIDTH;
+		CG_DrawBigString(hud.width5 - w, y + 2, s, 1.0F);
+		y += BIGCHAR_HEIGHT + 4;
 
-	s = va("LOSS: %i %i", cg.packetloss, cg.packetlossTotal);
-	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-	CG_DrawBigString( hud.width5 - w, y + 2, s, 1.0F);
-	y += BIGCHAR_HEIGHT + 4;
+		s = va("LOSS: %i %i", cg.packetloss, cg.packetlossTotal);
+		w = CG_DrawStrlen(s) * BIGCHAR_WIDTH;
+		CG_DrawBigString(hud.width5 - w, y + 2, s, 1.0F);
+		y += BIGCHAR_HEIGHT + 4;
 
-	s = va("RD: %i %i", cg.rateDelayed, cg.rateDelayedTotal);
-	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-	CG_DrawBigString( hud.width5 - w, y + 2, s, 1.0F);	
-	y += BIGCHAR_HEIGHT + 4;
+		s = va("RD: %i %i", cg.rateDelayed, cg.rateDelayedTotal);
+		w = CG_DrawStrlen(s) * BIGCHAR_WIDTH;
+		CG_DrawBigString(hud.width5 - w, y + 2, s, 1.0F);
+		y += BIGCHAR_HEIGHT + 4;
 
-	s = va("T: %i", cg.time);
-	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-	CG_DrawBigString( hud.width5 - w, y + 2, s, 1.0F);	
-	y += +BIGCHAR_HEIGHT + 4;
-#endif
+		s = va("T: %i", cg.time);
+		w = CG_DrawStrlen(s) * BIGCHAR_WIDTH;
+		CG_DrawBigString(hud.width5 - w, y + 2, s, 1.0F);
+		y += +BIGCHAR_HEIGHT + 4;
+	}
+
 	return y;
 }
 #endif
@@ -1684,7 +1687,6 @@ void CG_AddLagometerSnapshotInfo( snapshot_t *snap ) {
 	// add this snapshot's info
 	lagometer.snapshotSamples[ lagometer.snapshotCount & ( LAG_SAMPLES - 1) ] = snap->ping;
 	lagometer.snapshotFlags[ lagometer.snapshotCount & ( LAG_SAMPLES - 1) ] = snap->snapFlags;
-	lagometer.snapshotCount++;
 
 	if (cg_lagometer.integer > 1/* || cgx_networkAdjustments.integer*/)
 		CGX_UpdateNetworkStats(snap);		
@@ -1727,11 +1729,8 @@ static void CG_DrawDisconnect( void ) {
 
 	x = hud.lagometer_x;
 	y = hud.lagometer_y;
-	{
-		static qhandle_t net;
-		trap_LazyRegisterShader(net, "gfx/2d/net.tga");
-		CG_DrawPic(x, y, hud.icon_size, hud.icon_size, net);
-	}
+
+	CG_DrawPic(x, y, hud.icon_size, hud.icon_size, trap_R_RegisterShader( "gfx/2d/net.tga") );
 }
 
 

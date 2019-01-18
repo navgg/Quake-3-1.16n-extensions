@@ -729,9 +729,11 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_GRENADE_BOUNCE:
 		DEBUGNAME("EV_GRENADE_BOUNCE");
 		if ( rand() & 1 ) {
-			trap_S_StartSound (NULL, es->number, CHAN_AUTO, trap_S_RegisterSound("sound/weapons/grenade/hgrenb1a.wav") );
+			//trap_S_StartSound (NULL, es->number, CHAN_AUTO, trap_S_RegisterSound("sound/weapons/grenade/hgrenb1a.wav") );
+			trap_S_LazyStartSound ( hgrenb1a, es->number, CHAN_AUTO, "sound/weapons/grenade/hgrenb1a.wav" );
 		} else {
-			trap_S_StartSound (NULL, es->number, CHAN_AUTO, trap_S_RegisterSound("sound/weapons/grenade/hgrenb2a.wav") );
+			//trap_S_StartSound (NULL, es->number, CHAN_AUTO, trap_S_RegisterSound("sound/weapons/grenade/hgrenb2a.wav") );
+			trap_S_LazyStartSound ( hgrenb2a, es->number, CHAN_AUTO, "sound/weapons/grenade/hgrenb2a.wav" );
 		}
 		break;
 
@@ -886,7 +888,8 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			cg.powerupActive = PW_BATTLESUIT;
 			cg.powerupTime = cg.time;
 		}
-		trap_S_StartSound (NULL, es->number, CHAN_ITEM, trap_S_RegisterSound("sound/items/protect3.wav") );
+		//trap_S_StartSound (NULL, es->number, CHAN_ITEM, trap_S_RegisterSound("sound/items/protect3.wav") );
+		trap_S_LazyStartSound ( protect3, es->number, CHAN_ITEM, "sound/items/protect3.wav" );
 		break;
 	case EV_POWERUP_REGEN:
 		DEBUGNAME("EV_POWERUP_REGEN");
@@ -894,7 +897,8 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			cg.powerupActive = PW_REGEN;
 			cg.powerupTime = cg.time;
 		}
-		trap_S_StartSound (NULL, es->number, CHAN_ITEM, trap_S_RegisterSound("sound/items/regen.wav") );
+		//trap_S_StartSound (NULL, es->number, CHAN_ITEM, trap_S_RegisterSound("sound/items/regen.wav") );
+		trap_S_LazyStartSound ( regen, es->number, CHAN_ITEM, "sound/items/regen.wav" );
 		break;
 
 	case EV_GIB_PLAYER:

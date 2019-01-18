@@ -81,16 +81,18 @@
 #define WE_Z_PLASMA_TRAIL		512
 
 //try to register shader only if it's null
-#define trap_LazyRegisterShader(x,s) if (!x) x = trap_R_RegisterShader(s)
+#define trap_R_LazyRegisterShader(x, s) if (!x) x = trap_R_RegisterShader(s);
+#define trap_S_LazyRegisterSound(x, s) if (!x) x = trap_S_RegisterSound(s);
+#define trap_S_LazyStartSound(var, en, chan, path) { static sfxHandle_t var; trap_S_LazyRegisterSound(var, path); trap_S_StartSound (NULL, en, chan, var); }
 
 #if CGX_DEBUG 
-#define D_Printf(x) CG_Printf x
+#define D_Printf(x) if (cgx_debug.integer) CG_Printf x
 #else
 #define D_Printf(x)
 #endif
 
 // OSP Window Engine
-#define MAX_WINDOW_COUNT		10
+#define MAX_WINDOW_COUNT		1
 #define MAX_WINDOW_LINES		64
 
 #define MAX_STRINGS				80
