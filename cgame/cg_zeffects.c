@@ -5,6 +5,26 @@
 
 #include "cg_local.h"
 
+#define PLASMA_TIME		150
+#define PLASMA_TIME_RND 150
+#define PLASMA_RADIUS	2
+
+#define ROCKET_TIME		150
+#define ROCKET_TIME_RND	200
+#define ROCKET_RADIUS	1.5f
+
+#define LG_TIME			150
+#define LG_TIME_RND		150
+#define LG_RADIUS		2
+
+#define BULLET_TIME		200
+#define BULLET_TIME_RND	200
+#define BULLET_RADIUS	2
+
+#define EXPLOSION_TIME		200
+#define EXPLOSION_TIME_RND	250
+#define EXPLOSION_RADIUS	2
+
 /*
 ==================
 CG_ParticlePlasmaTrail
@@ -17,20 +37,13 @@ void CG_ParticlePlasmaTrail( centity_t *cent, vec3_t start, vec3_t end ) {
 	vec3_t		vec;
 	float		len;
 	float		i;
-	entityState_t	*es;
-	clientInfo_t	*ci, *ourCi;
 
-	float spacing = 16;
-	float gravity = 200;
-	float vel_rand = 40;
-	float vel_z = 15;
-	int normTime = 400;
-	int randTime = 200;
-	float radius = 1.5;
-
-	es = &cent->currentState;
-	ci = &cgs.clientinfo[es->otherEntityNum];
-	ourCi = &cgs.clientinfo[cg.clientNum];
+	float spacing = 28;
+	float gravity = 0;
+	float vel_rand = 20;
+	int normTime = PLASMA_TIME;
+	int randTime = PLASMA_TIME_RND;
+	float radius = PLASMA_RADIUS;
 
 	VectorCopy (start, move);
 	VectorSubtract (end, start, vec);
@@ -42,7 +55,7 @@ void CG_ParticlePlasmaTrail( centity_t *cent, vec3_t start, vec3_t end ) {
 
 	VectorScale (vec, spacing, vec);
 
-	trap_LazyRegisterShader(cgs.media.blueSpark, "gfx/misc/bluespark");
+	trap_R_LazyRegisterShader(cgs.media.blueSpark, "gfx/misc/bluespark");
 
 	for ( ; i < len; i += spacing ) {
 		localEntity_t	*le;
@@ -81,7 +94,7 @@ void CG_ParticlePlasmaTrail( centity_t *cent, vec3_t start, vec3_t end ) {
 		}
 		le->pos.trDelta[0] = crandom()*vel_rand;
 		le->pos.trDelta[1] = crandom()*vel_rand;
-		le->pos.trDelta[2] = crandom()*vel_rand + vel_z;
+		le->pos.trDelta[2] = crandom()*vel_rand;
 
 		VectorAdd (move, vec, move);
 	}
@@ -101,13 +114,13 @@ void CG_ParticleSparkTrail( vec3_t start, vec3_t end ) {
 	float		len;
 	float		i;
 
-	float spacing = 8;
-	float gravity = 200;
+	float spacing = 14;
+	float gravity = 0;
 	float vel_rand = 40;
-	float vel_z = 15;
-	int normTime = 400;
-	int randTime = 200;
-	float radius = 1.5;
+
+	int normTime = ROCKET_TIME;
+	int randTime = ROCKET_TIME_RND;
+	float radius = ROCKET_RADIUS;
 
 	VectorCopy (start, move);
 	VectorSubtract (end, start, vec);
@@ -155,7 +168,7 @@ void CG_ParticleSparkTrail( vec3_t start, vec3_t end ) {
 		}
 		le->pos.trDelta[0] = crandom()*vel_rand;
 		le->pos.trDelta[1] = crandom()*vel_rand;
-		le->pos.trDelta[2] = crandom()*vel_rand + vel_z;
+		le->pos.trDelta[2] = crandom()*vel_rand;
 
 		VectorAdd (move, vec, move);
 	}
@@ -172,19 +185,19 @@ void CG_LightningSpark( vec3_t origin, vec3_t dir ) {
 	int i, j;
 	int count =/* random() * 2*/ + 1;
 	float begin = 0;
-	float gravity = 500;
-	int normTime = 500;
-	int randTime = 700;
+	float gravity = 10;
+	int normTime = LG_TIME;
+	int randTime = LG_TIME_RND;
 	float normVel = 100;
-	float randVel = 150;
-	float radius = 3;
+	float randVel = 200;
+	float radius = LG_RADIUS;
 
-	trap_LazyRegisterShader(cgs.media.blueSpark, "gfx/misc/bluespark");
+	localEntity_t	*le;
+	refEntity_t		*re;
 
-	for (i = 0; i < count; i++) {
-		localEntity_t	*le;
-		refEntity_t		*re;
+	trap_R_LazyRegisterShader(cgs.media.blueSpark, "gfx/misc/bluespark");
 
+	//for (i = 0; i < count; i++) {
 		le = CG_AllocLocalEntity();
 		le->leFlags = LEF_PUFF_DONT_SCALE;
 		le->leType = LE_MOVE_SCALE_FADE;
@@ -227,7 +240,7 @@ void CG_LightningSpark( vec3_t origin, vec3_t dir ) {
 		VectorMA(le->pos.trBase, begin, le->pos.trDelta, le->pos.trBase);
 		VectorScale(le->pos.trDelta, normVel + random() * randVel, le->pos.trDelta);
 		le->pos.trDelta[2] += random() * 100;
-	}
+	//}
 }
 
 /*
@@ -238,22 +251,22 @@ Ported from z-effects
 ==================
 */
 void CG_BulletSpark( vec3_t origin, vec3_t dir ) {
-	int i, j;
+	int /*i,*/ j;
 	int count = 1;
 	float begin = 0;
-	float gravity = 500;
-	int normTime = 500;
-	int randTime = 700;
+	float gravity = 10;
+	int normTime = BULLET_TIME;
+	int randTime = BULLET_TIME_RND;
 	float normVel = 100;
-	float randVel = 150;
-	float radius = 3;
+	float randVel = 200;
+	float radius = BULLET_RADIUS/* + random()*/;
 	localEntity_t *smoke;
 	vec3_t smokeOrigin, up;
 
-	for (i = 0; i < count; i++) {
-		localEntity_t	*le;
-		refEntity_t		*re;
+	localEntity_t	*le;
+	refEntity_t		*re;
 
+	//for (i = 0; i < count; i++) {
 		le = CG_AllocLocalEntity();
 		le->leFlags = LEF_PUFF_DONT_SCALE;
 		le->leType = LE_MOVE_SCALE_FADE;
@@ -293,7 +306,7 @@ void CG_BulletSpark( vec3_t origin, vec3_t dir ) {
 		VectorMA(le->pos.trBase, begin, le->pos.trDelta, le->pos.trBase);
 		VectorScale(le->pos.trDelta, normVel + random() * randVel, le->pos.trDelta);
 		le->pos.trDelta[2] += random() * 100;
-	}
+	//}
 
 	VectorMA(origin, 4 + random() * 4, dir, smokeOrigin);
 	VectorSet(up, 0, 0, random() * 12);
@@ -313,16 +326,16 @@ Ported from z-effects
 */
 void CG_ParticleExplosionZE( vec3_t origin ) {
 	int			i, j;
-	int count = 100;
+	int count = 40;
 	float begin = 20;
-	float gravity = 500;
-	int normTime = 500;
-	int randTime = 1000;
+	float gravity = 50;
+	int normTime = EXPLOSION_TIME;
+	int randTime = EXPLOSION_TIME_RND;
 	float normVel = 130;
 	float randVel = 200;
 	float normZVel = 100;
 	float randZVel = 100;
-	float radius = 2;
+	float radius = EXPLOSION_RADIUS;
 
 	for (i = 0; i < count; i++) {
 		localEntity_t	*le;

@@ -176,12 +176,12 @@ static void CG_RailTrail32 (clientInfo_t *ci, vec3_t start, vec3_t end) {
 	VectorSubtract (end, start, vec);
 	len = VectorNormalize (vec);
 	//X-Mod: fix instant dissapear on long distance, it happens because too many disc entities spawned. if rail long - spawn less
+	time = cg_railTrailTime.integer;
+	if (time > 600) time = 600;
 	if (len >= 2000) {
 		spacing = SPACING * len / 1000;
-		time = 400;
 	} else {
 		spacing = SPACING;
-		time = 600;
 	}
 	PerpendicularVector(temp, vec);
 	for (i = 0 ; i < 36; i++) {

@@ -169,6 +169,7 @@
     <ClCompile Include="cg_unlagged.c" />
     <ClCompile Include="cg_view.c" />
     <ClCompile Include="cg_weapons.c" />
+    <ClCompile Include="cg_zeffects.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\game\bg_public.h" />

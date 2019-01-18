@@ -98,6 +98,9 @@
     <ClCompile Include="cg_scoreboard_nemesis.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cg_zeffects.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\game\bg_public.h">
