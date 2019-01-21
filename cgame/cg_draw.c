@@ -1551,8 +1551,6 @@ lagometer_t		lagometer;
 static void CGX_UpdateNetworkStats(snapshot_t *snap) {
 	static int pingTotal, pingCount, oldSnapshotCount;
 
-	lagometer.snapshotCount++;
-
 	//skip in intermission and skip localserver
 	if (cg.intermissionStarted || cgs.localServer)
 		return;	
@@ -1687,6 +1685,7 @@ void CG_AddLagometerSnapshotInfo( snapshot_t *snap ) {
 	// add this snapshot's info
 	lagometer.snapshotSamples[ lagometer.snapshotCount & ( LAG_SAMPLES - 1) ] = snap->ping;
 	lagometer.snapshotFlags[ lagometer.snapshotCount & ( LAG_SAMPLES - 1) ] = snap->snapFlags;
+	lagometer.snapshotCount++;
 
 	if (cg_lagometer.integer > 1/* || cgx_networkAdjustments.integer*/)
 		CGX_UpdateNetworkStats(snap);		

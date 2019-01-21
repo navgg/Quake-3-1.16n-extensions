@@ -81,7 +81,7 @@
 #define WE_Z_PLASMA_TRAIL		512
 
 //try to register shader only if it's null
-#define trap_R_LazyRegisterShader(x, s) if (!x) x = trap_R_RegisterShader(s);
+#define trap_R_LazyRegisterShader(x, s) if (!x) { CGX_NomipStart(); x = trap_R_RegisterShader(s); CGX_NomipEnd(); }
 #define trap_S_LazyRegisterSound(x, s) if (!x) x = trap_S_RegisterSound(s);
 #define trap_S_LazyStartSound(var, en, chan, path) { static sfxHandle_t var; trap_S_LazyRegisterSound(var, path); trap_S_StartSound (NULL, en, chan, var); }
 
