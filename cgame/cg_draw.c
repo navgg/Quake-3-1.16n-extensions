@@ -1729,7 +1729,7 @@ static void CG_DrawDisconnect( void ) {
 	x = hud.lagometer_x;
 	y = hud.lagometer_y;
 
-	CG_DrawPic(x, y, hud.icon_size, hud.icon_size, trap_R_RegisterShader( "gfx/2d/net.tga") );
+	CG_DrawPic(x, y, hud.icon_size, hud.icon_size, cgs.media.connectionShader );
 }
 
 
