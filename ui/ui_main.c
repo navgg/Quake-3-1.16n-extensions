@@ -274,8 +274,8 @@ cvarTable_t		cvarTable[] = {
 	{ &ui_server12, "server12", "", CVAR_ARCHIVE },
 	{ &ui_server13, "server13", "", CVAR_ARCHIVE },
 	{ &ui_server14, "server14", "", CVAR_ARCHIVE },
-	{ &ui_server15, "server15", "sodmod.ga:27962", CVAR_ARCHIVE },
-	{ &ui_server16, "server16", "sodmod.ga:27963", CVAR_ARCHIVE },
+	{ &ui_server15, "server15", "sodmod.ml:27962", CVAR_ARCHIVE },
+	{ &ui_server16, "server16", "sodmod.ml:27963", CVAR_ARCHIVE },
 
 	{ &ui_cdkeychecked, "ui_cdkeychecked", "0", CVAR_ROM }
 };
