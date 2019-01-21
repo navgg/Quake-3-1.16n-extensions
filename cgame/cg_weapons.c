@@ -165,18 +165,21 @@ static void CG_RailTrail32 (clientInfo_t *ci, vec3_t start, vec3_t end) {
 
 	localEntity_t *le;
 	refEntity_t   *re;
-	int spacing, time;
+	int spacing, time, endTime;
+	float shaderTime;
+	byte col2b[3];
+	float col2f[3];
 
 #define RADIUS   4
 #define ROTATION 1
-#define SPACING  5
+#define SPACING  8
 
 	start[2] -= 4;
 	VectorCopy (start, move);
 	VectorSubtract (end, start, vec);
 	len = VectorNormalize (vec);
 	//X-Mod: fix instant dissapear on long distance, it happens because too many disc entities spawned. if rail long - spawn less
-	time = cg_railTrailTime.integer;
+	time = cg_railTrailTime.integer * 3 / 4;
 	if (time > 600) time = 600;
 	if (len >= 2000) {
 		spacing = SPACING * len / 1000;
@@ -188,6 +191,9 @@ static void CG_RailTrail32 (clientInfo_t *ci, vec3_t start, vec3_t end) {
 		RotatePointAroundVector(axis[i], vec, temp, i * 10);//banshee 2.4 was 10
 	}
 
+	shaderTime = cg.time / 1000.0f;
+	endTime = cg.time + time;
+
 	le = CG_AllocLocalEntity();
 	re = &le->refEntity;
 
@@ -196,7 +202,7 @@ static void CG_RailTrail32 (clientInfo_t *ci, vec3_t start, vec3_t end) {
 	le->endTime = cg.time + cg_railTrailTime.value;
 	le->lifeRate = 1.0 / (le->endTime - le->startTime);
 
-	re->shaderTime = cg.time / 1000.0f;
+	re->shaderTime = shaderTime;
 	re->reType = RT_RAIL_CORE;
 	re->customShader = cgs.media.railCoreShader;
 
@@ -219,13 +225,20 @@ static void CG_RailTrail32 (clientInfo_t *ci, vec3_t start, vec3_t end) {
 	VectorCopy(move, next_move);
 	VectorScale (vec, spacing, vec);
 
-	//if (cgx_weaponEffects.integer & WE_RAILSIMPLE) {
+	//if (cg_oldRail.integer) {
 	//	// nudge down a bit so it isn't exactly in center
 	//	re->origin[2] -= 8;
 	//	re->oldorigin[2] -= 8;
-	//	return;
 	//}
 	skip = -1;
+
+	col2b[0] = ci->color2[0] * 255;
+	col2b[1] = ci->color2[1] * 255;
+	col2b[2] = ci->color2[2] * 255;
+
+	col2f[0] = ci->color2[0] * 0.75;
+	col2f[0] = ci->color2[1] * 0.75;
+	col2f[0] = ci->color2[2] * 0.75;
 
 	j = 18;
 	for (i = 0; i < len; i += spacing) {
@@ -236,22 +249,22 @@ static void CG_RailTrail32 (clientInfo_t *ci, vec3_t start, vec3_t end) {
 			le->leFlags = LEF_PUFF_DONT_SCALE;
 			le->leType = LE_MOVE_SCALE_FADE;
 			le->startTime = cg.time;
-			le->endTime = cg.time + (i>>1) + time;
-			le->lifeRate = 1.0 / (le->endTime - le->startTime);
+			le->endTime = endTime + (i>>1);
+			le->lifeRate = 1.0f / (le->endTime - le->startTime);
 
-			re->shaderTime = cg.time / 1000.0f;
+			re->shaderTime = shaderTime;
 			re->reType = RT_SPRITE;
 			re->radius = 1.1f;
 			re->customShader = cgs.media.railRingsShader;
 
-			re->shaderRGBA[0] = ci->color2[0] * 255;
-			re->shaderRGBA[1] = ci->color2[1] * 255;
-			re->shaderRGBA[2] = ci->color2[2] * 255;
+			re->shaderRGBA[0] = col2b[0];
+			re->shaderRGBA[1] = col2b[1];
+			re->shaderRGBA[2] = col2b[2];
 			re->shaderRGBA[3] = 255;
 
-			le->color[0] = ci->color2[0] * 0.75;
-			le->color[1] = ci->color2[1] * 0.75;
-			le->color[2] = ci->color2[2] * 0.75;
+			le->color[0] = col2f[0];
+			le->color[1] = col2f[1];
+			le->color[2] = col2f[2];
 			le->color[3] = 1.0f;
 
 			le->pos.trType = TR_LINEAR;
