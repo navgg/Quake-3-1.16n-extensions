@@ -1044,6 +1044,10 @@ typedef struct {
 	int				cofs;//compact hud offset
 
 	int				score_yofs;
+
+	int				minshadow;
+	int				lagometer_fw;
+	int				lagometer_fh;
 } xhud_t;
 
 //==============================================================================

@@ -185,8 +185,9 @@ int CG_DrawField2( int x, int y, int width, int chrWidth, int chrHeight, int val
 	if (l > width)
 		l = width;
 
-	if (!leftIndent)
-		x += 2 + chrWidth * (width - l);
+	if (!leftIndent) {
+		x -= 2 + chrWidth;
+	}
 
 	startx = x;
 

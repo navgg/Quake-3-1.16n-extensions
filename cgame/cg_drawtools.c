@@ -121,7 +121,7 @@ void CG_DrawStringExt( int x, int y, const char *string, const float *setColor,
 	// draw the drop shadow
 	if (shadow) {
 		//X-Mod: little adjust shadow for small fonts
-		int shadowSize = charHeight <= 12 ? 1 : 2;
+		int shadowSize = charHeight <= hud.minshadow ? 1 : 2;
 		color[0] = color[1] = color[2] = 0;
 		color[3] = setColor[3];
 		trap_R_SetColor( color );

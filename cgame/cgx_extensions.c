@@ -66,6 +66,10 @@ static void CGX_Init_HUD(void) {
 		hud.sbarmor_tx += hud.cofs;
 		hud.sbhealth_tx += hud.cofs;
 		hud.sbflagx -= hud.cofs;
+
+		hud.minshadow = 12;
+		hud.lagometer_fw = 4;
+		hud.lagometer_fh = 9;
 	} else {
 		hud.icon_size = ICON_SIZE;
 		hud.small_char_w = SMALLCHAR_WIDTH;
@@ -78,6 +82,10 @@ static void CGX_Init_HUD(void) {
 		//hud.weap_y = 380;
 		hud.char_width = CHAR_WIDTH;
 		hud.head_size = ICON_SIZE;
+
+		hud.minshadow = 8;
+		hud.lagometer_fw = 5;
+		hud.lagometer_fh = 10;
 	}
 
 	if (cg_draw2D.integer == HUD_VANILLAQ3) {

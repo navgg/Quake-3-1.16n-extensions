@@ -1852,12 +1852,12 @@ static void CG_DrawLagometer( void ) {
 		// draw ping packet loss and delayed rate if lag
 		if (cg.meanPing > 0) {
 			if (cg_lagometer.integer > 2)
-				CG_DrawStringExt(x + 1, y, va("%ims %i %i", cg.meanPing, cg.packetloss, cg.rateDelayed), g_color_table[ColorIndex(COLOR_WHITE)], qfalse, qfalse, 5, 10, 0);
+				CG_DrawStringExt(x + 1, y, va("%ims %i %i", cg.meanPing, cg.packetloss, cg.rateDelayed), g_color_table[ColorIndex(COLOR_WHITE)], qfalse, qfalse, hud.lagometer_fw, hud.lagometer_fh, 0);
 			else
-				CG_DrawStringExt(x + 1, y, va("%ims", cg.meanPing, cg.packetloss, cg.rateDelayed), g_color_table[ColorIndex(COLOR_WHITE)], qfalse, qfalse, 5, 10, 0);
+				CG_DrawStringExt(x + 1, y, va("%ims", cg.meanPing, cg.packetloss, cg.rateDelayed), g_color_table[ColorIndex(COLOR_WHITE)], qfalse, qfalse, hud.lagometer_fw, hud.lagometer_fh, 0);
 		} else {			
 			// draw if stats not calculated yet
-			CG_DrawStringExt(x + 1, y, "...", g_color_table[ColorIndex(COLOR_WHITE)], qfalse, qfalse, 5, 10, 0);			
+			CG_DrawStringExt(x + 1, y, "...", g_color_table[ColorIndex(COLOR_WHITE)], qfalse, qfalse, hud.lagometer_fw, hud.lagometer_fh, 0);
 		}
 	}
 	
