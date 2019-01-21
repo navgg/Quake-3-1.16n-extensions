@@ -1674,8 +1674,6 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir ) {
 		}
 		mark = cgs.media.holeMarkShader;
 		radius = 12;
-		if (cgx_weaponEffects.integer & WE_Z_LG_SPARKS)
-			CG_LightningSpark(origin, dir);
 		break;
 	case WP_GRENADE_LAUNCHER:
 		mod = cgs.media.dishFlashModel;
@@ -1738,8 +1736,6 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir ) {
 		mark = cgs.media.bulletMarkShader;
 		sfx = 0;
 		radius = 4;
-		if (cgx_weaponEffects.integer & WE_Z_BULLET_SPARKS)
-			CG_BulletSpark(origin, dir);
 		break;
 
 	case WP_MACHINEGUN:
@@ -1757,8 +1753,6 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir ) {
 		}
 
 		radius = 8;
-		if (cgx_weaponEffects.integer & WE_Z_BULLET_SPARKS)
-			CG_BulletSpark(origin, dir);
 		break;
 	}
 
@@ -1870,6 +1864,9 @@ static void CG_ShotgunPellet( vec3_t start, vec3_t end, int skipNum ) {
 			return;
 		}
 		CG_MissileHitWall( WP_SHOTGUN, 0, tr.endpos, tr.plane.normal );
+
+		if ( ( cgx_weaponEffects.integer & WE_Z_BULLET_SPARKS ) && !( destContentType & CONTENTS_WATER ) )
+			CG_BulletSpark(tr.endpos, tr.plane.normal);
 	}
 }
 
@@ -2107,6 +2104,9 @@ void CG_Bullet( vec3_t end, int sourceEntityNum, vec3_t normal, qboolean flesh, 
 		CG_Bleed( end, fleshEntityNum );
 	} else {
 		CG_MissileHitWall( WP_MACHINEGUN, 0, end, normal );
+
+		if ( ( cgx_weaponEffects.integer & WE_Z_BULLET_SPARKS ) && !( destContentType & CONTENTS_WATER ) )
+			CG_BulletSpark(end, normal);
 	}
 
 }
