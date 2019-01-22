@@ -592,7 +592,7 @@ void CG_DrawOSPFFAScoreboard( void ) {
 	}
 }
 
-
+qboolean CG_DrawNormalScoreboard( void );
 /*
 =================
 CG_DrawOSPScoreboard
@@ -1321,7 +1321,7 @@ void CG_windowDraw( void ) {
 void CG_statsWindow( void ) {
 	int weaponCount;
 	int kills, deaths, score;
-	float efficiency;
+	//float efficiency;
 	char *weaponName, *damageGivenStr;
 	const char		*line = "^7.............................................";
 	qboolean interMission = cg.snap->ps.pm_type == PM_INTERMISSION;

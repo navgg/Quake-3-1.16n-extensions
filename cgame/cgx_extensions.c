@@ -904,7 +904,7 @@ vmCvar_t	cgx_uinfo;
 
 // send modinfo if gamename nemesis or bma
 void CGX_SendModinfo(void) {
-	char	*gamename;
+//	char	*gamename;
 	qboolean isNemesis = qfalse, isBMA = qfalse;
 	static qboolean isNemesisRegistered = qfalse;
 

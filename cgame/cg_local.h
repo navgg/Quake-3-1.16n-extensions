@@ -1236,6 +1236,8 @@ void CG_AddGib( localEntity_t *le );
 
 // cg_scoreboard_nemesis.c
 qboolean CG_DrawOSPScoreboard( void );
+void CG_DrawWidthGauge( int x, int y, int width, int height, vec4_t color, int value, qboolean reverse );
+void CG_windowDraw( void );
 void CG_statsWindow( void );
 void CG_statsWindowFree( int weffects );
 
@@ -1281,6 +1283,11 @@ void CGX_Xmod(char *command);
 void CGX_DownloadMap(char *name, qboolean end_load);
 void CGX_ChatFilter(char *str);
 char *CGX_CheckChatTokens(char *message, char chatcol);
+
+void CG_WeaponAccCheck();
+void CGX_UpdateItemPickupStats(entityState_t *es, gitem_t *item);
+void CGX_UpdateDamageStats(playerState_t *ps, playerState_t *ops);
+void CGX_UpdateKillsDeathsStats(int mod, int target, int attacker);
 
 //
 // cg_main.c
@@ -1377,6 +1384,7 @@ int	CG_PointContents( const vec3_t point, int passEntityNum );
 void CG_Trace( trace_t *result, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, 
 					 int skipNumber, int mask );
 void CG_PredictPlayerState( void );
+void CG_PredictPlayerState32( void );
 void CG_LoadDeferredPlayers( void );
 
 
