@@ -46,11 +46,11 @@ Custom extensions for patching Quake 3 1.16n (beta version)
 - X-Mod - (c) 2018-2019 NaViGaToR (322)
 
 ###### Credits
-Unlagged 2.01 - (c) 2006 Neil “haste” Toronto
-Freeze Tag - (с) 1998, 2001, 2002 by Darrell Bircsak
-z-effects (c) 2001-2002 Randall "Ravenant" Piatek, Matt McChesney
-OSP - (c) 2003 Jason "Rhea" Keimig and Team
-CPMA - (c) 2000-2010 Challenge World, (c) 2016-2018 The ProMode Team
-13box - (c) 2009 sst13
-Nemesis - (c) 2005 Cyrus and Wonkey
-Quake 3 Arena - (c) 1999-2005 Id Software
+- Unlagged 2.01 - (c) 2006 Neil “haste” Toronto
+- Freeze Tag - (с) 1998, 2001, 2002 by Darrell Bircsak
+- z-effects (c) 2001-2002 Randall "Ravenant" Piatek, Matt McChesney
+- OSP - (c) 2003 Jason "Rhea" Keimig and Team
+- CPMA - (c) 2000-2010 Challenge World, (c) 2016-2018 The ProMode Team
+- 13box - (c) 2009 sst13
+- Nemesis - (c) 2005 Cyrus and Wonkey
+- Quake 3 Arena - (c) 1999-2005 Id Software
