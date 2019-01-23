@@ -1329,7 +1329,7 @@ static void CG_DrawLowerRight( void ) {
 	if ( cgs.gametype >= GT_TEAM && cg_drawTeamOverlay.integer == 2 ) {
 		y = CG_DrawTeamOverlay( y, qtrue, qfalse );
 	} else if (!cg_lagometer.integer && cg_draw2D.integer != HUD_VANILLAQ3 && (vScreen.offsetx > 16 || !cg_drawIcons.integer)) {
-		y += ICON_SIZE / 2;
+		y += hud.score_yofs_no_lagometer;
 	}
 
 	if (cgx_drawScoreBox.integer) {
@@ -2464,10 +2464,9 @@ static void CG_Draw2D( void ) {
 		return;
 	}
 
-	// OSP window style engine
-	CG_windowDraw();
-
 	if ( cg.snap->ps.pm_type == PM_INTERMISSION ) {
+		// OSP window style engine
+		CG_windowDraw();
 		CG_DrawIntermission();
 		return;
 	}
@@ -2509,6 +2508,8 @@ static void CG_Draw2D( void ) {
 	// don't draw center string if scoreboard is up
 	if ( !CG_DrawScoreboard() ) {
 		CG_DrawCenterString();
+		// OSP window style engine
+		CG_windowDraw();
 	}
 }
 

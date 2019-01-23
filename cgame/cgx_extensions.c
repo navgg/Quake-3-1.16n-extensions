@@ -70,6 +70,9 @@ static void CGX_Init_HUD(void) {
 		hud.minshadow = 12;
 		hud.lagometer_fw = 4;
 		hud.lagometer_fh = 9;
+
+		hud.score_yofs = BIGCHAR_HEIGHT + 4;
+		hud.score_yofs_no_lagometer = ICON_SIZE / 2;
 	} else {
 		hud.icon_size = ICON_SIZE;
 		hud.small_char_w = SMALLCHAR_WIDTH;
@@ -86,11 +89,13 @@ static void CGX_Init_HUD(void) {
 		hud.minshadow = 8;
 		hud.lagometer_fw = 5;
 		hud.lagometer_fh = 10;
+
+		hud.score_yofs = BIGCHAR_HEIGHT + 8;
+		hud.score_yofs_no_lagometer = ICON_SIZE / 2 + 4;
 	}
 
 	if (cg_draw2D.integer == HUD_VANILLAQ3) {
 		hud.head_size *= 1.25f;
-		hud.score_yofs = BIGCHAR_HEIGHT + 8;
 		hud.weap_y = 380;
 	} else {
 		int ox = 0;
@@ -107,7 +112,6 @@ static void CGX_Init_HUD(void) {
 		hud.sbhealth_tx += ox;
 		hud.sbheadx += ox;
 
-		hud.score_yofs = BIGCHAR_HEIGHT + 4;
 		hud.weap_y = SCREEN_HEIGHT - hud.head_size - hud.weap_icon_s2 - hud.weap_icon_sub;
 	}
 

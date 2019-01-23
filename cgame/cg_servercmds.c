@@ -321,7 +321,7 @@ static void CG_MapRestart( void ) {
 	//nemesis/osp reset stats
 	memset( &stats, 0, sizeof( stats ) );
 
-	CG_statsWindowFree( WFX_SCROLLLEFT );
+	CG_statsWindowFree( 0 );
 
 	cgs.voteTime = 0;
 

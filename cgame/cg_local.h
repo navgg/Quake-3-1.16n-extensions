@@ -1044,6 +1044,7 @@ typedef struct {
 	int				cofs;//compact hud offset
 
 	int				score_yofs;
+	int				score_yofs_no_lagometer;
 
 	int				minshadow;
 	int				lagometer_fw;

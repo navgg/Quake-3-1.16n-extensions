@@ -76,25 +76,27 @@ void CG_DrawWidthGauge( int x, int y, int width, int height, vec4_t color, int v
 	trap_R_SetColor( NULL );
 }
 
-void CG_DrawSides( float x, float y, float w, float h, float size ) {
+//X-mod: filled rect draw
+void CG_DrawFilledRect( float x, float y, float w, float h, float size, const float *bgcolor, const float *bordercolor ) {
+	float xs;
+	float ys;
+
+	xs = size * cgs.screenXScale;
+	ys = size * cgs.screenYScale;
+
 	CG_AdjustFrom640( &x, &y, &w, &h );
-	size *= cgs.screenXScale;
-	trap_R_DrawStretchPic( x, y, size, h, 0, 0, 0, 0, cgs.media.whiteShader );
-	trap_R_DrawStretchPic( x + w - size, y, size, h, 0, 0, 0, 0, cgs.media.whiteShader );
-}
 
-void CG_DrawTopBottom( float x, float y, float w, float h, float size ) {
-	CG_AdjustFrom640( &x, &y, &w, &h );
-	size *= cgs.screenYScale;
-	trap_R_DrawStretchPic( x, y, w, size, 0, 0, 0, 0, cgs.media.whiteShader );
-	trap_R_DrawStretchPic( x, y + h - size, w, size, 0, 0, 0, 0, cgs.media.whiteShader );
-}
+	trap_R_SetColor( bgcolor );
 
-void CG_DrawRect( float x, float y, float width, float height, float size, const float *color ) {
-	trap_R_SetColor( color );
+	trap_R_DrawStretchPic( x, y, w, h, 0, 0, 0, 0, cgs.media.whiteShader );
 
-	CG_DrawTopBottom( x, y, width, height, size );
-	CG_DrawSides( x, y, width, height, size );
+	trap_R_SetColor( bordercolor );
+
+	trap_R_DrawStretchPic( x, y, xs, h, 0, 0, 0, 0, cgs.media.whiteShader );
+	trap_R_DrawStretchPic( x + w - xs, y, xs, h, 0, 0, 0, 0, cgs.media.whiteShader );
+
+	trap_R_DrawStretchPic( x, y, w, ys, 0, 0, 0, 0, cgs.media.whiteShader );
+	trap_R_DrawStretchPic( x, y + h - ys, w, ys, 0, 0, 0, 0, cgs.media.whiteShader );
 
 	trap_R_SetColor( NULL );
 }
@@ -1301,8 +1303,7 @@ void CG_windowDraw( void ) {
 		borderColor[3] *= textColor[3];
 		bgColor[3] *= textColor[3];
 
-		CG_FillRect( x, y, w->w, h, bgColor );
-		CG_DrawRect( x, y, w->w, h, 1, borderColor );
+		CG_DrawFilledRect( x, y, w->w, h, 1.25f, bgColor, borderColor );
 
 		for (j = w->lineCount - 1; j >= 0; j--) {
 			h -= (w->lineHeight[j] + 3);
@@ -1336,7 +1337,7 @@ void CG_statsWindow( void ) {
 	if (cgs.clientinfo[cg.clientNum].team == TEAM_SPECTATOR && interMission)
 		return;
 
-	sw = CG_windowAlloc( WFX_TEXTSIZING | (interMission ? WFX_SCROLLRIGHT : 0), 350 );
+	sw = CG_windowAlloc( WFX_TEXTSIZING | (interMission ? WFX_FADEIN : 0), 350 );
 
 	cg.statsWindow = sw;
 	if (sw == NULL) return;
@@ -1352,14 +1353,9 @@ void CG_statsWindow( void ) {
 	// Window specific
 	sw->state = WSTATE_START;
 	sw->id = WID_ACC;
-	sw->fontScaleX = 0.9f;
-	sw->fontScaleY = 0.9f;
-	sw->x = 10;
-	
-	sw->y = hud.sbteambg_y - 90 - (weaponCount * (WINDOW_FONTHEIGHT + 3) * sw->fontScaleY);
-	
-	if (interMission)
-		sw->y += hud.head_size;
+	sw->fontScaleX = 1.0f;
+	sw->fontScaleY = 1.0f;
+	sw->x = 8;
 
 	sw->flashPeriod = 700;
 	sw->flashMidpoint = sw->flashPeriod * 0.5f;
@@ -1392,7 +1388,7 @@ void CG_statsWindow( void ) {
 	if (interMission && cgs.serverMod != SM_NOGHOST)
 		CG_Printf( "\n", line );
 
-	CG_printWindow( "   ^3Score   ^3Kills  ^3Deaths    ^3Suic    ^3Effncy" );
+	CG_printWindow( "   ^3Score   ^3Kills  ^3Deaths   ^3SelfK      ^3Eff " );
 	CG_printWindow( va( "^7%8i%8i%8i%8i  %5i.%i%%", score, kills, deaths, stats.suicides,
 		w, j - w * 10 ) );
 
@@ -1419,9 +1415,9 @@ void CG_statsWindow( void ) {
 		case WP_SHOTGUN: weaponName = "Shotgun"; break;
 		case WP_GRENADE_LAUNCHER: weaponName = "Grenade L."; break;
 		case WP_ROCKET_LAUNCHER: weaponName = "Rocket L."; break;
-		case WP_LIGHTNING: weaponName = "LightningGun"; break;
+		case WP_LIGHTNING: weaponName = "Lightning Gun"; break;
 		case WP_RAILGUN: weaponName = "Railgun"; break;
-		case WP_PLASMAGUN: weaponName = "PlasmaGun"; break;
+		case WP_PLASMAGUN: weaponName = "Plasma Gun"; break;
 		case WP_BFG: weaponName = "BFG"; break;
 		default: weaponName = "Unknown"; break;
 		}
@@ -1433,7 +1429,7 @@ void CG_statsWindow( void ) {
 
 		w = j / 10;
 
-		CG_printWindow( va( "^7%-12s   ^5%3i.%i%%   ^7%4i/%-4i  ^7%4i  ^7%4i",
+		CG_printWindow( va( "^7%-13s  ^5%3i.%i%%   ^7%4i/%-4i  ^7%4i  ^7%4i",
 			weaponName,
 			w, j - w * 10,
 			stats.weaponHits[i],
@@ -1449,19 +1445,23 @@ void CG_statsWindow( void ) {
 	else
 		damageGivenStr = va( "%6i", j );
 
-	CG_printWindow( va( "\n^3Damage Given  ^7%6s   ^3Armor  ^7%5i   ^3^7%-2i^1R ^7%-2i^3Y^7",
+	CG_printWindow( va( "\n^3Damage Done   ^7%6s   ^3Armor  ^7%5i   ^3^7%-2i^1R ^7%-2i^3Y^7",
 		damageGivenStr,
 		stats.armorTotal,
 		stats.armorRA,
 		stats.armorYA ) );
 
-	CG_printWindow( va( "^3Damage Recvd  ^7%6i  ^3Health  ^7%5i ^3      ^7%-2i^5M^7",
+	CG_printWindow( va( "^3Damage Taken  ^7%6i  ^3Health  ^7%5i ^3      ^7%-2i^5M^7",
 		stats.damageReceived,
 		stats.healthTotal,
 		stats.healthMH ) );
 
-	if (interMission)
-		CG_Printf( "\n", line );
+	sw->y = hud.sbteambg_y - (sw->lineCount) * (sw->fontScaleY * WINDOW_FONTHEIGHT + 3) - 8;
+
+	if (interMission) {
+		sw->y += hud.head_size;
+		CG_Printf("\n", line);
+	}
 }
 
 void CG_statsWindowFree( int weffects ) {

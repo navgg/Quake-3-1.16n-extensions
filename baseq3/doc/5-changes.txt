@@ -116,6 +116,7 @@ cl_timeNudge limit set -20 to 20
 renamed cg_networkAdjustments to cg_autoNetworkSettings
 1.32 rail effect overrides simple rail
 cg_delag_optimizePrediction by default 1
+clientstats appearance changed
 
 added cg_teamModel "*" (if enemymodels enabled this value sets default red/blue skins for team, 
   can be used as "*/mysuperskin" or "bitterman/*", same for cg_enemyModel)
