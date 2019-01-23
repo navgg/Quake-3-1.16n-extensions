@@ -109,9 +109,9 @@ fixed check for unlagged on nemesis/bma servers
 
 0.95b
 
-removed cg_teamInfoType, use cg_drawCrosshairNames insed. 
-  1: hp&armor as text, 2: hp&armor as bars, 3: only names
-removed draw play names in nemesis/osp style
+removed cg_teamInfoType, use cg_drawCrosshairNames instead. 
+  1: only names, 2: hp&armor as text, 3: hp&armor as bars
+removed draw player names in nemesis/osp style
 cl_timeNudge limit set -20 to 20
 renamed cg_networkAdjustments to cg_autoNetworkSettings
 1.32 rail effect overrides simple rail

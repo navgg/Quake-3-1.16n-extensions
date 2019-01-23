@@ -170,9 +170,9 @@ static const char *crosshairsize_items[] =
 
 static const char *drawnames_items[] = {
 	"off",
+	"name only",
 	"name+team info text",
 	"name+team info bars",
-	"name only Vanilla Q3",
 	0
 };
 
