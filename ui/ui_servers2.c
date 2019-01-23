@@ -825,7 +825,7 @@ static void ArenaServers_DoRefresh( void )
 	}
 
 	// trigger at 10Hz intervals
-	g_arenaservers.nextpingtime = uis.realtime + 50;
+	g_arenaservers.nextpingtime = uis.realtime + 10;
 
 	// process ping results
 	maxPing = ArenaServers_MaxPing();
