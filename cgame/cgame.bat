@@ -50,7 +50,9 @@ set cc=lcc -DQ3_VM -S -Wf-target=bytecode -Wf-g -I..\..\cgame -I..\..\game -I..\
 @if errorlevel 1 goto quit
 %cc% ../cg_scoreboard.c
 @if errorlevel 1 goto quit
-%cc% ../cg_scoreboard_nemesis.c
+%cc% ../cg_scoreboard_osp.c
+@if errorlevel 1 goto quit
+%cc% ../cg_osp.c
 @if errorlevel 1 goto quit
 %cc% ../cg_servercmds.c
 @if errorlevel 1 goto quit

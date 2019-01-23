@@ -1235,12 +1235,20 @@ qboolean Q_Isfreeze( int clientNum );
 void CG_AddGib( localEntity_t *le );
 #endif//freeze
 
-// cg_scoreboard_nemesis.c
+// cg_scoreboard_osps.c
 qboolean CG_DrawOSPScoreboard( void );
+
+// cg_osp.c
+void CG_DrawBorder( int x, int y, int w, int h, int size, const float *borderColor );
 void CG_DrawWidthGauge( int x, int y, int width, int height, vec4_t color, int value, qboolean reverse );
 void CG_windowDraw( void );
 void CG_statsWindow( void );
 void CG_statsWindowFree( int weffects );
+
+void CGX_WeaponAccCheck();
+void CGX_UpdateItemPickupStats(entityState_t *es, gitem_t *item);
+void CGX_UpdateDamageStats(playerState_t *ps, playerState_t *ops);
+void CGX_UpdateKillsDeathsStats(int mod, int target, int attacker);
 
 // cg_zeffects.c
 void CG_ParticlePlasmaTrail( centity_t *cent, vec3_t start, vec3_t end );
@@ -1284,11 +1292,6 @@ void CGX_Xmod(char *command);
 void CGX_DownloadMap(char *name, qboolean end_load);
 void CGX_ChatFilter(char *str);
 char *CGX_CheckChatTokens(char *message, char chatcol);
-
-void CG_WeaponAccCheck();
-void CGX_UpdateItemPickupStats(entityState_t *es, gitem_t *item);
-void CGX_UpdateDamageStats(playerState_t *ps, playerState_t *ops);
-void CGX_UpdateKillsDeathsStats(int mod, int target, int attacker);
 
 //
 // cg_main.c

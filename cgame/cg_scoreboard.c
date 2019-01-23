@@ -439,14 +439,8 @@ Draw specified scoreboard
 */
 qboolean CG_DrawScoreboard( void ) {
 	if (cgx_scoreboard.integer == 3) {
-		if (!cgs.media.scoreBarRed)
-			cgs.media.scoreBarRed = trap_R_RegisterShader( "scoreboard_bar_red" );
-		if (!cgs.media.scoreBarBlue)
-			cgs.media.scoreBarBlue = trap_R_RegisterShader( "scoreboard_bar_blue" );
-		//if (!cgs.media.teamIconRed)
-		//	cgs.media.teamIconRed = trap_R_RegisterShader( "team_red_icon" );
-		//if (!cgs.media.teamIconBlue)
-		//	cgs.media.teamIconBlue = trap_R_RegisterShader( "team_blue_icon" );
+		trap_R_LazyRegisterShader(cgs.media.scoreBarRed, "scoreboard_bar_red");
+		trap_R_LazyRegisterShader(cgs.media.scoreBarBlue, "scoreboard_bar_blue");
 
 		return CG_DrawOSPScoreboard();
 	} else {

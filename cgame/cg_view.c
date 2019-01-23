@@ -808,7 +808,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 
 	// nemesis/OSP
 	// calculates per weapon accuracy client side
-	CG_WeaponAccCheck();
+	CGX_WeaponAccCheck();
 
 	// actually issue the rendering calls
 	CG_DrawActive( stereoView );

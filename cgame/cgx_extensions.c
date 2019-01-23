@@ -505,7 +505,13 @@ void CGX_MapRestart() {
 	// X-MOD: send modinfo
 	CGX_SendModinfo();
 	if (cgx_enemyModel_enabled.integer)
-		CGX_CheckEnemyModelAll();	
+		CGX_CheckEnemyModelAll();
+
+	//nemesis/osp reset stats
+	memset( &stats, 0, sizeof( stats ) );
+
+	CG_statsWindowFree( 0 );
+
 	D_Printf(("^6CGX_MapRestart\n"));
 }
 

@@ -18,7 +18,8 @@ cg_players
 cg_playerstate
 cg_predict
 cg_scoreboard
-cg_scoreboard_nemesis
+cg_scoreboard_osp
+cg_osp
 cg_servercmds
 cg_snapshot
 cg_view

@@ -95,10 +95,13 @@
     <ClCompile Include="cg_freeze.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cg_scoreboard_nemesis.c">
+    <ClCompile Include="cg_zeffects.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cg_zeffects.c">
+    <ClCompile Include="cg_scoreboard_osp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cg_osp.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

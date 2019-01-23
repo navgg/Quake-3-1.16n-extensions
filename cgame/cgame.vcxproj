@@ -162,13 +162,14 @@
     <ClCompile Include="cg_playerstate.c" />
     <ClCompile Include="cg_predict.c" />
     <ClCompile Include="cg_scoreboard.c" />
-    <ClCompile Include="cg_scoreboard_nemesis.c" />
+    <ClCompile Include="cg_scoreboard_osp.c" />
     <ClCompile Include="cg_servercmds.c" />
     <ClCompile Include="cg_snapshot.c" />
     <ClCompile Include="cg_syscalls.c" />
     <ClCompile Include="cg_unlagged.c" />
     <ClCompile Include="cg_view.c" />
     <ClCompile Include="cg_weapons.c" />
+    <ClCompile Include="cg_osp.c" />
     <ClCompile Include="cg_zeffects.c" />
   </ItemGroup>
   <ItemGroup>
