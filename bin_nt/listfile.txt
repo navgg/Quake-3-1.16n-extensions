@@ -11,4 +11,5 @@ maps\
 win\
 sprites\*
 default.cfg
+default_servercache.dat
 

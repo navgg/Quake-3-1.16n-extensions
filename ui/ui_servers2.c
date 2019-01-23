@@ -182,6 +182,10 @@ typedef struct {
 	int					refreshtime;
 	char				favoriteaddresses[MAX_FAVORITESERVERS][MAX_ADDRESSLENGTH];
 	int					numfavoriteaddresses;
+	//X-mod: server cache
+	qboolean			refreshFromCache; // refreshing from cache or no
+	char				cachedAddresses[MAX_GLOBALSERVERS][MAX_ADDRESSLENGTH];
+	int					numCachedAddresses;
 } arenaservers_t;
 
 static arenaservers_t	g_arenaservers;
@@ -201,6 +205,13 @@ static int				g_sortkey;
 static int				g_emptyservers;
 static int				g_fullservers;
 
+// X-Mod: cache servers in case if master server not responding
+#define XMOD_FILE "{X-Mod}"
+#define SERVER_CACHE_FILE "servercache.dat"
+
+int UIX_GetGlobalServerCount(qboolean useDefaultCache);
+void UIX_GetGlobalServerAddressString( int n, char *buf, int buflen );
+int UIX_LoadCachedServers(qboolean useDefaultCache);
 
 /*
 =================
@@ -336,7 +347,8 @@ static void ArenaServers_UpdateMenu( void ) {
 		// servers found
 		if( g_arenaservers.refreshservers && ( g_arenaservers.currentping <= g_arenaservers.numqueriedservers ) ) {
 			// show progress
-			Com_sprintf( g_arenaservers.status.string, MAX_STATUSLENGTH, "%d of %d Arena Servers.", g_arenaservers.currentping, g_arenaservers.numqueriedservers);
+			Com_sprintf( g_arenaservers.status.string, MAX_STATUSLENGTH, "%d of %d Arena Servers.%s", 
+				g_arenaservers.currentping, g_arenaservers.numqueriedservers, g_arenaservers.refreshFromCache ? " Loaded from cache." : "");
 			g_arenaservers.statusbar.string  = "Press SPACE to stop";
 			qsort( g_arenaservers.serverlist, *g_arenaservers.numservers, sizeof( servernode_t ), ArenaServers_Compare);
 		}
@@ -754,6 +766,7 @@ static void ArenaServers_StopRefresh( void )
 		return;
 
 	g_arenaservers.refreshservers = qfalse;
+	g_arenaservers.refreshFromCache = qfalse;
 
 	if (g_servertype == AS_FAVORITES)
 	{
@@ -773,7 +786,6 @@ static void ArenaServers_StopRefresh( void )
 
 	ArenaServers_UpdateMenu();
 }
-
 
 /*
 =================
@@ -891,7 +903,7 @@ static void ArenaServers_DoRefresh( void )
 			break;
 
 		case AS_GLOBAL:
-			g_arenaservers.numqueriedservers = trap_LAN_GetGlobalServerCount();
+			g_arenaservers.numqueriedservers = UIX_GetGlobalServerCount(qtrue);
 			break;
 
 		case AS_FAVORITES:
@@ -899,7 +911,7 @@ static void ArenaServers_DoRefresh( void )
 			break;
 
 		case AS_MPLAYER:
-			g_arenaservers.numqueriedservers = trap_LAN_GetGlobalServerCount();
+			g_arenaservers.numqueriedservers = UIX_GetGlobalServerCount(qfalse);
 			break;
 	}
 
@@ -933,7 +945,7 @@ static void ArenaServers_DoRefresh( void )
 				break;
 
 			case AS_GLOBAL:
-				trap_LAN_GetGlobalServerAddressString( g_arenaservers.currentping, adrstr, MAX_ADDRESSLENGTH );
+				UIX_GetGlobalServerAddressString( g_arenaservers.currentping, adrstr, MAX_ADDRESSLENGTH );
 				break;
 
 			case AS_FAVORITES:
@@ -941,7 +953,7 @@ static void ArenaServers_DoRefresh( void )
 				break;
 
 			case AS_MPLAYER:
-				trap_LAN_GetGlobalServerAddressString( g_arenaservers.currentping, adrstr, MAX_ADDRESSLENGTH );
+				UIX_GetGlobalServerAddressString( g_arenaservers.currentping, adrstr, MAX_ADDRESSLENGTH );
 				break;
 		}
 
@@ -1552,4 +1564,101 @@ UI_ArenaServersMenu
 void UI_ArenaServersMenu( void ) {
 	ArenaServers_MenuInit();
 	UI_PushMenu( &g_arenaservers.menu );
-}						  
+}						
+
+//X-Mod: get cached server cound or from master server if it's online
+int UIX_GetGlobalServerCount(qboolean useDefaultCache) {
+	static int res = -1;
+
+	if (g_arenaservers.refreshFromCache) {
+		return res;
+	} else {
+		res = trap_LAN_GetGlobalServerCount();
+
+		if (res > 0)
+			return res;
+	}
+
+	{//try load cache if it fails return result from trap_LAN...
+		int tmp = UIX_LoadCachedServers(useDefaultCache);
+
+		if (tmp) {
+			g_arenaservers.refreshFromCache = qtrue;
+			res = tmp;
+		}
+	}
+
+	return res;
+}
+
+//X-Mod: get server address from cached list or master server
+void UIX_GetGlobalServerAddressString( int n, char *buf, int buflen ) {
+	if (g_arenaservers.refreshFromCache)
+		strcpy( buf, g_arenaservers.cachedAddresses[g_arenaservers.currentping] );
+	else
+		trap_LAN_GetGlobalServerAddressString( g_arenaservers.currentping, buf, MAX_ADDRESSLENGTH );
+}
+
+void UIX_SaveCachedServers() {
+	char buf[32];
+	int size;
+	int i;
+	fileHandle_t f;
+
+	if (!uix_serverCache.integer)
+		return;
+
+	// no servers to cache or servers was loaded from cache
+	if (!g_numglobalservers || g_arenaservers.numCachedAddresses)
+		return;
+
+	// save to baseq3
+	trap_Cvar_VariableStringBuffer("fs_game", buf, sizeof buf);
+
+	if (!buf[0])
+		trap_FS_FOpenFile(XMOD_FILE SERVER_CACHE_FILE, &f, FS_WRITE);
+	else
+		trap_FS_FOpenFile("..\\baseq3\\"XMOD_FILE SERVER_CACHE_FILE, &f, FS_WRITE);
+
+	if (!f) return;
+
+	for (i = 0; i < g_numglobalservers; i++)
+		strcpy(g_arenaservers.cachedAddresses[i], g_globalserverlist[i].adrstr);
+
+	trap_FS_Write(&g_numglobalservers, sizeof(int), f);
+	size = sizeof(g_arenaservers.cachedAddresses);
+	trap_FS_Write(&size, sizeof(int), f);
+	trap_FS_Write(&g_arenaservers.cachedAddresses, sizeof(g_arenaservers.cachedAddresses), f);
+
+	trap_FS_FCloseFile(f);
+}
+
+int UIX_LoadCachedServers(qboolean useDefaultCache) {
+	int size;
+	fileHandle_t f;
+	int num;
+
+	if (!uix_serverCache.integer)
+		return 0;
+
+	if ( trap_FS_FOpenFile(XMOD_FILE SERVER_CACHE_FILE, &f, FS_READ ) <= 0 ) {
+		if (!useDefaultCache)
+			return 0;
+
+		if (trap_FS_FOpenFile("default_"SERVER_CACHE_FILE, &f, FS_READ ) <= 0 )
+			return 0;
+	}
+
+	trap_FS_Read(&num, sizeof(int), f);
+	trap_FS_Read(&size, sizeof(int), f);
+	if (size == sizeof(g_arenaservers.cachedAddresses))
+		trap_FS_Read(&g_arenaservers.cachedAddresses, sizeof(g_arenaservers.cachedAddresses), f);
+	else
+		num = 0;
+
+	g_arenaservers.numCachedAddresses = num;
+
+	trap_FS_FCloseFile(f);
+
+	return num;
+}

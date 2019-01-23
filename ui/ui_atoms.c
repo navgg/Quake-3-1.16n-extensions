@@ -968,7 +968,7 @@ UI_Shutdown
 =================
 */
 void UI_Shutdown( void ) {
-
+	UIX_SaveCachedServers();
 }
 
 /*

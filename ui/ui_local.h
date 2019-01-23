@@ -69,6 +69,7 @@ extern vmCvar_t	ui_cdkey;
 extern vmCvar_t	ui_cdkeychecked;
 
 extern vmCvar_t uix_nomip;
+extern vmCvar_t	uix_serverCache;
 
 //
 // ui_qmenu.c
@@ -279,6 +280,8 @@ extern char	*ui_medalSounds[];
 //
 
 void UIX_CommonStatusBar(void *self, int min, int total, const char* info_messages[][2]);
+
+void UIX_SaveCachedServers();
 
 //
 // ui_mfield.c

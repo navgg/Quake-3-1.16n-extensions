@@ -137,6 +137,8 @@ vmCvar_t	ui_server16;
 vmCvar_t	ui_cdkeychecked;
 
 // X-MOD: ui params
+vmCvar_t	uix_serverCache;
+
 vmCvar_t	uix_wideScreenFix;
 vmCvar_t	uix_defaultWeapon;
 vmCvar_t	uix_drawPlayerIDs;
@@ -215,6 +217,9 @@ cvarTable_t		cvarTable[] = {
 	{ &ui_drawCrosshair, "cg_drawCrosshair", "4", CVAR_ARCHIVE },
 	{ &ui_drawCrosshairNames, "cg_drawCrosshairNames", "1", CVAR_ARCHIVE },
 	{ &ui_marks, "cg_marks", "1", CVAR_ARCHIVE },
+
+	// X-Mod: server cache
+	{ &uix_serverCache, "ui_serverCache", "1", CVAR_TEMP },
 
 	// X-MOD: default parameters
 	{ &uix_wideScreenFix, "cg_wideScreenFix", "3", CVAR_ARCHIVE },
