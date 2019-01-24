@@ -710,8 +710,21 @@ void CGX_SyncServerParams(const char *info) {
 			cgs.serverMod = SM_NEMESIS;
 		} else if (cgs.gamename[0] == 'B' && cgs.gamename[1] == 'M' && cgs.gamename[2] == 'A') {
 			cgs.serverMod = SM_BMA;
+		} else if (!Q_stricmp( cgs.gamename, "osp" )) {
+			cgs.serverMod = SM_OSP;
 		} else {
 			cgs.serverMod = SM_DEFAULT;
+		}
+
+		// X-Mod: add commands just for autocomplete
+		if (cgs.serverMod > SM_NOGHOST) {
+			trap_AddCommand("players");
+		} else if (cgs.serverMod == SM_NOGHOST) {
+			trap_AddCommand("playerlist");
+		}
+		if (cgs.serverMod >= SM_NOGHOST) {
+			trap_AddCommand("help");
+			trap_AddCommand("stats");
 		}
 	}
 }

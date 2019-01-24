@@ -314,11 +314,6 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand ("vote");
 	trap_AddCommand ("callvote");
 	trap_AddCommand ("loaddefered");	// spelled wrong, but not changing for demo
-	// X-MOD: just for autocomplete
-	trap_AddCommand ("help");
-	trap_AddCommand ("players");
-	trap_AddCommand ("playerlist");
-	trap_AddCommand ("stats");	
 #if CGX_FREEZE//freeze
 	trap_AddCommand( "ready" );
 #endif//freeze

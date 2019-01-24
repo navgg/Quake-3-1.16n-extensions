@@ -187,7 +187,8 @@ typedef enum {
 	SM_DEFAULT,
 	SM_NOGHOST,
 	SM_NEMESIS,
-	SM_BMA
+	SM_BMA,
+	SM_OSP
 } cgxServerMod_t;
 
 typedef enum {
