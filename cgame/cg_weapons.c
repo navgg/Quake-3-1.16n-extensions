@@ -299,10 +299,9 @@ void CG_RailTrail( clientInfo_t *ci, vec3_t start, vec3_t end ) {
 		return;
 	}
 
-	if (!(cgx_weaponEffects.integer & WE_RAILSIMPLE)) {
-		//
-		// rings
-		//
+	if (cgx_weaponEffects.integer & WE_RAILSIMPLE) {
+		start[2] -= 4;
+
 		le = CG_AllocLocalEntity();
 		re = &le->refEntity;
 
@@ -312,15 +311,11 @@ void CG_RailTrail( clientInfo_t *ci, vec3_t start, vec3_t end ) {
 		le->lifeRate = 1.0 / ( le->endTime - le->startTime );
 
 		re->shaderTime = cg.time / 1000.0f;
-		re->reType = RT_RAIL_RINGS;
-		re->customShader = cgs.media.railRingsShader;
-	
+		re->reType = RT_RAIL_CORE;
+		re->customShader = cgs.media.railCoreShader;
+
 		VectorCopy( start, re->origin );
 		VectorCopy( end, re->oldorigin );
-
-		// nudge down a bit so it isn't exactly in center
-		re->origin[2] -= 8;
-		re->oldorigin[2] -= 8;
 
 		le->color[0] = ci->color[0] * 0.75;
 		le->color[1] = ci->color[1] * 0.75;
@@ -328,7 +323,37 @@ void CG_RailTrail( clientInfo_t *ci, vec3_t start, vec3_t end ) {
 		le->color[3] = 1.0f;
 
 		AxisClear( re->axis );
+		return;
 	}
+	//
+	// rings
+	//
+	le = CG_AllocLocalEntity();
+	re = &le->refEntity;
+
+	le->leType = LE_FADE_RGB;
+	le->startTime = cg.time;
+	le->endTime = cg.time + cg_railTrailTime.value;
+	le->lifeRate = 1.0 / ( le->endTime - le->startTime );
+
+	re->shaderTime = cg.time / 1000.0f;
+	re->reType = RT_RAIL_RINGS;
+	re->customShader = cgs.media.railRingsShader;
+
+	VectorCopy( start, re->origin );
+	VectorCopy( end, re->oldorigin );
+
+	// nudge down a bit so it isn't exactly in center
+	re->origin[2] -= 8;
+	re->oldorigin[2] -= 8;
+
+	le->color[0] = ci->color[0] * 0.75;
+	le->color[1] = ci->color[1] * 0.75;
+	le->color[2] = ci->color[2] * 0.75;
+	le->color[3] = 1.0f;
+
+	AxisClear( re->axis );
+
 	//
 	// core
 	//
