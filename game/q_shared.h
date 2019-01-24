@@ -32,6 +32,18 @@
 #define CGX_WFIX_SCREEN	0x0001
 #define CGX_WFIX_FOV	0x0002
 
+// cg_weaponEffects
+#define WE_RAIL32				1
+#define WE_RAILSIMPLE			2
+#define WE_PLASMA32				4
+#define WE_LG32					8
+#define WE_ROCKET32				16
+#define WE_Z_EXPLOSIONS			32
+#define WE_Z_BULLET_SPARKS		64
+#define WE_Z_LG_SPARKS			128
+#define WE_Z_ROCKET_TRAIL		256
+#define WE_Z_PLASMA_TRAIL		512
+
 //unlagged - lag simulation #2
 #define MAX_LATENT_CMDS 64
 //unlagged - lag simulation #2

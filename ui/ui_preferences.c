@@ -1,6 +1,413 @@
 // Copyright (C) 1999-2000 Id Software, Inc.
 // Copyright (C) 2018 NaViGaToR (322)
 //
+
+#include "ui_local.h"
+
+#define PREFERENCES_X_POS		360
+
+/*
+=======================================================================
+
+ADVANCED EFFECTS MENU
+
+=======================================================================
+*/
+
+#define EFFECTS_FRAMEL	"menu/art/frame2_l"
+#define EFFECTS_FRAMER	"menu/art/frame1_r"
+#define EFFECTS_BACK0	"menu/art/back_0"
+#define EFFECTS_BACK1	"menu/art/back_1"
+
+static char* AdvancedEffects_artlist[] = 
+{
+	EFFECTS_FRAMEL,
+	EFFECTS_FRAMER,
+	EFFECTS_BACK0,
+	EFFECTS_BACK1,
+	NULL,
+};
+
+#define ID_EFFECTSBACK		100
+
+#define ID_RAIL				200
+#define ID_RAIL_TIME		201
+#define ID_ROCKET32			202
+#define ID_ROCKET_TRAIL		203
+#define ID_LG_BEAM			204
+#define ID_LG_SPARKS		205
+#define	ID_BULLET_SPARKS	206
+#define ID_PLASMA_TRAIL		207
+#define ID_EXPLOSION_SPARKS	208
+
+#define MAX_EFFECTS_INFO_MESSAGES 9
+
+static void UI_AdvancedEffects_StatusBar( void *self ) {	
+	static const char *info_messages[MAX_EFFECTS_INFO_MESSAGES][2] = {
+		{ "Sets rail trail style", "" },
+		{ "Sets rail trail time", "How fast rail trail will disappear" },
+		{ "Sets rocket explosion type", "" },
+		{ "Toggles rocket trail sparks", "" },
+		{ "Sets lightning gun beam type", "" },
+		{ "Toggles lightning gun sparks", "" },
+		{ "Toggles bullet sparks", "For shotgun and machinegun" },
+		{ "Sets plasma trail effect", "" },
+		{ "Toggles explosion sparks", "For rockets and grenades" }
+	};
+
+	UIX_CommonStatusBar(self, ID_RAIL, MAX_EFFECTS_INFO_MESSAGES, info_messages);
+}
+
+typedef struct {
+	menuframework_s	menu;
+	menutext_s		banner;
+	menubitmap_s	back;
+	menubitmap_s	framel;
+	menubitmap_s	framer;
+
+	menulist_s	rail;
+	menulist_s	railtime;
+	menulist_s	rocketexpl;
+	menulist_s	lgbeam;
+	menulist_s	plasmatrail;
+
+	menuradiobutton_s	explosparks;
+	menuradiobutton_s	rockettrail;
+	menuradiobutton_s	lgsparks;
+	menuradiobutton_s	bulletsparks;
+} AdvancedEffects_t;
+
+static AdvancedEffects_t	s_effects;
+
+static const char *rocketexpl_items[] =
+{
+	"default",
+	"1.30",
+	0
+};
+
+static const char *rail_items[] =
+{
+	"default",
+	"spiral",
+	"simple line",
+	0
+};
+
+static const char *railtime_items[] =
+{
+	"fast",
+	"default",
+	"slow",
+	"very slow",
+	0
+};
+
+static const char *lgbeam_items[] =
+{
+	"default",
+	"vanilla Q3",
+	0
+};
+
+static const char *plasmatrail_items[] =
+{
+	"off",
+	"1.30",
+	"sparks",
+	0
+};
+
+static void AdvancedEffects_SetMenuItems( void ) {
+	int i = trap_Cvar_VariableValue( "cg_weaponEffects" );
+
+	s_effects.rail.curvalue			= (i & WE_RAIL32) ? 1 : (i & WE_RAILSIMPLE) ? 2 : 0;
+	s_effects.rocketexpl.curvalue	= i & WE_ROCKET32 ? 1 : 0;
+	s_effects.lgbeam.curvalue		= i & WE_LG32 ? 0 : 1;
+	s_effects.rockettrail.curvalue	= i & WE_Z_ROCKET_TRAIL ? 1 : 0;
+	s_effects.plasmatrail.curvalue	= (i & WE_Z_PLASMA_TRAIL) ? 2 : (i & WE_PLASMA32) ? 1 : 0;
+	s_effects.explosparks.curvalue	= i & WE_Z_EXPLOSIONS ? 1 : 0;
+	s_effects.lgsparks.curvalue		= i & WE_Z_LG_SPARKS ? 1 : 0;
+	s_effects.bulletsparks.curvalue	= i & WE_Z_BULLET_SPARKS ? 1 : 0;
+
+	i = trap_Cvar_VariableValue( "cg_railTrailTime" );
+
+	if (i < 400) s_effects.railtime.curvalue = 0;
+	else if (i < 800) s_effects.railtime.curvalue = 1;
+	else if (i < 1200) s_effects.railtime.curvalue = 2;
+	else s_effects.railtime.curvalue = 3;
+}
+
+/*
+=================
+AdvancedEffects_SaveChanges
+=================
+*/
+static void AdvancedEffects_SaveChanges() {
+	int i = 0;
+
+	if (s_effects.rail.curvalue == 1)
+		i |= WE_RAIL32;
+	else if (s_effects.rail.curvalue == 2)
+		i |= WE_RAILSIMPLE;
+
+	if (s_effects.rocketexpl.curvalue)
+		i |= WE_ROCKET32;
+	if (!s_effects.lgbeam.curvalue)
+		i |= WE_LG32;
+	if (s_effects.explosparks.curvalue)
+		i |= WE_Z_EXPLOSIONS;
+	if (s_effects.lgsparks.curvalue)
+		i |= WE_Z_LG_SPARKS;
+	if (s_effects.bulletsparks.curvalue)
+		i |= WE_Z_BULLET_SPARKS;
+	if (s_effects.rockettrail.curvalue)
+		i |= WE_Z_ROCKET_TRAIL;
+
+	if (s_effects.plasmatrail.curvalue == 2)
+		i |= WE_Z_PLASMA_TRAIL;
+	else if (s_effects.plasmatrail.curvalue == 1)
+		i |= WE_PLASMA32;
+
+	trap_Cvar_SetValue( "cg_weaponEffects", i );
+
+	trap_Cmd_ExecuteText( EXEC_APPEND, "xmod reload effects\n" );
+}
+
+/*
+=================
+AdvancedEffects_Event
+=================
+*/
+static void AdvancedEffects_Event( void* ptr, int event ) {
+	int i;
+
+	if (event != QM_ACTIVATED)
+		return;
+
+	switch (((menucommon_s*)ptr)->id) {
+		case ID_RAIL_TIME:
+			if (s_effects.railtime.curvalue == 0) i = 200;
+			else if (s_effects.railtime.curvalue == 1) i = 400;
+			else if (s_effects.railtime.curvalue == 2) i = 800;
+			else i = 1200;
+
+			trap_Cvar_SetValue( "cg_railTrailTime", i );
+			break;
+		case ID_EFFECTSBACK:
+			AdvancedEffects_SaveChanges();
+			UI_PopMenu();
+			break;
+	}
+}
+
+/*
+=================
+AdvancedEffects_MenuDraw
+=================
+*/
+static void AdvancedEffects_MenuDraw( void ) {
+	Menu_Draw( &s_effects.menu );
+}
+
+/*
+=================
+AdvancedEffects_MenuKey
+=================
+*/
+static sfxHandle_t AdvancedEffects_MenuKey( int key )
+{
+	if( key == K_MOUSE2 || key == K_ESCAPE ) {
+		AdvancedEffects_SaveChanges();
+	}
+
+	return ( Menu_DefaultKey( &s_effects.menu, key ) );
+}
+
+/*
+=================
+AdvancedEffects_Cache
+=================
+*/
+void AdvancedEffects_Cache( void ) {
+	int	i;
+
+	// touch all our pics
+	for (i=0; ;i++) {
+		if (!AdvancedEffects_artlist[i])
+			break;
+		trap_R_RegisterShaderNoMip(AdvancedEffects_artlist[i]);
+	}
+}
+
+/*
+=================
+UI_AdvancedEffects_Menu
+=================
+*/
+static void UI_AdvancedEffects_Menu( void ) {
+	int		y;
+
+	// zero set all our globals
+	memset( &s_effects, 0 ,sizeof(AdvancedEffects_t) );
+
+	AdvancedEffects_Cache();
+
+	s_effects.menu.fullscreen = qtrue;
+	s_effects.menu.draw       = AdvancedEffects_MenuDraw;
+	s_effects.menu.key        = AdvancedEffects_MenuKey;
+
+	s_effects.banner.generic.type  = MTYPE_BTEXT;
+	s_effects.banner.generic.x	  = 320;
+	s_effects.banner.generic.y	  = 16;
+	s_effects.banner.string		  = "ADVANCED EFFECTS";
+	s_effects.banner.color	      = color_white;
+	s_effects.banner.style	      = UI_CENTER;
+
+	s_effects.framel.generic.type  = MTYPE_BITMAP;
+	s_effects.framel.generic.name  = EFFECTS_FRAMEL;
+	s_effects.framel.generic.flags = QMF_INACTIVE;
+	s_effects.framel.generic.x	   = 0;
+	s_effects.framel.generic.y	   = 78;
+	s_effects.framel.width  	   = 256;
+	s_effects.framel.height  	   = 329;
+
+	s_effects.framer.generic.type  = MTYPE_BITMAP;
+	s_effects.framer.generic.name  = EFFECTS_FRAMER;
+	s_effects.framer.generic.flags = QMF_INACTIVE;
+	s_effects.framer.generic.x	   = 376;
+	s_effects.framer.generic.y	   = 76;
+	s_effects.framer.width  	   = 256;
+	s_effects.framer.height  	   = 334;
+
+	s_effects.back.generic.type	    = MTYPE_BITMAP;
+	s_effects.back.generic.name     = EFFECTS_BACK0;
+	s_effects.back.generic.flags    = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_effects.back.generic.callback = AdvancedEffects_Event;
+	s_effects.back.generic.id	    = ID_EFFECTSBACK;
+	s_effects.back.generic.x		= 0;
+	s_effects.back.generic.y		= 480-64;
+	s_effects.back.width  		    = 128;
+	s_effects.back.height  		    = 64;
+	s_effects.back.focuspic         = EFFECTS_BACK1;
+
+	y = 40+144 - BIGCHAR_HEIGHT * 3;
+
+	y += BIGCHAR_HEIGHT+2;
+	s_effects.rail.generic.type       = MTYPE_SPINCONTROL;
+	s_effects.rail.generic.name	      = "Rail Trail:";
+	s_effects.rail.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_effects.rail.generic.callback   = AdvancedEffects_Event;
+	s_effects.rail.generic.id         = ID_RAIL;
+	s_effects.rail.generic.x	      = PREFERENCES_X_POS;
+	s_effects.rail.generic.y	      = y;
+	s_effects.rail.itemnames          = rail_items;
+	s_effects.rail.generic.statusbar  = UI_AdvancedEffects_StatusBar;
+
+	y += BIGCHAR_HEIGHT+2;
+	s_effects.railtime.generic.type       = MTYPE_SPINCONTROL;
+	s_effects.railtime.generic.name	      = "Rail Trail Time:";
+	s_effects.railtime.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_effects.railtime.generic.callback   = AdvancedEffects_Event;
+	s_effects.railtime.generic.id         = ID_RAIL_TIME;
+	s_effects.railtime.generic.x	      = PREFERENCES_X_POS;
+	s_effects.railtime.generic.y	      = y;
+	s_effects.railtime.itemnames          = railtime_items;
+	s_effects.railtime.generic.statusbar  = UI_AdvancedEffects_StatusBar;
+
+	y += BIGCHAR_HEIGHT+2;
+	s_effects.rocketexpl.generic.type       = MTYPE_SPINCONTROL;
+	s_effects.rocketexpl.generic.name	      = "Rocket Explosion:";
+	s_effects.rocketexpl.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_effects.rocketexpl.generic.callback   = AdvancedEffects_Event;
+	s_effects.rocketexpl.generic.id         = ID_ROCKET32;
+	s_effects.rocketexpl.generic.x	      = PREFERENCES_X_POS;
+	s_effects.rocketexpl.generic.y	      = y;
+	s_effects.rocketexpl.itemnames = rocketexpl_items;
+	s_effects.rocketexpl.generic.statusbar   = UI_AdvancedEffects_StatusBar;
+
+	y += BIGCHAR_HEIGHT+2;
+	s_effects.lgbeam.generic.type       = MTYPE_SPINCONTROL;
+	s_effects.lgbeam.generic.name	      = "Lightning Gun Beam:";
+	s_effects.lgbeam.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_effects.lgbeam.generic.callback   = AdvancedEffects_Event;
+	s_effects.lgbeam.generic.id         = ID_LG_BEAM;
+	s_effects.lgbeam.generic.x	      = PREFERENCES_X_POS;
+	s_effects.lgbeam.generic.y	      = y;
+	s_effects.lgbeam.itemnames = lgbeam_items;
+	s_effects.lgbeam.generic.statusbar   = UI_AdvancedEffects_StatusBar;
+
+	y += BIGCHAR_HEIGHT+2;
+	s_effects.explosparks.generic.type          = MTYPE_RADIOBUTTON;
+	s_effects.explosparks.generic.name	      = "Explosion Sparks:";
+	s_effects.explosparks.generic.flags	      = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_effects.explosparks.generic.callback      = AdvancedEffects_Event;
+	s_effects.explosparks.generic.id            = ID_EXPLOSION_SPARKS;
+	s_effects.explosparks.generic.x	          = PREFERENCES_X_POS;
+	s_effects.explosparks.generic.y	          = y;
+	s_effects.explosparks.generic.statusbar   = UI_AdvancedEffects_StatusBar;
+
+	y += BIGCHAR_HEIGHT+2;
+	s_effects.rockettrail.generic.type       = MTYPE_RADIOBUTTON;
+	s_effects.rockettrail.generic.name	      = "Rocket Trail Sparks:";
+	s_effects.rockettrail.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_effects.rockettrail.generic.callback   = AdvancedEffects_Event;
+	s_effects.rockettrail.generic.id         = ID_ROCKET_TRAIL;
+	s_effects.rockettrail.generic.x	      = PREFERENCES_X_POS;
+	s_effects.rockettrail.generic.y	      = y;
+	s_effects.rockettrail.generic.statusbar   = UI_AdvancedEffects_StatusBar;
+
+	y += BIGCHAR_HEIGHT+2;
+	s_effects.lgsparks.generic.type          = MTYPE_RADIOBUTTON;
+	s_effects.lgsparks.generic.name	      = "Lightning Gun Sparks:";
+	s_effects.lgsparks.generic.flags	      = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_effects.lgsparks.generic.callback      = AdvancedEffects_Event;
+	s_effects.lgsparks.generic.id            = ID_LG_SPARKS;
+	s_effects.lgsparks.generic.x	          = PREFERENCES_X_POS;
+	s_effects.lgsparks.generic.y	          = y;
+	s_effects.lgsparks.generic.statusbar   = UI_AdvancedEffects_StatusBar;
+
+	y += BIGCHAR_HEIGHT+2;
+	s_effects.bulletsparks.generic.type          = MTYPE_RADIOBUTTON;
+	s_effects.bulletsparks.generic.name	      = "Bullet Sparks:";
+	s_effects.bulletsparks.generic.flags	      = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_effects.bulletsparks.generic.callback      = AdvancedEffects_Event;
+	s_effects.bulletsparks.generic.id            = ID_BULLET_SPARKS;
+	s_effects.bulletsparks.generic.x	          = PREFERENCES_X_POS;
+	s_effects.bulletsparks.generic.y	          = y;
+	s_effects.bulletsparks.generic.statusbar   = UI_AdvancedEffects_StatusBar;
+
+	y += BIGCHAR_HEIGHT+2;
+	s_effects.plasmatrail.generic.type       = MTYPE_SPINCONTROL;
+	s_effects.plasmatrail.generic.name	      = "Plasma Trail:";
+	s_effects.plasmatrail.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_effects.plasmatrail.generic.callback   = AdvancedEffects_Event;
+	s_effects.plasmatrail.generic.id         = ID_PLASMA_TRAIL;
+	s_effects.plasmatrail.generic.x	      = PREFERENCES_X_POS;
+	s_effects.plasmatrail.generic.y	      = y;
+	s_effects.plasmatrail.itemnames = plasmatrail_items;
+	s_effects.plasmatrail.generic.statusbar   = UI_AdvancedEffects_StatusBar;
+
+	Menu_AddItem( &s_effects.menu, &s_effects.rail );
+	Menu_AddItem( &s_effects.menu, &s_effects.railtime );
+	Menu_AddItem( &s_effects.menu, &s_effects.rocketexpl );
+	Menu_AddItem( &s_effects.menu, &s_effects.rockettrail );
+	Menu_AddItem( &s_effects.menu, &s_effects.explosparks );
+	Menu_AddItem( &s_effects.menu, &s_effects.lgbeam );
+	Menu_AddItem( &s_effects.menu, &s_effects.lgsparks );
+	Menu_AddItem( &s_effects.menu, &s_effects.bulletsparks );
+	Menu_AddItem( &s_effects.menu, &s_effects.plasmatrail );
+
+	Menu_AddItem( &s_effects.menu, &s_effects.banner );
+	Menu_AddItem( &s_effects.menu, &s_effects.framel );
+	Menu_AddItem( &s_effects.menu, &s_effects.framer );
+	Menu_AddItem( &s_effects.menu, &s_effects.back );
+
+	AdvancedEffects_SetMenuItems();
+
+	UI_PushMenu( &s_effects.menu );
+}
+
 /*
 =======================================================================
 
@@ -10,7 +417,6 @@ GAME OPTIONS MENU
 */
 
 
-#include "ui_local.h"
 
 
 #define ART_FRAMEL				"menu/art/frame2_l"
@@ -18,7 +424,6 @@ GAME OPTIONS MENU
 #define ART_BACK0				"menu/art/back_0"
 #define ART_BACK1				"menu/art/back_1"
 
-#define PREFERENCES_X_POS		360
 
 #define ID_CROSSHAIR			127
 #define ID_SIMPLEITEMS			128
@@ -34,6 +439,8 @@ GAME OPTIONS MENU
 
 #define ID_CROSSHAIR_COLOR		138
 #define ID_CROSSHAIR_SIZE		139
+
+#define ID_EFFECTS				140
 //#define ID_SHAREDCONFIG			140
 
 #define ID_BACK					150
@@ -84,6 +491,7 @@ typedef struct {
 	menuradiobutton_s	allowdownload;
 	menubitmap_s		back;
 	//menuradiobutton_s	sharedconfig;
+	menutext_s			effects;
 
 	qhandle_t			defaultCrosshair[NUM_CROSSHAIRS];
 	qhandle_t			crosshairShader[NUM_CROSSHAIRS];
@@ -286,6 +694,10 @@ static void Preferences_Event( void* ptr, int notification ) {
 
 	case ID_ALLOWDOWNLOAD:
 		trap_Cvar_SetValue( "cl_allowDownload", s_preferences.allowdownload.curvalue );
+		break;
+
+	case ID_EFFECTS:
+		UI_AdvancedEffects_Menu();
 		break;
 
 	//case ID_SHAREDCONFIG:
@@ -547,7 +959,17 @@ static void Preferences_MenuInit( void ) {
 	//s_preferences.sharedconfig.generic.x = PREFERENCES_X_POS;
 	//s_preferences.sharedconfig.generic.y = y;
 
-	y += BIGCHAR_HEIGHT+2;
+	y += (BIGCHAR_HEIGHT+2) * 2;
+	s_preferences.effects.generic.type     = MTYPE_PTEXT;
+	s_preferences.effects.generic.flags    = QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_preferences.effects.generic.callback = Preferences_Event;
+	s_preferences.effects.generic.id       = ID_EFFECTS;
+	s_preferences.effects.generic.x        = 320;
+	s_preferences.effects.generic.y        = y;
+	s_preferences.effects.string           = "Advanced Effects";
+	s_preferences.effects.style            = UI_CENTER|UI_SMALLFONT;
+	s_preferences.effects.color            = color_red;
+
 	s_preferences.back.generic.type	    = MTYPE_BITMAP;
 	s_preferences.back.generic.name     = ART_BACK0;
 	s_preferences.back.generic.flags    = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -578,6 +1000,8 @@ static void Preferences_MenuInit( void ) {
 	Menu_AddItem( &s_preferences.menu, &s_preferences.crosshairsize);
 
 	//Menu_AddItem( &s_preferences.menu, &s_preferences.sharedconfig );
+
+	Menu_AddItem( &s_preferences.menu, &s_preferences.effects );
 
 	Menu_AddItem( &s_preferences.menu, &s_preferences.back );
 

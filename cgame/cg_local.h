@@ -68,17 +68,6 @@
 #define CGX_MINHUNKMEGS 112
 #define CGX_MAX_RATE 99999
 #define CGX_MAX_FPS 333
-//cg_weaponEffects
-#define WE_RAIL32				1
-#define WE_RAILSIMPLE			2
-#define WE_PLASMA32				4
-#define WE_LG32					8
-#define WE_ROCKET32				16
-#define WE_Z_EXPLOSIONS			32
-#define WE_Z_BULLET_SPARKS		64
-#define WE_Z_LG_SPARKS			128
-#define WE_Z_ROCKET_TRAIL		256
-#define WE_Z_PLASMA_TRAIL		512
 
 //try to register shader only if it's null
 #define trap_R_LazyRegisterShader(x, s) if (!x) { CGX_NomipStart(); x = trap_R_RegisterShader(s); CGX_NomipEnd(); }

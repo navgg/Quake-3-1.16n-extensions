@@ -1404,10 +1404,27 @@ static void CGX_ShowHelp(char *filename, char *cmd) {
 	}
 }
 
+//method to reload effects, used to call reload from UI
+static void CGX_ReloadEffects() {
+	char buf[32];
+	// get this cvar this way, in case if menu changed it and send command
+	trap_Cvar_Get("cg_weaponEffects", buf);
+
+	if (atoi(buf) & WE_LG32)
+		cgs.media.lightningShader = trap_R_RegisterShader( cgx_nomip.integer ? "lightningBoltNewNPM" : "lightningBoltNew" );
+	else
+		cgs.media.lightningShader = trap_R_RegisterShader("lightningBolt");
+}
+
 #define help_file "doc\\2-comand_list.txt"
 //xmod command
 void CGX_Xmod(char *command) {
 	int i;
+
+	if (!Q_stricmp(command, "reload effects ")) {
+		CGX_ReloadEffects();
+		return;
+	}
 
 	if (!Q_stricmp(command, "e ")) {
 		XMOD_ANSWER("checking enemy models...");

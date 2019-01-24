@@ -162,6 +162,7 @@ vmCvar_t	uix_scoreboard;
 vmCvar_t	uix_drawScoreBox;
 vmCvar_t	uix_sharedConfig;
 vmCvar_t	uix_nomip;
+vmCvar_t	uix_weaponEffects;
 // some q3 defaults to init
 vmCvar_t	uix_fov;
 vmCvar_t	uix_zoomfov;
@@ -248,6 +249,7 @@ cvarTable_t		cvarTable[] = {
 
 	{ &uix_cinematicplayed, "uix_cinematicplayed", "-1", CVAR_TEMP },
 	{ &uix_nomip, "cg_nomip", "-1", CVAR_ARCHIVE | CVAR_LATCH },
+	{ &uix_weaponEffects, "cg_weaponEffects", "8", CVAR_ARCHIVE },
 
 #if CGX_UNLAGGED
 	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE },	
