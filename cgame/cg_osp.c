@@ -156,7 +156,7 @@ void CG_printWindow( char *str ) {
 // Window stuct "constructor" with some common defaults
 void CG_windowReset( cg_window_t *w, int fx, int startupLength ) {
 	vec4_t colorGeneralBorder = { 0, 0, 0, 0.75f };
-	vec4_t colorGeneralFill = { 0.2f, 0.2f, 0.2f, 0.6f };
+	vec4_t colorGeneralFill = { 0.2f, 0.2f, 0.2f, 0.7f };
 
 	w->effects = fx;
 	w->fontScaleX = 0.25;
