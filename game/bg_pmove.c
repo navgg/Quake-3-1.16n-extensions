@@ -1838,7 +1838,9 @@ void PmoveSingle (pmove_t *pmove) {
 	PM_WaterEvents();
 
 	// snap some parts of playerstate to save network bandwidth
-	if ( !pmove->pmove_accurate)
+	// X-Mod: not sure if it's proper pmove_accurate implementation, and on noghost serv with both params it stutters sometimes
+	//if ( pmove->pmove_accurate && !pmove->pmove_fixed)
+	//	return;
 	SnapVector( pm->ps->velocity );
 }
 

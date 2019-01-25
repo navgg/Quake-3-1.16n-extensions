@@ -1188,7 +1188,7 @@ extern	vmCvar_t		cg_deferPlayers;
 //1.32
 extern	vmCvar_t		pmove_fixed;
 extern	vmCvar_t		pmove_msec;
-extern	vmCvar_t		pmove_accurate;
+//extern	vmCvar_t		pmove_accurate;
 
 //extern	pmove_t			cg_pmove;
 

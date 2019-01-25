@@ -87,7 +87,7 @@ vmCvar_t	cgx_debug;
 //1.32
 vmCvar_t	pmove_fixed;
 vmCvar_t	pmove_msec;
-vmCvar_t	pmove_accurate;
+//vmCvar_t	pmove_accurate;
 
 //unlagged - client options
 vmCvar_t	cg_delag;
@@ -338,7 +338,7 @@ cvarTable_t		cvarTable[] = {
 	//1.32
 	{ &pmove_fixed, "pmove_fixed", "0", 0},
 	{ &pmove_msec, "pmove_msec", "8", 0},
-	{ &pmove_accurate, "pmove_accurate", "0", 0},
+	//{ &pmove_accurate, "pmove_accurate", "0", 0},
 
 	{ &com_maxfps, "com_maxfps", "125", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
 	{ &cl_maxpackets, "cl_maxpackets", "40", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },				
@@ -1228,7 +1228,7 @@ void CG_Shutdown( void ) {
 
 	trap_Cvar_Set("pmove_fixed", "0");
 	trap_Cvar_Set("pmove_msec", "8");
-	trap_Cvar_Set("pmove_accurate", "0");
+	//trap_Cvar_Set("pmove_accurate", "0");
 
 	// some mods may need to do cleanup work here,
 	// like closing files or archiving session data

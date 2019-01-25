@@ -1001,7 +1001,7 @@ void CG_PredictPlayerState32( void ) {
 
 	cg_pmove.pmove_fixed = pmove_fixed.integer;// | cg_pmove_fixed.integer;
 	cg_pmove.pmove_msec = pmove_msec.integer;
-	cg_pmove.pmove_accurate = pmove_accurate.integer;
+	//cg_pmove.pmove_accurate = pmove_accurate.integer;
 
 	//unlagged - optimized prediction
 	// Like the comments described above, a player's state is entirely
