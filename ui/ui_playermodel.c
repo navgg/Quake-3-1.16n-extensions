@@ -13,7 +13,6 @@
 #define MODEL_ARROWSL		"menu/art/gs_arrows_l"
 #define MODEL_ARROWSR		"menu/art/gs_arrows_r"
 
-#define LOW_MEMORY			(5 * 1024 * 1024)
 
 static char* playermodel_artlist[] =
 {
@@ -332,9 +331,7 @@ static void PlayerModel_PicEvent( void* ptr, int event )
 
 		s_playermodel.selectedmodel = modelnum;
 
-		if( trap_MemoryRemaining() > LOW_MEMORY ) {
-			PlayerModel_UpdateModel();
-		}
+		PlayerModel_UpdateModel();
 	}
 }
 
@@ -348,11 +345,6 @@ static void PlayerModel_DrawPlayer( void *self )
 	menubitmap_s*	b;
 
 	b = (menubitmap_s*) self;
-
-	if( trap_MemoryRemaining() <= LOW_MEMORY ) {
-		UI_DrawProportionalString( b->generic.x, b->generic.y + b->height / 2, "LOW MEMORY", UI_LEFT, color_red );
-		return;
-	}
 
 	UI_DrawPlayer( b->generic.x, b->generic.y, b->width, b->height, &s_playermodel.playerinfo, uis.realtime/2 );
 }

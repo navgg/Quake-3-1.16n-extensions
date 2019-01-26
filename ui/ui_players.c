@@ -682,6 +682,11 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	float			len;
 	float			xx;
 
+	if( trap_MemoryRemaining() <= LOW_MEMORY ) {
+		UI_DrawProportionalString( x, y + h / 2, "LOW MEMORY", UI_LEFT, color_red );
+		return;
+	}
+
 	if ( !pi->legsModel || !pi->torsoModel || !pi->headModel || !pi->animations[0].numFrames ) {
 		return;
 	}

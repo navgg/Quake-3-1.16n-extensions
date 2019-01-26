@@ -48,6 +48,8 @@
 #define MAX_LATENT_CMDS 64
 //unlagged - lag simulation #2
 
+#define LOW_MEMORY			(5 * 1024 * 1024)
+
 #if !defined(Q3_VM) && defined(_WIN32)
 #define CGX_WIN
 #define CGX_SYSTEM	"Win"

@@ -54,6 +54,9 @@ static void UIX_NomipEnd() {
 }
 
 void UIX_PlayerInfo_SetModel( playerInfo_t *pi, const char *model ) {
+	if( trap_MemoryRemaining() <= LOW_MEMORY )
+		return;
+
 	UIX_NomipStart();
 	UI_PlayerInfo_SetModel(pi, model);
 	UIX_NomipEnd();
