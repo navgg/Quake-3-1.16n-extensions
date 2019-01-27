@@ -335,11 +335,6 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_enableBreath, "cg_enableBreath", "0", CVAR_TEMP },
 #endif
 
-	//1.32
-	{ &pmove_fixed, "pmove_fixed", "0", 0},
-	{ &pmove_msec, "pmove_msec", "8", 0},
-	//{ &pmove_accurate, "pmove_accurate", "0", 0},
-
 	{ &com_maxfps, "com_maxfps", "125", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
 	{ &cl_maxpackets, "cl_maxpackets", "40", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },				
 
@@ -424,6 +419,11 @@ cvarTable_t		cgx_cvarTable_temp[] = {
 	{ &cgx_dl_host, "cgx_dl_host", "ws.q3df.org", CVAR_TEMP },
 	{ &cgx_dl_page, "cgx_dl_page", "/maps/download/%s", CVAR_TEMP },
 	{ &cgx_dl_tobaseq3, "cgx_dl_tobaseq3", "1", CVAR_TEMP },
+
+	//1.32
+	{ &pmove_fixed, "pmove_fixed", "0", CVAR_ROM | CVAR_TEMP },
+	{ &pmove_msec, "pmove_msec", "8", CVAR_ROM | CVAR_TEMP},
+	//{ &pmove_accurate, "pmove_accurate", "0", CVAR_ROM | CVAR_TEMP },
 };
 
 /*
