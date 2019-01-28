@@ -72,11 +72,6 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 	cg.snap = snap;	
 
 	D_Printf(("^1CG_SetInitialSnapshot %i\n", cg.clientNum));
-	// X-MOD: if client is not initialized yet
-	if (cg.clientNum == -1) {
-		// X-MOD: send modinfo
-		CGX_SendModinfo();
-	}
 
 	BG_PlayerStateToEntityState( &snap->ps, &cg_entities[ snap->ps.clientNum ].currentState, qfalse );
 
@@ -101,6 +96,12 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 
 		// check for events
 		CG_CheckEvents( cent );
+	}
+
+	// X-MOD: if client is not initialized yet
+	if (cg.clientNum == -1) {
+		// X-MOD: send modinfo
+		CGX_SendModinfo(qfalse);
 	}
 }
 

@@ -187,6 +187,7 @@ typedef enum {
 	SM_DEFAULT,
 	SM_NOGHOST,
 	SM_NEMESIS,
+	SM_CARNAGE,
 	SM_BMA,
 	SM_OSP
 } cgxServerMod_t;
@@ -1272,7 +1273,7 @@ void CGX_NomipEnd();
 void CGX_NomipStart();
 void CGX_SavePicmip();
 void CGX_SaveSharedConfig(qboolean forced);
-void CGX_SendModinfo(void);
+void CGX_SendModinfo(qboolean force);
 char CGX_ServerNameFixInfoLoad(char *str);
 void CGX_CheckEnemyModel(clientInfo_t *ci, qboolean isDeferred, int clientNum);
 void CGX_SyncServerParams(const char *info);

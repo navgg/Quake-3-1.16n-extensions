@@ -503,7 +503,7 @@ void CGX_MapRestart() {
 	cg.clientIntermission = qfalse;
 
 	// X-MOD: send modinfo
-	CGX_SendModinfo();
+	CGX_SendModinfo(qfalse);
 	if (cgx_enemyModel_enabled.integer)
 		CGX_CheckEnemyModelAll();
 
@@ -706,14 +706,17 @@ void CGX_SyncServerParams(const char *info) {
 		if (!Q_stricmp( cgs.gamename, "NoGhost" )) {
 			cgs.serverMod = SM_NOGHOST;
 			//cgs.isFreezTag = atoi( Info_ValueForKey( info, "g_gameMod" ) ) == 1;
-		} else if (!Q_stricmp( cgs.gamename, "Nemesis" )) {
+		} else if (!Q_stricmp(cgs.gamename, "Nemesis")) {
 			cgs.serverMod = SM_NEMESIS;
+		} else if (!Q_stricmp(cgs.gamename, "Carnage")) {
+			cgs.serverMod = SM_CARNAGE;
 		} else if (cgs.gamename[0] == 'B' && cgs.gamename[1] == 'M' && cgs.gamename[2] == 'A') {
 			cgs.serverMod = SM_BMA;
 		} else if (!Q_stricmp( cgs.gamename, "osp" )) {
 			cgs.serverMod = SM_OSP;
 		} else {
 			cgs.serverMod = SM_DEFAULT;
+			return;
 		}
 
 		// X-Mod: add commands just for autocomplete
@@ -721,10 +724,27 @@ void CGX_SyncServerParams(const char *info) {
 			trap_AddCommand("players");
 		} else if (cgs.serverMod == SM_NOGHOST) {
 			trap_AddCommand("playerlist");
+			trap_AddCommand("setref");
 		}
 		if (cgs.serverMod >= SM_NOGHOST) {
 			trap_AddCommand("help");
 			trap_AddCommand("stats");
+			trap_AddCommand("ref");
+		}
+		if (cgs.serverMod == SM_NEMESIS || cgs.serverMod == SM_CARNAGE) {
+#if CGX_NEMESIS_COMPATIBLE
+			// nemesis compability info
+			static vmCvar_t	cgx_cgame, cgx_uinfo;
+			const char *cg_uinfo = va("%i %i 0", cl_timeNudge.integer, cl_maxpackets.integer);
+
+			//send info about client to nemesis servs
+			trap_Cvar_Register(&cgx_cgame, "cgame", CGX_FULLVER, CVAR_INIT | CVAR_ROM | CVAR_TEMP | CVAR_USERINFO);		
+			trap_Cvar_Register(&cgx_uinfo, "cg_uinfo", cg_uinfo, CVAR_INIT | CVAR_ROM | CVAR_TEMP | CVAR_USERINFO);
+#endif
+			trap_AddCommand("modinfo");
+			trap_AddCommand("clientmod");
+		} else if (cgs.serverMod == SM_BMA) {
+			trap_AddCommand("modinfo");
 		}
 	}
 }
@@ -893,11 +913,12 @@ char *CGX_CheckChatTokens( char *message, char chatcol ) {
 
 // check for unlagged enabled\disabled for bma\nms
 // send modinfo in initialsnapshot and check result here
+#define SEND_MODINFO_TIME	30000
 static int cgx_modinfosend = 0;
 qboolean CGX_CheckModInfo(const char *str) {
 	int i;
-	// if 30sec passed after sending then don't check
-	if (cg.time - cgx_modinfosend > 30000)
+	// if some time passed after sending then don't check
+	if (cg.time - cgx_modinfosend > SEND_MODINFO_TIME)
 		return qtrue;
 
 	i = strlen(str);
@@ -919,38 +940,14 @@ qboolean CGX_CheckModInfo(const char *str) {
 	return qtrue;
 }
 
-#if CGX_NEMESIS_COMPATIBLE
-// nemesis compability info
-vmCvar_t	cgx_cgame;
-vmCvar_t	cgx_uinfo;
-#endif
-
 // send modinfo if gamename nemesis or bma
-void CGX_SendModinfo(void) {
-//	char	*gamename;
-	qboolean isNemesis = qfalse, isBMA = qfalse;
-	static qboolean isNemesisRegistered = qfalse;
-
-	if (cg.intermissionStarted || cgs.delagHitscan == 1)
+void CGX_SendModinfo(qboolean force) {
+	if (cg.intermissionStarted || cgs.delagHitscan == 1 || cg.time - cgx_modinfosend <= SEND_MODINFO_TIME)
 		return;
 
 	D_Printf(("gamename %s\n", cgs.gamename));
 
-	isNemesis = cgs.serverMod == SM_NEMESIS;
-	isBMA = cgs.serverMod == SM_BMA;
-
-#if CGX_NEMESIS_COMPATIBLE
-	if (isNemesis && !isNemesisRegistered) {
-		//send info about clietn to nemesis servs
-		trap_Cvar_Register(&cgx_cgame, "cgame", CGX_FULLVER, CVAR_INIT | CVAR_ROM | CVAR_TEMP | CVAR_USERINFO);		
-		trap_Cvar_Register(&cgx_uinfo, "cg_uinfo", "", CVAR_INIT | CVAR_ROM | CVAR_TEMP | CVAR_USERINFO );
-		trap_Cvar_Set("cg_uinfo", va("%i %i 0", cl_timeNudge.integer, cl_maxpackets.integer));
-
-		isNemesisRegistered = qtrue;
-	};
-#endif	
-
-	if (isNemesis || isBMA) {
+	if (cgs.serverMod == SM_NEMESIS || cgs.serverMod == SM_BMA || force) {
 		cgx_modinfosend = cg.time;
 
 		trap_SendClientCommand("modinfo");
@@ -1457,6 +1454,8 @@ void CGX_Xmod(char *command) {
 		XMOD_ANSWER(cgx_version.string);
 	} else if (!Q_stricmp(command, "help")) {
 		CGX_ShowHelp(help_file, "");
+	} else if (!Q_stricmp(command, "modinfo")) {
+		CGX_SendModinfo(qtrue);
 	} else if (stristr(command, "8ball")) {
 		char *balls[] = {
 			"listen to your heart",
