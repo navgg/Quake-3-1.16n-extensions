@@ -1000,8 +1000,9 @@ static void Preferences_MenuInit( void ) {
 	Menu_AddItem( &s_preferences.menu, &s_preferences.crosshairsize);
 
 	//Menu_AddItem( &s_preferences.menu, &s_preferences.sharedconfig );
-
+#if CGX_Z_EFFECTS
 	Menu_AddItem( &s_preferences.menu, &s_preferences.effects );
+#endif
 
 	Menu_AddItem( &s_preferences.menu, &s_preferences.back );
 

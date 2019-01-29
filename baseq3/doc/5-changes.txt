@@ -107,7 +107,7 @@ fixed rail color restore for player after cg_enemyModel enable\disable toggle
 fixed playback of fall sound when player/enemy is dead
 fixed check for unlagged on nemesis/bma servers
 
-0.95b
+0.94.5b
 
 removed cg_teamInfoType, use cg_drawCrosshairNames instead. 
   1: only names, 2: hp&armor as text, 3: hp&armor as bars
@@ -120,15 +120,13 @@ clientstats appearance changed, prints to console only after intermission end
 server listing ping speed up
 
 added cg_teamModel "*" (if enemymodels enabled this value sets default red/blue skins for team, 
-  can be used as "*/mysuperskin" or "bitterman/*", same for cg_enemyModel)
+  can be used as "*/pm" = all with their models and pm skin, "bitterman/*" = all bittermans default skin, 
+  same for cg_enemyModel)
 added support for quakelive bright skins
 added huds, change with cg_draw2D 1,2,3 (1: default, 2: compact, 3: vanilla Q3)
-added z-effects (cg_weaponEffects 32, 64, 128, 256, 512, sum for multiple effects, -1 set all,
-  32: explosion sparks, 64: bullet sparks, 128: lg sparks, 256: rocket trail sparks, 
-  512: plasma trail sparks, to modify from menu -> game options -> advanced effects)
 added player movement prediction from 1.32 with pmove_fixed, pmove_msec, for NoGhost servers
 added caching for server list in case if master server is not responding (ui_serverCache 1|0, default 1)
-added caching for models to fix loading problems with low com_hunkMegs (cg_modelCache 1|0, default 1)
+added caching for models to fix low memory problems (cg_modelCache 1|0, default 1)
 
 fixed damage given and received calc
 fixed flag draw with cg_drawIcons 0
@@ -137,3 +135,9 @@ fixed 1.32 rail dissapear on long distance
 fixed crash taunt
 
 minor optimizations
+
+...
+
+added z-effects (cg_weaponEffects 32, 64, 128, 256, 512, sum for multiple effects, -1 set all,
+  32: explosion sparks, 64: bullet sparks, 128: lg sparks, 256: rocket trail sparks, 
+  512: plasma trail sparks, to modify from menu -> game options -> advanced effects)

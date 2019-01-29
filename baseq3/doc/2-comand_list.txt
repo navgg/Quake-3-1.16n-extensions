@@ -27,7 +27,7 @@ cg_teamModel "" - same as cg_enemyModel but for team
 cg_teamColors "" - same as cg_enemyColors but for team
 cg_lagometer 0|1|2|3 - 0 :off 1: default 2: default + ping 3: only when packetloss
 cg_hitsounds 0|1|2 - 0: default 1: pro mode hi-low 2: low-hi hp hitsounds
-cg_networkAdjustments 0|1|2|3 - 0: off 1: min rate 8000 packets 30 or sv_fps+10 2: packets 40-60 rate min 16000 
+cg_autoNetworkSettings 0|1|2|3 - 0: off 1: min rate 8000 packets 30 or sv_fps+10 2: packets 40-60 rate min 16000 
 		3: packets 60-100 rate min 25000 packetdup off (snaps = sv_fps or min 40 in all cases if it's on)
 cg_drawScoreBox 0|1 - display score box in low right corner
 cg_scoreboard 0|1|2|3 - scoreboard type 0: default large-small 1: always small 2: quake 3 vanilla (no ids, no ping colors) 3: nemesis/osp
@@ -42,8 +42,7 @@ cg_chatFilter 0|1 - on/off fixes chat spoofing bug on client
 cg_enableBreath 0|1 - show breath puffs from players (freeze tag command, for ambiance)
 cg_killbeep 0-7 - plays a sound after kill 0: Off 1: Ting 2: Tink 3: Dramatic 4: Voosh 
 		5: Drum 6: Bang 7: Ding 8: ChaChing
-cg_drawCrosshairNames 0|1|2 - draw target name above crosshair (0: off 1: default 2: nemesis/osp)
-cg_teamInfoType 0|1|2 - draw hp & armor info of teammates above crosshair if teamoverlay enabled (0: off 1: text 2: bars)
+cg_drawCrosshairNames 0|1|2|3 - draw target name above crosshair (0: off 1: only names, 2: hp&armor as text, 3: hp&armor as bars)
 writesharedconfig - writes q3config.cfg to baseq3 folder (command do the following 
 		"writeconfig ..\\baseq3\\q3config.cfg" - if playing on modded server,
 		"writeconfig q3config.cfg" - if playing on default quake 3 server)

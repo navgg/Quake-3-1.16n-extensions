@@ -6,6 +6,14 @@
 
 #include "cg_local.h"
 
+#if !CGX_Z_EFFECTS
+void CG_ParticlePlasmaTrail( centity_t *cent, vec3_t start, vec3_t end ) { }
+void CG_ParticleSparkTrail( vec3_t start, vec3_t end ) { }
+void CG_LightningSpark( vec3_t origin, vec3_t dir ) { }
+void CG_BulletSpark( vec3_t origin, vec3_t dir ) { }
+void CG_ParticleExplosionZE( vec3_t origin ) { }
+#else
+
 #define PLASMA_TIME		150
 #define PLASMA_TIME_RND 100
 #define PLASMA_RADIUS	2.0f
@@ -308,3 +316,5 @@ void CG_ParticleExplosionZE( vec3_t origin ) {
 		le->pos.trDelta[2] += EXPLOSION_Z_VEL + random() * EXPLOSION_Z_VEL_RND;
 	}
 }
+
+#endif
