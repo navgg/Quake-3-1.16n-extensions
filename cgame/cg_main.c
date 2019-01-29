@@ -430,7 +430,6 @@ cvarTable_t		cgx_cvarTable_temp[] = {
 	//1.32
 	{ &pmove_fixed, "pmove_fixed", "0", CVAR_ROM | CVAR_TEMP },
 	{ &pmove_msec, "pmove_msec", "8", CVAR_ROM | CVAR_TEMP},
-	//{ &pmove_accurate, "pmove_accurate", "0", CVAR_ROM | CVAR_TEMP },
 	{ &pmove_accurate, "pmove_accurate", "0", CVAR_ROM | CVAR_TEMP },
 #endif
 };

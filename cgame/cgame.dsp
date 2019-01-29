@@ -147,6 +147,14 @@ SOURCE=.\cgx_extensions.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\cg_osp.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\cg_zeffects.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\cg_main.c
 # End Source File
 # Begin Source File
@@ -171,6 +179,10 @@ SOURCE=.\cg_scoreboard.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\cg_scoreboard_osp.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\cg_servercmds.c
 # End Source File
 # Begin Source File
@@ -192,6 +204,10 @@ SOURCE=.\cg_weapons.c
 # Begin Source File
 
 SOURCE=.\cg_unlagged.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\cg_freeze.c
 # End Source File
 # Begin Source File
 

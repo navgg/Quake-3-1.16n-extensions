@@ -11,7 +11,8 @@ move "%pakname%" "%gamedir%baseq3\%pakname%"
 rem start /D "%gamedir%" /MAX "" quake3.exe +set sv_pure 0 +connect localhost:27960
 rem start /D "%gamedir%" /MAX "" quake3.exe +set sv_pure 0 +devmap 13box +set g_gametype 4 +addbot anarki 3 r +addbot bones b 3 +addbot mynx r 3 +addbot lucy 3 b
 rem start /D "%gamedir%" /MAX "" quake3.exe +set sv_pure 0 +devmap q3dm1 +set cg_debugEvents 1 +set cg_debugDelag 1 +set cg_showMiss 1 +set cg_drawBBox 1
-start /D "%gamedir%" /MAX "" quake3.exe +set sv_pure 0 +devmap q3dm17
+rem start /D "%gamedir%" /MAX "" quake3.exe +set sv_pure 0 +devmap q3dm17
 rem start /D "%gamedir%" /MAX "" quake3.exe
+start /D "%gamedir%" /MAX "" quake3.exe +set sv_pure 0 +connect sodmod.ml:27964
 
 rem +cg_debuganim 1
