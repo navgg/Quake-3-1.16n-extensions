@@ -1457,6 +1457,17 @@ void CGX_Xmod() {
 		return;
 	}
 
+#if CGX_DEBUG
+	if (!Q_stricmp(command, "float")) {
+		float f;
+		int p = abs(atoi(arg));
+		i = 1;
+		while (p--) i *= 10;
+		for (f = 0.0f; f <= 0.001f * i; f += 0.00001f * i)
+			CG_Printf("%f\n", f);
+	} else
+#endif
+
 	if (!Q_stricmp(command, "version")) {
 		XMOD_ANSWER(cgx_version.string);
 	} else if (!Q_stricmp(command, "help")) {

@@ -908,6 +908,7 @@ void AddInt( char **buf_p, int val, int width, int flags ) {
 	*buf_p = buf;
 }
 
+#define float_div 1000 // x-mod: float wtf fix
 void AddFloat( char **buf_p, float fval, int width, int prec ) {
 	char	text[32];
 	int		digits;
@@ -915,15 +916,15 @@ void AddFloat( char **buf_p, float fval, int width, int prec ) {
 	char	*buf;
 	int		val;
 
-	// FIXME!!!! handle fractions
-
-	digits = 0;
+	// get the sign
 	signedVal = fval;
 	if ( fval < 0 ) {
 		fval = -fval;
 	}
 
-	val = (int)fval;
+	// write the float number
+	digits = 0;
+	val = (int)(fval * float_div) / float_div;
 	do {
 		text[digits++] = '0' + val % 10;
 		val /= 10;
@@ -945,6 +946,26 @@ void AddFloat( char **buf_p, float fval, int width, int prec ) {
 	}
 
 	*buf_p = buf;
+
+	if (prec < 0)
+		prec = 5;//was 6
+	// write the fraction
+	digits = 0;
+	while (digits < prec) {
+		fval -= (int) (fval * float_div) / float_div;
+		fval *= 10;
+		val = (int) (fval * float_div) / float_div;
+		text[digits++] = '0' + val % 10;
+	}
+
+	if (digits > 0) {
+		buf = *buf_p;
+		*buf++ = '.';
+		for (prec = 0; prec < digits; prec++) {
+			*buf++ = text[prec];
+		}
+		*buf_p = buf;
+	}
 }
 
 
