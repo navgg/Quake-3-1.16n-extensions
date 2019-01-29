@@ -1428,15 +1428,24 @@ static void CGX_ReloadEffects() {
 
 #define help_file "doc\\2-comand_list.txt"
 //xmod command
-void CGX_Xmod(char *command) {
-	int i;
+void CGX_Xmod() {
+	char command[MAX_QPATH], arg[MAX_QPATH];
+	int i, argc = trap_Argc();
 
-	if (!Q_stricmp(command, "reload effects ")) {
-		CGX_ReloadEffects();
+	if (argc < 2) {
+		Q_strncpyz(command, "help", MAX_QPATH);
+	} else {
+		trap_Argv(1, command, MAX_QPATH);
+		if (argc > 2) trap_Argv(2, arg, MAX_QPATH);
+	}
+
+	if (!Q_stricmp(command, "reload")) {
+		if (!Q_stricmp(arg, "effects"))
+			CGX_ReloadEffects();
 		return;
 	}
 
-	if (!Q_stricmp(command, "e ")) {
+	if (!Q_stricmp(command, "e")) {
 		XMOD_ANSWER("checking enemy models...");
 		CGX_CheckEnemyModelAll();
 		return;
@@ -1447,8 +1456,6 @@ void CGX_Xmod(char *command) {
 		XMOD_ANSWER("too short cmd");		
 		return;
 	}
-	//remove emtpy space
-	command[i - 1] = 0;
 
 	if (!Q_stricmp(command, "version")) {
 		XMOD_ANSWER(cgx_version.string);

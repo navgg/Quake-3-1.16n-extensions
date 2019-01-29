@@ -1278,7 +1278,7 @@ void CGX_CheckEnemyModel(clientInfo_t *ci, qboolean isDeferred, int clientNum);
 void CGX_SyncServerParams(const char *info);
 void CGX_TrackEnemyModelChanges();
 void CGX_TryLoadingFix();
-void CGX_Xmod(char *command);
+void CGX_Xmod();
 void CGX_DownloadMap(char *name, qboolean end_load);
 void CGX_ChatFilter(char *str);
 char *CGX_CheckChatTokens(char *message, char chatcol);

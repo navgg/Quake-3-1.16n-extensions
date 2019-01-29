@@ -130,10 +130,7 @@ static void CGX_RecordSync_f( void ) {
 }
 
 static void CGX_Xmod_f(void) {
-	char	command[MAX_QPATH];
-	trap_Args( command, MAX_QPATH );
-
-	CGX_Xmod(command);
+	CGX_Xmod();
 }
 
 static void CGX_Download_f(void) {
