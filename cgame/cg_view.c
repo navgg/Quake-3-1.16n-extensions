@@ -757,7 +757,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	cg.clientFrame++;
 
 	// update cg.predictedPlayerState
-	if (cg_delag_predict32.integer && cgs.serverMod == SM_NOGHOST)
+	if (cgs.serverMod == SM_NOGHOST)
 		CG_PredictPlayerState32();
 	else
 		CG_PredictPlayerState();

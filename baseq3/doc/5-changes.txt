@@ -126,8 +126,7 @@ added huds, change with cg_draw2D 1,2,3 (1: default, 2: compact, 3: vanilla Q3)
 added z-effects (cg_weaponEffects 32, 64, 128, 256, 512, sum for multiple effects, -1 set all,
   32: explosion sparks, 64: bullet sparks, 128: lg sparks, 256: rocket trail sparks, 
   512: plasma trail sparks, to modify from menu -> game options -> advanced effects)
-added player movement prediction from 1.32 with pmove_fixed, pmove_msec, for NoGhost servers. 
-  (cg_delag_predict32 1|0 on\off, by default is on)
+added player movement prediction from 1.32 with pmove_fixed, pmove_msec, for NoGhost servers
 added caching for server list in case if master server is not responding (ui_serverCache 1|0, default on)
 
 fixed damage given and received calc
