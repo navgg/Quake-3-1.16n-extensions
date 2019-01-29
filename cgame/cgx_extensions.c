@@ -1466,6 +1466,37 @@ void CGX_Xmod() {
 		for (f = 0.0f; f <= 0.001f * i; f += 0.00001f * i)
 			CG_Printf("%f\n", f);
 	} else
+	if (!Q_stricmp(command, "eFlags")) {
+		centity_t *cent = &cg_entities[cg.clientNum];
+
+		CG_Printf("%i\n%i\n", cent->currentState.eFlags, cg.snap->ps.eFlags);
+	} else if (!Q_stricmp(command, "stats")) {
+		for (i = 0; i < MAX_STATS; i++)
+			CG_Printf("%i ", cg.snap->ps.stats[i]);
+		CG_Printf("\n");
+	} else if (!Q_stricmp(command, "pers")) {
+		for (i = 0; i < MAX_PERSISTANT; i++)
+			CG_Printf("%i ", cg.snap->ps.persistant[i]);
+		CG_Printf("\n");
+	} else if (!Q_stricmp(command, "powerups")) {
+		for (i = 0; i < MAX_POWERUPS; i++)
+			CG_Printf("%i ", cg.snap->ps.powerups[i]);
+		CG_Printf("\n");
+	} else if (!Q_stricmp(command, "ammo")) {
+		for (i = 0; i < MAX_WEAPONS; i++)
+			CG_Printf("%i ", cg.snap->ps.ammo[i]);
+		CG_Printf("\n");
+	} else if (!Q_stricmp(command, "css")) {
+		for (i = 0; i < MAX_CONFIGSTRINGS; i++) {
+			const char *cs = CG_ConfigString(i);
+			if (*cs) CG_Printf("%i %s\n", i, cs);
+		}
+	} else if (!Q_stricmp(command, "ccss")) {
+		for (i = 0; i < MAX_CLIENTS; i++) {
+			const char *cs = CG_ConfigString(CS_PLAYERS + i);
+			if (*cs) CG_Printf("%i %s\n", i, cs);
+		}
+	} else
 #endif
 
 	if (!Q_stricmp(command, "version")) {
