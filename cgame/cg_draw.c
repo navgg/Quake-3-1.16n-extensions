@@ -1600,12 +1600,40 @@ static void CGX_UpdateNetworkStats(snapshot_t *snap) {
 // X-MOD: display custom debug info
 static float CGX_DrawDebugInfo( float y ) {	
 	char		*s;
-	int			w;		
+	int			w;
+	static int  t = -1, opes, ppes, ppms, opms, ppds, opds;
 
 	s = va("ENTS: %i", cg.entities);
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 	CG_DrawBigString( hud.width5 - w, y + 2, s, 1.0F);	
 	y += BIGCHAR_HEIGHT + 4;
+
+	if (cg_showmiss.integer) {
+		if (trap_Milliseconds() > t) {
+			t = trap_Milliseconds() + 1000;
+			ppes = cg.predictionErrors - opes;
+			opes = cg.predictionErrors;
+			ppms = cg.predictionMisses - opms;
+			opms = cg.predictionMisses;
+			ppds = cg.predictionDecays - opds;
+			opds = cg.predictionDecays;
+		}
+
+		s = va("PE: %2i %2i", ppes, cg.predictionErrors - opes);
+		w = CG_DrawStrlen(s) * BIGCHAR_WIDTH;
+		CG_DrawBigString(hud.width5 - w, y + 2, s, 1.0F);
+		y += BIGCHAR_HEIGHT + 4;
+
+		s = va("PM: %2i %2i", ppms, cg.predictionMisses - opms);
+		w = CG_DrawStrlen(s) * BIGCHAR_WIDTH;
+		CG_DrawBigString(hud.width5 - w, y + 2, s, 1.0F);
+		y += BIGCHAR_HEIGHT + 4;
+
+		s = va("PD: %2i %2i", ppds, cg.predictionDecays - opds);
+		w = CG_DrawStrlen(s) * BIGCHAR_WIDTH;
+		CG_DrawBigString(hud.width5 - w, y + 2, s, 1.0F);
+		y += BIGCHAR_HEIGHT + 4;
+	}
 
 	if (cgx_debug.integer & 2) {
 		s = va("CI: %i", cg.connectionInterrupteds);

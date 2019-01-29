@@ -756,7 +756,9 @@ void CG_PredictPlayerState( void ) {
 #if CGX_DEBUG
 				if ( cg_showmiss.integer ) {
 					if (!VectorCompare( oldPlayerState.origin, adjusted )) {
+						if (cg_showmiss.integer & 2)
 						CG_Printf("prediction error\n");
+						cg.predictionErrors++;
 					}
 				}
 #endif
@@ -765,7 +767,9 @@ void CG_PredictPlayerState( void ) {
 				if ( len > 0.1 ) {
 #if CGX_DEBUG
 					if ( cg_showmiss.integer ) {
+						if (cg_showmiss.integer & 2)
 						CG_Printf("Prediction miss: %f\n", len);
+						cg.predictionMisses++;
 					}
 #endif
 					if ( cg_errorDecay.integer ) {
@@ -779,7 +783,9 @@ void CG_PredictPlayerState( void ) {
 						}
 #if CGX_DEBUG
 						if ( f > 0 && cg_showmiss.integer ) {
+							if (cg_showmiss.integer & 2)
 							CG_Printf("Double prediction decay: %f\n", f);
+							cg.predictionDecays++;
 						}
 #endif
 						VectorScale( cg.predictedError, f, cg.predictedError );
@@ -855,16 +861,19 @@ void CG_PredictPlayerState( void ) {
 		CG_TouchTriggerPrediction();
 	}
 
+#if CGX_DEBUG
 	//unlagged - optimized prediction
 	// do a /condump after a few seconds of this
-	//CG_Printf("cg.time: %d, numPredicted: %d, numPlayedBack: %d\n", cg.time, numPredicted, numPlayedBack); // debug code
+	if ( cg_showmiss.integer == -1 ) {
+		CG_Printf("cg.time: %d, numPredicted: %d, numPlayedBack: %d\n", cg.time, numPredicted, numPlayedBack); // debug code
+	}
 	// if everything is working right, numPredicted should be 1 more than 98%
 	// of the time, meaning only ONE predicted move was done in the frame
 	// you should see other values for numPredicted after IsUnacceptableError
 	// returns nonzero, and that's it
 	//unlagged - optimized prediction
-#if CGX_DEBUG
-	if ( cg_showmiss.integer > 1 ) {
+
+	if ( cg_showmiss.integer == -2 ) {
 		CG_Printf( "[%i : %i] ", cg_pmove.cmd.serverTime, cg.time );
 	}
 #endif
@@ -908,7 +917,9 @@ void CG_PredictPlayerState32( void ) {
 	usercmd_t	latestCmd;
 	//unlagged - optimized prediction
 	int stateIndex, predictCmd;
-	//int numPredicted = 0, numPlayedBack = 0; // debug code
+#if CGX_DEBUG
+	int numPredicted = 0, numPlayedBack = 0; // debug code
+#endif
 											 //unlagged - optimized prediction
 
 	cg.hyperspace = qfalse;	// will be set if touching a trigger_teleport
@@ -971,9 +982,11 @@ void CG_PredictPlayerState32( void ) {
 	trap_GetUserCmd( cmdNum, &oldestCmd );
 	if ( oldestCmd.serverTime > cg.snap->ps.commandTime 
 		&& oldestCmd.serverTime < cg.time ) {	// special check for map_restart
-		//if ( cg_showmiss.integer ) {
-		//	CG_Printf ("exceeded PACKET_BACKUP on commands\n");
-		//}
+#if CGX_DEBUG
+		if ( cg_showmiss.integer ) {
+			CG_Printf ("exceeded PACKET_BACKUP on commands\n");
+		}
+#endif
 		return;
 	}
 
@@ -999,9 +1012,9 @@ void CG_PredictPlayerState32( void ) {
 		trap_Cvar_Set("pmove_msec", "33");
 	}
 
-	cg_pmove.pmove_fixed = pmove_fixed.integer;// | cg_pmove_fixed.integer;
+	cg_pmove.pmove_fixed = pmove_fixed.integer;
 	cg_pmove.pmove_msec = pmove_msec.integer;
-	//cg_pmove.pmove_accurate = pmove_accurate.integer;
+	cg_pmove.pmove_accurate = pmove_accurate.integer;
 
 	//unlagged - optimized prediction
 	// Like the comments described above, a player's state is entirely
@@ -1057,9 +1070,11 @@ void CG_PredictPlayerState32( void ) {
 
 					// too much change?
 					if ( errorcode ) {
-						//if ( cg_showmiss.integer ) {
-						//	CG_Printf("errorcode %d at %d\n", errorcode, cg.time);
-						//}
+#if CGX_DEBUG
+						if ( cg_showmiss.integer ) {
+							CG_Printf("errorcode %d at %d\n", errorcode, cg.time);
+						}
+#endif
 						// yeah, so do a full predict
 						break;
 					}
@@ -1126,26 +1141,35 @@ void CG_PredictPlayerState32( void ) {
 			if ( cg.thisFrameTeleport ) {
 				// a teleport will not cause an error decay
 				VectorClear( cg.predictedError );
-				//if ( cg_showmiss.integer ) {
-				//	CG_Printf( "PredictionTeleport\n" );
-				//}
+#if CGX_DEBUG
+				if ( cg_showmiss.integer ) {
+					CG_Printf( "PredictionTeleport\n" );
+				}
+#endif
 				cg.thisFrameTeleport = qfalse;
 			} else {
 				vec3_t	adjusted;
 				CG_AdjustPositionForMover( cg.predictedPlayerState.origin, 
 					cg.predictedPlayerState.groundEntityNum, cg.physicsTime, cg.oldTime, adjusted );
-
-				//if ( cg_showmiss.integer ) {
-				//	if (!VectorCompare( oldPlayerState.origin, adjusted )) {
-				//		CG_Printf("prediction error\n");
-				//	}
-				//}
+#if CGX_DEBUG
+				if ( cg_showmiss.integer ) {
+					if (!VectorCompare( oldPlayerState.origin, adjusted )) {
+						if (cg_showmiss.integer & 2)
+						CG_Printf("prediction error\n");
+						cg.predictionErrors++;
+					}
+				}
+#endif
 				VectorSubtract( oldPlayerState.origin, adjusted, delta );
 				len = VectorLength( delta );
 				if ( len > 0.1 ) {
-					//if ( cg_showmiss.integer ) {
-					//	CG_Printf("Prediction miss: %f\n", len);
-					//}
+#if CGX_DEBUG
+					if ( cg_showmiss.integer ) {
+						if (cg_showmiss.integer & 2)
+						CG_Printf("Prediction miss: %f\n", len);
+						cg.predictionMisses++;
+					}
+#endif
 					if ( cg_errorDecay.integer ) {
 						int		t;
 						float	f;
@@ -1155,9 +1179,13 @@ void CG_PredictPlayerState32( void ) {
 						if ( f < 0 ) {
 							f = 0;
 						}
-						//if ( f > 0 && cg_showmiss.integer ) {
-						//	CG_Printf("Double prediction decay: %f\n", f);
-						//}
+#if CGX_DEBUG
+						if ( f > 0 && cg_showmiss.integer ) {
+							if (cg_showmiss.integer & 2)
+							CG_Printf("Double prediction decay: %f\n", f);
+							cg.predictionDecays++;
+						}
+#endif
 						VectorScale( cg.predictedError, f, cg.predictedError );
 					} else {
 						VectorClear( cg.predictedError );
@@ -1188,9 +1216,11 @@ void CG_PredictPlayerState32( void ) {
 				// run the Pmove
 				Pmove32 (&cg_pmove);
 
-				//numPredicted++; // debug code
+#if CGX_DEBUG
+				numPredicted++; // debug code
+#endif
 
-								// record the last predicted command
+				// record the last predicted command
 				cg.lastPredictedCommand = cmdNum;
 
 				// if we haven't run out of space in the saved states queue
@@ -1203,13 +1233,15 @@ void CG_PredictPlayerState32( void ) {
 				}
 			}
 			else {
-				//numPlayedBack++; // debug code
+#if CGX_DEBUG
+				numPlayedBack++; // debug code
 
-				//if ( cg_showmiss.integer && 
-				//	cg.savedPmoveStates[stateIndex].commandTime != cg_pmove.cmd.serverTime) {
-				//	// this should ONLY happen just after changing the value of pmove_fixed
-				//	CG_Printf( "saved state miss\n" );
-				//}
+				if ( cg_showmiss.integer && 
+					cg.savedPmoveStates[stateIndex].commandTime != cg_pmove.cmd.serverTime) {
+					// this should ONLY happen just after changing the value of pmove_fixed
+					CG_Printf( "saved state miss\n" );
+				}
+#endif
 
 				// play back the command from the saved states
 				*cg_pmove.ps = cg.savedPmoveStates[stateIndex];
@@ -1222,7 +1254,9 @@ void CG_PredictPlayerState32( void ) {
 			// run the Pmove
 			Pmove32 (&cg_pmove);
 
-			//numPredicted++; // debug code
+#if CGX_DEBUG
+			numPredicted++; // debug code
+#endif
 		}
 		//unlagged - optimized prediction
 
@@ -1235,23 +1269,29 @@ void CG_PredictPlayerState32( void ) {
 		//CG_CheckChangedPredictableEvents(&cg.predictedPlayerState);
 	}
 
+#if CGX_DEBUG
 	//unlagged - optimized prediction
 	// do a /condump after a few seconds of this
-	//CG_Printf("cg.time: %d, numPredicted: %d, numPlayedBack: %d\n", cg.time, numPredicted, numPlayedBack); // debug code
+	if (cg_showmiss.integer == -1) {
+		CG_Printf("cg.time: %d, numPredicted: %d, numPlayedBack: %d\n", cg.time, numPredicted, numPlayedBack); // debug code
+	}
 	// if everything is working right, numPredicted should be 1 more than 98%
 	// of the time, meaning only ONE predicted move was done in the frame
 	// you should see other values for numPredicted after IsUnacceptableError
 	// returns nonzero, and that's it
 	//unlagged - optimized prediction
 
-	/*if ( cg_showmiss.integer > 1 ) {
+	if ( cg_showmiss.integer == -2 ) {
 		CG_Printf( "[%i : %i] ", cg_pmove.cmd.serverTime, cg.time );
-	}*/
+	}
+#endif
 
 	if ( !moved ) {
-		//if ( cg_showmiss.integer ) {
-		//	CG_Printf( "not moved\n" );
-		//}
+#if CGX_DEBUG
+		if ( cg_showmiss.integer ) {
+			CG_Printf( "not moved\n" );
+		}
+#endif
 		return;
 	}
 
@@ -1259,12 +1299,13 @@ void CG_PredictPlayerState32( void ) {
 	CG_AdjustPositionForMover( cg.predictedPlayerState.origin, 
 		cg.predictedPlayerState.groundEntityNum, 
 		cg.physicsTime, cg.time, cg.predictedPlayerState.origin );
-
-	//if ( cg_showmiss.integer ) {
-	//	if (cg.predictedPlayerState.eventSequence > oldPlayerState.eventSequence + MAX_PS_EVENTS) {
-	//		CG_Printf("WARNING: dropped event\n");
-	//	}
-	//}
+#if CGX_DEBUG
+	if ( cg_showmiss.integer ) {
+		if (cg.predictedPlayerState.eventSequence > oldPlayerState.eventSequence + MAX_PS_EVENTS) {
+			CG_Printf("WARNING: dropped event\n");
+		}
+	}
+#endif
 
 	// fire events and other transition triggered things
 	CG_TransitionPlayerState( &cg.predictedPlayerState, &oldPlayerState );

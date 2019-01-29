@@ -87,7 +87,8 @@ vmCvar_t	cgx_debug;
 //1.32
 vmCvar_t	pmove_fixed;
 vmCvar_t	pmove_msec;
-//vmCvar_t	pmove_accurate;
+vmCvar_t	pmove_accurate;
+
 
 //unlagged - client options
 vmCvar_t	cg_delag;
@@ -354,6 +355,10 @@ cvarTable_t		cvarTable[] = {
 	// but we also reference them here
 #if CGX_DEBUG
 	{ &cg_buildScript, "com_buildScript", "0", 0 },	// force loading of all possible data amd error on failures
+
+	{ &pmove_fixed, "pmove_fixed", "0", CVAR_TEMP },
+	{ &pmove_msec, "pmove_msec", "8", CVAR_TEMP},
+	{ &pmove_accurate, "pmove_accurate", "0", CVAR_TEMP },
 #endif
 	{ &cg_paused, "cl_paused", "0", CVAR_ROM },
 	{ &cg_blood, "com_blood", "1", CVAR_ARCHIVE },
@@ -418,10 +423,13 @@ cvarTable_t		cgx_cvarTable_temp[] = {
 	{ &cgx_dl_page, "cgx_dl_page", "/maps/download/%s", CVAR_TEMP },
 	{ &cgx_dl_tobaseq3, "cgx_dl_tobaseq3", "1", CVAR_TEMP },
 
+#if !CGX_DEBUG
 	//1.32
 	{ &pmove_fixed, "pmove_fixed", "0", CVAR_ROM | CVAR_TEMP },
 	{ &pmove_msec, "pmove_msec", "8", CVAR_ROM | CVAR_TEMP},
 	//{ &pmove_accurate, "pmove_accurate", "0", CVAR_ROM | CVAR_TEMP },
+	{ &pmove_accurate, "pmove_accurate", "0", CVAR_ROM | CVAR_TEMP },
+#endif
 };
 
 /*
@@ -1226,7 +1234,7 @@ void CG_Shutdown( void ) {
 
 	trap_Cvar_Set("pmove_fixed", "0");
 	trap_Cvar_Set("pmove_msec", "8");
-	//trap_Cvar_Set("pmove_accurate", "0");
+	trap_Cvar_Set("pmove_accurate", "0");
 
 	// some mods may need to do cleanup work here,
 	// like closing files or archiving session data
