@@ -1086,6 +1086,7 @@ extern	vmCvar_t		cgx_nomip;
 extern	vmCvar_t		cgx_sharedConfig;
 extern	vmCvar_t		cgx_chatFilter;
 extern	vmCvar_t		cgx_killBeep;
+extern	vmCvar_t		cgx_modelCache;
 
 extern	vmCvar_t		com_maxfps;
 extern	vmCvar_t		cl_maxpackets;

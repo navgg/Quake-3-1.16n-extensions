@@ -1267,22 +1267,6 @@ void CGX_LoadWorldMap() {
 
 #pragma endregion
 
-//fix enemymodels with vertex light
-//check vertex light and load client info
-void CGX_LoadClientInfo( clientInfo_t *ci ) {
-	CGX_NomipStart();	
-
-	if (r_vertexLight.integer) {
-		trap_Cvar_Set("r_vertexLight", "0");
-		CG_LoadClientInfo(ci);
-		trap_Cvar_Set("r_vertexLight", "1");
-	} else {
-		CG_LoadClientInfo(ci);
-	}
-
-	CGX_NomipEnd();
-}
-
 #pragma region Xmod command
 
 //small talk
@@ -1427,6 +1411,7 @@ static void CGX_ReloadEffects() {
 }
 
 #define help_file "doc\\2-comand_list.txt"
+static void CGX_PrintModelCache();
 //xmod command
 void CGX_Xmod() {
 	char command[MAX_QPATH], arg[MAX_QPATH];
@@ -1503,6 +1488,10 @@ void CGX_Xmod() {
 		XMOD_ANSWER(cgx_version.string);
 	} else if (!Q_stricmp(command, "help")) {
 		CGX_ShowHelp(help_file, "");
+	} else if (!Q_stricmp(command, "freemem")) {
+		CG_Printf("%i Mb\n", trap_MemoryRemaining() / 1024 / 1024);
+	} else if (!Q_stricmp(command, "models")) {
+		CGX_PrintModelCache();
 	} else if (!Q_stricmp(command, "modinfo")) {
 		CGX_SendModinfo(qtrue);
 	} else if (stristr(command, "8ball")) {
@@ -1645,6 +1634,213 @@ static int CGX_FCopy(char *filename, char *dest) {
 	}
 
 	return len;
+}
+
+#pragma endregion
+
+#pragma region Model loading and caching
+
+typedef struct {
+#if CGX_DEBUG
+	int				size;
+#endif
+
+	char			modelName[MAX_QPATH];
+	char			skinName[MAX_QPATH];
+
+	vec3_t			headOffset;		// move head in icon views
+	footstep_t		footsteps;
+	gender_t		gender;			// from model
+
+	qhandle_t		legsModel;
+	qhandle_t		legsSkin;
+
+	qhandle_t		torsoModel;
+	qhandle_t		torsoSkin;
+
+	qhandle_t		headModel;
+	qhandle_t		headSkin;
+
+	qhandle_t		modelIcon;
+
+	animation_t		animations[MAX_ANIMATIONS];
+
+	sfxHandle_t		sounds[MAX_CUSTOM_SOUNDS];
+} modelInfo_t;
+
+static modelInfo_t modelCache[MAX_CLIENTS];
+
+static int modelCacheNum;
+
+void CGX_ResetModelCache() {
+	if (!cgx_modelCache.integer) return;
+
+	memset(&modelCache, 0, sizeof modelCache);
+	modelCacheNum = 0;
+
+	D_Printf(("CGX_ResetModelCache %i\n", sizeof modelCache));
+}
+
+static void CGX_PrintModelCache() {
+	int i;
+
+	if (!cgx_modelCache.integer) {
+		CG_Printf("Model cache is disabled\n");
+		return;
+	}
+
+	for (i = 0; i < modelCacheNum; i++) {
+		modelInfo_t *mi = &modelCache[i];
+
+#if CGX_DEBUG
+		CG_Printf("%i %s %s %i\n", i, mi->modelName, mi->skinName, mi->size);
+#else
+		CG_Printf("%i %s %s\n", i, mi->modelName, mi->skinName);
+#endif
+	}
+
+	CG_Printf("Freemem: %i Mb\n", trap_MemoryRemaining() / 1024 / 1024);
+}
+
+static void CGX_SaveModelToCache(modelInfo_t *to, clientInfo_t *from) {
+	VectorCopy( from->headOffset, to->headOffset );
+	to->footsteps = from->footsteps;
+	to->gender = from->gender;
+
+	to->legsModel = from->legsModel;
+	to->legsSkin = from->legsSkin;
+	to->torsoModel = from->torsoModel;
+	to->torsoSkin = from->torsoSkin;
+	to->headModel = from->headModel;
+	to->headSkin = from->headSkin;
+	to->modelIcon = from->modelIcon;
+
+	memcpy( to->animations, from->animations, sizeof( to->animations ) );
+	memcpy( to->sounds, from->sounds, sizeof( to->sounds ) );
+}
+
+static void CGX_LoadModelFromCache(clientInfo_t *to, modelInfo_t *from) {
+	VectorCopy( from->headOffset, to->headOffset );
+	to->footsteps = from->footsteps;
+	to->gender = from->gender;
+
+	to->legsModel = from->legsModel;
+	to->legsSkin = from->legsSkin;
+	to->torsoModel = from->torsoModel;
+	to->torsoSkin = from->torsoSkin;
+	to->headModel = from->headModel;
+	to->headSkin = from->headSkin;
+	to->modelIcon = from->modelIcon;
+
+	memcpy( to->animations, from->animations, sizeof( to->animations ) );
+	memcpy( to->sounds, from->sounds, sizeof( to->sounds ) );
+
+	to->deferred = qfalse;
+}
+
+#if CGX_DEBUG
+static void CGX_CacheModel(clientInfo_t *ci, int size) {
+#else
+static void CGX_CacheModel(clientInfo_t *ci) {
+#endif
+	int i;
+
+	if (!cgx_modelCache.integer) return;
+
+	if (modelCacheNum == MAX_CLIENTS) {
+		D_Printf(("Model cache is full\n"));
+		return;
+	}
+
+	for (i = 0; i < modelCacheNum; i++) {
+		modelInfo_t *mi = &modelCache[i];
+
+		if (!Q_stricmp(ci->skinName, mi->skinName) && !Q_stricmp(ci->modelName, mi->modelName)) {
+			D_Printf(("Already cached %s %s\n", mi->modelName, mi->skinName));
+			return;
+		}
+	}
+
+	for (i = 0; i < MAX_CLIENTS; i++) {
+		modelInfo_t *mi = &modelCache[i];
+
+		if (!*mi->skinName && !*mi->modelName) {
+			Q_strncpyz(mi->skinName, ci->skinName, sizeof ci->skinName);
+			Q_strncpyz(mi->modelName, ci->modelName, sizeof ci->modelName);
+#if CGX_DEBUG
+			mi->size = size;
+#endif
+			CGX_SaveModelToCache(mi, ci);
+			modelCacheNum++;
+			D_Printf(("CGX_CacheModel %s %s %i\n", mi->modelName, mi->skinName, modelCacheNum));
+			return;
+		}
+	}
+}
+
+qboolean CGX_TryLoadModelFromCache(clientInfo_t *ci, qboolean tryAny) {
+	int i;
+
+	if (!cgx_modelCache.integer) return qfalse;
+
+	//CG_Printf("CGX_TryLoadModelFromCache %s %s\n", ci->modelName, ci->skinName);
+	D_Printf(("CGX_TryLoadModelFromCache %s %s ", ci->modelName, ci->skinName));
+
+	for (i = 0; i < modelCacheNum; i++) {
+		modelInfo_t *mi = &modelCache[i];
+
+		if (!Q_stricmp(ci->skinName, mi->skinName) &&
+			!Q_stricmp(ci->modelName, mi->modelName)) {
+
+			CGX_LoadModelFromCache(ci, mi);
+			D_Printf(("Success %i\n", i));
+			return qtrue;
+		}
+	}
+
+	if (tryAny) {
+		qboolean lowMem = trap_MemoryRemaining() < LOW_MEMORY;
+		for (i = modelCacheNum; i--; ) {
+			modelInfo_t *mi = &modelCache[i];
+
+			if (!Q_stricmp(ci->skinName, mi->skinName)) {
+
+				CGX_LoadModelFromCache(ci, mi);
+				D_Printf(("Got any %i %s %s\n", i, mi->modelName, mi->skinName));
+				if (lowMem)
+					CG_Printf("Memory is low. For %s/%s loaded %s/%s from cache.\n", ci->modelName, ci->skinName, mi->modelName, mi->skinName);
+				return qtrue;
+			}
+		}
+	}
+
+	D_Printf(("NoModel %i\n", i));
+	return qfalse;
+}
+
+//fix enemymodels with vertex light
+//check vertex light and load client info
+//cache models
+void CGX_LoadClientInfo( clientInfo_t *ci ) {
+#if CGX_DEBUG
+	int size = trap_MemoryRemaining();
+#endif
+	CGX_NomipStart();
+	
+	if (r_vertexLight.integer) {
+		trap_Cvar_Set("r_vertexLight", "0");
+		CG_LoadClientInfo(ci);
+		trap_Cvar_Set("r_vertexLight", "1");
+	} else {
+		CG_LoadClientInfo(ci);
+	}
+	
+	CGX_NomipEnd();
+#if CGX_DEBUG
+	CGX_CacheModel(ci, size - trap_MemoryRemaining());
+#else
+	CGX_CacheModel(ci);
+#endif
 }
 
 #pragma endregion

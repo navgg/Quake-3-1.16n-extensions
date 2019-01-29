@@ -77,6 +77,7 @@ vmCvar_t	cgx_nomip;
 vmCvar_t	cgx_sharedConfig;
 vmCvar_t	cgx_chatFilter;
 vmCvar_t	cgx_killBeep;
+vmCvar_t	cgx_modelCache;
 
 vmCvar_t	com_maxfps;
 vmCvar_t	cl_maxpackets;
@@ -407,6 +408,8 @@ cvarTable_t		cgx_cvarTable_temp[] = {
 	{ &cgx_fixedmaps, "cl_fixedmaps", "", CVAR_ROM | CVAR_ARCHIVE },
 	//mod version
 	{ &cgx_version, "cgx_version", "", CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
+	//for model cahe
+	{ &cgx_modelCache, "cg_modelCache", "1", CVAR_TEMP | CVAR_LATCH },
 	//for unlagged.c
 	//better not register here or servefs will screw clients sv_fps
 	// this will be automagically copied from the server	
@@ -1164,6 +1167,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence ) {
 	
 	CGX_Init_enemyModels();
 	CGX_Init_vScreen();
+	CGX_ResetModelCache();
 
 	// get the gamestate from the client system
 	trap_GetGameState( &cgs.gameState );

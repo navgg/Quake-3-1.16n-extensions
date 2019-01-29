@@ -664,12 +664,27 @@ void CG_NewClientInfo( int clientNum ) {
 		CGX_CheckEnemyModel(&newInfo, qfalse, clientNum);
 	}
 
+	// X-Mod: new loading from cache
+	if (cgx_modelCache.integer) {
+		if (!CGX_TryLoadModelFromCache(&newInfo, qfalse)) {
+			qboolean lowMem = trap_MemoryRemaining() < LOW_MEMORY;
+
+			if (lowMem || (cg_deferPlayers.integer && !cg_buildScript.integer && !cg.loading)) {
+				CGX_TryLoadModelFromCache(&newInfo, qtrue);
+				newInfo.deferred = !lowMem;
+			} else {
+				CGX_LoadClientInfo(&newInfo);
+			}
+		}
+	}
+	// old loading
+	else
 	// scan for an existing clientinfo that matches this modelname
 	// so we can avoid loading checks if possible
 	if ( !CG_ScanForExistingClientInfo( &newInfo ) ) {
 		qboolean	forceDefer;
 
-		forceDefer = trap_MemoryRemaining() < 4000000;
+		forceDefer = trap_MemoryRemaining() < LOW_MEMORY;
 
 		// if we are defering loads, just have it pick the first valid
 		if ( forceDefer || ( cg_deferPlayers.integer && !cg_buildScript.integer && !cg.loading ) ) {
@@ -684,8 +699,7 @@ void CG_NewClientInfo( int clientNum ) {
 			}
 			// if we are low on memory, leave them with this model
 			if ( forceDefer ) {
-				CG_Printf( "Memory is low.  Using deferred model. Set higher ^3com_hunkmegs^7 and restart game. Min: 112 Max: 256\n" );
-				CGX_IncreaseHunkmegs( CGX_MINHUNKMEGS );
+				CG_Printf( "Memory is low.  Using deferred model. Set higher ^3com_hunkmegs^7 and restart.\n" );
 				newInfo.deferred = qfalse;
 			}
 		} else {
@@ -719,13 +733,16 @@ void CG_LoadDeferredPlayers( void ) {
 	for ( i = 0, ci = cgs.clientinfo ; i < cgs.maxclients ; i++, ci++ ) {
 		if ( ci->infoValid && ci->deferred ) {
 			// if we are low on memory, leave it deferred
-			if ( trap_MemoryRemaining() < 4000000 ) {
-				CG_Printf( "Memory is low.  Using deferred model. Set higher ^3com_hunkmegs^7 and restart game. Min: 112 Max: 256\n" );
-				CGX_IncreaseHunkmegs( CGX_MINHUNKMEGS );
+			if ( trap_MemoryRemaining() < LOW_MEMORY ) {
+				if (CGX_TryLoadModelFromCache(ci, qtrue))
+					continue;
+	
+				CG_Printf( "Memory is low.  Using deferred model. Set higher ^3com_hunkmegs^7 and restart.\n" );
 				ci->deferred = qfalse;
 				continue;
 			}
-			CGX_LoadClientInfo( ci );
+			if (!CGX_TryLoadModelFromCache(ci, qfalse))
+				CGX_LoadClientInfo( ci );
 //			break;
 		}
 	}
