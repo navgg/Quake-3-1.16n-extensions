@@ -1240,6 +1240,8 @@ void CG_Shutdown( void ) {
 	trap_Cvar_Set("pmove_msec", "8");
 	trap_Cvar_Set("pmove_accurate", "0");
 
+	CG_statsWindowPrint();
+
 	// some mods may need to do cleanup work here,
 	// like closing files or archiving session data
 }

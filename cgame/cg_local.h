@@ -1238,6 +1238,7 @@ void CG_DrawWidthGauge( int x, int y, int width, int height, vec4_t color, int v
 void CG_windowDraw( void );
 void CG_statsWindow( void );
 void CG_statsWindowFree( int weffects );
+void CG_statsWindowPrint( void );
 
 void CGX_WeaponAccCheck();
 void CGX_UpdateItemPickupStats(entityState_t *es, gitem_t *item);

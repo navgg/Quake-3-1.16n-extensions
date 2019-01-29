@@ -116,7 +116,7 @@ cl_timeNudge limit set -20 to 20
 renamed cg_networkAdjustments to cg_autoNetworkSettings
 1.32 rail effect overrides simple rail
 cg_delag_optimizePrediction set by default 1
-clientstats appearance changed
+clientstats appearance changed, prints to console only after intermission end
 server listing ping speed up
 
 added cg_teamModel "*" (if enemymodels enabled this value sets default red/blue skins for team, 

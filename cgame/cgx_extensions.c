@@ -510,6 +510,7 @@ void CGX_MapRestart() {
 	//nemesis/osp reset stats
 	memset( &stats, 0, sizeof( stats ) );
 
+	CG_statsWindowPrint();
 	CG_statsWindowFree( 0 );
 
 	D_Printf(("^6CGX_MapRestart\n"));

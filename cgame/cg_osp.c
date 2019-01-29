@@ -148,9 +148,6 @@ void CG_printWindow( char *str ) {
 	if (pos2 < pos) {
 		CG_addString( w, buf + pos2 );
 	}
-
-	if (cg.snap->ps.pm_type == PM_INTERMISSION)
-		CG_Printf( "%s\n", str );
 }
 
 // Window stuct "constructor" with some common defaults
@@ -520,9 +517,6 @@ void CG_statsWindow( void ) {
 
 	cg.windowCurrent = sw;
 
-	if (interMission && cgs.serverMod != SM_NOGHOST)
-		CG_Printf( "\n", line );
-
 	CG_printWindow( "   ^3Score   ^3Kills  ^3Deaths   ^3SelfK      ^3Eff " );
 	CG_printWindow( va( "^7%8i%8i%8i%8i  %5i.%i%%", score, kills, deaths, stats.suicides,
 		w, j - w * 10 ) );
@@ -595,7 +589,6 @@ void CG_statsWindow( void ) {
 
 	if (interMission) {
 		sw->y += hud.head_size;
-		CG_Printf("\n", line);
 	}
 }
 
@@ -608,6 +601,19 @@ void CG_statsWindowFree( int weffects ) {
 
 	CG_windowFree( cg.statsWindow );
 	cg.statsWindow = NULL;
+}
+
+//X-Mod: print to console
+void CG_statsWindowPrint( void ) {
+	cg_window_t *w = cg.statsWindow;
+	int i;
+
+	if (w) {
+		CG_Printf("\n");
+		for (i = 0; i < w->lineCount; i++)
+			CG_Printf("%s\n", w->lineText[i]);
+		CG_Printf("\n");
+	}
 }
 
 //X-Mod: refactored and improved stats gathering
