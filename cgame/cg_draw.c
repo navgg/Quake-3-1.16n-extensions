@@ -1633,6 +1633,11 @@ static float CGX_DrawDebugInfo( float y ) {
 		w = CG_DrawStrlen(s) * BIGCHAR_WIDTH;
 		CG_DrawBigString(hud.width5 - w, y + 2, s, 1.0F);
 		y += BIGCHAR_HEIGHT + 4;
+
+		s = va( "OP: %2i %2i", cg.numPredicted, cg.numPlayedBack );
+		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
+		CG_DrawBigString( hud.width5 - w, y + 2, s, 1.0F );
+		y += BIGCHAR_HEIGHT + 4;
 	}
 
 	if (cgx_debug.integer & 2) {

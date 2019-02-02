@@ -867,6 +867,8 @@ void CG_PredictPlayerState( void ) {
 	if ( cg_showmiss.integer == -1 ) {
 		CG_Printf("cg.time: %d, numPredicted: %d, numPlayedBack: %d\n", cg.time, numPredicted, numPlayedBack); // debug code
 	}
+	cg.numPredicted = numPredicted;
+	cg.numPlayedBack = numPlayedBack;
 	// if everything is working right, numPredicted should be 1 more than 98%
 	// of the time, meaning only ONE predicted move was done in the frame
 	// you should see other values for numPredicted after IsUnacceptableError
@@ -1275,6 +1277,8 @@ void CG_PredictPlayerState32( void ) {
 	if (cg_showmiss.integer == -1) {
 		CG_Printf("cg.time: %d, numPredicted: %d, numPlayedBack: %d\n", cg.time, numPredicted, numPlayedBack); // debug code
 	}
+	cg.numPredicted = numPredicted;
+	cg.numPlayedBack = numPlayedBack;
 	// if everything is working right, numPredicted should be 1 more than 98%
 	// of the time, meaning only ONE predicted move was done in the frame
 	// you should see other values for numPredicted after IsUnacceptableError

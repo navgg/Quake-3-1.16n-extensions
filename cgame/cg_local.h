@@ -693,6 +693,9 @@ typedef struct {
 	int			predictionErrors;
 	int			predictionMisses;
 	int			predictionDecays;
+
+	int			numPredicted;
+	int			numPlayedBack;
 #endif
 
 	//unlagged - optimized prediction
