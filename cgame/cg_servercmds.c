@@ -15,7 +15,7 @@ CG_ParseScores
 =================
 */
 static void CG_ParseScores( void ) {
-	int		i, powerups;
+	int		i, powerups, argc;
 
 	cg.numScores = atoi( CG_Argv( 1 ) );
 	if ( cg.numScores > MAX_CLIENTS ) {
@@ -25,16 +25,17 @@ static void CG_ParseScores( void ) {
 	cg.teamScores[0] = atoi( CG_Argv( 2 ) );
 	cg.teamScores[1] = atoi( CG_Argv( 3 ) );
 
+	argc = cgs.serverMod == SM_NOGHOST ? 7 : 6;
 	memset( cg.scores, 0, sizeof( cg.scores ) );
 	for ( i = 0 ; i < cg.numScores ; i++ ) {
-		cg.scores[i].client = atoi( CG_Argv( i * 6 + 4 ) );
-		cg.scores[i].score = atoi( CG_Argv( i * 6 + 5 ) );
-		cg.scores[i].ping = atoi( CG_Argv( i * 6 + 6 ) );
-		cg.scores[i].time = atoi( CG_Argv( i * 6 + 7 ) );
-		cg.scores[i].scoreFlags = atoi( CG_Argv( i * 6 + 8 ) );
-		powerups = atoi( CG_Argv( i * 6 + 9 ) );
+		cg.scores[i].client = atoi( CG_Argv( i * argc + 4 ) );
+		cg.scores[i].score = atoi( CG_Argv( i * argc + 5 ) );
+		cg.scores[i].ping = atoi( CG_Argv( i * argc + 6 ) );
+		cg.scores[i].time = atoi( CG_Argv( i * argc + 7 ) );
+		cg.scores[i].scoreFlags = atoi( CG_Argv( i * argc + 8 ) );
+		powerups = atoi( CG_Argv( i * argc + 9 ) );
 		if (cgs.serverMod == SM_NOGHOST)
-			cg.scores[i].isReferee = atoi( CG_Argv( i * 6 + 10 ) );
+			cg.scores[i].isReferee = atoi( CG_Argv( i * argc + 10 ) );
 
 		if ( cg.scores[i].client < 0 || cg.scores[i].client >= MAX_CLIENTS ) {
 			cg.scores[i].client = 0;
