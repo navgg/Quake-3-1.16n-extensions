@@ -212,6 +212,12 @@ void CG_DrawOSPClientScore( int x, int y, clientInfo_t *ci, score_t *score ) {
 			OSP_SB_CHAR_HEIGHT, OSP_SB_CHAR_HEIGHT, score->client, headAngles );
 	}
 
+	if ( score->isReferee ) {
+		CG_DrawStringExt( x + OSP_SB_MODEL_OFFSET + 12, y, "^2R", color,
+			qfalse, qtrue,
+			OSP_SB_CHAR_WIDTH, OSP_SB_CHAR_HEIGHT, 0 );
+	}
+
 	// score/ping/time
 	if ( score->ping == -1 ) {
 		Com_sprintf( string, sizeof(string), "connecting" );

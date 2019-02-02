@@ -61,7 +61,7 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 	char	string[1024];
 	vec3_t	headAngles;
 	clientInfo_t	*ci;
-	int iconx, headx, iconxoffs;
+	int iconx, headx, iconxoffs, w;
 	int		pingCol;
 
 	if ( score->client < 0 || score->client >= cgs.maxclients ) {
@@ -116,16 +116,15 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 		// draw the wins / losses
 		if ( cgs.gametype == GT_TOURNAMENT ) {
 			Com_sprintf( string, sizeof( string ), "%i/%i", ci->wins, ci->losses );
+			w = strlen( string ) * SMALLCHAR_WIDTH;
 			//if( ci->handicap < 100 && !ci->botSkill ) {
 			//	CG_DrawSmallStringColor( iconx - iconxoffs * 0.75f - 34, y, string, color );
 			//}
 			//else {
 			//	CG_DrawSmallStringColor( iconx - iconxoffs * 0.75f - 34, y, string, color );
 			//}
-			if( largeFormat )
-				CG_DrawSmallStringColor( iconx - iconxoffs * 0.75f - 52, y, string, color );
-			else 
-				CG_DrawSmallStringColor( iconx - iconxoffs * 0.75f - 48, y, string, color );
+
+			CG_DrawSmallStringColor( iconx - iconxoffs * 0.75f - w - 10, y, string, color );
 		}
 	}
 
@@ -145,16 +144,26 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 	if (cgx_scoreboard.integer != 2) {		
 		float color[4];
 		color[0] = color[1] = color[2] = 1.0f;
-		Com_sprintf(string, sizeof(string), "%3i", score->client);
-		//CG_DrawBigString(SB_SCORELINE_X + vScreen.offsetx - 64 - 40, y, string, 0.5f);
+		Com_sprintf(string, sizeof(string), "%i", score->client);
+		w = (strlen( string ) - 1) * BIGCHAR_WIDTH / 2;
 		if (largeFormat) {
 			color[3] = 0.5f;
-			CG_DrawStringExt(SB_SCORELINE_X + vScreen.offsetx - 64 - 40, y, string,
-				color, qfalse, qtrue, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0);
+			CG_DrawStringExt( SB_SCORELINE_X + vScreen.offsetx - 64 - 8 - w, y, string,
+				color, qfalse, qtrue, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
+			if (score->isReferee) {
+				color[3] = 1.0f;
+				CG_DrawStringExt( iconx + 8, y - 16, "^2R", color, qfalse, qtrue, 
+					BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
+			}
 		} else {
-			color[3] = 0.25f;
-			CG_DrawStringExt( SB_SCORELINE_X + vScreen.offsetx - 64 - 40, y, string, 
+			color[3] = 0.33f;
+			CG_DrawStringExt( SB_SCORELINE_X + vScreen.offsetx - 64 - 4 - w, y, string, 
 				color, qfalse, qtrue, BIGCHAR_WIDTH, BIGCHAR_WIDTH, 0 );
+			if (score->isReferee) {
+				color[3] = 1.0f;
+				CG_DrawStringExt( headx + 40, y, "^2R", color, qfalse, qtrue, 
+					BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
+			}
 		}
 	}
 

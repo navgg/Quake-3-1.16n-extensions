@@ -33,6 +33,8 @@ static void CG_ParseScores( void ) {
 		cg.scores[i].time = atoi( CG_Argv( i * 6 + 7 ) );
 		cg.scores[i].scoreFlags = atoi( CG_Argv( i * 6 + 8 ) );
 		powerups = atoi( CG_Argv( i * 6 + 9 ) );
+		if (cgs.serverMod == SM_NOGHOST)
+			cg.scores[i].isReferee = atoi( CG_Argv( i * 6 + 10 ) );
 
 		if ( cg.scores[i].client < 0 || cg.scores[i].client >= MAX_CLIENTS ) {
 			cg.scores[i].client = 0;
