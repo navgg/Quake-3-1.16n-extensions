@@ -17,21 +17,21 @@ This must be the very first function compiled into the .q3vm file
 */
 int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6 ) {
 	switch ( command ) {
+	case CG_DRAW_ACTIVE_FRAME:
+		CG_DrawActiveFrame( arg0, arg1, arg2 );
+		return 0;
+	case CG_CONSOLE_COMMAND:		
+		return CG_ConsoleCommand();
+	case CG_CROSSHAIR_PLAYER:
+		return CG_CrosshairPlayer();
+	case CG_LAST_ATTACKER:
+		return CG_LastAttacker();
 	case CG_INIT:
 		CG_Init( arg0, arg1 );
 		return 0;
 	case CG_SHUTDOWN:
 		CG_Shutdown();
 		return 0;
-	case CG_CONSOLE_COMMAND:		
-		return CG_ConsoleCommand();
-	case CG_DRAW_ACTIVE_FRAME:
-		CG_DrawActiveFrame( arg0, arg1, arg2 );
-		return 0;
-	case CG_CROSSHAIR_PLAYER:
-		return CG_CrosshairPlayer();
-	case CG_LAST_ATTACKER:
-		return CG_LastAttacker();
 	default:
 		CG_Error( "vmMain: unknown command %i", command );
 		break;
