@@ -379,6 +379,8 @@ typedef struct {
 	int				ping;
 	int				time;
 	int				scoreFlags;
+
+	qboolean		isReferee;
 } score_t;
 
 // each client has an associated clientInfo_t
