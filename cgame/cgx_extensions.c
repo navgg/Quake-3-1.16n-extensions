@@ -1429,12 +1429,6 @@ void CGX_Xmod() {
 		if (argc > 2) trap_Argv(2, arg, MAX_QPATH);
 	}
 
-	if (!Q_stricmp(command, "reload")) {
-		if (!Q_stricmp(arg, "effects"))
-			CGX_ReloadEffects();
-		return;
-	}
-
 	if (!Q_stricmp(command, "e")) {
 		XMOD_ANSWER("checking enemy models...");
 		CGX_CheckEnemyModelAll();
@@ -1455,6 +1449,11 @@ void CGX_Xmod() {
 		while (p--) i *= 10;
 		for (f = 0.0f; f <= 0.001f * i; f += 0.00001f * i)
 			CG_Printf("%f\n", f);
+	} else if (!Q_stricmp(command, "crandom")) {
+		for (i = 0; i < 100; i++)
+			CG_Printf("%1.2f ", crandom());
+		CG_Printf("\n");
+		return;
 	} else
 	if (!Q_stricmp(command, "eFlags")) {
 		centity_t *cent = &cg_entities[cg.clientNum];
@@ -1499,6 +1498,9 @@ void CGX_Xmod() {
 		CGX_PrintModelCache();
 	} else if (!Q_stricmp(command, "modinfo")) {
 		CGX_SendModinfo(qtrue);
+	} else if (!Q_stricmp(command, "reload")) {
+		if (!Q_stricmp(arg, "effects"))
+			CGX_ReloadEffects();
 	} else if (stristr(command, "8ball")) {
 		char *balls[] = {
 			"listen to your heart",
