@@ -1693,7 +1693,7 @@ void CG_Player( centity_t *cent ) {
 	CG_AddRefEntityWithPowerups( &head, &cent->currentState, ci->team );
 
 #if CGX_FREEZE
-	if (cg_enableBreath.integer)
+	if (cg_enableBreath.integer || (cgx_winterEffects.integer & CGX_WINTER_BREATH))
 		CG_BreathPuffs( cent, &head );
 #endif
 

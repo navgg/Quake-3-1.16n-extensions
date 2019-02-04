@@ -125,6 +125,7 @@ added cg_teamModel "*" (if enemymodels enabled this value sets default red/blue 
 added support for quakelive bright skins
 added referees display in scoreboard on noghost servers
 added huds, change with cg_draw2D 1,2,3 (1: default, 2: compact, 3: vanilla Q3)
+added snow & winter effects (cg_winterEffects 1: snow, 2: footsteps, 4: breath, -1: all. Sum for effects)
 added player movement prediction from 1.32 with pmove_fixed, pmove_msec, for NoGhost servers
 added caching for server list in case if master server is not responding (ui_serverCache 1|0, default 1)
 added caching for models to fix low memory problems (cg_modelCache 1|0, default 1)

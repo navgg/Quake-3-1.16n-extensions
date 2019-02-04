@@ -301,6 +301,7 @@ A tournement restart will clear everything, but doesn't
 require a reload of all the media
 ===============
 */
+extern qboolean initparticles;
 static void CG_MapRestart( void ) {
 #ifdef CGX_DEUBG
 	if ( cg_showmiss.integer ) {
@@ -310,7 +311,7 @@ static void CG_MapRestart( void ) {
 
 	CG_InitLocalEntities();
 	CG_InitMarkPolys();
-	CG_ClearParticles();
+	initparticles = qfalse;
 
 	// make sure the "3 frags left" warnings play again
 	cg.fraglimitWarnings = 0;

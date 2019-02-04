@@ -69,10 +69,26 @@
 #define CGX_MAX_RATE 99999
 #define CGX_MAX_FPS 333
 
+//weather
+#define CGX_GOLDENRATIO 1.618034f
+
+#define CGX_WINTER_SNOW		1
+#define CGX_WINTER_STEPS	2
+#define CGX_WINTER_BREATH	4
+#define CGX_WINTER_COLORS	8
+
+#define CGX_SNOW_RANGE	256
+#define CGX_SNOW_TOTAL	(MAX_MARK_POLYS / 2)
+#define CGX_SNOW_TURBULENT	8
+
 //try to register shader only if it's null
 #define trap_R_LazyRegisterShader(x, s) if (!x) { CGX_NomipStart(); x = trap_R_RegisterShader(s); CGX_NomipEnd(); }
 #define trap_S_LazyRegisterSound(x, s) if (!x) x = trap_S_RegisterSound(s);
 #define trap_S_LazyStartSound(var, en, chan, path) { static sfxHandle_t var; trap_S_LazyRegisterSound(var, path); trap_S_StartSound (NULL, en, chan, var); }
+#define trap_S_LazyStartSound2(var, en, chan, path) { trap_S_LazyRegisterSound(var, path); trap_S_StartSound (NULL, en, chan, var); }
+//stuff
+#define playWinterFootstep() { int is = rand() & 3; trap_S_LazyStartSound2(cgs.media.footsteps[ FOOTSTEP_SNOW ][ is ], es->number, CHAN_BODY, va("sound/player/footsteps/snow%i.wav", is + 1) ); }
+#define playWinterLand() { trap_S_LazyStartSound2(cgs.media.snowLandSound, es->number, CHAN_AUTO, "sound/player/snow-land.wav" ); }
 
 #if CGX_DEBUG 
 #define D_Printf(x) if (cgx_debug.integer) CG_Printf x
@@ -207,6 +223,8 @@ typedef enum {
 	FOOTSTEP_ENERGY,
 	FOOTSTEP_METAL,
 	FOOTSTEP_SPLASH,
+	// X-Mod
+	FOOTSTEP_SNOW,
 
 	FOOTSTEP_TOTAL
 } footstep_t;
@@ -690,6 +708,7 @@ typedef struct {
 	int			rateDelayedTotal;	
 	
 	int			connectionInterrupteds;
+	// x-mod: debug info
 #if CGX_DEBUG
 	int			entities;
 	int			predictionErrors;
@@ -698,6 +717,8 @@ typedef struct {
 
 	int			numPredicted;
 	int			numPlayedBack;
+
+	int			activeParticles;
 #endif
 
 	//unlagged - optimized prediction
@@ -792,6 +813,8 @@ typedef struct {
 	qhandle_t	burnMarkShader;
 	qhandle_t	holeMarkShader;
 	qhandle_t	energyMarkShader;
+
+	qhandle_t	snowShader;
 
 #if CGX_FREEZE
 	qhandle_t	freezeShader;
@@ -888,6 +911,9 @@ typedef struct {
 	sfxHandle_t hitSounds[4];
 	// ql kill beep
 	sfxHandle_t killBeep;
+	// snow sounds
+	sfxHandle_t snowLandSound;
+
 
 	sfxHandle_t hitSound;
 	sfxHandle_t hitTeamSound;
@@ -1091,6 +1117,7 @@ extern	vmCvar_t		cgx_nomip;
 extern	vmCvar_t		cgx_sharedConfig;
 extern	vmCvar_t		cgx_chatFilter;
 extern	vmCvar_t		cgx_killBeep;
+extern	vmCvar_t		cgx_winterEffects;
 extern	vmCvar_t		cgx_modelCache;
 
 extern	vmCvar_t		com_maxfps;

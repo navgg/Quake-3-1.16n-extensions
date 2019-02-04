@@ -17,6 +17,7 @@ MARK POLYS
 markPoly_t	cg_activeMarkPolys;			// double linked list
 markPoly_t	*cg_freeMarkPolys;			// single linked list
 markPoly_t	cg_markPolys[MAX_MARK_POLYS];
+int			cg_marksTotal;
 
 /*
 ===================
@@ -36,6 +37,8 @@ void	CG_InitMarkPolys( void ) {
 	for ( i = 0 ; i < MAX_MARK_POLYS - 1 ; i++ ) {
 		cg_markPolys[i].nextMark = &cg_markPolys[i+1];
 	}
+
+	cg_marksTotal = 0;
 }
 
 
@@ -56,6 +59,8 @@ void CG_FreeMarkPoly( markPoly_t *le ) {
 	// the free list is only singly linked
 	le->nextMark = cg_freeMarkPolys;
 	cg_freeMarkPolys = le;
+
+	cg_marksTotal--;
 }
 
 /*
@@ -68,8 +73,10 @@ Will allways succeed, even if it requires freeing an old active mark
 markPoly_t	*CG_AllocMark( void ) {
 	markPoly_t	*le;
 	int time;
+	// snow using marks. small fix to fit everything on screen
+	qboolean tooManyMarks = (cgx_winterEffects.integer & CGX_WINTER_SNOW) && cg_marksTotal >= MAX_MARK_POLYS / 2;
 
-	if ( !cg_freeMarkPolys ) {
+	if ( !cg_freeMarkPolys || tooManyMarks ) {
 		// no free entities, so free the one at the end of the chain
 		// remove the oldest active entity
 		time = cg_activeMarkPolys.prevMark->time;
@@ -88,6 +95,9 @@ markPoly_t	*CG_AllocMark( void ) {
 	le->prevMark = &cg_activeMarkPolys;
 	cg_activeMarkPolys.nextMark->prevMark = le;
 	cg_activeMarkPolys.nextMark = le;
+
+	cg_marksTotal++;
+
 	return le;
 }
 
@@ -278,8 +288,8 @@ typedef struct particle_s
 {
 	struct particle_s	*next;
 
-	float		time;
-	float		endtime;
+	int			time;
+	int			endtime;
 
 	vec3_t		org;
 	vec3_t		vel;
@@ -300,7 +310,7 @@ typedef struct particle_s
 	float		start;
 	float		end;
 
-	float		startfade;
+	int			startfade;
 	qboolean	rotate;
 	int			snum;
 
@@ -334,8 +344,8 @@ typedef enum
 	P_SPRITE
 } particle_type_t;
 
-#define	MAX_SHADER_ANIMS		32
-#define	MAX_SHADER_ANIM_FRAMES	64
+#define	MAX_SHADER_ANIMS		4
+#define	MAX_SHADER_ANIM_FRAMES	32
 
 static char *shaderAnimNames[MAX_SHADER_ANIMS] = {
 	"explode1",
@@ -352,7 +362,7 @@ static int	numShaderAnims;
 // done.
 
 #define		PARTICLE_GRAVITY	40
-#define		MAX_PARTICLES	1024
+#define		MAX_PARTICLES	(CGX_SNOW_TOTAL + 128*3)
 
 cparticle_t	*active_particles, *free_particles;
 cparticle_t	particles[MAX_PARTICLES];
@@ -362,7 +372,309 @@ qboolean		initparticles = qfalse;
 vec3_t			pvforward, pvright, pvup;
 vec3_t			rforward, rright, rup;
 
-float			oldtime;
+int			oldtime;
+
+// Ridah, made this static so it doesn't interfere with other files
+static float roll = 0.0;
+
+static centity_t *cent;
+static qboolean isSnowing = qfalse;
+
+void CG_ParticleSnow2( qhandle_t pshader ) {
+	cparticle_t	*p;
+	float sz;
+
+	if (!free_particles)
+		return;
+	p = free_particles;
+	free_particles = p->next;
+	p->next = active_particles;
+	active_particles = p;
+	p->time = cg.time;
+	p->color = 0;
+	p->alpha = 0.6f + random() * 0.4f;
+	p->alphavel = 0;
+	p->pshader = pshader;
+	sz = 0.6f + random() * 0.4f;
+
+	if (rand() % 100 >= 90)
+		sz *= CGX_GOLDENRATIO;
+
+	p->height = sz;
+	p->width = sz;
+
+	if (CGX_SNOW_TURBULENT) {
+		p->type = P_WEATHER_TURBULENT;
+		p->vel[2] = -50 * 1.1;
+	}
+	else {
+		p->type = P_WEATHER;
+		p->vel[2] = -50;
+	}
+
+	VectorClear( p->accel );
+
+	p->org[0] = crandom() * CGX_SNOW_RANGE;
+	p->org[1] = crandom() * CGX_SNOW_RANGE;
+	p->org[2] = crandom() * CGX_SNOW_RANGE;
+
+	p->vel[0] = crandom() * CGX_SNOW_TURBULENT;
+	p->vel[1] = crandom() * CGX_SNOW_TURBULENT;
+
+	VectorAdd(p->org, cent->lerpOrigin, p->org);
+}
+
+void CG_AddParticleToScene2( cparticle_t *p, vec3_t org ) {
+	vec3_t		point;
+	polyVert_t	verts[4];
+	float		width;
+	float		height;
+	float		time, time2;
+	float		ratio;
+	float		invratio;
+	vec3_t		color;
+	polyVert_t	TRIverts[3];
+	vec3_t		rright2, rup2;
+
+	if (isSnowing && p->type != P_ANIM) {// create a front facing polygon
+		int i;
+		for (i = 0; i < 3; i++) {//check snow borders, it snows around entity
+			if (org[i] <= cent->lerpOrigin[i] - CGX_SNOW_RANGE)
+				p->org[i] += CGX_SNOW_RANGE * 2;
+			else if (org[i] >= cent->lerpOrigin[i] + CGX_SNOW_RANGE)
+				p->org[i] -= CGX_SNOW_RANGE * 2;
+		}
+
+		VectorMA( org, -p->height, pvup, point );
+		VectorMA( point, -p->width, pvright, point );
+		VectorCopy( point, TRIverts[0].xyz );
+		TRIverts[0].st[0] = 1;
+		TRIverts[0].st[1] = 0;
+		TRIverts[0].modulate[0] = 255;
+		TRIverts[0].modulate[1] = 255;
+		TRIverts[0].modulate[2] = 255;
+		TRIverts[0].modulate[3] = 255 * p->alpha;
+
+		VectorMA( org, p->height, pvup, point );
+		VectorMA( point, -p->width, pvright, point );
+		VectorCopy( point, TRIverts[1].xyz );
+		TRIverts[1].st[0] = 0;
+		TRIverts[1].st[1] = 0;
+		TRIverts[1].modulate[0] = 255;
+		TRIverts[1].modulate[1] = 255;
+		TRIverts[1].modulate[2] = 255;
+		TRIverts[1].modulate[3] = 255 * p->alpha;
+
+		VectorMA( org, p->height, pvup, point );
+		VectorMA( point, p->width, pvright, point );
+		VectorCopy( point, TRIverts[2].xyz );
+		TRIverts[2].st[0] = 0;
+		TRIverts[2].st[1] = 1;
+		TRIverts[2].modulate[0] = 255;
+		TRIverts[2].modulate[1] = 255;
+		TRIverts[2].modulate[2] = 255;
+		TRIverts[2].modulate[3] = 255 * p->alpha;
+	}
+	// Ridah
+	else if (p->type == P_ANIM) {
+		vec3_t	rr, ru;
+		vec3_t	rotate_ang;
+		int i, j;
+
+		time = cg.time - p->time;
+		time2 = p->endtime - p->time;
+		ratio = time / time2;
+		if (ratio >= 1.0f) {
+			ratio = 0.9999f;
+		}
+
+		width = p->width + (ratio * (p->endwidth - p->width));
+		height = p->height + (ratio * (p->endheight - p->height));
+
+		// if we are "inside" this sprite, don't draw
+		if (Distance( cg.snap->ps.origin, org ) < width / 1.5) {
+			return;
+		}
+
+		i = p->shaderAnim;
+		j = (int)floor( ratio * shaderAnimCounts[p->shaderAnim] );
+		p->pshader = shaderAnims[i][j];
+
+		if (p->roll) {
+			vectoangles( cg.refdef.viewaxis[0], rotate_ang );
+			rotate_ang[ROLL] += p->roll;
+			AngleVectors( rotate_ang, NULL, rr, ru );
+		}
+
+		if (p->roll) {
+			VectorMA( org, -height, ru, point );
+			VectorMA( point, -width, rr, point );
+		}
+		else {
+			VectorMA( org, -height, pvup, point );
+			VectorMA( point, -width, pvright, point );
+		}
+		VectorCopy( point, verts[0].xyz );
+		verts[0].st[0] = 0;
+		verts[0].st[1] = 0;
+		verts[0].modulate[0] = 255;
+		verts[0].modulate[1] = 255;
+		verts[0].modulate[2] = 255;
+		verts[0].modulate[3] = 255;
+
+		if (p->roll) {
+			VectorMA( point, 2 * height, ru, point );
+		}
+		else {
+			VectorMA( point, 2 * height, pvup, point );
+		}
+		VectorCopy( point, verts[1].xyz );
+		verts[1].st[0] = 0;
+		verts[1].st[1] = 1;
+		verts[1].modulate[0] = 255;
+		verts[1].modulate[1] = 255;
+		verts[1].modulate[2] = 255;
+		verts[1].modulate[3] = 255;
+
+		if (p->roll) {
+			VectorMA( point, 2 * width, rr, point );
+		}
+		else {
+			VectorMA( point, 2 * width, pvright, point );
+		}
+		VectorCopy( point, verts[2].xyz );
+		verts[2].st[0] = 1;
+		verts[2].st[1] = 1;
+		verts[2].modulate[0] = 255;
+		verts[2].modulate[1] = 255;
+		verts[2].modulate[2] = 255;
+		verts[2].modulate[3] = 255;
+
+		if (p->roll) {
+			VectorMA( point, -2 * height, ru, point );
+		}
+		else {
+			VectorMA( point, -2 * height, pvup, point );
+		}
+		VectorCopy( point, verts[3].xyz );
+		verts[3].st[0] = 1;
+		verts[3].st[1] = 0;
+		verts[3].modulate[0] = 255;
+		verts[3].modulate[1] = 255;
+		verts[3].modulate[2] = 255;
+		verts[3].modulate[3] = 255;
+	}
+	// done.
+
+	if (p->type != P_ANIM)
+		trap_R_AddPolyToScene( p->pshader, 3, TRIverts );
+	else
+		trap_R_AddPolyToScene( p->pshader, 4, verts );
+}
+
+//optimized addparticles, only snow and rockets processing
+void CG_AddParticles2( void ) {
+	cparticle_t		*p, *next;
+	float			time;
+	vec3_t			org;
+	cparticle_t		*active, *tail;
+	int				i;
+	static qboolean	animInit = qfalse;
+
+	if (!initparticles)
+		CG_ClearParticles();
+
+	if (!animInit && cgx_weaponEffects.integer & WE_ROCKET32) {
+		CGX_NomipStart();
+		// Ridah, init the shaderAnims
+		for (i = 0; shaderAnimNames[i]; i++) {
+			int j;
+
+			for (j = 0; j < shaderAnimCounts[i]; j++) {
+				shaderAnims[i][j] = trap_R_RegisterShader(va("%s%i", shaderAnimNames[i], j + 1));
+			}
+		}
+		CGX_NomipEnd();
+		numShaderAnims = i;
+		// done.
+		animInit = qtrue;
+		D_Printf(("Anim init\n"));
+	}
+
+	if (cgx_winterEffects.integer & CGX_WINTER_SNOW) {
+		cent = &cg_entities[cg.snap->ps.clientNum];
+
+		if (!isSnowing) {
+			static qhandle_t snowShader;
+			trap_R_LazyRegisterShader(snowShader, "snowflake2");
+
+			for (i = 0; i < CGX_SNOW_TOTAL; i++)
+				CG_ParticleSnow2(snowShader);
+
+			isSnowing = qtrue;
+			D_Printf(("Snow init\n"));
+		}
+	} else {
+		isSnowing = qfalse;
+	}
+
+	VectorCopy(cg.refdef.viewaxis[0], pvforward);
+	VectorCopy(cg.refdef.viewaxis[1], pvright);
+	VectorCopy(cg.refdef.viewaxis[2], pvup);
+
+	active = NULL;
+	tail = NULL;
+
+#if CGX_DEBUG
+	cg.activeParticles = 0;
+#endif
+	for (p = active_particles; p; p = next) {
+#if CGX_DEBUG
+		cg.activeParticles++;
+#endif
+		next = p->next;
+
+		if (p->type == P_ANIM) {
+			if (cg.time > p->endtime) {
+				p->next = free_particles;
+				free_particles = p;
+				p->type = 0;
+				p->color = 0;
+				p->alpha = 0;
+				continue;
+			}
+		}
+
+		if (!isSnowing && (p->type == P_WEATHER_TURBULENT || p->type == P_WEATHER)) {
+			p->next = free_particles;
+			free_particles = p;
+			p->type = 0;
+			p->color = 0;
+			p->alpha = 0;
+			continue;
+		}
+
+		p->next = NULL;
+		if (!tail)
+			active = tail = p;
+		else {
+			tail->next = p;
+			tail = p;
+		}
+
+		time = (cg.time - p->time)*0.001;
+
+		//time2 = time*time;
+
+		org[0] = p->org[0] + p->vel[0] * time /*+ p->accel[0] * time2*/;
+		org[1] = p->org[1] + p->vel[1] * time /*+ p->accel[1] * time2*/;
+		org[2] = p->org[2] + p->vel[2] * time /*+ p->accel[2] * time2*/;
+
+		CG_AddParticleToScene2( p, org );
+	}
+
+	active_particles = active;
+}
 
 /*
 ===============
@@ -373,36 +685,21 @@ void CG_ClearParticles (void)
 {
 	int		i;
 
-	if (!(cgx_weaponEffects.integer & WE_ROCKET32)) //only rocket using particles
-		return;
-
-	memset( particles, 0, sizeof(particles) );
+	memset(particles, 0, sizeof(particles));
 
 	free_particles = &particles[0];
 	active_particles = NULL;
 
-	for (i=0 ;i<cl_numparticles ; i++)
-	{
-		particles[i].next = &particles[i+1];
+	for (i = 0; i<cl_numparticles; i++) {
+		particles[i].next = &particles[i + 1];
 		particles[i].type = 0;
 	}
-	particles[cl_numparticles-1].next = NULL;
+	particles[cl_numparticles - 1].next = NULL;
 
 	oldtime = cg.time;
-	CGX_NomipStart();
-	// Ridah, init the shaderAnims
-	for (i=0; shaderAnimNames[i]; i++) {
-		int j;
-
-		for (j=0; j<shaderAnimCounts[i]; j++) {
-			shaderAnims[i][j] = trap_R_RegisterShader( va("%s%i", shaderAnimNames[i], j+1) );
-		}
-	}
-	CGX_NomipEnd();
-	numShaderAnims = i;
-	// done.
 
 	initparticles = qtrue;
+	isSnowing = qfalse;
 }
 
 
@@ -1053,9 +1350,6 @@ void CG_AddParticleToScene (cparticle_t *p, vec3_t org, float alpha)
 		trap_R_AddPolyToScene( p->pshader, 4, verts );
 
 }
-
-// Ridah, made this static so it doesn't interfere with other files
-static float roll = 0.0;
 
 /*
 ===============

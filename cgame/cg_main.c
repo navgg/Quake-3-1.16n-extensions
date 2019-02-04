@@ -77,6 +77,7 @@ vmCvar_t	cgx_nomip;
 vmCvar_t	cgx_sharedConfig;
 vmCvar_t	cgx_chatFilter;
 vmCvar_t	cgx_killBeep;
+vmCvar_t	cgx_winterEffects;
 vmCvar_t	cgx_modelCache;
 
 vmCvar_t	com_maxfps;
@@ -313,6 +314,8 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_nomip, "cg_nomip", "-1", CVAR_ARCHIVE | CVAR_LATCH },
 	{ &cgx_chatFilter, "cg_chatFilter", "1", CVAR_ARCHIVE },
 	{ &cgx_killBeep, "cg_killBeep", "0", CVAR_ARCHIVE | CVAR_LATCH },
+
+	{ &cgx_winterEffects, "cg_winterEffects", "0", CVAR_TEMP },
 #if CGX_UNLAGGED
 	//unlagged - client options
 	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},	
@@ -1059,8 +1062,6 @@ static void CG_RegisterGraphics( void ) {
 	}
 
 	CGX_NomipEnd();
-
-	CG_ClearParticles();
 }
 
 /*

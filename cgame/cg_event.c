@@ -428,6 +428,9 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #if CGX_DEBUG
 		if (cg_footsteps.integer) 
 #endif
+		if ((cgx_winterEffects.integer & CGX_WINTER_STEPS))
+			playWinterFootstep()
+		else
 			trap_S_StartSound (NULL, es->number, CHAN_BODY, 
 				cgs.media.footsteps[ ci->footsteps ][rand()&3] );		
 		break;
@@ -436,6 +439,9 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #if CGX_DEBUG
 		if (cg_footsteps.integer) 
 #endif
+		if (cgx_winterEffects.integer & CGX_WINTER_STEPS)
+			playWinterFootstep()
+		else
 			trap_S_StartSound (NULL, es->number, CHAN_BODY, 
 				cgs.media.footsteps[ FOOTSTEP_METAL ][rand()&3] );		
 		break;
@@ -467,7 +473,10 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	case EV_FALL_SHORT:
 		DEBUGNAME("EV_FALL_SHORT");
-		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.landSound );
+		if (cgx_winterEffects.integer & CGX_WINTER_STEPS)
+			playWinterLand()
+		else
+			trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.landSound );
 		if ( clientNum == cg.predictedPlayerState.clientNum ) {
 			// smooth landing z changes
 			cg.landChange = -8;
