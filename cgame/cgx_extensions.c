@@ -534,12 +534,17 @@ static qboolean CGX_ValidateFPS(void) {
 
 #define NET_Set(x, y) { CG_Printf("Auto: %s %i\n", x, y); trap_Cvar_Set(x, va("%i", y)); }
 static void CGX_Auto_sv_fps(void) {
-	if (sv_fps.integer < 40)
-		sv_fps.integer = 40;
-	else if (sv_fps.integer > 125)
-		sv_fps.integer = 125;
+	char buf[10];
+	int i;
+	trap_Cvar_Get("sv_fps", buf);
+	i = atoi(buf);
 
-	NET_Set("sv_fps", sv_fps.integer)
+	if (i < 40)
+		NET_Set("sv_fps", 40)
+	else if (i > 125)
+		NET_Set("sv_fps", 125)
+
+	sv_fps.integer = i;
 }
 
 //validate and adjust client network settings
