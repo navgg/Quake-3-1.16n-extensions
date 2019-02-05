@@ -343,7 +343,7 @@ void CG_LoadClientInfo( clientInfo_t *ci ) {
 			switch (ci->team) {
 				case TEAM_RED: skin = "red"; break;
 				case TEAM_BLUE: skin = "blue"; break;
-				default: skin = "default"; break;
+				default: skin = !Q_stricmp(ci->skinName, "blue") ? "blue" : "red"; break;
 			}
 			if ( !CG_RegisterClientModelname( ci, DEFAULT_MODEL, skin ) ) {
 				// X-MOD: if DEFAULT_MODEL error appeared during loading 
@@ -508,7 +508,7 @@ static void CG_SetDeferredClientInfo( clientInfo_t *ci ) {
 	}
 
 	// we should never get here...
-	//CG_Printf( "CG_SetDeferredClientInfo: no valid clients!\n" );
+	CG_Printf( "^3CG_SetDeferredClientInfo: no valid clients!\n" );
 
 	CGX_LoadClientInfo( ci );
 }
