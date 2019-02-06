@@ -410,7 +410,7 @@ cvarTable_t		cgx_cvarTable_temp[] = {
 	// stored fixed maplist, so if it once was fixed nextime will just read from this list
 	{ &cgx_fixedmaps, "cl_fixedmaps", "", CVAR_ROM | CVAR_ARCHIVE },
 	//mod version
-	{ &cgx_version, "cgx_version", "", CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
+	{ &cgx_version, "cgx_version", CGX_FULLVER, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
 	//for model cahe
 	{ &cgx_modelCache, "cg_modelCache", "1", CVAR_TEMP | CVAR_LATCH },
 	//for unlagged.c
@@ -466,8 +466,6 @@ void CG_RegisterCvars( void ) {
 
 	//save current picmip
 	CGX_SavePicmip();
-
-	trap_Cvar_Set("cgx_version", CGX_FULLVER" "CGX_DATE);
 }
 
 /*

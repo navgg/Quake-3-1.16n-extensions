@@ -1500,7 +1500,7 @@ void CGX_Xmod() {
 #endif
 
 	if (!Q_stricmp(command, "version")) {
-		XMOD_ANSWER(cgx_version.string);
+		XMOD_ANSWER(CGX_FULLVER" "CGX_DATE);
 	} else if (!Q_stricmp(command, "help")) {
 		CGX_ShowHelp(help_file, "");
 	} else if (!Q_stricmp(command, "freemem")) {
