@@ -1291,7 +1291,7 @@ void CG_ParticleExplosionZE( vec3_t origin );
 void CG_LoadClientInfo( clientInfo_t *ci );
 
 void CGX_ResetModelCache();
-qboolean CGX_TryLoadModelFromCache(clientInfo_t *ci, qboolean tryAny);
+qboolean CGX_TryLoadModelFromCache(clientInfo_t *ci, qboolean tryAny, qboolean trySkinLoads);
 
 qboolean CGX_IsPure();
 qboolean CGX_CheckModInfo(const char *str);

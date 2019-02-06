@@ -1491,6 +1491,11 @@ void CGX_Xmod() {
 			const char *cs = CG_ConfigString(CS_PLAYERS + i);
 			if (*cs) CG_Printf("%i %s\n", i, cs);
 		}
+	} else if (!Q_stricmp(command, "clients")) {
+		clientInfo_t *ci;
+		for (i = 0, ci = cgs.clientinfo; i < MAX_CLIENTS; i++, ci++)
+			if (*ci->modelName && *ci->skinName)
+				CG_Printf("%i %15s %s/%s %s/%s\n", i, ci->name, ci->modelName, ci->skinName, ci->modelNameCopy, ci->skinNameCopy);
 	} else
 #endif
 
@@ -1706,7 +1711,7 @@ static void CGX_PrintModelCache() {
 		modelInfo_t *mi = &modelCache[i];
 
 #if CGX_DEBUG
-		CG_Printf("%i %s %s %i\n", i, mi->modelName, mi->skinName, mi->size);
+		CG_Printf("%i %s %s %i b\n", i, mi->modelName, mi->skinName, mi->size);
 #else
 		CG_Printf("%i %s %s\n", i, mi->modelName, mi->skinName);
 #endif
@@ -1751,80 +1756,151 @@ static void CGX_LoadModelFromCache(clientInfo_t *to, modelInfo_t *from) {
 	to->deferred = qfalse;
 }
 
+//sort z-a by modelName
+static int QDECL CacheModel_Compare(const void *arg1, const void *arg2) {
+	modelInfo_t* t1 = (modelInfo_t *)arg1;
+	modelInfo_t* t2 = (modelInfo_t *)arg2;
+
+	return Q_stricmp(t2->modelName, t1->modelName);
+}
+
 #if CGX_DEBUG
 static void CGX_CacheModel(clientInfo_t *ci, int size) {
 #else
 static void CGX_CacheModel(clientInfo_t *ci) {
 #endif
 	int i;
+	modelInfo_t *mi;
 
 	if (!cgx_modelCache.integer) return;
 
-	if (modelCacheNum == MAX_CLIENTS) {
+	if (modelCacheNum == ArrLen(modelCache)) {
 		D_Printf(("Model cache is full\n"));
 		return;
 	}
 
-	for (i = 0; i < modelCacheNum; i++) {
-		modelInfo_t *mi = &modelCache[i];
-
+	for (i = 0, mi = modelCache; i < modelCacheNum; i++, mi++) {
 		if (!Q_stricmp(ci->skinName, mi->skinName) && !Q_stricmp(ci->modelName, mi->modelName)) {
-			D_Printf(("Already cached %s %s\n", mi->modelName, mi->skinName));
+			D_Printf(("Already cached %s/%s\n", mi->modelName, mi->skinName));
 			return;
 		}
 	}
-
-	for (i = 0; i < MAX_CLIENTS; i++) {
-		modelInfo_t *mi = &modelCache[i];
-
-		if (!*mi->skinName && !*mi->modelName) {
-			Q_strncpyz(mi->skinName, ci->skinName, sizeof ci->skinName);
-			Q_strncpyz(mi->modelName, ci->modelName, sizeof ci->modelName);
+	
+	// if it's not cached, cache here
 #if CGX_DEBUG
-			mi->size = size;
+	mi->size = size;
 #endif
-			CGX_SaveModelToCache(mi, ci);
-			modelCacheNum++;
-			D_Printf(("CGX_CacheModel %s %s %i\n", mi->modelName, mi->skinName, modelCacheNum));
-			return;
-		}
-	}
+	Q_strncpyz(mi->skinName, ci->skinName, sizeof ci->skinName);
+	Q_strncpyz(mi->modelName, ci->modelName, sizeof ci->modelName);
+
+	CGX_SaveModelToCache(mi, ci);
+	modelCacheNum++;
+	D_Printf(("CGX_CacheModel %s/%s %i\n", mi->modelName, mi->skinName, modelCacheNum));
+
+	//qsort(modelCache, modelCacheNum, sizeof (modelInfo_t), CacheModel_Compare);
 }
 
-qboolean CGX_TryLoadModelFromCache(clientInfo_t *ci, qboolean tryAny) {
+static qboolean CGX_TrySkinLoad(clientInfo_t *ci) {
 	int i;
+	modelInfo_t *mi;
+
+	for (i = modelCacheNum, mi = modelCache; i--; mi++)
+		if (!Q_stricmp(ci->modelName, mi->modelName)) {
+			D_Printf(("^5Skin load %i %s/%s\n", i, mi->modelName, mi->skinName));
+			CGX_LoadClientInfo(ci);
+			return qtrue;
+		}
+
+	return qfalse;
+}
+
+qboolean CGX_TryLoadModelFromCache(clientInfo_t *ci, qboolean tryAny, qboolean trySkinLoads) {
+	int i;
+	modelInfo_t *mi;
 
 	if (!cgx_modelCache.integer) return qfalse;
 
-	//CG_Printf("CGX_TryLoadModelFromCache %s %s\n", ci->modelName, ci->skinName);
-	D_Printf(("CGX_TryLoadModelFromCache %s %s ", ci->modelName, ci->skinName));
+	D_Printf(("CGX_TryLoadModelFromCache %s/%s ", ci->modelName, ci->skinName));
 
-	for (i = 0; i < modelCacheNum; i++) {
-		modelInfo_t *mi = &modelCache[i];
-
+	for (i = modelCacheNum, mi = modelCache; i--; mi++)
 		if (!Q_stricmp(ci->skinName, mi->skinName) &&
 			!Q_stricmp(ci->modelName, mi->modelName)) {
 
 			CGX_LoadModelFromCache(ci, mi);
-			D_Printf(("Success %i\n", i));
+			D_Printf(("^2Success %i\n", i));
 			return qtrue;
 		}
-	}
 
 	if (tryAny) {
-		qboolean lowMem = trap_MemoryRemaining() < LOW_MEMORY;
-		for (i = modelCacheNum; i--; ) {
-			modelInfo_t *mi = &modelCache[i];
+		int mem = trap_MemoryRemaining();
+		qboolean lowMem = mem < LOW_MEMORY;
+		
+		if (trySkinLoads) {
+			D_Printf(("trySkinLoads "));
+			//if have some mem try skin load, it takes 3-5kb
+			if (mem > LOW_MEMORY / 5 && CGX_TrySkinLoad(ci))
+				return qtrue;
+			D_Printf(("^3NoModel... "));
+		}
 
+		for (i = modelCacheNum, mi = modelCache; i--; mi++)
 			if (!Q_stricmp(ci->skinName, mi->skinName)) {
+				if (cgx_enemyModel_enabled.integer && !Q_stricmp(mi->modelName, cg.enemyModel))
+					continue;
+			
+				D_Printf(("^4Got any %i %s/%s\n", i, mi->modelName, mi->skinName));
 
 				CGX_LoadModelFromCache(ci, mi);
-				D_Printf(("Got any %i %s %s\n", i, mi->modelName, mi->skinName));
-				if (lowMem)
+#if !CGX_DEBUG
+				if (lowMem && trySkinLoads)
 					CG_Printf("Memory is low. For %s/%s loaded %s/%s from cache.\n", ci->modelName, ci->skinName, mi->modelName, mi->skinName);
+#endif
 				return qtrue;
 			}
+
+		// try skin loads before full loads if we didn't try yet
+		if (!trySkinLoads) {
+			D_Printf(("trySkinLoads 2! "));
+			if (mem > LOW_MEMORY / 5 && CGX_TrySkinLoad(ci))
+				return qtrue;
+			D_Printf(("^3NoModel... "));
 		}
+
+		//if we are on low mem and have something in cache try to load only skin for first model
+		if (lowMem && modelCacheNum > 1) {
+			//get first not enemy model
+			for (i = modelCacheNum, mi = modelCache; i--; mi++)
+				if (!cgx_enemyModel_enabled.integer || Q_stricmp(mi->modelName, cg.enemyModel))
+					break;
+
+			if (cgs.gametype >= GT_TEAM) {
+				D_Printf(("^1Last model skin %i %s => %s \n", i, ci->modelName, mi->modelName));
+#if !CGX_DEBUG
+				CG_Printf("^3Memory is low. For %s loading %s.\n", ci->modelName, mi->modelName);
+#endif
+				Q_strncpyz(ci->modelName, mi->modelName, sizeof ci->modelName);
+				Q_strncpyz(ci->modelNameCopy, mi->modelName, sizeof ci->modelName);
+			} else {
+				D_Printf(("^1Last model skin %i %s/%s => %s/%s \n", i, ci->modelName, ci->skinName, mi->modelName, mi->skinName));
+#if !CGX_DEBUG
+				CG_Printf("^3Memory is low. For %s/%s loading %s/%s.\n", ci->modelName, ci->skinName, mi->modelName, mi->skinName);
+#endif
+				Q_strncpyz(ci->modelName, mi->modelName, sizeof ci->modelName);
+				Q_strncpyz(ci->modelNameCopy, mi->modelName, sizeof ci->modelName);
+				Q_strncpyz(ci->skinName, mi->skinName, sizeof ci->skinName);
+				Q_strncpyz(ci->skinNameCopy, mi->skinName, sizeof ci->skinName);
+			}
+
+			CGX_LoadClientInfo(ci);
+
+			return qtrue;
+		} 
+
+		D_Printf(("^1FULL LOAD\n"));
+
+		CGX_LoadClientInfo(ci);
+
+		return qtrue;
 	}
 
 	D_Printf(("NoModel %i\n", i));

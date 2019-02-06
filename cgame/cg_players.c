@@ -666,11 +666,11 @@ void CG_NewClientInfo( int clientNum ) {
 
 	// X-Mod: new loading from cache
 	if (cgx_modelCache.integer) {
-		if (!CGX_TryLoadModelFromCache(&newInfo, qfalse)) {
+		if (!CGX_TryLoadModelFromCache(&newInfo, qfalse, qfalse)) {
 			qboolean lowMem = trap_MemoryRemaining() < LOW_MEMORY;
 
 			if (lowMem || (cg_deferPlayers.integer && !cg_buildScript.integer && !cg.loading)) {
-				CGX_TryLoadModelFromCache(&newInfo, qtrue);
+				CGX_TryLoadModelFromCache(&newInfo, qtrue, qfalse);
 				newInfo.deferred = !lowMem;
 			} else {
 				CGX_LoadClientInfo(&newInfo);
@@ -734,14 +734,14 @@ void CG_LoadDeferredPlayers( void ) {
 		if ( ci->infoValid && ci->deferred ) {
 			// if we are low on memory, leave it deferred
 			if ( trap_MemoryRemaining() < LOW_MEMORY ) {
-				if (CGX_TryLoadModelFromCache(ci, qtrue))
+				if (CGX_TryLoadModelFromCache(ci, qtrue, qtrue))
 					continue;
 	
 				CG_Printf( "Memory is low.  Using deferred model. Set higher ^3com_hunkmegs^7 and restart.\n" );
 				ci->deferred = qfalse;
 				continue;
 			}
-			if (!CGX_TryLoadModelFromCache(ci, qfalse))
+			if (!CGX_TryLoadModelFromCache(ci, qfalse, qtrue))
 				CGX_LoadClientInfo( ci );
 //			break;
 		}
