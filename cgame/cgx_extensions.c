@@ -2,7 +2,8 @@
 
 #include "cg_local.h"
 
-#define ShaderRGBAFill(a,c)	((a)[0]=(c),(a)[1]=(c),(a)[2]=(c),(a)[3]=(255))
+#define ShaderRGBFill(a,c)	((a)[0]=(c),(a)[1]=(c),(a)[2]=(c))
+#define ShaderRGBCopy(a,b)	((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2])
 
 #define XMOD_ANSWER(x) { CG_Printf("^7[^1xmod^7]: ^6%s\n", x); trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND ); }
 
@@ -295,9 +296,9 @@ static void CGX_SetColorInfo(clientInfo_t *info, const char *color, int clientNu
 		//D_Printf(("%3i %3i %3i\n", info->colors[i][0], info->colors[i][1], info->colors[i][2]));		
 
 		if (cgx_deadBodyDarken.integer)
-			ShaderRGBAFill(info->darkenColors[i], CGX_RGBToGray(info->colors[i]));
+			ShaderRGBFill(info->darkenColors[i], CGX_RGBToGray(info->colors[i]));
 		else
-			ShaderRGBACopy(info->colors[i], info->darkenColors[i]);		
+			ShaderRGBCopy(info->colors[i], info->darkenColors[i]);		
 	}	
 
 	// copy rail color

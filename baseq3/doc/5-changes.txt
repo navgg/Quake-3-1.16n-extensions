@@ -135,6 +135,7 @@ fixed flag draw with cg_drawIcons 0
 fixed sometimes missing cg_killbeep sounds
 fixed 1.32 rail dissapear on long distance
 fixed crash taunt
+fixed cg_deadBodyDarken color copy bug
 
 minor optimizations
 
