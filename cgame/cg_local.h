@@ -59,8 +59,6 @@
 
 #define	DEFAULT_MODEL		"sarge"
 
-//X-MOD: custom color extensions
-#define ShaderRGBACopy(a,b)	((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2],(b)[3]=(255))
 //X-MOD: limits
 #define CGX_MIN_MAXPACKETS 30
 #define CGX_MAX_MAXPACKETS 125

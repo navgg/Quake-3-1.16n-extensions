@@ -681,6 +681,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	vec3_t			maxs = {16, 16, 32};
 	float			len;
 	float			xx;
+	byte			color[3] = { 0, 255, 0 };
 
 	if( trap_MemoryRemaining() <= LOW_MEMORY ) {
 		UI_DrawProportionalString( x, y + h / 2, "LOW MEMORY", UI_LEFT, color_red );
@@ -766,7 +767,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	VectorCopy( origin, legs.lightingOrigin );
 	legs.renderfx = renderfx;
 	VectorCopy (legs.origin, legs.oldorigin);
-
+	ShaderRGBACopy(color, legs.shaderRGBA);
 	trap_R_AddRefEntityToScene( &legs );
 
 	if (!legs.hModel) {
@@ -788,7 +789,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	UI_PositionRotatedEntityOnTag( &torso, &legs, pi->legsModel, "tag_torso");
 
 	torso.renderfx = renderfx;
-
+	ShaderRGBACopy(color, torso.shaderRGBA);
 	trap_R_AddRefEntityToScene( &torso );
 
 	//
@@ -805,7 +806,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	UI_PositionRotatedEntityOnTag( &head, &torso, pi->torsoModel, "tag_head");
 
 	head.renderfx = renderfx;
-
+	ShaderRGBACopy(color, head.shaderRGBA);
 	trap_R_AddRefEntityToScene( &head );
 
 	//

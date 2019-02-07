@@ -29,6 +29,9 @@
 //length of array
 #define ArrLen(x)	(sizeof x / sizeof *x)
 
+//X-MOD: custom color extensions
+#define ShaderRGBACopy(a,b)	((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2],(b)[3]=(255))
+
 // widescreen fix flags
 #define CGX_WFIX_SCREEN	0x0001
 #define CGX_WFIX_FOV	0x0002
