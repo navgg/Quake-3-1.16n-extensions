@@ -184,8 +184,6 @@ typedef struct {
 	int					numfavoriteaddresses;
 	//X-mod: server cache
 	qboolean			refreshFromCache; // refreshing from cache or no
-	char				cachedAddresses[MAX_GLOBALSERVERS][MAX_ADDRESSLENGTH];
-	int					numCachedAddresses;
 } arenaservers_t;
 
 static arenaservers_t	g_arenaservers;
@@ -1591,10 +1589,14 @@ int UIX_GetGlobalServerCount(qboolean useDefaultCache) {
 	return res;
 }
 
+//x-mod: server cache
+static char g_cachedAddresses[MAX_GLOBALSERVERS][MAX_ADDRESSLENGTH];
+static int g_numCachedAddresses;
+
 //X-Mod: get server address from cached list or master server
 void UIX_GetGlobalServerAddressString( int n, char *buf, int buflen ) {
 	if (g_arenaservers.refreshFromCache)
-		strcpy( buf, g_arenaservers.cachedAddresses[g_arenaservers.currentping] );
+		strcpy( buf, g_cachedAddresses[g_arenaservers.currentping] );
 	else
 		trap_LAN_GetGlobalServerAddressString( g_arenaservers.currentping, buf, MAX_ADDRESSLENGTH );
 }
@@ -1609,7 +1611,7 @@ void UIX_SaveCachedServers() {
 		return;
 
 	// no servers to cache or servers was loaded from cache
-	if (!g_numglobalservers || g_arenaservers.numCachedAddresses)
+	if (!g_numglobalservers || g_numCachedAddresses)
 		return;
 
 	// save to baseq3
@@ -1623,12 +1625,12 @@ void UIX_SaveCachedServers() {
 	if (!f) return;
 
 	for (i = 0; i < g_numglobalservers; i++)
-		strcpy(g_arenaservers.cachedAddresses[i], g_globalserverlist[i].adrstr);
+		strcpy(g_cachedAddresses[i], g_globalserverlist[i].adrstr);
 
 	trap_FS_Write(&g_numglobalservers, sizeof(int), f);
-	size = sizeof(g_arenaservers.cachedAddresses);
+	size = sizeof(g_cachedAddresses);
 	trap_FS_Write(&size, sizeof(int), f);
-	trap_FS_Write(&g_arenaservers.cachedAddresses, sizeof(g_arenaservers.cachedAddresses), f);
+	trap_FS_Write(&g_cachedAddresses, sizeof(g_cachedAddresses), f);
 
 	trap_FS_FCloseFile(f);
 }
@@ -1651,12 +1653,12 @@ int UIX_LoadCachedServers(qboolean useDefaultCache) {
 
 	trap_FS_Read(&num, sizeof(int), f);
 	trap_FS_Read(&size, sizeof(int), f);
-	if (size == sizeof(g_arenaservers.cachedAddresses))
-		trap_FS_Read(&g_arenaservers.cachedAddresses, sizeof(g_arenaservers.cachedAddresses), f);
+	if (size == sizeof(g_cachedAddresses))
+		trap_FS_Read(&g_cachedAddresses, sizeof(g_cachedAddresses), f);
 	else
 		num = 0;
 
-	g_arenaservers.numCachedAddresses = num;
+	g_numCachedAddresses = num;
 
 	trap_FS_FCloseFile(f);
 
