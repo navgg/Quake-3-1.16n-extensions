@@ -170,6 +170,7 @@ vmCvar_t	uix_drawgun;
 vmCvar_t	uix_drawrewards;
 vmCvar_t	uix_draw3dicons;
 vmCvar_t	uix_gibs;
+vmCvar_t	uix_draw2D;
 
 #if CGX_UNLAGGED
 vmCvar_t	cg_delag;
@@ -250,6 +251,7 @@ cvarTable_t		cvarTable[] = {
 	{ &uix_cinematicplayed, "uix_cinematicplayed", "-1", CVAR_TEMP },
 	{ &uix_nomip, "cg_nomip", "-1", CVAR_ARCHIVE | CVAR_LATCH },
 	{ &uix_weaponEffects, "cg_weaponEffects", "8", CVAR_ARCHIVE },
+	{ &uix_draw2D, "cg_draw2D", "1", CVAR_ARCHIVE },
 
 #if CGX_UNLAGGED
 	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE },	
