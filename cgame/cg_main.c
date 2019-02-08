@@ -79,6 +79,7 @@ vmCvar_t	cgx_chatFilter;
 vmCvar_t	cgx_killBeep;
 vmCvar_t	cgx_winterEffects;
 vmCvar_t	cgx_modelCache;
+vmCvar_t	cgx_intermissionStats;
 
 vmCvar_t	com_maxfps;
 vmCvar_t	cl_maxpackets;
@@ -413,6 +414,8 @@ cvarTable_t		cgx_cvarTable_temp[] = {
 	{ &cgx_version, "cgx_version", CGX_FULLVER, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
 	//for model cahe
 	{ &cgx_modelCache, "cg_modelCache", "1", CVAR_TEMP | CVAR_LATCH },
+	//ops stats window in intermission
+	{ &cgx_intermissionStats, "cg_intermissionStats", "1", CVAR_TEMP },
 	//for unlagged.c
 	//better not register here or servefs will screw clients sv_fps
 	// this will be automagically copied from the server	
