@@ -167,6 +167,7 @@ A respawn happened this snapshot
 ================
 */
 void CG_Respawn( void ) {
+	static qboolean spawnProtectionRegistered = qfalse;
 	int defaultWeapon;
 
 	// no error decay on player movement
@@ -181,6 +182,20 @@ void CG_Respawn( void ) {
 	D_Printf(("CG_Respawn\n"));
 	D_Printf(("cgx_defaultWeapon: %i\n", defaultWeapon));
 	cg.weaponSelect = cgx_defaultWeapon.integer == 0 ? cg.snap->ps.weapon : defaultWeapon;	
+
+	// fix emtpy model drops on spawnkills
+	if (cgs.serverMod == SM_NOGHOST && !spawnProtectionRegistered && cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR) {
+		if (cg.snap->ps.powerups[PW_BATTLESUIT]) {
+			CG_RegisterItemVisuals(ITEM_INDEX(BG_FindItemForPowerup(PW_BATTLESUIT)));
+			D_Printf(("PW_BATTLESUIT "));
+		}
+		if (cg.snap->ps.powerups[PW_INVIS]) {
+			CG_RegisterItemVisuals(ITEM_INDEX(BG_FindItemForPowerup(PW_INVIS)));
+			D_Printf(("PW_INVIS "));
+		}
+		spawnProtectionRegistered = qtrue;
+		D_Printf(("spawnProtectionRegistered\n"));
+	}
 }
 
 
