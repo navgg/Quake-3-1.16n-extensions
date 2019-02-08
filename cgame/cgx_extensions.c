@@ -1844,7 +1844,7 @@ qboolean CGX_TryLoadModelFromCache(clientInfo_t *ci, qboolean tryAny, qboolean t
 		}
 
 		for (i = modelCacheNum, mi = modelCache; i--; mi++)
-			if (!Q_stricmp(ci->skinName, mi->skinName)) {
+			if (cgs.gametype < GT_TEAM || !Q_stricmp(ci->skinName, mi->skinName)) {
 				if (cgx_enemyModel_enabled.integer && !Q_stricmp(mi->modelName, cg.enemyModel))
 					continue;
 			
