@@ -143,4 +143,4 @@ minor optimizations
 
 added z-effects (cg_weaponEffects 32, 64, 128, 256, 512, sum for multiple effects, -1 set all,
   32: explosion sparks, 64: bullet sparks, 128: lg sparks, 256: rocket trail sparks, 
-  512: plasma trail sparks, to modify from menu -> game options -> advanced effects)
+  512: plasma trail sparks, to modify from menu -> game options -> advanced effects)fixed saving shared config on click leave arena when cg_sharedConfig 0

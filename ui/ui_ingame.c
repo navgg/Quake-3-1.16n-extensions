@@ -98,7 +98,7 @@ void InGame_Event( void *ptr, int notification ) {
 		break;
 
 	case ID_LEAVEARENA:
-		trap_Cmd_ExecuteText( EXEC_APPEND, "writesharedconfig\n");
+		trap_Cmd_ExecuteText( EXEC_APPEND, "writesharedconfig ui\n");
 		trap_Cmd_ExecuteText( EXEC_APPEND, "disconnect\n" );
 		break;
 
