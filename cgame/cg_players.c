@@ -671,7 +671,7 @@ void CG_NewClientInfo( int clientNum ) {
 
 			if (lowMem || (cg_deferPlayers.integer && !cg_buildScript.integer && !cg.loading)) {
 				CGX_TryLoadModelFromCache(&newInfo, qtrue, qfalse);
-				newInfo.deferred = !lowMem;
+				newInfo.deferred = qtrue; // in CG_LoadDeferredPlayers try skin loads
 			} else {
 				CGX_LoadClientInfo(&newInfo);
 			}
