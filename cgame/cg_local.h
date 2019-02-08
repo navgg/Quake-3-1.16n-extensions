@@ -911,7 +911,9 @@ typedef struct {
 	sfxHandle_t killBeep;
 	// snow sounds
 	sfxHandle_t snowLandSound;
-
+	
+	sfxHandle_t hgrenb1aSound;
+	sfxHandle_t hgrenb2aSound;
 
 	sfxHandle_t hitSound;
 	sfxHandle_t hitTeamSound;

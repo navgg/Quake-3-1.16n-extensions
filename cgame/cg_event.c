@@ -738,10 +738,10 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		DEBUGNAME("EV_GRENADE_BOUNCE");
 		if ( rand() & 1 ) {
 			//trap_S_StartSound (NULL, es->number, CHAN_AUTO, trap_S_RegisterSound("sound/weapons/grenade/hgrenb1a.wav") );
-			trap_S_LazyStartSound ( hgrenb1a, es->number, CHAN_AUTO, "sound/weapons/grenade/hgrenb1a.wav" );
+			trap_S_LazyStartSound2(cgs.media.hgrenb1aSound, es->number, CHAN_AUTO, "sound/weapons/grenade/hgrenb1a.wav");
 		} else {
 			//trap_S_StartSound (NULL, es->number, CHAN_AUTO, trap_S_RegisterSound("sound/weapons/grenade/hgrenb2a.wav") );
-			trap_S_LazyStartSound ( hgrenb2a, es->number, CHAN_AUTO, "sound/weapons/grenade/hgrenb2a.wav" );
+			trap_S_LazyStartSound2(cgs.media.hgrenb2aSound, es->number, CHAN_AUTO, "sound/weapons/grenade/hgrenb2a.wav");
 		}
 		break;
 
