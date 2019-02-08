@@ -168,7 +168,6 @@ A respawn happened this snapshot
 */
 void CG_Respawn( void ) {
 	static qboolean spawnProtectionRegistered = qfalse;
-	int defaultWeapon;
 
 	// no error decay on player movement
 	cg.thisFrameTeleport = qtrue;
@@ -176,12 +175,16 @@ void CG_Respawn( void ) {
 	// display weapons available
 	cg.weaponSelectTime = cg.time;
 	
-	// X-MOD: select custom specified weapon or
-	// select the weapon the server says we are using
-	defaultWeapon = abs(cgx_defaultWeapon.integer % (WP_NUM_WEAPONS - 1));
 	D_Printf(("CG_Respawn\n"));
-	D_Printf(("cgx_defaultWeapon: %i\n", defaultWeapon));
-	cg.weaponSelect = cgx_defaultWeapon.integer == 0 ? cg.snap->ps.weapon : defaultWeapon;	
+	if (cgx_defaultWeapon.integer) {
+		int defaultWeapon = abs(cgx_defaultWeapon.integer % (WP_NUM_WEAPONS - 1));
+		// X-MOD: select custom specified weapon
+		D_Printf(("cg_defaultWeapon: %i\n", defaultWeapon));
+		cg.weaponSelect = defaultWeapon;
+	} else {
+		// select the weapon the server says we are using
+		cg.weaponSelect = cg.snap->ps.weapon;
+	}
 
 	// fix emtpy model drops on spawnkills
 	if (cgs.serverMod == SM_NOGHOST && !spawnProtectionRegistered && cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR) {
