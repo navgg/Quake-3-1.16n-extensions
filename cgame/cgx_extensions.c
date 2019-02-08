@@ -1409,6 +1409,23 @@ static void CGX_ShowHelp(char *filename, char *cmd) {
 	}
 }
 
+static void CGX_Pk3list_f(void) {
+	trap_SendConsoleCommand("dir . pk3\n");
+}
+
+static char CGX_RandChar() {
+	char res;
+	do res = 32 + rand() % 58;
+	while (res == '%' || (res >= 39 && res <= 63));
+	return res;
+}
+
+#define rc CGX_RandChar()
+static void CGX_RageQuit_f(void) {
+	trap_SendConsoleCommand(va("say %c%c%c%c%c%c%c%c%c%c%c%c%c!!!; wait 300; disconnet; quit;\n", rc, rc, rc, rc, rc, rc, rc, rc, rc, rc, rc, rc, rc));
+}
+#undef rc
+
 //method to reload effects, used to call reload from UI
 static void CGX_ReloadEffects() {
 	char buf[32];
@@ -1512,6 +1529,10 @@ void CGX_Xmod() {
 	} else if (!Q_stricmp(command, "reload")) {
 		if (!Q_stricmp(arg, "effects"))
 			CGX_ReloadEffects();
+	} else if (stristr(command, "pk3")) {
+		CGX_Pk3list_f();
+	} else if (!Q_stricmp(command, "ragequit")) {
+		CGX_RageQuit_f();
 	} else if (stristr(command, "8ball")) {
 		char *balls[] = {
 			"listen to your heart",
