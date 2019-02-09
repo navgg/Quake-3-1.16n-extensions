@@ -848,29 +848,37 @@ void CG_AddPacketEntities( void ) {
 	// lerp the non-predicted value for lightning gun origins
 	CG_CalcEntityLerpPositions( &cg_entities[ cg.snap->ps.clientNum ] );
 
-	//unlagged - early transitioning
-	if ( cg.nextSnap ) {
-		// pre-add some of the entities sent over by the server
-		// we have data for them and they don't need to interpolate
-		for ( num = 0 ; num < cg.nextSnap->numEntities ; num++ ) {
-			cent = &cg_entities[ cg.nextSnap->entities[ num ].number ];
-			if ( cent->nextState.eType == ET_MISSILE || cent->nextState.eType == ET_GENERAL ) {
-				// transition it immediately and add it
-				CG_TransitionEntity( cent );
-				cent->interpolate = qtrue;
-				CG_AddCEntity( cent );
+	if (!cg_delag_interp32.integer) {
+		// X-Mod: 1.16 add each entity sent over by the server
+		for (num = 0; num < cg.snap->numEntities; num++) {
+			cent = &cg_entities[cg.snap->entities[num].number];
+			CG_AddCEntity(cent);
+		}
+	} else {
+		//unlagged - early transitioning
+		if (cg.nextSnap) {
+			// pre-add some of the entities sent over by the server
+			// we have data for them and they don't need to interpolate
+			for (num = 0; num < cg.nextSnap->numEntities; num++) {
+				cent = &cg_entities[cg.nextSnap->entities[num].number];
+				if (cent->nextState.eType == ET_MISSILE || cent->nextState.eType == ET_GENERAL) {
+					// transition it immediately and add it
+					CG_TransitionEntity(cent);
+					cent->interpolate = qtrue;
+					CG_AddCEntity(cent);
+				}
 			}
 		}
-	}
-	//unlagged - early transitioning
+		//unlagged - early transitioning
 
-	// add each entity sent over by the server
-	for ( num = 0 ; num < cg.snap->numEntities ; num++ ) {
-		cent = &cg_entities[ cg.snap->entities[ num ].number ];
-		//unlagged - early transitioning
-		if ( !cg.nextSnap || cent->nextState.eType != ET_MISSILE && cent->nextState.eType != ET_GENERAL ) {
-		//unlagged - early transitioning
-			CG_AddCEntity( cent );
+		// add each entity sent over by the server
+		for (num = 0; num < cg.snap->numEntities; num++) {
+			cent = &cg_entities[cg.snap->entities[num].number];
+			//unlagged - early transitioning
+			if (!cg.nextSnap || cent->nextState.eType != ET_MISSILE && cent->nextState.eType != ET_GENERAL) {
+				//unlagged - early transitioning
+				CG_AddCEntity(cent);
+			}
 		}
 	}
 }
