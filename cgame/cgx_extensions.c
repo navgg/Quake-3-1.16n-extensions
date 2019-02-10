@@ -1508,12 +1508,7 @@ void CGX_Xmod() {
 			const char *cs = CG_ConfigString(CS_PLAYERS + i);
 			if (*cs) CG_Printf("%i %s\n", i, cs);
 		}
-	} else if (!Q_stricmp(command, "clients")) {
-		clientInfo_t *ci;
-		for (i = 0, ci = cgs.clientinfo; i < MAX_CLIENTS; i++, ci++)
-			if (*ci->modelName && *ci->skinName)
-				CG_Printf("%i %15s %s/%s %s/%s\n", i, ci->name, ci->modelName, ci->skinName, ci->modelNameCopy, ci->skinNameCopy);
-	} else
+	} else 
 #endif
 
 	if (!Q_stricmp(command, "version")) {
@@ -1524,6 +1519,14 @@ void CGX_Xmod() {
 		CG_Printf("%i Mb\n", trap_MemoryRemaining() / 1024 / 1024);
 	} else if (!Q_stricmp(command, "models")) {
 		CGX_PrintModelCache();
+	} else if (!Q_stricmp(command, "clients")) {
+		clientInfo_t *ci;
+		char clname[MAX_QPATH];
+		for (i = 0, ci = cgs.clientinfo; i < MAX_CLIENTS; i++, ci++)
+			if (*ci->modelName && *ci->skinName) {
+				Q_strncpyz(clname, ci->name, sizeof clname);
+				CG_Printf("%3i %20s %s/%s %s/%s\n", i, Q_CleanStr(clname), ci->modelName, ci->skinName, ci->modelNameCopy, ci->skinNameCopy);
+			}
 	} else if (!Q_stricmp(command, "modinfo")) {
 		CGX_SendModinfo(qtrue);
 	} else if (!Q_stricmp(command, "reload")) {
