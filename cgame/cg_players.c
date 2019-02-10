@@ -1564,7 +1564,6 @@ void CG_Player( centity_t *cent ) {
 	int				renderfx;
 	qboolean		shadow;
 	float			shadowPlane;
-	qboolean		isdead;
 
 	// the client number is stored in clientNum.  It can't be derived
 	// from the entity number, because a single client may have
@@ -1585,8 +1584,16 @@ void CG_Player( centity_t *cent ) {
 	memset( &torso, 0, sizeof(torso) );
 	memset( &head, 0, sizeof(head) );
 
-	// X-MOD: cg_deadBodyDarken
-	isdead = cent->currentState.eFlags & EF_DEAD;		
+	// X-MOD: cg_deadBodyDarken & colored skin
+	if (cent->currentState.eFlags & EF_DEAD) {
+		ShaderRGBACopy(ci->darkenColors[3], legs.shaderRGBA);
+		ShaderRGBACopy(ci->darkenColors[2], torso.shaderRGBA);
+		ShaderRGBACopy(ci->darkenColors[1], head.shaderRGBA);
+	} else {
+		ShaderRGBACopy(ci->colors[3], legs.shaderRGBA);
+		ShaderRGBACopy(ci->colors[2], torso.shaderRGBA);
+		ShaderRGBACopy(ci->colors[1], head.shaderRGBA);
+	}
 
 	// get the rotation information
 	CG_PlayerAngles( cent, legs.axis, torso.axis, head.axis );
@@ -1630,12 +1637,6 @@ void CG_Player( centity_t *cent ) {
 	legs.renderfx = renderfx;
 	VectorCopy (legs.origin, legs.oldorigin);	// don't positionally lerp at all
 
-	// colored skin
-	if (isdead)
-		ShaderRGBACopy(ci->darkenColors[3], legs.shaderRGBA);
-	else
-		ShaderRGBACopy(ci->colors[3], legs.shaderRGBA);	
-
 	CG_AddRefEntityWithPowerups( &legs, &cent->currentState, ci->team );
 
 	// if the model failed, allow the default nullmodel to be displayed
@@ -1660,12 +1661,6 @@ void CG_Player( centity_t *cent ) {
 	torso.shadowPlane = shadowPlane;
 	torso.renderfx = renderfx;
 
-	// colored skin
-	if (isdead)
-		ShaderRGBACopy(ci->darkenColors[2], torso.shaderRGBA);
-	else 
-		ShaderRGBACopy(ci->colors[2], torso.shaderRGBA);	
-
 	CG_AddRefEntityWithPowerups( &torso, &cent->currentState, ci->team );
 
 	//
@@ -1683,12 +1678,6 @@ void CG_Player( centity_t *cent ) {
 
 	head.shadowPlane = shadowPlane;
 	head.renderfx = renderfx;
-
-	// colored skin
-	if (isdead)
-		ShaderRGBACopy(ci->darkenColors[1], head.shaderRGBA);
-	else 
-		ShaderRGBACopy(ci->colors[1], head.shaderRGBA);
 
 	CG_AddRefEntityWithPowerups( &head, &cent->currentState, ci->team );
 

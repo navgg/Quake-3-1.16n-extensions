@@ -713,6 +713,10 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	memset( &torso, 0, sizeof(torso) );
 	memset( &head, 0, sizeof(head) );
 
+	ShaderRGBACopy(color, legs.shaderRGBA);
+	ShaderRGBACopy(color, torso.shaderRGBA);
+	ShaderRGBACopy(color, head.shaderRGBA);
+
 	refdef.rdflags = RDF_NOWORLDMODEL;
 
 	AxisClear( refdef.viewaxis );
@@ -767,7 +771,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	VectorCopy( origin, legs.lightingOrigin );
 	legs.renderfx = renderfx;
 	VectorCopy (legs.origin, legs.oldorigin);
-	ShaderRGBACopy(color, legs.shaderRGBA);
+	
 	trap_R_AddRefEntityToScene( &legs );
 
 	if (!legs.hModel) {
@@ -789,7 +793,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	UI_PositionRotatedEntityOnTag( &torso, &legs, pi->legsModel, "tag_torso");
 
 	torso.renderfx = renderfx;
-	ShaderRGBACopy(color, torso.shaderRGBA);
+	
 	trap_R_AddRefEntityToScene( &torso );
 
 	//
@@ -806,7 +810,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	UI_PositionRotatedEntityOnTag( &head, &torso, pi->torsoModel, "tag_head");
 
 	head.renderfx = renderfx;
-	ShaderRGBACopy(color, head.shaderRGBA);
+	
 	trap_R_AddRefEntityToScene( &head );
 
 	//
