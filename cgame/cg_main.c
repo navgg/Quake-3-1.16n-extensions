@@ -52,7 +52,6 @@ itemInfo_t			cg_items[MAX_ITEMS];
 clientStats_t		stats;
 
 vmCvar_t	cgx_wideScreenFix;
-//vmCvar_t	cgx_drawPlayerIDs;
 vmCvar_t	cgx_enemyModel;
 vmCvar_t	cgx_enemyModel_enabled;
 vmCvar_t	cgx_enemyColors;
@@ -67,7 +66,6 @@ vmCvar_t	cgx_centerPrintAlpha;
 vmCvar_t	cgx_crosshairColor;
 vmCvar_t	cgx_drawSpeed;
 vmCvar_t	cgx_hitsounds;
-//vmCvar_t	cgx_coloredPing;
 vmCvar_t	cgx_networkAdjustments;
 vmCvar_t	cgx_drawScoreBox;
 vmCvar_t	cgx_scoreboard;
@@ -83,7 +81,6 @@ vmCvar_t	cgx_intermissionStats;
 
 vmCvar_t	com_maxfps;
 vmCvar_t	cl_maxpackets;
-vmCvar_t	cgx_delag;
 
 vmCvar_t	cgx_debug;
 
@@ -305,7 +302,6 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_centerPrintAlpha, "cg_centerPrintAlpha", "1.0", CVAR_ARCHIVE },
 	{ &cgx_crosshairColor, "cg_crosshairColor", "", CVAR_ARCHIVE },
 	{ &cgx_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
-	//{ &cgx_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },
 	{ &cgx_networkAdjustments, "cg_autoNetworkSettings", "1", CVAR_ARCHIVE },
 	{ &cgx_scoreboard, "cg_scoreboard", "0", CVAR_ARCHIVE },
 	{ &cgx_drawScoreBox, "cg_drawScoreBox", "1", CVAR_ARCHIVE },

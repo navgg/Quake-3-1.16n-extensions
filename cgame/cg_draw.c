@@ -1605,17 +1605,19 @@ static float CGX_DrawDebugInfo( float y ) {
 	static int  t = -1, opes, ppes, ppms, opms, ppds, opds;
 	centity_t *cent;
 
-	s = va("ES: %i PS: %i MS: %i", cg.entities, cg.activeParticles, cg_marksTotal);
-	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-	CG_DrawBigString( hud.width5 - w, y + 2, s, 1.0F);	
-	y += BIGCHAR_HEIGHT + 4;
+	if (cgx_debug.integer & 4) {
+		s = va("ES: %i PS: %i MS: %i", cg.entities, cg.activeParticles, cg_marksTotal);
+		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
+		CG_DrawBigString( hud.width5 - w, y + 2, s, 1.0F);	
+		y += BIGCHAR_HEIGHT + 4;
 
-	cent = &cg_entities[cg.snap->ps.clientNum];
+		cent = &cg_entities[cg.snap->ps.clientNum];
 
-	s = va( "LO: %1.0f %1.0f %1.0f", cent->lerpOrigin[0], cent->lerpOrigin[1], cent->lerpOrigin[2] );
-	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-	CG_DrawBigString( hud.width5 - w, y + 2, s, 1.0F );
-	y += BIGCHAR_HEIGHT + 4;
+		s = va( "LO: %1.0f %1.0f %1.0f", cent->lerpOrigin[0], cent->lerpOrigin[1], cent->lerpOrigin[2] );
+		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
+		CG_DrawBigString( hud.width5 - w, y + 2, s, 1.0F );
+		y += BIGCHAR_HEIGHT + 4;
+	}
 
 	if (cg_showmiss.integer) {
 		if (trap_Milliseconds() > t) {
