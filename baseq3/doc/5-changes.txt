@@ -143,3 +143,7 @@ fixed crash taunt
 fixed cg_deadBodyDarken color copy bug
 fixed saving shared config on click leave arena when cg_sharedConfig 0
 fixed emtpy model drops on spawnkills (battlesuit, invis etc.)
+
+0.95.1b
+
+fixed model/skin not found error flood notifications

@@ -381,7 +381,7 @@ static int CGX_IsKnownModel(const char *modelName) {
 static void CGX_SetPMSkin(clientInfo_t *ci) {
 	int r = CGX_IsKnownModel(ci->modelName);
 	if (r == 0) {
-		CG_Printf(CGX_NAME": Bright skin not found for model %s. Using %s model\n", ci->modelName, DEFAULT_MODEL);
+		CG_Printf("Bright skin not found for model %s. Using %s model\n", ci->modelName, DEFAULT_MODEL);
 		Q_strncpyz(ci->modelName, DEFAULT_MODEL, sizeof(ci->modelName));
 	}
 	if (r == 2)
@@ -399,7 +399,7 @@ static void CGX_SetSkin(clientInfo_t *ci, char *skinName) {
 		if (CGX_IsSkinExists(ci->modelName, skinName)) {
 			Q_strncpyz(ci->skinName, skinName, sizeof(ci->skinName)); //set whatever specified if skin exists
 		} else {
-			CG_Printf(CGX_NAME": %s skin not found for model %s. Using %s skin\n", skinName, ci->modelName, ci->skinNameCopy);
+			D_Printf(("^3%s skin not found for model %s. Using %s skin\n", skinName, ci->modelName, ci->skinNameCopy));
 			Q_strncpyz(ci->skinName, ci->skinNameCopy, sizeof(ci->skinName)); //set copied backup
 		}
 	/// if gametype is not team\ctf or skin pm set it, otherwise red\blue will be used 
