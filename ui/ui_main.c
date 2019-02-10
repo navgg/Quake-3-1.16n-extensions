@@ -224,7 +224,7 @@ cvarTable_t		cvarTable[] = {
 	{ &uix_serverCache, "ui_serverCache", "1", CVAR_TEMP },
 
 	// X-MOD: default parameters
-	{ &uix_wideScreenFix, "cg_wideScreenFix", "3", CVAR_ARCHIVE },
+	{ &uix_wideScreenFix, "cg_wideScreenFix", "1", CVAR_ARCHIVE },
 	{ &uix_defaultWeapon, "cg_defaultWeapon", "0", CVAR_ARCHIVE },
 	//{ &uix_drawPlayerIDs, "cg_drawPlayerIDs", "1", CVAR_ARCHIVE },
 
