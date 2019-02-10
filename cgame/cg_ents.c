@@ -668,11 +668,12 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 	int timeshift = 0;
 	//unlagged - projectile nudge
 
-	if (!cg_delag_interp32.integer) {
+	//use 1.16n method for calc
+	if (cg.useCalcEntityLerpPositions116) {
 		CG_CalcEntityLerpPositions116( cent );
 		return;
 	}
-
+	
 	//1.32 stuff
 	if ( cent->interpolate && cent->currentState.pos.trType == TR_INTERPOLATE ) {
 		CG_InterpolateEntityPosition( cent );
@@ -703,6 +704,7 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 	// if it's a missile but not a grappling hook
 	if ( cent->currentState.eType == ET_MISSILE && cent->currentState.weapon != WP_GRAPPLING_HOOK ) {
 		// if it's one of ours
+		// x-mod: on default servers we have this parameter always 0, so it's better not to come here and call CG_CalcEntityLerpPositions116
 		if ( cent->currentState.otherEntityNum == cg.clientNum ) {
 			// extrapolate one server frame's worth - this will correct for tiny
 			// visual inconsistencies introduced by backward-reconciling all players
@@ -845,10 +847,13 @@ void CG_AddPacketEntities( void ) {
 	BG_PlayerStateToEntityState( ps, &cg.predictedPlayerEntity.currentState, qfalse );
 	CG_AddCEntity( &cg.predictedPlayerEntity );
 
+	// X-Mod: if server has no delag or it's default server don't use early transitioning and CG_CalcEntityLerpPositions from 1.32
+	cg.useCalcEntityLerpPositions116 = (!cgs.delagHitscan || cgs.serverMod == SM_DEFAULT) || !cg_delag_interp32.integer;
+	
 	// lerp the non-predicted value for lightning gun origins
 	CG_CalcEntityLerpPositions( &cg_entities[ cg.snap->ps.clientNum ] );
 
-	if (!cg_delag_interp32.integer) {
+	if (cg.useCalcEntityLerpPositions116) {
 		// X-Mod: 1.16 add each entity sent over by the server
 		for (num = 0; num < cg.snap->numEntities; num++) {
 			cent = &cg_entities[cg.snap->entities[num].number];

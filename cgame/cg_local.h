@@ -725,6 +725,7 @@ typedef struct {
 	playerState_t savedPmoveStates[NUM_SAVED_STATES];
 	int			stateHead, stateTail;
 	//unlagged - optimized prediction
+	qboolean	useCalcEntityLerpPositions116; //x-mod: use default calc method or unlagged
 
 	// OSP Window Engine
 	cg_string_t			aStringPool[MAX_STRINGS];

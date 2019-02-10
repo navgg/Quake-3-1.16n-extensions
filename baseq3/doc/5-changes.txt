@@ -147,3 +147,6 @@ fixed emtpy model drops on spawnkills (battlesuit, invis etc.)
 0.95.1b
 
 fixed model/skin not found error flood notifications
+fixed projectile interpolation/extrapolation on servers without delag (vanilla servers, sodmod)
+P.S. On noghost/nemesis/bma or any other servers with delag - no changes.
+
