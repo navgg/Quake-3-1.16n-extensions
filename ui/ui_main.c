@@ -141,7 +141,6 @@ vmCvar_t	uix_serverCache;
 
 vmCvar_t	uix_wideScreenFix;
 vmCvar_t	uix_defaultWeapon;
-vmCvar_t	uix_drawPlayerIDs;
 vmCvar_t	uix_enemyModel_enabled;
 vmCvar_t	uix_enemyModel;
 vmCvar_t	uix_enemyColors;
@@ -155,7 +154,6 @@ vmCvar_t	uix_centerPrintAlpha;
 vmCvar_t	uix_crosshairColor;
 vmCvar_t	uix_crosshairSize;
 vmCvar_t	uix_drawSpeed;
-vmCvar_t	uix_coloredPing;
 vmCvar_t	uix_lagometer;
 vmCvar_t	uix_networkAdjustments;
 vmCvar_t	uix_scoreboard;
@@ -226,7 +224,6 @@ cvarTable_t		cvarTable[] = {
 	// X-MOD: default parameters
 	{ &uix_wideScreenFix, "cg_wideScreenFix", "1", CVAR_ARCHIVE },
 	{ &uix_defaultWeapon, "cg_defaultWeapon", "0", CVAR_ARCHIVE },
-	//{ &uix_drawPlayerIDs, "cg_drawPlayerIDs", "1", CVAR_ARCHIVE },
 
 	{ &uix_enemyModel_enabled, "cg_enemyModel_enabled", "0", CVAR_ARCHIVE },
 	{ &uix_enemyModel, "cg_enemyModel", "", CVAR_ARCHIVE },		
@@ -242,7 +239,6 @@ cvarTable_t		cvarTable[] = {
 	{ &uix_centerPrintAlpha, "cg_centerPrintAlpha", "1.0", CVAR_ARCHIVE },
 	{ &uix_crosshairColor, "cg_crosshairColor", "", CVAR_ARCHIVE },	
 	{ &uix_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE },
-	//{ &uix_coloredPing, "cg_coloredPing", "1", CVAR_ARCHIVE },	
 	{ &uix_networkAdjustments, "cg_autoNetworkSettings", "1", CVAR_ARCHIVE },
 	{ &uix_scoreboard, "cg_scoreboard", "0", CVAR_ARCHIVE },
 	{ &uix_drawScoreBox, "cg_drawScoreBox", "1", CVAR_ARCHIVE },

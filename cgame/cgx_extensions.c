@@ -381,7 +381,7 @@ static int CGX_IsKnownModel(const char *modelName) {
 static void CGX_SetPMSkin(clientInfo_t *ci) {
 	int r = CGX_IsKnownModel(ci->modelName);
 	if (r == 0) {
-		CG_Printf("Bright skin not found for model %s. Using %s model\n", ci->modelName, DEFAULT_MODEL);
+		D_Printf(("^3Bright skin not found for model %s. Using %s model\n", ci->modelName, DEFAULT_MODEL));
 		Q_strncpyz(ci->modelName, DEFAULT_MODEL, sizeof(ci->modelName));
 	}
 	if (r == 2)

@@ -286,7 +286,6 @@ cvarTable_t		cvarTable[] = {
 
 	{ &cgx_wideScreenFix, "cg_wideScreenFix", "1", CVAR_ARCHIVE },
 	{ &cgx_defaultWeapon, "cg_defaultWeapon", "0", CVAR_ARCHIVE },
-	//{ &cgx_drawPlayerIDs, "cg_drawPlayerIDs", "1", CVAR_ARCHIVE },
 	
 	{ &cgx_enemyModel_enabled, "cg_enemyModel_enabled", "0", CVAR_ARCHIVE },
 	{ &cgx_enemyModel, "cg_enemyModel", "", CVAR_ARCHIVE },		
