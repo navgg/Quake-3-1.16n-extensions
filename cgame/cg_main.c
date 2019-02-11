@@ -81,6 +81,8 @@ vmCvar_t	cgx_intermissionStats;
 
 vmCvar_t	com_maxfps;
 vmCvar_t	cl_maxpackets;
+vmCvar_t	cl_timeNudge;
+vmCvar_t	sv_fps;
 
 vmCvar_t	cgx_debug;
 
@@ -89,15 +91,14 @@ vmCvar_t	pmove_fixed;
 vmCvar_t	pmove_msec;
 vmCvar_t	pmove_accurate;
 
-
 //unlagged - client options
 vmCvar_t	cg_delag;
 vmCvar_t	cg_cmdTimeNudge;
+#if CGX_UNLAGGED
 vmCvar_t	cg_projectileNudge;
 vmCvar_t	cg_optimizePrediction;
 vmCvar_t	cg_delag_interp32;
-vmCvar_t	cl_timeNudge;
-vmCvar_t	sv_fps;
+#endif
 #if CGX_DEBUG
 vmCvar_t	cg_debugDelag;
 vmCvar_t	cg_drawBBox;
@@ -144,9 +145,10 @@ vmCvar_t	cg_errorDecay;
 vmCvar_t	cg_nopredict;
 #if CGX_DEBUG
 vmCvar_t	cg_noPlayerAnims;
-vmCvar_t	cg_showmiss;
 vmCvar_t	cg_footsteps;
 #endif
+vmCvar_t	cg_showmiss;
+
 vmCvar_t	cg_addMarks;
 vmCvar_t	cg_brassTime;
 vmCvar_t	cg_viewsize;
@@ -312,15 +314,14 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_killBeep, "cg_killBeep", "0", CVAR_ARCHIVE | CVAR_LATCH },
 
 	{ &cgx_winterEffects, "cg_winterEffects", "0", CVAR_TEMP },
-#if CGX_UNLAGGED
+
 	//unlagged - client options
-	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},	
+	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},
+	{ &cg_cmdTimeNudge, "cg_delag_cmdTimeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
+#if CGX_UNLAGGED
 	{ &cg_projectileNudge, "cg_delag_projectileNudge", "0", CVAR_ARCHIVE },
 	{ &cg_optimizePrediction, "cg_delag_optimizePrediction", "1", CVAR_ARCHIVE },
-	{ &cg_cmdTimeNudge, "cg_delag_cmdTimeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
 	{ &cg_delag_interp32, "cg_delag_interp32", "1", CVAR_TEMP },
-
-	{ &cl_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},
 #if CGX_DEBUG
 	{ &cg_debugDelag, "cg_debugDelag", "0", CVAR_CHEAT },
 	{ &cg_drawBBox, "cg_drawBBox", "0", CVAR_CHEAT },
@@ -329,6 +330,8 @@ cvarTable_t		cvarTable[] = {
 	{ &cg_plOut, "cg_plOut", "0", CVAR_CHEAT },
 #endif
 	//unlagged - client options
+#else
+	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE },
 #endif
 #if CGX_FREEZE
 	{ &cg_enableBreath, "cg_enableBreath", "0", CVAR_TEMP },
@@ -336,6 +339,7 @@ cvarTable_t		cvarTable[] = {
 
 	{ &com_maxfps, "com_maxfps", "125", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
 	{ &cl_maxpackets, "cl_maxpackets", "40", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },				
+	{ &cl_timeNudge, "cl_timeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
 
 #if CGX_DEBUG
 	{ &cgx_debug, "cgx_debug", "1", CVAR_TEMP },

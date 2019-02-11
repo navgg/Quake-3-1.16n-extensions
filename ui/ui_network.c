@@ -406,8 +406,11 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.prediction.generic.y			= y;
 	networkOptionsInfo.prediction.itemnames			= prediction_items;
 	networkOptionsInfo.prediction.generic.statusbar	= UI_Network_StatusBar;
-
+#if !CGX_UNLAGGED
+	y = 240 + 3 * (BIGCHAR_HEIGHT+2);
+#else
 	y = 240 + 4 * (BIGCHAR_HEIGHT+2);
+#endif
 	networkOptionsInfo.predictitems.generic.type		= MTYPE_RADIOBUTTON;
 	networkOptionsInfo.predictitems.generic.name		= "Predict item pickups:";
 	networkOptionsInfo.predictitems.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_GRAYED;
@@ -463,7 +466,9 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.adjustments );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.snaps );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.delag );
+#if CGX_UNLAGGED
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.prediction );
+#endif
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.predictitems );
 	//Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.lagometer );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.back );

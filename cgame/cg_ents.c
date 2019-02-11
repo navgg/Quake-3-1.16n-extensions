@@ -638,7 +638,11 @@ static void CG_InterpolateEntityPosition( centity_t *cent ) {
 }
 
 //X-Mod: 1.16 method
+#if !CGX_UNLAGGED
+static void CG_CalcEntityLerpPositions(centity_t *cent) {
+#else
 static void CG_CalcEntityLerpPositions116(centity_t *cent) {
+#endif
 	if ( cent->interpolate && cent->currentState.pos.trType == TR_INTERPOLATE ) {
 		CG_InterpolateEntityPosition( cent );
 		return;
@@ -655,7 +659,7 @@ static void CG_CalcEntityLerpPositions116(centity_t *cent) {
 			cg.snap->serverTime, cg.time, cent->lerpOrigin );
 	}
 }
-
+#if CGX_UNLAGGED
 /*
 ===============
 CG_CalcEntityLerpPositions
@@ -747,7 +751,7 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 			cg.snap->serverTime, cg.time, cent->lerpOrigin );
 	}
 }
-
+#endif
 /*
 ===============
 CG_AddCEntity
@@ -845,11 +849,24 @@ void CG_AddPacketEntities( void ) {
 	// generate and add the entity from the playerstate
 	ps = &cg.predictedPlayerState;
 	BG_PlayerStateToEntityState( ps, &cg.predictedPlayerEntity.currentState, qfalse );
-	CG_AddCEntity( &cg.predictedPlayerEntity );
+	
+#if !CGX_UNLAGGED
+	CG_AddCEntity(&cg.predictedPlayerEntity);
 
+	// lerp the non-predicted value for lightning gun origins
+	CG_CalcEntityLerpPositions(&cg_entities[cg.snap->ps.clientNum]);
+
+	// add each entity sent over by the server
+	for (num = 0; num < cg.snap->numEntities; num++) {
+		cent = &cg_entities[cg.snap->entities[num].number];
+		CG_AddCEntity(cent);
+	}
+#else
 	// X-Mod: if server has no delag or it's default server don't use early transitioning and CG_CalcEntityLerpPositions from 1.32
 	cg.useCalcEntityLerpPositions116 = (!cgs.delagHitscan || cgs.serverMod == SM_DEFAULT) || !cg_delag_interp32.integer;
-	
+
+	CG_AddCEntity(&cg.predictedPlayerEntity);
+
 	// lerp the non-predicted value for lightning gun origins
 	CG_CalcEntityLerpPositions( &cg_entities[ cg.snap->ps.clientNum ] );
 
@@ -886,5 +903,6 @@ void CG_AddPacketEntities( void ) {
 			}
 		}
 	}
+#endif
 }
 

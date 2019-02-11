@@ -259,11 +259,14 @@ void CG_DrawOSPClientScore( int x, int y, clientInfo_t *ci, score_t *score ) {
 	// highlight players in the ready state
 	if ( cg.snap->ps.stats[ STAT_CLIENTS_READY ] & ( 1 << score->client ) ) {
 		// Lets change "READY" to "FROZEN" for freeze mode
+#if CGX_FREEZE
 		if ( Q_Isfreeze(score->client) ) {
 			CG_DrawStringExt( x, y + 2, "FROZE", colorYellow, 
 						  qfalse, qfalse, 
 						  OSP_SB_CHAR_WIDTH - 4, OSP_SB_CHAR_HEIGHT - 4, 0 );
-		} else {
+		} else
+#endif
+		{
 			CG_DrawStringExt( x + OSP_SB_FLAG_OFFSET, y + 2, "READY", colorYellow, 
 						  qfalse, qfalse, 
 						  OSP_SB_CHAR_WIDTH - 4, OSP_SB_CHAR_HEIGHT - 4, 0 );

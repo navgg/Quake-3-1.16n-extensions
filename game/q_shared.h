@@ -10,18 +10,19 @@
 #define	Q3_VERSION		"Q3 1.16n"
 // X-MOD constants
 #define CGX_NAME		"X-Mod"
-#define CGX_VERSION		"0.95.1b"
+#define CGX_VERSION		"0.95.2b"
 #define CGX_DATE		"11 Feb 2019" //__DATE__ not working with dd/mm/yyyy format
 #define CGX_DEBUG		0
-#define	CGX_UNLAGGED	1//0 not wokring
+#define	CGX_UNLAGGED	1
 #define CGX_FREEZE		1
-#define CGX_NOGHOST_COMPATIBLE CVAR_USERINFO
-#if CGX_DEBUG
-#undef CGX_NOGHOST_COMPATIBLE
-#define CGX_NOGHOST_COMPATIBLE 0
-#endif
-#define CGX_NEMESIS_COMPATIBLE !CGX_DEBUG
 #define CGX_Z_EFFECTS	1
+#if CGX_DEBUG || 0
+#define CGX_NOGHOST_COMPATIBLE 0
+#define CGX_NEMESIS_COMPATIBLE 0
+#else
+#define CGX_NOGHOST_COMPATIBLE CVAR_USERINFO
+#define CGX_NEMESIS_COMPATIBLE 1
+#endif
 #define CGX_MAPURL		"https://ws.q3df.org/map/"
 #define CGX_MAPBAT		"download_map.bat"
 #define CGX_BP_NUMBER	44	//secret number

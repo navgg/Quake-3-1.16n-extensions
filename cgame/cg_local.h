@@ -718,7 +718,7 @@ typedef struct {
 
 	int			activeParticles;
 #endif
-
+#if CGX_UNLAGGED
 	//unlagged - optimized prediction
 	int			lastPredictedCommand;
 	int			lastServerTime;
@@ -726,7 +726,7 @@ typedef struct {
 	int			stateHead, stateTail;
 	//unlagged - optimized prediction
 	qboolean	useCalcEntityLerpPositions116; //x-mod: use default calc method or unlagged
-
+#endif
 	// OSP Window Engine
 	cg_string_t			aStringPool[MAX_STRINGS];
 	cg_window_t			*specWindow, *statsWindow, *intermWindow;
@@ -1182,9 +1182,10 @@ extern	vmCvar_t		cg_errorDecay;
 extern	vmCvar_t		cg_nopredict;
 #if CGX_DEBUG
 extern	vmCvar_t		cg_noPlayerAnims;
-extern	vmCvar_t		cg_showmiss;
 extern	vmCvar_t		cg_footsteps;
 #endif
+extern	vmCvar_t		cg_showmiss;
+
 extern	vmCvar_t		cg_addMarks;
 extern	vmCvar_t		cg_brassTime;
 extern	vmCvar_t		cg_gun_frame;
@@ -1231,9 +1232,11 @@ extern	vmCvar_t		pmove_accurate;
 //unlagged - client options
 extern	vmCvar_t		cg_delag;
 extern	vmCvar_t		cg_cmdTimeNudge;
+#if CGX_UNLAGGED
 extern	vmCvar_t		cg_projectileNudge;
 extern	vmCvar_t		cg_optimizePrediction;
 extern	vmCvar_t		cg_delag_interp32;
+#endif
 extern	vmCvar_t		cl_timeNudge;
 extern	vmCvar_t		sv_fps;
 #if CGX_DEBUG
