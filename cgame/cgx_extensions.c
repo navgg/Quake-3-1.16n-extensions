@@ -657,36 +657,31 @@ void CGX_SyncServer_delagHitscan(const char * info) {
 	if (g_delagHitscan || g_unlaggedVersion[0] != '\0')
 		D_Printf(("g_delagHitscan '%i' g_unlaggedVersion '%s'\n", g_delagHitscan, g_unlaggedVersion));
 	//unlagged - server options	
-
-	// get sv_fps and save for unlagged	
-	D_Printf(("^3g_delag '%i'\n", cgs.delagHitscan));
 }
 
 void CGX_SyncServer_sv_fps(const char *info) {
 	static int old_sv_fps = -1;
-	int i;
 
 	if (!sv_fps.integer || old_sv_fps != sv_fps.integer) {
-		i = atoi(Info_ValueForKey(info, "sv_fps"));
+		int i = atoi(Info_ValueForKey(info, "sv_fps"));
 
 		D_Printf(("^3sv_fps serv '%i' sv_fps client '%i' ", i, sv_fps.integer));
 
-		sv_fps.integer = i;
-
-		if (!sv_fps.integer) {
+		if (!i) {
 			char buf[4];
 			// get sv_fps if server sent it
 			trap_Cvar_Get("sv_fps", buf);
-			sv_fps.integer = atoi(buf);
+			i = atoi(buf);
 			//on some servs fps coming to sv_fps client value, on some stored in server info
 			//try get from server info first, then from client
-			if (!sv_fps.integer)
-				sv_fps.integer = 20;
+			if (!i)
+				i = 20;
 		}
+
+		old_sv_fps = sv_fps.integer = i;
 
 		D_Printf(("^3sv_fps final '%i'\n", sv_fps.integer));
 
-		old_sv_fps = sv_fps.integer;
 		CGX_AutoAdjustNetworkSettings();
 	}
 }
