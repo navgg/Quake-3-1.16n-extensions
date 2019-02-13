@@ -796,6 +796,9 @@ char* QX_GetHostnameSpacesFix(char *string) {
 
 //X-MOD: string to color
 char QX_StringToColor(const char *s) {
+	if (!Q_isalpha(*s))
+		return 0;
+
 	if (!Q_stricmp(s, "white")) 
 		return COLOR_WHITE;
 	else if (!Q_stricmp(s, "red"))
