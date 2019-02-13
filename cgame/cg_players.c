@@ -331,6 +331,22 @@ void CG_LoadClientInfo( clientInfo_t *ci ) {
 	const char	*s;
 	int			clientNum;
 
+	// sounds
+	//x-mod: load sounds here to keep funny bug when sarge can sound like any q3 model
+	dir = ci->modelName;
+	fallback = DEFAULT_MODEL;
+
+	for (i = 0; i < MAX_CUSTOM_SOUNDS; i++) {
+		s = cg_customSoundNames[i];
+		if (!s) {
+			break;
+		}
+		ci->sounds[i] = trap_S_RegisterSound(va("sound/player/%s/%s", dir, s + 1));
+		if (!ci->sounds[i]) {
+			ci->sounds[i] = trap_S_RegisterSound(va("sound/player/%s/%s", fallback, s + 1));
+		}
+	}
+
 	if ( !CG_RegisterClientModelname( ci, ci->modelName, ci->skinName ) ) {
 		if ( cg_buildScript.integer ) {
 			CG_Error( "CG_RegisterClientModelname( %s, %s ) failed", ci->modelName, ci->skinName );
@@ -354,6 +370,15 @@ void CG_LoadClientInfo( clientInfo_t *ci ) {
 					CG_Printf("^1DEFAULT_MODEL / skin (%s/%s) failed to register\n",
 						DEFAULT_MODEL, ci->skinName);
 				}
+			} else {
+				if (!Q_stricmp(ci->modelName, ci->modelNameCopy) && !Q_stricmp(ci->skinName, ci->skinNameCopy)) {
+					// if it was attempt to set real model, overwrite copy
+					Q_strncpyz(ci->modelNameCopy, DEFAULT_MODEL, sizeof ci->modelNameCopy);
+					Q_strncpyz(ci->skinNameCopy, skin, sizeof ci->skinNameCopy);
+				}
+				// overwrite model and skin names
+				Q_strncpyz(ci->modelName, DEFAULT_MODEL, sizeof ci->modelName);
+				Q_strncpyz(ci->skinName, skin, sizeof ci->skinName);
 			}
 		} else {
 			if ( !CG_RegisterClientModelname( ci, DEFAULT_MODEL, "default" ) ) {
@@ -364,24 +389,20 @@ void CG_LoadClientInfo( clientInfo_t *ci ) {
 				} else {
 					CG_Printf("^1DEFAULT_MODEL (%s) failed to register\n", DEFAULT_MODEL);
 				}
+			} else {
+				if (!Q_stricmp(ci->modelName, ci->modelNameCopy) && !Q_stricmp(ci->skinName, ci->skinNameCopy)) {
+					// if it was attempt to set real model, overwrite copy
+					Q_strncpyz(ci->modelNameCopy, DEFAULT_MODEL, sizeof ci->modelNameCopy);
+					Q_strncpyz(ci->skinNameCopy, "default", sizeof ci->skinNameCopy);
+				}
+				// overwrite model and skin names
+				Q_strncpyz(ci->modelName, DEFAULT_MODEL, sizeof ci->modelName);
+				Q_strncpyz(ci->skinName, "default", sizeof ci->skinName);
 			}
 		}
 	}
 
-	// sounds
-	dir = ci->modelName;
-	fallback = DEFAULT_MODEL;
-
-	for ( i = 0 ; i < MAX_CUSTOM_SOUNDS ; i++ ) {
-		s = cg_customSoundNames[i];
-		if ( !s ) {
-			break;
-		}
-		ci->sounds[i] = trap_S_RegisterSound( va("sound/player/%s/%s", dir, s + 1) );
-		if ( !ci->sounds[i] ) {
-			ci->sounds[i] = trap_S_RegisterSound( va("sound/player/%s/%s", fallback, s + 1) );
-		}
-	}
+	//load sound here to fix bug when sarge can make sounds of any model
 
 	ci->deferred = qfalse;
 
