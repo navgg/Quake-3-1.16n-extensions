@@ -656,6 +656,11 @@ void CGX_UpdateItemPickupStats( entityState_t *es, gitem_t *item ) {
 	}
 }
 
+#if CGX_DEBUG && 0
+#define Dmg_Printf D_Printf
+#else
+#define Dmg_Printf(x)
+#endif
 void CGX_UpdateDamageStats( playerState_t *ps, playerState_t *ops ) {
 	if (cg.snap->ps.pm_flags & PMF_FOLLOW)
 		return;
@@ -667,7 +672,7 @@ void CGX_UpdateDamageStats( playerState_t *ps, playerState_t *ops ) {
 		int given = ps->persistant[PERS_HITS] - ops->persistant[PERS_HITS];
 		if (given > ops->stats[STAT_HEALTH])
 			given = ops->stats[STAT_HEALTH];
-		D_Printf( ("Damaged ^3%i (%i)\n", given, ps->persistant[PERS_HITS] - ops->persistant[PERS_HITS]) );
+		Dmg_Printf( ("Damaged ^3%i (%i)\n", given, ps->persistant[PERS_HITS] - ops->persistant[PERS_HITS]) );
 		stats.damageGiven += given;
 	}
 
@@ -679,11 +684,11 @@ void CGX_UpdateDamageStats( playerState_t *ps, playerState_t *ops ) {
 				received = ops->stats[STAT_HEALTH];
 			if (received < 0)
 				received = 0;
-			D_Printf( ("Health -^3%i (%i)\n", received, ops->stats[STAT_HEALTH] - ps->stats[STAT_HEALTH]) );
+			Dmg_Printf( ("Health -^3%i (%i)\n", received, ops->stats[STAT_HEALTH] - ps->stats[STAT_HEALTH]) );
 			stats.damageReceived += received;
 		}
 	} else if (ps->stats[STAT_HEALTH] > ops->stats[STAT_HEALTH] && ops->stats[STAT_HEALTH] > 0) {
-		D_Printf( ("Helath +^3%i\n", ps->stats[STAT_HEALTH] - ops->stats[STAT_HEALTH]) );
+		Dmg_Printf( ("Helath +^3%i\n", ps->stats[STAT_HEALTH] - ops->stats[STAT_HEALTH]) );
 		stats.healthTotal += ps->stats[STAT_HEALTH] - ops->stats[STAT_HEALTH];
 	}
 
@@ -691,11 +696,11 @@ void CGX_UpdateDamageStats( playerState_t *ps, playerState_t *ops ) {
 		int received = ops->stats[STAT_ARMOR] - ps->stats[STAT_ARMOR];
 
 		if (!(received == 1 && ps->stats[STAT_ARMOR] >= 100)) {
-			D_Printf( ("Armor -^3%i\n", received) );
+			Dmg_Printf( ("Armor -^3%i\n", received) );
 			stats.damageReceived += received;
 		}
 	} else if (ps->stats[STAT_ARMOR] > ops->stats[STAT_ARMOR] && ops->stats[STAT_HEALTH] > 0) {
-		D_Printf( ("Armor +^3%i\n", ps->stats[STAT_ARMOR] - ops->stats[STAT_ARMOR]) );
+		Dmg_Printf( ("Armor +^3%i\n", ps->stats[STAT_ARMOR] - ops->stats[STAT_ARMOR]) );
 		stats.armorTotal += ps->stats[STAT_ARMOR] - ops->stats[STAT_ARMOR];
 	}
 }
