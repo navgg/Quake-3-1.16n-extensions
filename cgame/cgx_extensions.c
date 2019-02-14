@@ -1620,7 +1620,10 @@ static int CGX_FSize(char* filename) {
 
 //check if file exists
 static qboolean CGX_FExists(char* filename) {
-	return CGX_FSize(filename) ? qtrue : qfalse;
+	fileHandle_t f;
+	if (trap_FS_FOpenFile(filename, &f, FS_READ) <= 0) return qfalse;
+	trap_FS_FCloseFile(f);
+	return qtrue;
 }
 
 //copy file
@@ -1637,7 +1640,6 @@ static int CGX_FCopy(char *filename, char *dest) {
 
 		if (!f2) {
 			CG_Printf("^1Couldn't open %s to write", dest);
-			trap_FS_FCloseFile(f2);
 			return 0;
 		}
 
