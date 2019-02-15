@@ -1467,7 +1467,8 @@ void CG_NextWeapon_f( void ) {
 	if ( !cg.snap ) {
 		return;
 	}
-	if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
+	if ( cg.snap->ps.pm_flags & PMF_FOLLOW || cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_SPECTATOR) {
+		trap_SendClientCommand("follownext");
 		return;
 	}
 
@@ -1503,7 +1504,8 @@ void CG_PrevWeapon_f( void ) {
 	if ( !cg.snap ) {
 		return;
 	}
-	if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
+	if ( cg.snap->ps.pm_flags & PMF_FOLLOW || cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_SPECTATOR) {
+		trap_SendClientCommand("followprev");
 		return;
 	}
 
