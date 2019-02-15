@@ -1494,7 +1494,7 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int te
 		ent->customShader = cgs.media.invisShader;
 		trap_R_AddRefEntityToScene( ent );
 	} else {
-		trap_R_AddRefEntityToScene( ent );
+		CGX_AddRefEntityWithCustomShader( ent, state->eFlags );
 
 		if ( powerups & ( 1 << PW_QUAD ) )  //default freeze tag - battlesuit, noghost - quad
 		{
@@ -1604,6 +1604,9 @@ void CG_Player( centity_t *cent ) {
 	memset( &legs, 0, sizeof(legs) );
 	memset( &torso, 0, sizeof(torso) );
 	memset( &head, 0, sizeof(head) );
+
+	if (ci->customShader)
+		legs.customShader = torso.customShader = head.customShader = ci->customShader;
 
 	// X-MOD: cg_deadBodyDarken & colored skin
 	if (cent->currentState.eFlags & EF_DEAD) {

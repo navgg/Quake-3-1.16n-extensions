@@ -79,7 +79,7 @@ CG_Draw3DModel
 
 ================
 */
-static void CG_Draw3DModelColor(float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles, byte *color) {
+static void CG_Draw3DModelColor(float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles, byte *color, qhandle_t shader) {
 	refdef_t		refdef;
 	refEntity_t		ent;
 
@@ -97,6 +97,7 @@ static void CG_Draw3DModelColor(float x, float y, float w, float h, qhandle_t mo
 	ent.hModel = model;
 	ent.customSkin = skin;
 	ent.renderfx = RF_NOSHADOW;		// no stencil shadows
+	ent.customShader = shader;
 
 	refdef.rdflags = RDF_NOWORLDMODEL;
 
@@ -118,7 +119,7 @@ static void CG_Draw3DModelColor(float x, float y, float w, float h, qhandle_t mo
 	ent.shaderRGBA[3] = 255;
 
 	trap_R_ClearScene();
-	trap_R_AddRefEntityToScene(&ent);
+	CGX_AddRefEntityWithCustomShader(&ent, 0);
 	trap_R_RenderScene(&refdef);
 }
 
@@ -202,7 +203,7 @@ void CG_DrawHead( float x, float y, float w, float h, int clientNum, vec3_t head
 		// allow per-model tweaking
 		VectorAdd( origin, ci->headOffset, origin );
 		if (cgx_enemyModel_enabled.integer) {			
-			CG_Draw3DModelColor(x, y, w, h, ci->headModel, ci->headSkin, origin, headAngles, ci->colors[1]);			
+			CG_Draw3DModelColor(x, y, w, h, ci->headModel, ci->headSkin, origin, headAngles, ci->colors[1], ci->customShader);			
 		} else {
 			CG_Draw3DModel(x, y, w, h, ci->headModel, ci->headSkin, origin, headAngles);
 		}

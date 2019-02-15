@@ -15,6 +15,13 @@
 
 #define dl_tempname	"{X-Mod}download.tmp"
 
+//bright skins
+#define S_PM		"pm"
+#define S_BRIGHT	"bright"
+
+//bright skin shader
+#define SS_BRIGHT	"xm_bright"
+
 //file i/o
 static int CGX_FCopy(char *filename, char *dest);
 static qboolean CGX_FExists(char* filename);
@@ -317,6 +324,8 @@ void CGX_SetSkinColors(clientInfo_t *ci, int clientNum) {
 //restore real model and skin if needed and return result
 #define IsSameModel(x) !Q_stricmp(x->modelName, x->modelNameCopy) && !Q_stricmp(x->skinName, x->skinNameCopy)
 static qboolean CGX_RestoreModelAndSkin(clientInfo_t *ci, qboolean isDeferred) {
+	ci->customShader = 0; // reset custom shader here
+
 	if (IsSameModel(ci))		
 		return qfalse;
 
@@ -338,64 +347,133 @@ static void CGX_SetModel(clientInfo_t *ci, char *modelName) {
 		Q_strncpyz(ci->modelName, modelName, sizeof(ci->modelName));
 }
 
+//cache skin existense, just in case, for less trap open files
+typedef struct {
+	char			modelName[MAX_QPATH];
+	char			skinName[MAX_QPATH];
+	qboolean		exists;
+} skinCache_t;
+
+static int skinCacheNum;
+static skinCache_t skinCache[MAX_CLIENTS*2];
+
+static void CGX_PrintSkinCache() {
+	int i; skinCache_t *sc;
+	for (i = 0, sc = skinCache; i < skinCacheNum; i++, sc++)
+		CG_Printf("%i %s %s %i\n", i, sc->modelName, sc->skinName, sc->exists);
+}
+
 //check skin existence
 static qboolean CGX_IsSkinExists(const char *model, const char *skin) {
-	fileHandle_t f;
+	int i; qboolean res; skinCache_t *sc;
 
-	if (trap_FS_FOpenFile(va("models\\players\\%s\\head_%s.skin", model, skin), &f, FS_READ) <= 0)
-		return qfalse;
+	for (i = 0, sc = skinCache; i < skinCacheNum; i++, sc++)
+		if (!Q_stricmp(model, sc->modelName) && !Q_stricmp(skin, sc->skinName))
+			return sc->exists;
 
-	trap_FS_FCloseFile(f);
-	return qtrue;
-}
+	res = CGX_FExists(va("models\\players\\%s\\head_%s.skin", model, skin));
 
-static int CGX_IsKnownModel(const char *modelName) {
-	static char *known_models[] = {
-		"anarki", "biker", "bitterman", "bones", "crash", "doom", "grunt", "hunter",
-		"keel", "klesk", "lucy", "major", "mynx", "orbb", "ranger", "razor", "sarge",
-		"slash", "sorlag", "tankjr", "uriel", "visor", "xaero" };
-	int i;
-	for (i = 0; i < ArrLen(known_models); i++)
-		if (Q_stricmp(modelName, known_models[i]) == 0)
-			return 1;
-
-	if (CGX_IsSkinExists(modelName, "bright"))//quake live
-		return 2;
-	if (CGX_IsSkinExists(modelName, "pm"))
-		return 1;
-
-	return 0;	
-}
-
-static void CGX_SetPMSkin(clientInfo_t *ci) {
-	int r = CGX_IsKnownModel(ci->modelName);
-	if (r == 0) {
-		D_Printf(("^3Bright skin not found for model %s. Using %s model\n", ci->modelName, DEFAULT_MODEL));
-		Q_strncpyz(ci->modelName, DEFAULT_MODEL, sizeof(ci->modelName));
+	if (skinCacheNum < ArrLen(skinCache)) {
+		Q_strncpyz(sc->modelName, model, MAX_QPATH);
+		Q_strncpyz(sc->skinName, skin, MAX_QPATH);
+		sc->exists = res;
+		skinCacheNum++;
+	} else {
+		skinCacheNum = 0;
+		memset(&skinCache, 0, sizeof skinCache);
 	}
-	if (r == 2)
-		Q_strncpyz(ci->skinName, "bright", sizeof(ci->skinName));
-	else
-		Q_strncpyz(ci->skinName, "pm", sizeof(ci->skinName));
+
+	return res;
 }
 
-static void CGX_SetSkin(clientInfo_t *ci, char *skinName) {	
-	if (!skinName[0]) //if no skin set pm
-		CGX_SetPMSkin(ci);
-	else if (skinName[0] == '*')
-		Q_strncpyz(ci->skinName, ci->skinNameCopy, sizeof(ci->skinName));
-	else /* if (cgs.gametype < GT_TEAM || !Q_stricmp(skinName, "pm"))*/ //doesnt work
-		if (CGX_IsSkinExists(ci->modelName, skinName)) {
-			Q_strncpyz(ci->skinName, skinName, sizeof(ci->skinName)); //set whatever specified if skin exists
-		} else {
-			D_Printf(("^3%s skin not found for model %s. Using %s skin\n", skinName, ci->modelName, ci->skinNameCopy));
-			Q_strncpyz(ci->skinName, ci->skinNameCopy, sizeof(ci->skinName)); //set copied backup
+//adds enntity to scene with shader
+void CGX_AddRefEntityWithCustomShader(refEntity_t *ent, int eFlags) {
+	if ( ent->customShader < 0 ) {
+		//entity has additional shader, add entity with no shader first then with customShader
+		int s = ent->customShader;
+		//don't draw dead players
+		if (!(eFlags & EF_DEAD) || !cgx_deadBodyDarken.integer) {
+			ent->customShader = 0;
+			trap_R_AddRefEntityToScene(ent);
 		}
-	/// if gametype is not team\ctf or skin pm set it, otherwise red\blue will be used 
+		ent->customShader = -s;
+		trap_R_AddRefEntityToScene(ent);
+	} else {
+		trap_R_AddRefEntityToScene( ent );
+	}
+}
+
+//sets any shader for model instead of skin, or adds shader on skin
+static void CGX_SetCustomSkinShader(clientInfo_t *ci, char *shader, qboolean additionalShader) {
+	//prepare skin
+	Q_strncpyz(ci->skinName, ci->skinNameCopy, sizeof ci->skinName);
+	if (Q_stricmp(ci->skinName, "default") && !CGX_IsSkinExists(ci->modelName, ci->skinName))
+		Q_strncpyz(ci->skinName, "default", sizeof ci->skinName);
+
+	//calling register shader like that is not good, but it will be called not often so it's fine
+	if (r_vertexLight.integer) {
+		if (!ci->customShader) {
+			trap_Cvar_Set("r_vertexLight", "0");
+			ci->customShader = trap_R_RegisterShaderNoMip(shader);
+			trap_Cvar_Set("r_vertexLight", "1");
+		}
+	} else {
+		ci->customShader = trap_R_RegisterShaderNoMip(shader);
+	}
+
+	//it will add another entity to scene with specified shader
+	if (additionalShader)
+		ci->customShader = -ci->customShader;
+}
+
+static void CGX_SetAnyBrightSkin(clientInfo_t *ci) {
+	if (CGX_IsSkinExists(ci->modelName, S_PM)) {
+		Q_strncpyz(ci->skinName, S_PM, sizeof(ci->skinName));
+	} else if (CGX_IsSkinExists(ci->modelName, S_BRIGHT)) {
+		Q_strncpyz(ci->skinName, S_BRIGHT, sizeof(ci->skinName));
+	} else {
+		CGX_SetCustomSkinShader(ci, SS_BRIGHT, qtrue);
+	}
+}
+
+static void CGX_SetSkin(clientInfo_t *ci, char *skinName) {
+	ci->customShader = 0;
+
+	if (!skinName[0]) {
+		CGX_SetAnyBrightSkin(ci);
+	} else if (skinName[0] == '*') {
+		Q_strncpyz(ci->skinName, ci->skinNameCopy, sizeof(ci->skinName));
+	} else if (skinName[0] == '!') {
+		CGX_SetCustomSkinShader(ci, &skinName[1], qfalse);
+	} else if (skinName[0] == '+') {
+		CGX_SetCustomSkinShader(ci, &skinName[1], qtrue);
+	} else if (!Q_stricmp(skinName, "fb") && !CGX_IsSkinExists(ci->modelName, skinName)) {
+		CGX_SetCustomSkinShader(ci, SS_BRIGHT, qtrue);
+	} else if (!Q_stricmp(skinName, "fb2") && !CGX_IsSkinExists(ci->modelName, skinName)) {
+		CGX_SetCustomSkinShader(ci, "xm_fb2", qfalse);
+	} else if (!Q_stricmp(skinName, "fb3") && !CGX_IsSkinExists(ci->modelName, skinName)) {
+		CGX_SetCustomSkinShader(ci, "xm_fb3", qfalse);
+	} else if (CGX_IsSkinExists(ci->modelName, skinName)) {
+		Q_strncpyz(ci->skinName, skinName, sizeof(ci->skinName)); //set whatever specified if skin exists
+	} else if (CGX_IsSkinExists(ci->modelName, ci->skinNameCopy)) {
+		Q_strncpyz(ci->skinName, ci->skinNameCopy, sizeof(ci->skinName)); //set copied backup
+	} else {
+		//set something
+		if (cgs.gametype >= GT_TEAM) {
+			if (ci->team == TEAM_BLUE)
+				Q_strncpyz(ci->skinName, "blue", sizeof(ci->skinName));
+			else
+				Q_strncpyz(ci->skinName, "red", sizeof(ci->skinName));
+		} else {
+			Q_strncpyz(ci->skinName, "default", sizeof(ci->skinName));
+		}
+
+		D_Printf(("^3'%s' skin not found for model '%s'. Using '%s' skin\n", skinName, ci->modelName, ci->skinName));
+	}
 }
 
 #define IsSameModel2(x, y, z) (!Q_stricmp(x->modelName, y) && !Q_stricmp(x->skinName, z)) || \
- (!*y && !Q_stricmp(x->modelName, x->modelNameCopy) && !Q_stricmp(x->skinName, "pm"))
+ (!*y && !Q_stricmp(x->modelName, x->modelNameCopy) && !Q_stricmp(x->skinName, S_PM))
 static qboolean CGX_SetModelAndSkin(clientInfo_t *ci, qboolean isDeferred, int clientNum) {
 	qboolean isSameTeam = qfalse;
 
@@ -1503,6 +1581,8 @@ void CGX_Xmod() {
 		CG_Printf("%i Mb\n", trap_MemoryRemaining() / 1024 / 1024);
 	} else if (!Q_stricmp(command, "models")) {
 		CGX_PrintModelCache();
+	} else if (!Q_stricmp(command, "skins")) {
+		CGX_PrintSkinCache();
 	} else if (!Q_stricmp(command, "clients")) {
 		clientInfo_t *ci;
 		char clname[MAX_QPATH];

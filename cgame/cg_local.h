@@ -463,6 +463,8 @@ typedef struct {
 	//X-MOD: model colors for pm skins	
 	byte			colors[4][3];
 	byte			darkenColors[4][3];
+	
+	qhandle_t		customShader;
 
 #if CGX_FREEZE
 	int				breathPuffTime;
@@ -1302,6 +1304,7 @@ void CGX_AutoAdjustNetworkSettings(void);
 void CGX_CheckEnemyModelAll(void);
 void CGX_GenerateMapBat(char *map);
 void CGX_IncreaseHunkmegs(int min);
+void CGX_AddRefEntityWithCustomShader(refEntity_t *ent, int eFlags);
 void CGX_SetSkinColors(clientInfo_t *ci, int clientNum);
 void CGX_SetSkinColorsAll(void);
 void CGX_Init_enemyModels(void);
