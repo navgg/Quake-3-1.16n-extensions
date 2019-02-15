@@ -175,6 +175,32 @@ static void CGX_SayTeam_f( void ) {
 	trap_SendClientCommand( va( "say_team %s\n", res ) );
 }
 
+//fixed follownext & followprev works only in spectator team
+static void CGX_Follownext_f(void) {
+	if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_SPECTATOR || cg.snap->ps.pm_flags & PMF_FOLLOW) {
+		char args[128];
+		trap_Args(args, 128);
+		trap_SendClientCommand(va("follownext %s\n", args));
+	}
+}
+
+static void CGX_Followprev_f(void) {
+	if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_SPECTATOR || cg.snap->ps.pm_flags & PMF_FOLLOW) {
+		char args[128];
+		trap_Args(args, 128);
+		trap_SendClientCommand(va("followprev %s\n", args));
+	}
+}
+
+static void CGX_Followtarget_f(void) {
+	int clientNum = CG_CrosshairPlayer();
+	if (clientNum == -1)
+		return;
+
+	if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_SPECTATOR || cg.snap->ps.pm_flags & PMF_FOLLOW)
+		trap_SendClientCommand(va("follow %i\n", clientNum));
+}
+
 // nemesis/OSP client statistics window 
 static void CG_drawstatsWindow( void ) {
 	if (!cg.intermissionStarted)
@@ -221,6 +247,9 @@ static consoleCommand_t	commands[] = {
 	{ "xmod", CGX_Xmod_f },
 	{ "say", CGX_Say_f },
 	{ "say_team", CGX_SayTeam_f },
+	{ "follownext", CGX_Follownext_f },
+	{ "followprev", CGX_Followprev_f },
+	{ "followtarget", CGX_Followtarget_f },
 
 #if CGX_FREEZE//freeze
 	{ "drop", CG_Drop_f },
