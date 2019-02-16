@@ -113,10 +113,7 @@ static void CG_Draw3DModelColor(float x, float y, float w, float h, qhandle_t mo
 
 	refdef.time = cg.time;	
 
-	ent.shaderRGBA[0] = color[0];
-	ent.shaderRGBA[1] = color[1];
-	ent.shaderRGBA[2] = color[2];
-	ent.shaderRGBA[3] = 255;
+	ShaderRGBACopy(color, ent.shaderRGBA);
 
 	trap_R_ClearScene();
 	CGX_AddRefEntityWithCustomShader(&ent, 0);
@@ -202,11 +199,7 @@ void CG_DrawHead( float x, float y, float w, float h, int clientNum, vec3_t head
 
 		// allow per-model tweaking
 		VectorAdd( origin, ci->headOffset, origin );
-		if (cgx_enemyModel_enabled.integer) {			
-			CG_Draw3DModelColor(x, y, w, h, ci->headModel, ci->headSkin, origin, headAngles, ci->colors[1], ci->customShader);			
-		} else {
-			CG_Draw3DModel(x, y, w, h, ci->headModel, ci->headSkin, origin, headAngles);
-		}
+		CG_Draw3DModelColor(x, y, w, h, ci->headModel, ci->headSkin, origin, headAngles, ci->colors[1], ci->customShader);
 	} else if ( cg_drawIcons.integer ) {		
 		cm = ci->headModel;
 		if ( !cm ) {			
