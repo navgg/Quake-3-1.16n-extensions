@@ -2,9 +2,6 @@
 
 #include "cg_local.h"
 
-#define ShaderRGBFill(a,c)	((a)[0]=(c),(a)[1]=(c),(a)[2]=(c))
-#define ShaderRGBCopy(a,b)	((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2])
-
 #define XMOD_ANSWER(x) { CG_Printf("^7[^1xmod^7]: ^6%s\n", x); trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND ); }
 
 #define DARKEN_COLOR 64

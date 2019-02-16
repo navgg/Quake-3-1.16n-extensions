@@ -895,6 +895,9 @@ static void CG_CalculateWeaponPosition( vec3_t origin, vec3_t angles ) {
 	VectorCopy( cg.refdef.vieworg, origin );
 	VectorCopy( cg.refdefViewAngles, angles );
 
+	if (cg_drawGun.integer >= 2 || !cg_drawGun.integer)
+		return;
+
 	// on odd legs, invert some angles
 	if ( cg.bobcycle & 1 ) {
 		scale = -cg.xyspeed;
@@ -903,21 +906,17 @@ static void CG_CalculateWeaponPosition( vec3_t origin, vec3_t angles ) {
 	}	
 
 	// gun angles from bobbing
-	if (cg_drawGun.integer < 2) {		
-		angles[ROLL] += scale * cg.bobfracsin * 0.005;
-		angles[YAW] += scale * cg.bobfracsin * 0.01;
-		angles[PITCH] += cg.xyspeed * cg.bobfracsin * 0.005;
-	}
-
-	if (cg_drawGun.integer != 2) {
-		// drop the weapon when landing
-		delta = cg.time - cg.landTime;
-		if (delta < LAND_DEFLECT_TIME) {
-			origin[2] += cg.landChange*0.25 * delta / LAND_DEFLECT_TIME;
-		} else if (delta < LAND_DEFLECT_TIME + LAND_RETURN_TIME) {
-			origin[2] += cg.landChange*0.25 *
-				(LAND_DEFLECT_TIME + LAND_RETURN_TIME - delta) / LAND_RETURN_TIME;
-		}
+	angles[ROLL] += scale * cg.bobfracsin * 0.005;
+	angles[YAW] += scale * cg.bobfracsin * 0.01;
+	angles[PITCH] += cg.xyspeed * cg.bobfracsin * 0.005;
+	
+	// drop the weapon when landing
+	delta = cg.time - cg.landTime;
+	if (delta < LAND_DEFLECT_TIME) {
+		origin[2] += cg.landChange*0.25 * delta / LAND_DEFLECT_TIME;
+	} else if (delta < LAND_DEFLECT_TIME + LAND_RETURN_TIME) {
+		origin[2] += cg.landChange*0.25 *
+			(LAND_DEFLECT_TIME + LAND_RETURN_TIME - delta) / LAND_RETURN_TIME;
 	}
 #if 0
 	// drop the weapon when stair climbing
@@ -930,14 +929,12 @@ static void CG_CalculateWeaponPosition( vec3_t origin, vec3_t angles ) {
 #endif
 
 	// idle drift	
-	if (cg_drawGun.integer < 2) {
-		scale = cg.xyspeed + 40;
-		fracsin = sin(cg.time * 0.001);
+	scale = cg.xyspeed + 40;
+	fracsin = sin(cg.time * 0.001);
 
-		angles[ROLL] += scale * fracsin * 0.01;
-		angles[YAW] += scale * fracsin * 0.01;
-		angles[PITCH] += scale * fracsin * 0.01;
-	}
+	angles[ROLL] += scale * fracsin * 0.01;
+	angles[YAW] += scale * fracsin * 0.01;
+	angles[PITCH] += scale * fracsin * 0.01;
 }
 
 
@@ -1133,6 +1130,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	weapon_t	weaponNum;
 	weaponInfo_t	*weapon;
 	centity_t	*nonPredictedCent;
+	static qhandle_t ghostShader;
 
 	weaponNum = cent->currentState.weapon;
 
@@ -1147,6 +1145,12 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 	// set custom shading for railgun refire rate
 	if ( ps ) {
+		//x-mod: transparent weapon like in ql
+		if (cg_drawGun.integer == 3) {
+			if (!ghostShader) ghostShader = trap_R_RegisterShader("xm_whiteShader");
+			gun.customShader = ghostShader;
+			ShaderRGBFill(gun.shaderRGBA, 16);
+		} else
 		if ( cg.predictedPlayerState.weapon == WP_RAILGUN 
 			&& cg.predictedPlayerState.weaponstate == WEAPON_FIRING ) {
 			float	f;
@@ -1198,6 +1202,11 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		AnglesToAxis( angles, barrel.axis );
 
 		CG_PositionRotatedEntityOnTag( &barrel, &gun, weapon->weaponModel, "tag_barrel" );
+
+		if (ps && cg_drawGun.integer == 3) {
+			barrel.customShader = ghostShader;
+			ShaderRGBFill(barrel.shaderRGBA, 16);
+		}
 
 		CG_AddWeaponWithPowerups( &barrel, cent->currentState.powerups );
 	}

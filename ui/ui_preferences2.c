@@ -162,6 +162,7 @@ static const char *drawgun_items[] =
 	"off",
 	"default",
 	"still",
+	"transparent",
 	0
 };
 

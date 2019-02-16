@@ -33,6 +33,9 @@
 //X-MOD: custom color extensions
 #define ShaderRGBACopy(a,b)	((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2],(b)[3]=(255))
 
+#define ShaderRGBFill(a,c)	((a)[0]=(c),(a)[1]=(c),(a)[2]=(c))
+#define ShaderRGBCopy(a,b)	((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2])
+
 // widescreen fix flags
 #define CGX_WFIX_SCREEN	0x0001
 #define CGX_WFIX_FOV	0x0002

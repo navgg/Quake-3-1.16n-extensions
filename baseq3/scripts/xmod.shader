@@ -32,3 +32,12 @@ xm_fb3
 		rgbGen entity
 	}
 }
+
+xm_whiteShader
+{
+	{
+		map $whiteimage
+		blendfunc add
+		rgbGen entity
+	}
+}
