@@ -937,7 +937,7 @@ static void CG_RegisterGraphics( void ) {
 
 	//X-MOD: fixed crosshair shaders for crosshair color		
 	for (i = 0; i < NUM_CROSSHAIRS; i++) {
-		cgs.media.crosshairShader[i] = trap_R_RegisterShader( va( "gfx/2d/fixed_crosshair%c", 'a' + i ) );
+		cgs.media.crosshairShader[i] = trap_R_RegisterShader( va( "gfx/2d/xm_crosshair%c", 'a' + i ) );
 	}
 	if (!cgx_crosshairColor.string[0])
 	for (i = 0; i < NUM_CROSSHAIRS; i++) {
