@@ -47,6 +47,19 @@ xm_whiteShader
 	}
 }
 
+//weather
+
+xm_snowflake2
+{
+	cull none
+	entityMergable
+	{
+		map gfx/misc/snowflake2.tga
+		blendFunc blend
+		rgbGen vertex
+	}
+}
+
 //crosshairs
 
 gfx/2d/xm_crosshair

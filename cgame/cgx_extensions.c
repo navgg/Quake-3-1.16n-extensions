@@ -1492,9 +1492,9 @@ static void CGX_ReloadEffects() {
 	trap_Cvar_Get("cg_weaponEffects", buf);
 
 	if (atoi(buf) & WE_LG32)
-		cgs.media.lightningShader = trap_R_RegisterShader( cgx_nomip.integer ? "lightningBoltNewNPM" : "lightningBoltNew" );
+		trap_R_RegisterShaderOrNomip(cgs.media.lightningShader, "lightningBoltNew")
 	else
-		cgs.media.lightningShader = trap_R_RegisterShader("lightningBolt");
+		trap_R_RegisterShaderOrNomip(cgs.media.lightningShader, "lightningBolt")
 }
 
 #define help_file "doc\\2-comand_list.txt"

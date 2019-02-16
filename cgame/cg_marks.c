@@ -606,7 +606,7 @@ void CG_AddParticles2( void ) {
 
 		if (!isSnowing) {
 			static qhandle_t snowShader;
-			trap_R_LazyRegisterShader(snowShader, "snowflake2");
+			trap_R_LazyRegisterShader(snowShader, "xm_snowflake2");
 
 			for (i = 0; i < CGX_SNOW_TOTAL; i++)
 				CG_ParticleSnow2(snowShader);

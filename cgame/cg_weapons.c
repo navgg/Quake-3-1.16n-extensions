@@ -703,9 +703,9 @@ void CG_RegisterWeapon( int weaponNum ) {
 
 		weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/lightning/lg_fire.wav" );
 		if (cgx_weaponEffects.integer & WE_LG32)
-			cgs.media.lightningShader = trap_R_RegisterShader( cgx_nomip.integer ? "lightningBoltNewNPM" : "lightningBoltNew" );
+			trap_R_RegisterShaderOrNomip(cgs.media.lightningShader, "lightningBoltNew")
 		else
-			cgs.media.lightningShader = trap_R_RegisterShader("lightningBolt");
+			trap_R_RegisterShaderOrNomip(cgs.media.lightningShader, "lightningBolt")
 		
 		cgs.media.lightningExplosionModel = trap_R_RegisterModel( "models/weaphits/crackle.md3" );
 		cgs.media.sfx_lghit1 = trap_S_RegisterSound( "sound/weapons/lightning/lg_hit.wav" );
