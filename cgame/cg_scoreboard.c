@@ -301,7 +301,7 @@ qboolean CG_DrawNormalScoreboard( void ) {
 	}
 
 	// don't draw scoreboard during death while warmup up
-	if ( cg.warmup && !cg.showScores ) {
+	if ( cg.warmup && !cg.showScores && cg.predictedPlayerState.pm_type != PM_INTERMISSION ) {
 		return qfalse;
 	}
 
