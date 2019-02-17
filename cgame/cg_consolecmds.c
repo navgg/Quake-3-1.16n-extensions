@@ -183,7 +183,7 @@ static void CGX_Follownext_f(void) {
 	if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_SPECTATOR || cg.snap->ps.pm_flags & PMF_FOLLOW) {
 		char args[128];
 		trap_Args(args, 128);
-		trap_SendClientCommand(va("follownext %s\n", args));
+		CGX_SendClientCommand(va("follownext %s\n", args));
 	}
 }
 
@@ -191,7 +191,7 @@ static void CGX_Followprev_f(void) {
 	if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_SPECTATOR || cg.snap->ps.pm_flags & PMF_FOLLOW) {
 		char args[128];
 		trap_Args(args, 128);
-		trap_SendClientCommand(va("followprev %s\n", args));
+		CGX_SendClientCommand(va("followprev %s\n", args));
 	}
 }
 
@@ -201,7 +201,7 @@ static void CGX_Followtarget_f(void) {
 		return;
 
 	if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_SPECTATOR || cg.snap->ps.pm_flags & PMF_FOLLOW)
-		trap_SendClientCommand(va("follow %i\n", clientNum));
+		CGX_SendClientCommand(va("follow %i\n", clientNum));
 }
 
 // nemesis/OSP client statistics window 

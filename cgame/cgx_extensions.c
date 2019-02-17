@@ -581,6 +581,20 @@ void CGX_MapRestart() {
 	D_Printf(("^6CGX_MapRestart\n"));
 }
 
+//send cmd with interval on servers with sv_floodprotect 1
+void CGX_SendClientCommand(char *command) {
+	static int cmd_time;
+
+	if (cgs.sv_floodProtect) {
+		if (cg.time < cmd_time)
+			return;
+
+		cmd_time = cg.time + 1000;
+	}
+
+	trap_SendClientCommand(command);
+}
+
 #pragma region auto network settings
 
 static qboolean CGX_ValidateFPS(void) {
@@ -766,6 +780,8 @@ void CGX_SyncServerParams(const char *info) {
 
 	if (cgs.serverMod == SM_UNDEFINED) {
 		CGX_SyncServer_delagHitscan( info );
+
+		cgs.sv_floodProtect = atoi(Info_ValueForKey(info, "sv_floodProtect"));
 
 		Q_strncpyz( cgs.gamename, Info_ValueForKey( info, "gamename" ), sizeof( cgs.gamename ) );
 

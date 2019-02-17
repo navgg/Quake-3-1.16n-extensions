@@ -1018,6 +1018,7 @@ typedef struct {
 	//int				sv_maxrate;
 	char			gamename[MAX_QPATH];
 	cgxServerMod_t	serverMod;
+	qboolean		sv_floodProtect;
 
 	//unlagged - client options
 	// this will be set to the server's g_delagHitscan
@@ -1294,6 +1295,7 @@ void CG_ParticleExplosionZE( vec3_t origin );
 //
 
 void CG_LoadClientInfo( clientInfo_t *ci );
+void CGX_SendClientCommand ( char *command );
 
 void CGX_ResetModelCache();
 qboolean CGX_TryLoadModelFromCache(clientInfo_t *ci, qboolean tryAny, qboolean trySkinLoads);
