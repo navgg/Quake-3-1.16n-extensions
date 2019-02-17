@@ -125,8 +125,11 @@ static void CGX_SaveSharedConfig_f( void ) {
 static void CGX_RecordSync_f( void ) {
 	char	name[MAX_QPATH];
 	trap_Args( name, MAX_QPATH );
-
-	trap_SendConsoleCommand(va("g_syncronousClients 1; record %s; g_syncronousClients 0\n", name));
+	
+	if (cg_syncronousClients.integer)
+		trap_SendConsoleCommand(va("record %s\n", name));
+	else
+		trap_SendConsoleCommand(va("g_syncronousClients 1; record %s; g_syncronousClients 0\n", name));
 }
 
 static void CGX_Xmod_f(void) {
