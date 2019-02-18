@@ -572,18 +572,23 @@ void CGX_MapRestart() {
 	if (cgx_enemyModel_enabled.integer)
 		CGX_CheckEnemyModelAll();
 
+	if (stats.needprint)
+		CG_statsWindowPrint();
+	else
+		CG_statsWindowFree(0);
+
 	//nemesis/osp reset stats
 	memset( &stats, 0, sizeof( stats ) );
-
-	CG_statsWindowPrint();
-	CG_statsWindowFree( 0 );
 
 	D_Printf(("^6CGX_MapRestart\n"));
 }
 
-//send cmd with interval on servers with sv_floodprotect 1
+//send cmd with interval on servers with sv_floodprotect 1, in intermission skip
 void CGX_SendClientCommand(char *command) {
 	static int cmd_time;
+
+	if (cg.snap->ps.pm_type == PM_INTERMISSION)
+		return;
 
 	if (cgs.sv_floodProtect) {
 		if (cg.time < cmd_time)
@@ -1609,6 +1614,8 @@ void CGX_Xmod() {
 	} else if (!Q_stricmp(command, "reload")) {
 		if (!Q_stricmp(arg, "effects"))
 			CGX_ReloadEffects();
+	} else if (!Q_stricmp(command, "stats")) {
+		CG_statsWindowPrint();
 	} else if (stristr(command, "pk3")) {
 		CGX_Pk3list_f();
 	} else if (!Q_stricmp(command, "ragequit")) {

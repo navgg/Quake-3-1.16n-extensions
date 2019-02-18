@@ -414,7 +414,7 @@ cvarTable_t		cgx_cvarTable_temp[] = {
 	//for model cahe
 	{ &cgx_modelCache, "cg_modelCache", "1", CVAR_TEMP | CVAR_LATCH },
 	//ops stats window in intermission
-	{ &cgx_intermissionStats, "cg_intermissionStats", "1", CVAR_TEMP },
+	{ &cgx_intermissionStats, "cg_intermissionStats", "0", CVAR_TEMP },
 	//for unlagged.c
 	//better not register here or servefs will screw clients sv_fps
 	// this will be automagically copied from the server	
@@ -1240,7 +1240,8 @@ void CG_Shutdown( void ) {
 	trap_Cvar_Set("pmove_msec", "8");
 	trap_Cvar_Set("pmove_accurate", "0");
 
-	CG_statsWindowPrint();
+	if (stats.needprint)
+		CG_statsWindowPrint();
 
 	// some mods may need to do cleanup work here,
 	// like closing files or archiving session data

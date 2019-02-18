@@ -279,9 +279,13 @@ extern char	*ui_medalSounds[];
 // uix_extensions.c
 //
 
-void UIX_CommonStatusBar(void *self, int min, int total, const char* info_messages[][2]);
+extern void Controls_GetKeyAssignment(char *command, int *twokeys);
 
-void UIX_SaveCachedServers();
+extern void UIX_CommonStatusBar(void *self, int min, int total, const char* info_messages[][2]);
+
+extern void UIX_SaveCachedServers();
+extern void UIX_Init();
+extern void UIX_Init_Input();
 
 //
 // ui_mfield.c

@@ -58,8 +58,27 @@ static void CG_Viewpos_f (void) {
 		(int)cg.refdefViewAngles[YAW]);
 }
 
+// nemesis/OSP client statistics window 
+static void CG_StatsWindowDown_f(void) {
+	if (cg.snap->ps.pm_type == PM_INTERMISSION && cgx_intermissionStats.integer)
+		return;
+
+	CG_statsWindow(0);
+}
+
+static void CG_StatsWindowUp_f(void) {
+	if (cg.snap->ps.pm_type == PM_INTERMISSION && cgx_intermissionStats.integer)
+		return;
+
+	CG_statsWindowFree(0);
+}
 
 static void CG_ScoresDown_f( void ) {
+	if ( cg.snap->ps.pm_type == PM_INTERMISSION ) {
+		CG_StatsWindowDown_f();
+		return;
+	}
+
 	if ( cg.scoresRequestTime + 2000 < cg.time ) {
 		// the scores are more than two seconds out of data,
 		// so request new ones
@@ -80,6 +99,11 @@ static void CG_ScoresDown_f( void ) {
 }
 
 static void CG_ScoresUp_f( void ) {
+	if ( cg.snap->ps.pm_type == PM_INTERMISSION ) {
+		CG_StatsWindowUp_f();
+		return;
+	}
+
 	cg.showScores = qfalse;
 	cg.scoreFadeTime = cg.time;
 }
@@ -204,17 +228,6 @@ static void CGX_Followtarget_f(void) {
 		CGX_SendClientCommand(va("follow %i\n", clientNum));
 }
 
-// nemesis/OSP client statistics window 
-static void CG_drawstatsWindow( void ) {
-	if (!cg.intermissionStarted)
-		CG_statsWindow();
-}
-
-static void CG_removestatsWindow( void ) {
-	if (!cg.intermissionStarted)
-		CG_statsWindowFree( 0 );
-}
-
 typedef struct {
 	char	*cmd;
 	void	(*function)(void);
@@ -259,8 +272,8 @@ static consoleCommand_t	commands[] = {
 #endif//freeze
 
 	//nemesis/OSP
-	{ "+cstats", CG_drawstatsWindow },
-	{ "-cstats", CG_removestatsWindow },
+	{ "+stats", CG_StatsWindowDown_f },
+	{ "-stats", CG_StatsWindowUp_f },
 };
 
 

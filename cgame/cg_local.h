@@ -192,6 +192,7 @@ typedef struct {
 	//int flagsCaptured;
 	//int flagsReturned;
 	//int flagTime;
+	qboolean needprint; //print stats after intermission
 } clientStats_t;
 
 //OSP end
@@ -1274,7 +1275,7 @@ qboolean CG_DrawOSPScoreboard( void );
 void CG_DrawBorder( int x, int y, int w, int h, int size, const float *borderColor );
 void CG_DrawWidthGauge( int x, int y, int width, int height, vec4_t color, int value, qboolean reverse );
 void CG_windowDraw( void );
-void CG_statsWindow( void );
+void CG_statsWindow( int weffects );
 void CG_statsWindowFree( int weffects );
 void CG_statsWindowPrint( void );
 

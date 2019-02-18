@@ -67,3 +67,22 @@ void UIX_PlayerInfo_SetWeapon( playerInfo_t *pi, weapon_t weaponNum ) {
 	UI_PlayerInfo_SetWeapon(pi, weaponNum);
 	UIX_NomipEnd();
 }
+
+//get +scores key for cgame
+void UIX_Init_Input() {
+	int keys[2];
+	char name[32];
+	
+	Controls_GetKeyAssignment("+scores", keys);
+
+	if (keys[0] != -1)
+		trap_Key_KeynumToStringBuf(keys[0], name, 32);
+	else
+		*name = 0;
+
+	trap_Cvar_Set("cgx_scores_key", name);
+}
+
+void UIX_Init() {
+	UIX_Init_Input();
+}

@@ -863,6 +863,8 @@ static void Controls_SetConfig( void )
 	trap_Cvar_SetValue( "joy_threshold", s_controls.joythreshold.curvalue );
 	trap_Cvar_SetValue( "cl_freelook", s_controls.freelook.curvalue );
 	trap_Cmd_ExecuteText( EXEC_APPEND, "in_restart\n" );
+
+	UIX_Init_Input();
 }
 
 /*

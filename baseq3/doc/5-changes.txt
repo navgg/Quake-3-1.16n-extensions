@@ -154,5 +154,7 @@ cg_wideScreenFix by default set to 1 just for compability with vanilla q3 cg_fov
 
 ...
 
+stats show by tab key press in intermission
+
 added cg_drawGun 3 - transparent
 added followtarget on zoom in spect

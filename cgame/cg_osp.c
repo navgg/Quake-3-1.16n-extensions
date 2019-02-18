@@ -451,7 +451,7 @@ void CG_windowDraw( void ) {
 }
 
 // stats windows init
-void CG_statsWindow( void ) {
+void CG_statsWindow( int weffects ) {
 	int weaponCount;
 	int kills, deaths, score;
 	//float efficiency;
@@ -469,7 +469,7 @@ void CG_statsWindow( void ) {
 	if (cgs.clientinfo[cg.clientNum].team == TEAM_SPECTATOR && interMission)
 		return;
 
-	sw = CG_windowAlloc( WFX_TEXTSIZING | (interMission ? WFX_FADEIN : 0), 350 );
+	sw = CG_windowAlloc( WFX_TEXTSIZING | weffects, 350 );
 
 	cg.statsWindow = sw;
 	if (sw == NULL) return;
@@ -605,15 +605,22 @@ void CG_statsWindowFree( int weffects ) {
 
 //X-Mod: print to console
 void CG_statsWindowPrint( void ) {
-	cg_window_t *w = cg.statsWindow;
+	cg_window_t *w;
 	int i;
+	
+	if (!cg.statsWindow)
+		CG_statsWindow(0);
 
-	if (w) {
-		CG_Printf("\n");
-		for (i = 0; i < w->lineCount; i++)
-			CG_Printf("%s\n", w->lineText[i]);
-		CG_Printf("\n");
-	}
+	w = cg.statsWindow;
+
+	if (!w) return;
+
+	CG_Printf("\n");
+	for (i = 0; i < w->lineCount; i++)
+		CG_Printf("%s\n", w->lineText[i]);
+	CG_Printf("\n");
+
+	CG_statsWindowFree(0);
 }
 
 //X-Mod: refactored and improved stats gathering

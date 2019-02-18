@@ -2302,9 +2302,16 @@ static void CG_DrawIntermission( void ) {
 	cg.scoreFadeTime = cg.time;
 	CG_DrawScoreboard();
 
+	stats.needprint = qtrue;
 	trap_Cvar_Update(&cgx_intermissionStats);
-	if (cgx_intermissionStats.integer)
-	CG_statsWindow();
+	if (cgx_intermissionStats.integer) {
+		CG_statsWindow(WFX_FADEIN);
+	} else if (!cg.statsWindow && cgs.clientinfo[cg.snap->ps.clientNum].team != TEAM_SPECTATOR) {
+		char key[32];
+		trap_Cvar_VariableStringBuffer("cgx_scores_key", key, sizeof key);
+		CG_DrawStringExt(8, SCREEN_HEIGHT - 8 - 8, va("Press %s to see your stats", *key ? key : "+scores key"), 
+			colorWhite, qfalse, qtrue, WINDOW_FONTWIDTH, WINDOW_FONTHEIGHT, 0);
+	}
 }
 
 /*
@@ -2503,9 +2510,9 @@ static void CG_Draw2D( void ) {
 	}
 
 	if ( cg.snap->ps.pm_type == PM_INTERMISSION ) {
+		CG_DrawIntermission();
 		// OSP window style engine
 		CG_windowDraw();
-		CG_DrawIntermission();
 		return;
 	}
 
@@ -2546,9 +2553,10 @@ static void CG_Draw2D( void ) {
 	// don't draw center string if scoreboard is up
 	if ( !CG_DrawScoreboard() ) {
 		CG_DrawCenterString();
-		// OSP window style engine
-		CG_windowDraw();
 	}
+
+	// OSP window style engine
+	CG_windowDraw();
 }
 
 /*
