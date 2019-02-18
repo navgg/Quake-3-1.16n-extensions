@@ -1,7 +1,5 @@
 call compile_cgame
-cd ..
 rem call compile_ui
-rem cd ..
 
 set "pakname={X-Mod}.pk3"
 

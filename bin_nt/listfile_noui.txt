@@ -3,6 +3,7 @@ vm\cgame.qvm
 doc\*
 models\*
 sound\feedback\*
+sound\player\*
 scripts\*
 gfx\*
 levelshots\
