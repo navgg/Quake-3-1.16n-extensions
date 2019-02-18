@@ -422,6 +422,12 @@ static void CG_OffsetFirstPersonView( void ) {
 //======================================================================
 
 void CG_ZoomDown_f( void ) { 
+	if (cgs.clientinfo[cg.snap->ps.clientNum].team == TEAM_SPECTATOR || cg.snap->ps.pm_flags & PMF_FOLLOW) {
+		int clientNum = CG_CrosshairPlayer();
+		if (clientNum != -1)
+			CGX_SendClientCommand(va("follow %i\n", clientNum));
+	}
+
 	if ( cg.zoomed ) {
 		return;
 	}
