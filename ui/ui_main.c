@@ -176,8 +176,6 @@ vmCvar_t	cg_projectileNudge;
 vmCvar_t	cg_optimizePrediction;
 #endif
 
-//X-MOD: ui_cinematics playback fix for custom resolutions
-vmCvar_t	uix_cinematicplayed;
 
 cvarTable_t		cvarTable[] = {
 	{ &ui_ffa_fraglimit, "ui_ffa_fraglimit", "20", CVAR_ARCHIVE },
@@ -244,7 +242,6 @@ cvarTable_t		cvarTable[] = {
 	{ &uix_drawScoreBox, "cg_drawScoreBox", "1", CVAR_ARCHIVE },
 	{ &uix_sharedConfig, "cg_sharedConfig", "0", CVAR_ARCHIVE },
 
-	{ &uix_cinematicplayed, "uix_cinematicplayed", "-1", CVAR_TEMP },
 	{ &uix_nomip, "cg_nomip", "-1", CVAR_ARCHIVE | CVAR_LATCH },
 	{ &uix_weaponEffects, "cg_weaponEffects", "8", CVAR_ARCHIVE },
 	{ &uix_draw2D, "cg_draw2D", "1", CVAR_ARCHIVE },

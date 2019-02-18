@@ -89,9 +89,9 @@ static void UI_CinematicsMenu_Event( void *ptr, int event ) {
 	}
 	else {
 		// X-MOD: hack - play cinematic in custom resolution, set 640x480 to play and then restore old resolution
-		if (trap_Cvar_VariableValue("r_mode") == -1.0f) {
-			trap_Cvar_Set( "nextmap", "vid_restart" );
-			trap_Cmd_ExecuteText(EXEC_APPEND, va("disconnect; r_mode 3; vid_restart; cinematic %s.RoQ; r_mode -1; uix_cinematicplayed %i\n", cinematics[n], n + 100));
+		if (uis.bias) {
+			trap_Cvar_Set( "nextmap", va( "vid_restart; wait 3; ui_cinematics %i", n ) );
+			trap_Cmd_ExecuteText(EXEC_APPEND, va("disconnect; r_mode 3; vid_restart; cinematic %s.RoQ; r_mode -1\n", cinematics[n]));
 		} else {
 			trap_Cvar_Set( "nextmap", va( "ui_cinematics %i", n ) );
 			trap_Cmd_ExecuteText(EXEC_APPEND, va("disconnect; cinematic %s.RoQ\n", cinematics[n]));
