@@ -228,11 +228,11 @@ static void UI_NetworkOptionsMenu_Event( void* ptr, int event ) {
 
 	case ID_PREDICTION:
 		trap_Cvar_SetValue( "cg_delag_optimizePrediction", networkOptionsInfo.prediction.curvalue );
-		if (networkOptionsInfo.prediction.curvalue)
-			networkOptionsInfo.predictitems.curvalue = 0;					
-		else
-			networkOptionsInfo.predictitems.curvalue = 1;	
-		trap_Cvar_SetValue( "cg_predictitems", networkOptionsInfo.predictitems.curvalue );	
+		//if (networkOptionsInfo.prediction.curvalue)
+		//	networkOptionsInfo.predictitems.curvalue = 0;					
+		//else
+		//	networkOptionsInfo.predictitems.curvalue = 1;	
+		//trap_Cvar_SetValue( "cg_predictitems", networkOptionsInfo.predictitems.curvalue );	
 		break;
 
 	case ID_PREDICTITEMS:
