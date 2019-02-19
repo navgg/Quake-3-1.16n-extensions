@@ -544,7 +544,7 @@ void CG_UpdateCvars( void ) {
 		}
 		else {
 			CGX_Init_enemyModels();			
-			CGX_CheckEnemyModelAll();
+			CGX_CheckEnemyModelAll(qtrue);
 			D_Printf(("^6CG_UpdateCvars value changed\n"));
 		}
 

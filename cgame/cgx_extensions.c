@@ -200,11 +200,14 @@ void CGX_Init_enemyModels(void) {
 }
 
 //checks enemy models of all clients and loads if needed
-void CGX_CheckEnemyModelAll(void) {
+void CGX_CheckEnemyModelAll(qboolean force) {
 	int		i;
 	clientInfo_t	*ci;
 
 	if (cgs.gametype == GT_SINGLE_PLAYER)
+		return;
+
+	if (!cgx_enemyModel_enabled.integer && !force)
 		return;
 
 	if (cg.clientNum == -1) {
@@ -528,14 +531,13 @@ void CGX_CheckEnemyModel(clientInfo_t *ci, qboolean isDeferred, int clientNum) {
 }
 
 // tracking changes, only after cg.snap received
-void CGX_TrackEnemyModelChanges() {
+void CGX_TrackPlayerStateChanges() {
 	// track client num change
 	if (cg.clientNum != cg.snap->ps.clientNum) {
 		cg.clientNum = cg.snap->ps.clientNum;
 		cg.oldTeam = cgs.clientinfo[cg.clientNum].team;
 
-		if (cgx_enemyModel_enabled.integer)
-		CGX_CheckEnemyModelAll();
+		CGX_CheckEnemyModelAll(qfalse);
 		D_Printf(("^6cg.clientNum %i\n", cg.clientNum));
 	} // track team change
 	else if (cg.oldTeam != cgs.clientinfo[cg.clientNum].team) {
@@ -545,16 +547,14 @@ void CGX_TrackEnemyModelChanges() {
 		if (!(cg.snap->ps.pm_flags & PMF_FOLLOW))
 			memset( &stats, 0, sizeof( stats ) );
 
-		if (cgx_enemyModel_enabled.integer)
-		CGX_CheckEnemyModelAll();
+		CGX_CheckEnemyModelAll(qfalse);
 		D_Printf(("^6TEAM CHANGED!\n"));
 	} //track intermission change
 	else if (cg.snap->ps.pm_type == PM_INTERMISSION && !cg.clientIntermission &&
 		EM_Check(EM_INTERMISSION)) {
 		cg.clientIntermission = qtrue;
 
-		if (cgx_enemyModel_enabled.integer)
-		CGX_CheckEnemyModelAll();
+		CGX_CheckEnemyModelAll(qfalse);
 		D_Printf(("^6PM_INTERMISSION!\n"));
 	}
 }
@@ -569,8 +569,8 @@ void CGX_MapRestart() {
 
 	// X-MOD: send modinfo
 	CGX_SendModinfo(qfalse);
-	if (cgx_enemyModel_enabled.integer)
-		CGX_CheckEnemyModelAll();
+
+	CGX_CheckEnemyModelAll(qfalse);
 
 	if (stats.needprint)
 		CG_statsWindowPrint();
@@ -1534,7 +1534,7 @@ void CGX_Xmod() {
 
 	if (!Q_stricmp(command, "e")) {
 		XMOD_ANSWER("checking enemy models...");
-		CGX_CheckEnemyModelAll();
+		CGX_CheckEnemyModelAll(qtrue);
 		return;
 	} 
 
