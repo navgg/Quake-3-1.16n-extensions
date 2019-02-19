@@ -258,7 +258,7 @@ void UI_MainMenu( void ) {
 	//if( !uis.demoversion && !ui_cdkeychecked.integer ) {
 	//	char	key[17];
 
-	//	trap_GetCDKey( key, sizeof(key) );
+	//	UIX_GetCDKey(key, sizeof key);
 	//	if( strcmp( key, "123456789" ) == 0 ) {
 	//		UI_CDKeyMenu();
 	//		return;
@@ -329,6 +329,7 @@ void UI_MainMenu( void ) {
 	s_main.cinematics.color					= color_red;
 	s_main.cinematics.style					= style;
 
+	if (uis.q3version >= 16)
 	y += MAIN_MENU_VERTICAL_SPACING;
 	s_main.mods.generic.type			= MTYPE_PTEXT;
 	s_main.mods.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS|isHidden;
@@ -378,6 +379,7 @@ void UI_MainMenu( void ) {
 	Menu_AddItem( &s_main.menu,	&s_main.setup );
 	Menu_AddItem( &s_main.menu,	&s_main.demos );
 	Menu_AddItem( &s_main.menu,	&s_main.cinematics );
+	if (uis.q3version >= 16)
 	Menu_AddItem( &s_main.menu,	&s_main.mods );
 	Menu_AddItem( &s_main.menu,	&s_main.exit );   
 	Menu_AddItem( &s_main.menu,	&s_main.lasterror );

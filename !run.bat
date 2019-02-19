@@ -7,6 +7,7 @@ rem set "gamedir=C:\Games\Quake 3 Arena 1.16n clean\"
 rem set "gamedir=C:\Games\Quake\Quake 3 Arena 1.16n Vanilla\Vanilla Quake III Arena 1.16n\"
 
 rem set "gamedir=D:\Games\Quake 3\"
+rem 
 set "gamedir=D:\Games\Quake3Gracz\"
 
 set "pakname={X-Mod}.pk3"
@@ -21,7 +22,7 @@ rem start /D "%gamedir%" "" quake3.exe +set sv_pure 0 +devmap q3dm17
 rem start /D "%gamedir%" "" quake3.exe
 rem start /D "%gamedir%" "" quake3.exe +connect sodmod.ml:27964 +set developer 1
 rem start /D "%gamedir%" "" quake3.exe +set sv_pure 0 +devmap 13box +set g_gametype 0
-start /D "%gamedir%" "" quake3.exe
+start /D "%gamedir%" "" quake3.exe +nointro
 
 rem +cg_debuganim 1
 rem +devmap q3dm1

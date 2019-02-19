@@ -83,6 +83,41 @@ void UIX_Init_Input() {
 	trap_Cvar_Set("cgx_scores_key", name);
 }
 
+void UIX_GetCDKey(char *buf, int buflen) {
+	if (uis.q3version > 11)
+		trap_GetCDKey(buf, buflen);
+	else
+		trap_Cvar_VariableStringBuffer("cl_cdkey", buf, buflen);
+
+	if (!*buf || !strcmp(buf, "123456789"))
+		strcpy(buf, "3222222222222222");
+}
+
+void UIX_SetCDKey(char *buf) {
+	if (uis.q3version > 11)
+		trap_SetCDKey(buf);
+	else
+		trap_Cmd_ExecuteText(EXEC_APPEND, va("seta cl_cdkey %s\n", buf));
+}
+
+//return api version based on game version
+//seems the only difference between 1.11 and 1.16n ui is cd key traps
+//mods menu can work in 1.11, but it's hidden on purpose
+int UIX_GetApiVersion() {
+	char buf[32];
+	
+	trap_Cvar_VariableStringBuffer("version", buf, sizeof buf);
+
+	uis.q3version = atoi(&buf[5]);
+
+	//trap_Print(va("^3version: %s uis.q3version %i\n", buf, uis.q3version));
+
+	if (uis.q3version > 11)
+		return UI_API_VERSION;
+
+	return UI_API_VERSION - 1;
+}
+
 void UIX_Init() {
 	UIX_Init_Input();
 }

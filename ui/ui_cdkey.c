@@ -51,7 +51,7 @@ static void UI_CDKeyMenu_Event( void *ptr, int event ) {
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_ACCEPT:
 		if( cdkeyMenuInfo.cdkey.field.buffer[0] ) {
-			trap_SetCDKey( cdkeyMenuInfo.cdkey.field.buffer );
+			UIX_SetCDKey( cdkeyMenuInfo.cdkey.field.buffer );
 		}
 		UI_PopMenu();
 		break;
@@ -229,7 +229,7 @@ static void UI_CDKeyMenu_Init( void ) {
 		Menu_AddItem( &cdkeyMenuInfo.menu, &cdkeyMenuInfo.back );
 	}
 
-	trap_GetCDKey( cdkeyMenuInfo.cdkey.field.buffer, cdkeyMenuInfo.cdkey.field.maxchars + 1 );
+	UIX_GetCDKey( cdkeyMenuInfo.cdkey.field.buffer, cdkeyMenuInfo.cdkey.field.maxchars + 1 );
 	if( strcmp( cdkeyMenuInfo.cdkey.field.buffer, "123456789" ) == 0 ) {
 		cdkeyMenuInfo.cdkey.field.buffer[0] = 0;
 	}

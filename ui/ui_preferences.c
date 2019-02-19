@@ -938,7 +938,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.drawteamoverlay.generic.y	       = y;
 	s_preferences.drawteamoverlay.itemnames			= teamoverlay_names;
 	s_preferences.drawteamoverlay.generic.statusbar   = UI_Preferences_StatusBar;
-
+	if (uis.q3version >= 16)
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.allowdownload.generic.type     = MTYPE_RADIOBUTTON;
 	s_preferences.allowdownload.generic.name	   = "Automatic Downloading:";
@@ -995,6 +995,7 @@ static void Preferences_MenuInit( void ) {
 	Menu_AddItem( &s_preferences.menu, &s_preferences.synceveryframe );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.forcemodel );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.drawteamoverlay );
+	if (uis.q3version >= 16)
 	Menu_AddItem( &s_preferences.menu, &s_preferences.allowdownload );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.crosshaircolor );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.crosshairsize);

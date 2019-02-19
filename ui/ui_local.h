@@ -283,6 +283,9 @@ extern void Controls_GetKeyAssignment(char *command, int *twokeys);
 
 extern void UIX_CommonStatusBar(void *self, int min, int total, const char* info_messages[][2]);
 
+extern void UIX_GetCDKey(char *buf, int buflen);
+extern void UIX_SetCDKey(char *buf);
+extern int  UIX_GetApiVersion();
 extern void UIX_SaveCachedServers();
 extern void UIX_Init();
 extern void UIX_Init_Input();
@@ -543,6 +546,8 @@ typedef struct {
 	float				bias;
 	qboolean			demoversion;
 	qboolean			firstdraw;
+	//x-mod: stuff
+	int					q3version;
 } uiStatic_t;
 
 extern void			UI_Init( void );

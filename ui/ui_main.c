@@ -25,7 +25,7 @@ This must be the very first function compiled into the .qvm file
 int vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6 ) {
 	switch ( command ) {
 	case UI_GETAPIVERSION:
-		return UI_API_VERSION;
+		return UIX_GetApiVersion();
 
 	case UI_INIT:
 		UI_Init();
