@@ -80,8 +80,9 @@
 #define CGX_SNOW_TURBULENT	8
 
 //try to register shader only if it's null
-#define trap_R_RegisterShaderOrNomip(x, s) { CGX_NomipStart(); x = trap_R_RegisterShader(s); CGX_NomipEnd(); }
-#define trap_R_LazyRegisterShader(x, s) if (!x) { CGX_NomipStart(); x = trap_R_RegisterShader(s); CGX_NomipEnd(); }
+#define trap_R_RegisterShaderCGXNomip(x, s) { CGX_NomipStart(); x = trap_R_RegisterShader(s); CGX_NomipEnd(); }
+#define trap_R_LazyRegisterShaderCGXNoMip(x, s) if (!x) { CGX_NomipStart(); x = trap_R_RegisterShader(s); CGX_NomipEnd(); }
+#define trap_R_LazyRegisterShader(x, s) if (!x) x = trap_R_RegisterShader(s)
 #define trap_S_LazyRegisterSound(x, s) if (!x) x = trap_S_RegisterSound(s);
 #define trap_S_LazyStartSound(var, en, chan, path) { static sfxHandle_t var; trap_S_LazyRegisterSound(var, path); trap_S_StartSound (NULL, en, chan, var); }
 #define trap_S_LazyStartSound2(var, en, chan, path) { trap_S_LazyRegisterSound(var, path); trap_S_StartSound (NULL, en, chan, var); }

@@ -130,7 +130,7 @@ qboolean Q_Isfreeze( int clientNum ) {
 void CG_AddGib( localEntity_t *le ) {
 	const qhandle_t	hShader = cgs.media.freezeShader;
 
-	if ( le->refEntity.customShader == hShader ) {
+	if ( hShader && le->refEntity.customShader == hShader ) {
 		le->refEntity.customShader = 0;
 		trap_R_AddRefEntityToScene( &le->refEntity );
 		le->refEntity.customShader = hShader;

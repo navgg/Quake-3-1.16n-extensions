@@ -73,7 +73,7 @@ void CG_ParticlePlasmaTrail( centity_t *cent, vec3_t start, vec3_t end ) {
 
 	VectorScale (vec, PLASMA_SPACING, vec);
 
-	trap_R_LazyRegisterShader(cgs.media.blueSpark, "gfx/misc/bluespark");
+	trap_R_LazyRegisterShaderCGXNoMip(cgs.media.blueSpark, "gfx/misc/bluespark");
 
 	for ( ; i < len; i += PLASMA_SPACING ) {
 		localEntity_t	*le;
@@ -178,7 +178,7 @@ void CG_LightningSpark( vec3_t origin, vec3_t dir ) {
 	if ( trap_CM_PointContents(origin, 0) & CONTENTS_WATER )
 		return;
 
-	trap_R_LazyRegisterShader(cgs.media.blueSpark, "gfx/misc/bluespark");
+	trap_R_LazyRegisterShaderCGXNoMip(cgs.media.blueSpark, "gfx/misc/bluespark");
 
 		le = CG_AllocLocalEntity();
 		le->leFlags = LEF_PUFF_DONT_SCALE;

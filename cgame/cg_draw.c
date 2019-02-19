@@ -2072,15 +2072,16 @@ static void CG_DrawCrosshair(void) {
 	y = cg_crosshairY.integer;
 	CG_AdjustFrom640( &x, &y, &w, &h );
 	
-	if (!cgx_crosshairColor.string[0]) {
+	{
 		int cn = cg_drawCrosshair.integer % NUM_CROSSHAIRS;
-		hShader = cgs.media.defaultCrosshair[cn];
-		if (!hShader) { // lazy load crosshair shader
-			hShader = cgs.media.defaultCrosshair[cn] = trap_R_RegisterShader( va( "gfx/2d/crosshair%c", 'a' + cn ) );
-			if (!hShader) hShader = cgs.media.defaultCrosshair[cn] = cgs.media.crosshairShader[cn];			
+		if (!*cgx_crosshairColor.string) {
+			if (!(hShader = cgs.media.defaultCrosshair[cn]))
+				hShader = cgs.media.defaultCrosshair[cn] = trap_R_RegisterShader(va("gfx/2d/crosshair%c", 'a' + cn));
+		} else {
+			if (!(hShader = cgs.media.crosshairShader[cn]))
+				hShader = cgs.media.crosshairShader[cn] = trap_R_RegisterShader(va("gfx/2d/xm_crosshair%c", 'a' + cn));
 		}
-	} else		
-		hShader = cgs.media.crosshairShader[ cg_drawCrosshair.integer % NUM_CROSSHAIRS ];
+	}
 
 	trap_R_DrawStretchPic( x + cg.refdef.x + 0.5f * (cg.refdef.width - w), 
 		y + cg.refdef.y + 0.5f * (cg.refdef.height - h), 

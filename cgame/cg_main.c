@@ -935,15 +935,6 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.tracerShader = trap_R_RegisterShader( "gfx/misc/tracer" );
 	cgs.media.selectShader = trap_R_RegisterShader( "gfx/2d/select" );
 
-	//X-MOD: fixed crosshair shaders for crosshair color		
-	for (i = 0; i < NUM_CROSSHAIRS; i++) {
-		cgs.media.crosshairShader[i] = trap_R_RegisterShader( va( "gfx/2d/xm_crosshair%c", 'a' + i ) );
-	}
-	if (!cgx_crosshairColor.string[0])
-	for (i = 0; i < NUM_CROSSHAIRS; i++) {
-		cgs.media.defaultCrosshair[i] = trap_R_RegisterShader( va( "gfx/2d/crosshair%c", 'a' + i ) );
-	}
-
 	cgs.media.backTileShader = trap_R_RegisterShader( "gfx/2d/backtile" );
 	cgs.media.noammoShader = trap_R_RegisterShader( "icons/noammo" );
 
@@ -974,8 +965,10 @@ static void CG_RegisterGraphics( void ) {
 	}
 
 #if CGX_FREEZE
-	cgs.media.freezeShader = trap_R_RegisterShader( "freezeShader" );
-	cgs.media.freezeMarkShader = trap_R_RegisterShader( "freezeMarkShader" );
+	if ( cgs.gametype == GT_TEAM ) {
+		cgs.media.freezeShader = trap_R_RegisterShader( "freezeShader" );
+		cgs.media.freezeMarkShader = trap_R_RegisterShader( "freezeMarkShader" );
+	}
 #endif //freeze
 
 	cgs.media.armorModel = trap_R_RegisterModel( "models/powerups/armor/armor_yel.md3" );

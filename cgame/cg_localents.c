@@ -145,7 +145,7 @@ void CG_FragmentBounceMark( localEntity_t *le, trace_t *trace ) {
 		radius = 16 + (rand()&31);
 
 #if CGX_FREEZE
-		if ( le->refEntity.customShader == cgs.media.freezeShader )
+		if ( cgs.media.freezeShader && le->refEntity.customShader == cgs.media.freezeShader )
 			CG_ImpactMark( cgs.media.freezeMarkShader, trace->endpos, trace->plane.normal, random() * 360, 1, 1, 1, 1, qtrue, radius, qfalse );
 		else
 #endif//freeze
