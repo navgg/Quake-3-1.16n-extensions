@@ -1,14 +1,14 @@
 ==========================================================================================================
-======================================Quake III X-Mod 1.16n 0.95.1b=======================================
+======================================Quake III X-Mod 1.16n 0.95.2b=======================================
 ==========================================================================================================
 
-Custom extensions for patching Quake 3 1.16n (beta version)
+Custom extensions for patching Quake 3 1.11 - 1.16n (beta version)
 
 ==========================================================================================================
                                         Installation & Requirements
 ==========================================================================================================
 
-- requires quake 3 arena version 1.16n
+- requires quake 3 arena version 1.16n or 1.11 - 1.15c
 - to install unzip {X-Mod}.pk3 to baseq3 folder of your quake 3 arena installation path
 - since version 0.80b mod renamed to X-Mod (remove old pak2X.pk3 file if you have it)
 

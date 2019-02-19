@@ -1647,7 +1647,7 @@ int UIX_LoadCachedServers(qboolean useDefaultCache) {
 		if (!useDefaultCache)
 			return 0;
 
-		if (trap_FS_FOpenFile("default_"SERVER_CACHE_FILE, &f, FS_READ ) <= 0 )
+		if (trap_FS_FOpenFile("xm\\" SERVER_CACHE_FILE, &f, FS_READ ) <= 0 )
 			return 0;
 	}
 

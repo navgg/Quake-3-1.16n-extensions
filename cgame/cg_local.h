@@ -703,6 +703,8 @@ typedef struct {
 	char		enemySkin[MAX_QPATH];
 	char		teamModel[MAX_QPATH];
 	char		teamSkin[MAX_QPATH];
+
+	int			q3version;
 	
 	int			meanPing;
 	int			packetloss;

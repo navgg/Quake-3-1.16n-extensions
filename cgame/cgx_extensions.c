@@ -1055,14 +1055,8 @@ void CGX_SendModinfo(qboolean force) {
 void CGX_SaveSharedConfig(qboolean forced) {
 	if (cgx_sharedConfig.integer || forced) {
 		char buf[32];
-		trap_Cvar_Get("version", buf);
 
-		if (!stristr(buf, "1.16")) {
-			trap_Print(va("Version %s skip shared config save\n", buf));
-			return;
-		}
-
-		trap_Cvar_Get("fs_game", buf);		
+		trap_Cvar_Get("fs_game", buf);
 
 		if (!buf[0]) {
 			trap_Print("Saving shared config... Mod: baseq3\n");
@@ -1114,7 +1108,7 @@ void CGX_GenerateMapBat2(char *map) {
 		mod = *fs_game ? fs_game : "baseq3";		
 	}
 
-	if (res = CGX_FReadAll("win\\download_map.bat", txt, sizeof txt)) {
+	if (res = CGX_FReadAll("xm\\win\\download_map.bat", txt, sizeof txt)) {
 		char page[1024];
 		char *script;
 

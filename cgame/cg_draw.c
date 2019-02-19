@@ -2217,9 +2217,9 @@ static void CG_DrawCrosshairNames( void ) {
 	w = CG_DrawStrlen(name) * hud.big_char_w;
 	CG_DrawBigString2(vScreen.hwidth - w / 2, 170, name, color[3]);
 
-	if (cg_drawCrosshairNames.integer > 1 && ci->health > 0) {
+	if (cg_drawCrosshairNames.integer > 1 && ci->health > 0 && !(cg.snap->ps.pm_flags & PMF_FOLLOW)) {
 		int startY = 170 + hud.big_char_w + 2;
-		clientInfo_t *pci = &cgs.clientinfo[cg.clientNum];
+		clientInfo_t *pci = &cgs.clientinfo[cg.snap->ps.clientNum];
 
 		if (pci->team == ci->team && (pci->team == TEAM_RED || pci->team == TEAM_BLUE)) {
 			if (cg_drawCrosshairNames.integer == 2) {

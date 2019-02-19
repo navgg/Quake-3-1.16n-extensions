@@ -449,6 +449,23 @@ void CG_RegisterCvars( void ) {
 	cvarTable_t	*cv;
 	char		var[MAX_TOKEN_CHARS];
 
+	trap_Cvar_VariableStringBuffer("version", var, sizeof var);
+
+	cg.q3version = atoi(&var[5]);
+
+	//vanilla defaults
+	if (cg.q3version != 16 && var[6] != 'x') {
+		for (i = 0, cv = cvarTable; i < cvarTableSize; i++, cv++)
+			if (cv->vmCvar == &cl_maxpackets)
+				cv->defaultString = "30";
+			else if (cv->vmCvar == &com_maxfps)
+				cv->defaultString = "85";
+
+		for (i = 0, cv = cgx_cvarTable_temp; i < ArrLen(cgx_cvarTable_temp); i++, cv++)
+			if (cv->vmCvar == &r_picmip)
+				cv->defaultString = "1";
+	}
+
 	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
 		trap_Cvar_Register( cv->vmCvar, cv->cvarName,
 			cv->defaultString, cv->cvarFlags );
@@ -876,6 +893,7 @@ This function may execute for a couple of minutes with a slow disk.
 */
 static void CG_RegisterGraphics( void ) {
 	int			i;
+	char		*fold = "";
 	char		items[MAX_ITEMS+1];
 	static char		*sb_nums[11] = {
 		"gfx/2d/numbers/zero_32b",
@@ -947,15 +965,24 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.regenShader = trap_R_RegisterShader("powerups/regen" );
 	cgs.media.hastePuffShader = trap_R_RegisterShader("hasteSmokePuff" );
 
+	if (cg.q3version == 11) {
+		// update icon references, some games register it even not in ctf mode
+		gitem_t *item;
+		item = BG_FindItemForPowerup(PW_REDFLAG);
+		item->icon = "xm/icons/iconf_red1";
+		item = BG_FindItemForPowerup(PW_BLUEFLAG);
+		item->icon = "xm/icons/iconf_blu1";
+		fold = "xm/";
+	}
+
 	if ( cgs.gametype == GT_CTF || cg_buildScript.integer ) {
 		cgs.media.redFlagModel = trap_R_RegisterModel( "models/flags/r_flag.md3" );
 		cgs.media.blueFlagModel = trap_R_RegisterModel( "models/flags/b_flag.md3" );
-		cgs.media.redFlagShader[0] = trap_R_RegisterShaderNoMip( "icons/iconf_red1" );
-		cgs.media.redFlagShader[1] = trap_R_RegisterShaderNoMip( "icons/iconf_red2" );
-		cgs.media.redFlagShader[2] = trap_R_RegisterShaderNoMip( "icons/iconf_red3" );
-		cgs.media.blueFlagShader[0] = trap_R_RegisterShaderNoMip( "icons/iconf_blu1" );
-		cgs.media.blueFlagShader[1] = trap_R_RegisterShaderNoMip( "icons/iconf_blu2" );
-		cgs.media.blueFlagShader[2] = trap_R_RegisterShaderNoMip( "icons/iconf_blu3" );
+
+		for (i = 3; i--; ) {
+			cgs.media.redFlagShader[i] = trap_R_RegisterShaderNoMip(va("%sicons/iconf_red%i", fold, i + 1));
+			cgs.media.blueFlagShader[i] = trap_R_RegisterShaderNoMip(va("%sicons/iconf_blu%i", fold, i + 1));
+		}
 	}
 
 	if ( cgs.gametype >= GT_TEAM || cg_buildScript.integer ) {
