@@ -1053,6 +1053,11 @@ void CGX_SendModinfo(qboolean force) {
 
 // X-MOD: potential fix for q3config saving problem
 void CGX_SaveSharedConfig(qboolean forced) {
+	if (cg.q3version > 16) {
+		CG_Printf("Shared config saving not supported by current q3 version");
+		return;
+	}
+
 	if (cgx_sharedConfig.integer || forced) {
 		char buf[32];
 
