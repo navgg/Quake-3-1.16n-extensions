@@ -646,6 +646,8 @@ void QDECL CG_Error( const char *msg, ... ) {
 	vsprintf (text, msg, argptr);
 	va_end (argptr);
 
+	trap_Cvar_Set("cgx_last_error", va("0 %s", text));
+
 	trap_Error( text );
 }
 
