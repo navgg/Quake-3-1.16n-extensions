@@ -869,7 +869,6 @@ void UI_Cache_f( void ) {
 	Demos_Cache();
 	UI_CinematicsMenu_Cache();
 	Preferences_Cache();
-	Preferences2_Cache();
 	ServerInfo_Cache();
 	SpecifyServer_Cache();
 	ArenaServers_Cache();
@@ -887,12 +886,13 @@ void UI_Cache_f( void ) {
 	UI_AddBots_Cache();
 	UI_RemoveBots_Cache();
 	UI_SetupMenu_Cache();
-	UI_LoadConfig_Cache();
-	UI_SaveConfigMenu_Cache();
+	//UI_LoadConfig_Cache();
+	//UI_SaveConfigMenu_Cache();
 	UI_BotSelectMenu_Cache();
 	UI_CDKeyMenu_Cache();
 	UI_ModsMenu_Cache();
 
+	Preferences2_Cache();
 }
 
 
