@@ -98,11 +98,7 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 		CG_CheckEvents( cent );
 	}
 
-	// X-MOD: if client is not initialized yet
-	if (cg.clientNum == -1) {
-		// X-MOD: send modinfo
-		CGX_SendModinfo(qfalse);
-	}
+	CGX_InitialSnapshot();
 }
 
 

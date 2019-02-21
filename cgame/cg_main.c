@@ -586,7 +586,7 @@ void CG_UpdateCvars( void ) {
 	if (cgx_fps_modificationCount != com_maxfps.modificationCount) {
 		cgx_fps_modificationCount = com_maxfps.modificationCount;		
 
-		CGX_AutoAdjustNetworkSettings();
+		CGX_AutoNetworkSettings();
 	}
 	//track shared config change
 	if (cgx_sharedConfigModificationCount != cgx_sharedConfig.modificationCount) {	

@@ -1050,7 +1050,7 @@ typedef struct {
 
 	int				sby;//screen_height - icon_size
 
-	int				sbteambg_y;//team background
+	int				sbteambg_y;//team background //SCREEN_HEIGHT - head_size
 
 	int				sbarmor_tx;
 	int				sbammo_tx;
@@ -1306,8 +1306,8 @@ qboolean CGX_TryLoadModelFromCache(clientInfo_t *ci, qboolean tryAny, qboolean t
 
 qboolean CGX_IsPure();
 qboolean CGX_CheckModInfo(const char *str);
-void CGX_CheckChatCommand(const char *str);
-void CGX_AutoAdjustNetworkSettings(void);
+void CGX_CheckChat(const char *str, qboolean tchat);
+void CGX_AutoNetworkSettings(void);
 void CGX_CheckEnemyModelAll(qboolean force);
 void CGX_GenerateMapBat(char *map);
 void CGX_IncreaseHunkmegs(int min);
@@ -1324,7 +1324,7 @@ void CGX_NomipEnd();
 void CGX_NomipStart();
 void CGX_SavePicmip();
 void CGX_SaveSharedConfig(qboolean forced);
-void CGX_SendModinfo(qboolean force);
+void CGX_InitialSnapshot();
 char CGX_ServerNameFixInfoLoad(char *str);
 void CGX_CheckEnemyModel(clientInfo_t *ci, qboolean isDeferred, int clientNum);
 void CGX_SyncServerParams(const char *info);
@@ -1332,7 +1332,6 @@ void CGX_TrackPlayerStateChanges();
 void CGX_TryLoadingFix();
 void CGX_Xmod();
 void CGX_DownloadMap(char *name, qboolean end_load);
-void CGX_ChatFilter(char *str);
 char *CGX_CheckChatTokens(char *message, char chatcol);
 
 //

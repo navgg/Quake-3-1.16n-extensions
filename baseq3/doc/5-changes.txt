@@ -159,4 +159,4 @@ mod works on 1.11 - 1.15c now
 
 added cg_drawGun 3 - transparent
 added followtarget on zoom in spect
-added fullbright skins, cg_enemyModel "*/fb" (fb, fb1, fb2)
+added fullbright skins, example: cg_enemyModel "keel/fb1" (fb1, fb2, fb3)

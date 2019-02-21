@@ -464,6 +464,11 @@ static int CG_CalcFov( void ) {
 	float	f;
 	int		inwater;
 
+	//x-mod: sotre values for less repetitive trigonometry
+	static float last_fov_x = -1;
+	static float last_fov_y = -1;
+	static float desiredFov = -1;
+
 	if ( cg.predictedPlayerState.pm_type == PM_INTERMISSION ) {
 		// if in intermission, use a fixed value
 		fov_x = 90;
@@ -507,10 +512,6 @@ static int CG_CalcFov( void ) {
 	}
 
 	if (cgx_wideScreenFix.integer & CGX_WFIX_FOV) {
-		static float desiredFov = -1;
-		static float last_fov_x = -1;
-		static float last_fov_y = -1;
-		
 		if (fov_x != desiredFov) {
 			desiredFov = fov_x;
 			fov_x = atan2(tan(desiredFov * M_PI / 360.0f) * vScreen.fovaspect, 1) * 360.0f / M_PI;
@@ -521,15 +522,20 @@ static int CG_CalcFov( void ) {
 
 			last_fov_x = fov_x;
 			last_fov_y = fov_y;
-		} else {
-			fov_x = last_fov_x;
-			fov_y = last_fov_y;
 		}
-	} else {
+	} else if (fov_x != last_fov_x) {
+		desiredFov = -1;
+
 		x = cg.refdef.width / tan( fov_x / 360 * M_PI );
 		fov_y = atan2( cg.refdef.height, x );
 		fov_y = fov_y * 360 / M_PI;
+
+		last_fov_x = fov_x;
+		last_fov_y = fov_y;
 	}
+
+	fov_x = last_fov_x;
+	fov_y = last_fov_y;
 
 	// warp if underwater
 	contents = CG_PointContents( cg.refdef.vieworg, -1 );

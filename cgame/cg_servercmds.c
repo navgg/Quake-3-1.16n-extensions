@@ -365,36 +365,33 @@ static void CG_ServerCommand( void ) {
 	}
 
 	if ( !strcmp( cmd, "print" ) ) {
-		// X-MOD: check for modinfo, bma\nemesis unlagged parameter, if it returns error message don't print it
 		const char *str = CG_Argv(1);
 		
-		if (CGX_CheckModInfo(str))
-			CG_Printf( "%s", str );
+		// X-MOD: check for modinfo, bma\nemesis unlagged parameter
+		CGX_CheckModInfo( str );
 
+		CG_Printf( "%s", str );
 		return;
 	}
 
 	if ( !strcmp( cmd, "chat" ) ) {
-		char *str = (char*)CG_Argv(1);
-
+		const char *str = CG_Argv(1);
 		if (cgx_chatSound.integer && cgx_chatSound.integer != 2)
 			trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
-
-		// X-MOD: check chat message for special commands
-		CGX_CheckChatCommand( str );
-		//filter chat
-		if (cgx_chatFilter.integer)
-			CGX_ChatFilter( str );
-
+		// X-MOD: check chat message for special commands or filter
+		CGX_CheckChat( str, qfalse );
 		CG_Printf( "%s\n", str );
 		return;
 	}
 
 	if ( !strcmp( cmd, "tchat" ) ) {
+		const char *str = CG_Argv(1);
 		if (cgx_chatSound.integer)
 			trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
-		CG_AddToTeamChat( CG_Argv(1) );
-		CG_Printf( "%s\n", CG_Argv(1) );
+		// x-mod: tchat check
+		CGX_CheckChat(str, qtrue);
+		CG_AddToTeamChat( str );
+		CG_Printf( "%s\n", str );
 		return;
 	}
 

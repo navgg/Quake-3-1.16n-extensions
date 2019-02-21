@@ -2,7 +2,7 @@
 
 #include "cg_local.h"
 
-#define XMOD_ANSWER(x) { CG_Printf("^7[^1xmod^7]: ^6%s\n", x); trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND ); }
+#define XMOD_ANSWER(x) { CG_Printf("^7[^1xmod^7]: ^6%s\n", x); /*trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND )*/; }
 
 #define DARKEN_COLOR 64
 #define EM_SPECT			2
@@ -33,6 +33,8 @@ static void CGX_Delay( int msec ) {
 	while (msec > trap_Milliseconds());
 	CG_Printf( "Delay end\n" );
 }
+
+#pragma region hud & virtual screen
 
 #define XM_SMALLCHAR_WIDTH  6
 #define XM_BIGCHAR_WIDTH	12
@@ -156,6 +158,8 @@ void CGX_Init_vScreen(void) {
 
 	D_Printf(("CGX_Init_vScreen %ix%i cgx_wideScreenFix %i\n", vScreen.width, SCREEN_HEIGHT, cgx_wideScreenFix.integer));	
 }
+
+#pragma endregion
 
 #pragma region Xmod enemy models
 
@@ -561,45 +565,6 @@ void CGX_TrackPlayerStateChanges() {
 
 #pragma endregion
 
-//extended map restart
-void CGX_MapRestart() {
-	D_Printf(("^1CGX_MapRestart\n"));
-
-	cg.clientIntermission = qfalse;
-
-	// X-MOD: send modinfo
-	CGX_SendModinfo(qfalse);
-
-	CGX_CheckEnemyModelAll(qfalse);
-
-	if (stats.needprint)
-		CG_statsWindowPrint();
-	else
-		CG_statsWindowFree(0);
-
-	//nemesis/osp reset stats
-	memset( &stats, 0, sizeof( stats ) );
-
-	D_Printf(("^6CGX_MapRestart\n"));
-}
-
-//send cmd with interval on servers with sv_floodprotect 1, in intermission skip
-void CGX_SendClientCommand(char *command) {
-	static int cmd_time;
-
-	if (cg.snap->ps.pm_type == PM_INTERMISSION)
-		return;
-
-	if (cgs.sv_floodProtect) {
-		if (cg.time < cmd_time)
-			return;
-
-		cmd_time = cg.time + 1000;
-	}
-
-	trap_SendClientCommand(command);
-}
-
 #pragma region auto network settings
 
 static qboolean CGX_ValidateFPS(void) {
@@ -632,10 +597,10 @@ static void CGX_Auto_sv_fps(void) {
 }
 
 //validate and adjust client network settings
-void CGX_AutoAdjustNetworkSettings(void) {
+void CGX_AutoNetworkSettings(void) {
 	static int info_showed = 0;
 
-	D_Printf(("CGX_AutoAdjustNetworkSettings %i\n", cgx_networkAdjustments.integer));
+	D_Printf(("CGX_AutoNetworkSettings %i\n", cgx_networkAdjustments.integer));
 
 	if (cgx_networkAdjustments.integer) {
 		int i, minRate, minSnaps, k;
@@ -653,7 +618,7 @@ void CGX_AutoAdjustNetworkSettings(void) {
 		i = 0;		
 
 		if (cgx_networkAdjustments.integer == 1) {			
-			minRate = 8000;
+			minRate = 10000;
 		
 			// if packets < 30 set it to 30
 			if (cl_maxpackets.integer < CGX_MIN_MAXPACKETS)
@@ -776,7 +741,7 @@ void CGX_SyncServer_sv_fps(const char *info) {
 
 		D_Printf(("^3sv_fps final '%i'\n", sv_fps.integer));
 
-		CGX_AutoAdjustNetworkSettings();
+		CGX_AutoNetworkSettings();
 	}
 }
 
@@ -830,7 +795,9 @@ void CGX_SyncServerParams(const char *info) {
 
 			//send info about client to nemesis servs
 			trap_Cvar_Register(&cgx_cgame, "cgame", CGX_FULLVER, CVAR_INIT | CVAR_ROM | CVAR_TEMP | CVAR_USERINFO);		
-			trap_Cvar_Register(&cgx_uinfo, "cg_uinfo", cg_uinfo, CVAR_INIT | CVAR_ROM | CVAR_TEMP | CVAR_USERINFO);
+			trap_Cvar_Register(&cgx_uinfo, "cg_uinfo", "", CVAR_INIT | CVAR_ROM | CVAR_TEMP | CVAR_USERINFO);
+
+			trap_Cvar_Set("cg_uinfo", cg_uinfo);
 #endif
 			trap_AddCommand("modinfo");
 			trap_AddCommand("clientmod");
@@ -842,6 +809,8 @@ void CGX_SyncServerParams(const char *info) {
 
 #pragma endregion
 
+#pragma region Chat filter & check
+
 //check message for special commands
 #define CHECK_INTERVAL	15000 //msec
 void CGX_CheckChatCommand(const char *str) {
@@ -850,15 +819,13 @@ void CGX_CheckChatCommand(const char *str) {
 	i = strlen(str);
 
 	if (i > 3 && str[i - 2] == '!' && str[i - 1] == 'v') {
-		int	mins, seconds, tens;
-		int	msec;
-		static int last_check = -CHECK_INTERVAL;
+		int	mins, seconds, tens, msec;
+		static int last_check;
 
-		msec = cg.time - cgs.levelStartTime;
+		if (cg.time > last_check) {
+			last_check = cg.time + CHECK_INTERVAL;
 
-		if (cg.time - last_check > CHECK_INTERVAL) {
-			last_check = cg.time;
-
+			msec = cg.time - cgs.levelStartTime;
 			seconds = msec / 1000;
 			mins = seconds / 60;
 			seconds -= mins * 60;
@@ -874,10 +841,21 @@ void CGX_CheckChatCommand(const char *str) {
 void CGX_ChatFilter(char *str) {
 	char *c;
 
+	if (cgx_chatFilter.integer & 1)
 	//fix \r bug in chat
 	for (c = str; *c; c++)
 		if (*c == '\r') *c = '.';
 }
+
+//check chat string
+void CGX_CheckChat(const char *str, qboolean tchat) {
+	if (!tchat)
+		CGX_CheckChatCommand(str);
+
+	CGX_ChatFilter((char *)str);
+}
+
+#pragma endregion
 
 #pragma region Chat Tokens
 
@@ -1003,13 +981,13 @@ char *CGX_CheckChatTokens( char *message, char chatcol ) {
 #pragma region Modinfo
 
 // check for unlagged enabled\disabled for bma\nms
-// send modinfo in initialsnapshot and check result here
+// send modinfo and check result here
 #define SEND_MODINFO_TIME	30000
 static int cgx_modinfosend = 0;
 qboolean CGX_CheckModInfo(const char *str) {
 	int i;
 	// if some time passed after sending then don't check
-	if (cg.time - cgx_modinfosend > SEND_MODINFO_TIME)
+	if (cg.time > cgx_modinfosend)
 		return qtrue;
 
 	i = strlen(str);
@@ -1018,13 +996,14 @@ qboolean CGX_CheckModInfo(const char *str) {
 		D_Printf(("BMA Unlagged!\n"));
 
 		cgs.delagHitscan = 2;
-		CGX_AutoAdjustNetworkSettings();
+		CGX_AutoNetworkSettings();
 	} else if (Q_stricmp(str, "^3Unlagged compensation: ^5ENABLED\n") == 0) {
 		D_Printf(("Nemesis Unlagged!\n"));
 
 		cgs.delagHitscan = 3;
-		CGX_AutoAdjustNetworkSettings();
+		CGX_AutoNetworkSettings();
 	} else if (Q_stricmp(str, "unknown cmd modinfo\n") == 0) {
+		D_Printf(("unknwn cmd\n"));
 		return qfalse;
 	}
 
@@ -1033,13 +1012,13 @@ qboolean CGX_CheckModInfo(const char *str) {
 
 // send modinfo if gamename nemesis or bma
 void CGX_SendModinfo(qboolean force) {
-	if (cg.intermissionStarted || cgs.delagHitscan == 1 || cg.time - cgx_modinfosend <= SEND_MODINFO_TIME)
+	if (cgx_modinfosend <= cg.time || cg.snap->ps.pm_type == PM_INTERMISSION)
 		return;
 
 	D_Printf(("gamename %s\n", cgs.gamename));
 
 	if (cgs.serverMod == SM_NEMESIS || cgs.serverMod == SM_BMA || force) {
-		cgx_modinfosend = cg.time;
+		cgx_modinfosend = cg.time + SEND_MODINFO_TIME;
 
 		trap_SendClientCommand("modinfo");
 
@@ -1050,6 +1029,52 @@ void CGX_SendModinfo(qboolean force) {
 }
 
 #pragma endregion
+
+#pragma region extended commands & fixes
+
+//calling method after receiving first snapshot
+void CGX_InitialSnapshot() {
+	CGX_SendModinfo(qfalse);
+}
+
+//extended map restart
+void CGX_MapRestart() {
+	D_Printf(("^1CGX_MapRestart\n"));
+
+	cg.clientIntermission = qfalse;
+
+	// X-MOD: send modinfo
+	CGX_SendModinfo(qfalse);
+
+	CGX_CheckEnemyModelAll(qfalse);
+
+	if (stats.needprint)
+		CG_statsWindowPrint();
+	else
+		CG_statsWindowFree(0);
+
+	//nemesis/osp reset stats
+	memset(&stats, 0, sizeof(stats));
+
+	D_Printf(("^6CGX_MapRestart\n"));
+}
+
+//send cmd with interval on servers with sv_floodprotect 1, in intermission skip
+void CGX_SendClientCommand(char *command) {
+	static int cmd_time;
+
+	if (cg.snap->ps.pm_type == PM_INTERMISSION)
+		return;
+
+	if (cgs.sv_floodProtect) {
+		if (cg.time < cmd_time)
+			return;
+
+		cmd_time = cg.time + 1000;
+	}
+
+	trap_SendClientCommand(command);
+}
 
 // X-MOD: potential fix for q3config saving problem
 void CGX_SaveSharedConfig(qboolean forced) {
@@ -1076,6 +1101,29 @@ void CGX_SaveSharedConfig(qboolean forced) {
 		trap_Print("Shared config saving is disabled (cg_sharedConfig)\n");
 	}
 }
+
+//clears sv_hostname from ^. and returns color if ^^.. was used
+char CGX_ServerNameFixInfoLoad(char *str) {
+	char* c;
+	char res;
+	//clean with leaving color
+	QX_CleanStrHostnameFix(str);
+
+	//check if color left
+	for (c = str; *c; c++)
+		if (*c == Q_COLOR_ESCAPE) {
+			//return the color and clean string completly
+			res = *(c + 1);
+			Q_CleanStr(str);
+			return res;
+		}
+
+	return COLOR_WHITE;
+}
+
+#pragma endregion
+
+#pragma region map download
 
 static char* CGX_GetQuakeStartPars(char *map, char *fs_game, char* custom) {
 	char *q3pars;
@@ -1215,6 +1263,8 @@ void CGX_DownloadMap(char *name, qboolean end_load) {
 	CGX_GenerateMapBat2(name);
 #endif
 }
+
+#pragma endregion
 
 #pragma region cg_nomip
 
@@ -1505,6 +1555,25 @@ static void CGX_RageQuit_f(void) {
 }
 #undef rc
 
+//weird bug when desktop has 60hz and game trying to set 144hz, picture becomes darker (with r_overbrightbits 1)
+//toggling gamma fixing it
+//another bug it's not always sets 144hz, vid_restart helps
+static void CGX_GammaFix() {
+	char buf[4];
+
+	trap_Cvar_Get("r_gamma", buf);
+	trap_SendConsoleCommand(va("r_gamma 0;r_gamma %s\n", buf));
+}
+
+static void CGX_PrintClients() {
+	int i;  clientInfo_t *ci; char clname[MAX_QPATH];
+	for (i = 0, ci = cgs.clientinfo; i < MAX_CLIENTS; i++, ci++)
+		if (*ci->modelName && *ci->skinName) {
+			Q_strncpyz(clname, ci->name, sizeof clname);
+			CG_Printf("%3i %20s %s/%s %s/%s\n", i, Q_CleanStr(clname), ci->modelName, ci->skinName, ci->modelNameCopy, ci->skinNameCopy);
+		}
+}
+
 //method to reload effects, used to call reload from UI
 static void CGX_ReloadEffects() {
 	char buf[32];
@@ -1518,6 +1587,8 @@ static void CGX_ReloadEffects() {
 }
 
 #define help_file "doc\\2-comand_list.txt"
+#define cmd_is(x) !Q_stricmp(command, x)
+#define arg_is(x) !Q_stricmp(arg, x)
 static void CGX_PrintModelCache();
 //xmod command
 void CGX_Xmod() {
@@ -1531,7 +1602,7 @@ void CGX_Xmod() {
 		if (argc > 2) trap_Argv(2, arg, MAX_QPATH);
 	}
 
-	if (!Q_stricmp(command, "e")) {
+	if (cmd_is("e")) {
 		XMOD_ANSWER("checking enemy models...");
 		CGX_CheckEnemyModelAll(qtrue);
 		return;
@@ -1544,45 +1615,45 @@ void CGX_Xmod() {
 	}
 
 #if CGX_DEBUG
-	if (!Q_stricmp(command, "float")) {
+	if (cmd_is("float")) {
 		float f;
 		int p = abs(atoi(arg));
 		i = 1;
 		while (p--) i *= 10;
 		for (f = 0.0f; f <= 0.001f * i; f += 0.00001f * i)
 			CG_Printf("%f\n", f);
-	} else if (!Q_stricmp(command, "crandom")) {
+	} else if (cmd_is("crandom")) {
 		for (i = 0; i < 100; i++)
 			CG_Printf("%1.2f ", crandom());
 		CG_Printf("\n");
 		return;
 	} else
-	if (!Q_stricmp(command, "eFlags")) {
+	if (cmd_is("eFlags")) {
 		centity_t *cent = &cg_entities[cg.clientNum];
 
 		CG_Printf("%i\n%i\n", cent->currentState.eFlags, cg.snap->ps.eFlags);
-	} else if (!Q_stricmp(command, "stats")) {
+	} else if (cmd_is("stats")) {
 		for (i = 0; i < MAX_STATS; i++)
 			CG_Printf("%i ", cg.snap->ps.stats[i]);
 		CG_Printf("\n");
-	} else if (!Q_stricmp(command, "pers")) {
+	} else if (cmd_is("pers")) {
 		for (i = 0; i < MAX_PERSISTANT; i++)
 			CG_Printf("%i ", cg.snap->ps.persistant[i]);
 		CG_Printf("\n");
-	} else if (!Q_stricmp(command, "powerups")) {
+	} else if (cmd_is("powerups")) {
 		for (i = 0; i < MAX_POWERUPS; i++)
 			CG_Printf("%i ", cg.snap->ps.powerups[i]);
 		CG_Printf("\n");
-	} else if (!Q_stricmp(command, "ammo")) {
+	} else if (cmd_is("ammo")) {
 		for (i = 0; i < MAX_WEAPONS; i++)
 			CG_Printf("%i ", cg.snap->ps.ammo[i]);
 		CG_Printf("\n");
-	} else if (!Q_stricmp(command, "css")) {
+	} else if (cmd_is("css")) {
 		for (i = 0; i < MAX_CONFIGSTRINGS; i++) {
 			const char *cs = CG_ConfigString(i);
 			if (*cs) CG_Printf("%i %s\n", i, cs);
 		}
-	} else if (!Q_stricmp(command, "ccss")) {
+	} else if (cmd_is("ccss")) {
 		for (i = 0; i < MAX_CLIENTS; i++) {
 			const char *cs = CG_ConfigString(CS_PLAYERS + i);
 			if (*cs) CG_Printf("%i %s\n", i, cs);
@@ -1590,34 +1661,30 @@ void CGX_Xmod() {
 	} else 
 #endif
 
-	if (!Q_stricmp(command, "version")) {
+	if (cmd_is("version")) {
 		XMOD_ANSWER(CGX_FULLVER" "CGX_DATE);
-	} else if (!Q_stricmp(command, "help")) {
+	} else if (cmd_is("help")) {
 		CGX_ShowHelp(help_file, "");
-	} else if (!Q_stricmp(command, "freemem")) {
+	} else if (cmd_is("freemem")) {
 		CG_Printf("%i Mb\n", trap_MemoryRemaining() / 1024 / 1024);
-	} else if (!Q_stricmp(command, "models")) {
+	} else if (cmd_is("models")) {
 		CGX_PrintModelCache();
-	} else if (!Q_stricmp(command, "skins")) {
+	} else if (cmd_is("skins")) {
 		CGX_PrintSkinCache();
-	} else if (!Q_stricmp(command, "clients")) {
-		clientInfo_t *ci;
-		char clname[MAX_QPATH];
-		for (i = 0, ci = cgs.clientinfo; i < MAX_CLIENTS; i++, ci++)
-			if (*ci->modelName && *ci->skinName) {
-				Q_strncpyz(clname, ci->name, sizeof clname);
-				CG_Printf("%3i %20s %s/%s %s/%s\n", i, Q_CleanStr(clname), ci->modelName, ci->skinName, ci->modelNameCopy, ci->skinNameCopy);
-			}
-	} else if (!Q_stricmp(command, "modinfo")) {
+	} else if (cmd_is("clients")) {
+		CGX_PrintClients();
+	} else if (cmd_is("modinfo")) {
 		CGX_SendModinfo(qtrue);
-	} else if (!Q_stricmp(command, "reload")) {
-		if (!Q_stricmp(arg, "effects"))
+	} else if (cmd_is("reload")) {
+		if (arg_is("effects"))
 			CGX_ReloadEffects();
-	} else if (!Q_stricmp(command, "stats")) {
+	} else if (cmd_is("stats")) {
 		CG_statsWindowPrint();
+	} else if (cmd_is("gammafix")) {
+		CGX_GammaFix();
 	} else if (stristr(command, "pk3")) {
 		CGX_Pk3list_f();
-	} else if (!Q_stricmp(command, "ragequit")) {
+	} else if (cmd_is("ragequit")) {
 		CGX_RageQuit_f();
 	} else if (stristr(command, "8ball")) {
 		char *balls[] = {
@@ -1628,7 +1695,7 @@ void CGX_Xmod() {
 			"listen to your feelings",
 		};
 		XMOD_ANSWER(balls[rand() % 5]);
-	} else if (!Q_stricmp(command, "coin")) {
+	} else if (cmd_is("coin")) {
 		XMOD_ANSWER(rand() % 100 >= 50 ? "true": "false");
 	} else {
 		CGX_ShowHelp(help_file, command);
@@ -1636,25 +1703,6 @@ void CGX_Xmod() {
 }
 
 #pragma endregion
-
-//clears sv_hostname from ^. and returns color if ^^.. was used
-char CGX_ServerNameFixInfoLoad(char *str) {
-	char* c;
-	char res;
-	//clean with leaving color
-	QX_CleanStrHostnameFix(str);	
-
-	//check if color left
-	for (c = str; *c; c++)
-		if (*c == Q_COLOR_ESCAPE) {
-			//return the color and clean string completly
-			res = *(c + 1);
-			Q_CleanStr(str);			
-			return res;
-		}
-
-	return COLOR_WHITE;	
-}
 
 #pragma region Xmod I/O
 
@@ -1943,6 +1991,8 @@ qboolean CGX_TryLoadModelFromCache(clientInfo_t *ci, qboolean tryAny, qboolean t
 	if (tryAny) {
 		int mem = trap_MemoryRemaining();
 		qboolean lowMem = mem < LOW_MEMORY;
+		qboolean showLowMem = qfalse;
+		static int show_time = 0;
 		
 		if (trySkinLoads) {
 			D_Printf(("trySkinLoads "));
@@ -1950,6 +2000,11 @@ qboolean CGX_TryLoadModelFromCache(clientInfo_t *ci, qboolean tryAny, qboolean t
 			if (mem > LOW_MEMORY / 5 && CGX_TrySkinLoad(ci))
 				return qtrue;
 			D_Printf(("^3NoModel... "));
+		}
+
+		if (lowMem && trySkinLoads && show_time < cg.time) {
+			showLowMem = qtrue;
+			show_time = cg.time + 60 * 1000;
 		}
 
 		for (i = modelCacheNum, mi = modelCache; i--; mi++)
@@ -1961,7 +2016,7 @@ qboolean CGX_TryLoadModelFromCache(clientInfo_t *ci, qboolean tryAny, qboolean t
 
 				CGX_LoadModelFromCache(ci, mi);
 #if !CGX_DEBUG
-				if (lowMem && trySkinLoads)
+				if (showLowMem)
 					CG_Printf("Memory is low. For %s/%s loaded %s/%s from cache.\n", ci->modelName, ci->skinName, mi->modelName, mi->skinName);
 #endif
 				return qtrue;
