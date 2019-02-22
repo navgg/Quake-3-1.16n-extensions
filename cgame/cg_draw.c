@@ -1751,6 +1751,9 @@ static void CG_DrawDisconnect( void ) {
 		return;
 	}
 
+	if (cg.snap->ps.pm_flags & PMF_FOLLOW)
+		return;
+
 	// X-MOD: count connection interrupteds	
 	cg.connectionInterrupteds++;	
 
