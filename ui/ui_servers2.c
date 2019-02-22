@@ -16,13 +16,14 @@ MULTIPLAYER MENU (SERVER BROWSER)
 #define MAX_GLOBALSERVERS		128
 #define MAX_PINGREQUESTS		16
 #define MAX_ADDRESSLENGTH		64
-#define MAX_HOSTNAMELENGTH		22
+#define MAX_HOSTNAMELENGTH		22 + 16 + 4
 #define MAX_MAPNAMELENGTH		16
 #define MAX_LISTBOXITEMS		128
 #define MAX_LOCALSERVERS		128
 #define MAX_STATUSLENGTH		64
 //add 2 to fix color name server bug by adding two spaces later
-#define MAX_LISTBOXWIDTH		59+2
+//add 4 to extend visible hostname
+#define MAX_LISTBOXWIDTH		59 + 2 + 4
 
 #define ART_BACK0				"menu/art/back_0"
 #define ART_BACK1				"menu/art/back_1"
@@ -485,12 +486,19 @@ static void ArenaServers_UpdateMenu( void ) {
 			pingColor = S_COLOR_RED;
 		}		
 
+		if (uix_browserShowNettype.integer)
 		// copy allinfo to buffer and add two spaces or no if color bug used
-		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s%s %-12.12s %2d/%2d %-8.8s %3s %s%3d", 
+		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-24.24s%s %-12.12s %2d/%2d %-8.8s %3s %s%3d", 
 			servernodeptr->hostname, QX_GetHostnameSpacesFix(servernodeptr->hostname), 
 			servernodeptr->mapname, servernodeptr->numclients,
 	 		servernodeptr->maxclients, servernodeptr->gamename,
 			netnames[servernodeptr->nettype], pingColor, servernodeptr->pingtime );
+		else
+		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-27.27s%s %-12.12s %2d/%2d %-8.8s %s%3d", 
+			servernodeptr->hostname, QX_GetHostnameSpacesFix(servernodeptr->hostname), 
+			servernodeptr->mapname, servernodeptr->numclients,
+	 		servernodeptr->maxclients, servernodeptr->gamename,
+			pingColor, servernodeptr->pingtime );
 		j++;
 	}
 
@@ -1095,6 +1103,12 @@ ArenaServers_SetType
 */
 void ArenaServers_SetType( int type )
 {
+	// x-mod: skip mplayer menu
+	if (!uix_browserShowMplayer.integer && type == 1) {
+		g_arenaservers.master.curvalue++;
+		type++;
+	}
+
 	if (g_servertype == type)
 		return;
 
@@ -1358,7 +1372,7 @@ static void ArenaServers_MenuInit( void ) {
 	g_arenaservers.list.generic.callback		= ArenaServers_Event;
 	g_arenaservers.list.generic.x				= 72;
 	g_arenaservers.list.generic.y				= y;
-	g_arenaservers.list.width					= MAX_LISTBOXWIDTH;
+	g_arenaservers.list.width					= MAX_LISTBOXWIDTH-4;//cut highlight by 4 symbols, 2 for ping color, 2 for server color
 	g_arenaservers.list.height					= 11;
 	g_arenaservers.list.itemnames				= (const char **)g_arenaservers.items;
 	for( i = 0; i < MAX_LISTBOXITEMS; i++ ) {

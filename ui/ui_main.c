@@ -138,6 +138,8 @@ vmCvar_t	ui_cdkeychecked;
 
 // X-MOD: ui params
 vmCvar_t	uix_serverCache;
+vmCvar_t	uix_browserShowMplayer;
+vmCvar_t	uix_browserShowNettype;
 
 vmCvar_t	uix_wideScreenFix;
 vmCvar_t	uix_defaultWeapon;
@@ -218,6 +220,8 @@ cvarTable_t		cvarTable[] = {
 
 	// X-Mod: server cache
 	{ &uix_serverCache, "ui_serverCache", "1", CVAR_TEMP },
+	{ &uix_browserShowMplayer, "ui_browserShowMplayer", "0", CVAR_TEMP },
+	{ &uix_browserShowNettype, "ui_browserShowNettype", "1", CVAR_TEMP },
 
 	// X-MOD: default parameters
 	{ &uix_wideScreenFix, "cg_wideScreenFix", "1", CVAR_ARCHIVE },

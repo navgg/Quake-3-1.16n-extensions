@@ -365,11 +365,11 @@ void UI_MainMenu( void ) {
 
 	s_main.credits.generic.type				= MTYPE_PTEXT;
 	s_main.credits.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS|QMF_SMALLFONT|isHidden;
-	s_main.credits.generic.x				= 320;
+	s_main.credits.generic.x				= 320-SMALLCHAR_WIDTH;
 	s_main.credits.generic.y				= 420;
 	s_main.credits.generic.id				= ID_CREDITS;
 	s_main.credits.generic.callback			= Main_MenuEvent; 
-	s_main.credits.string					= "                                             ";
+	s_main.credits.string					= "  ";
 	s_main.credits.generic.statusbar		= UI_Menu_Credits;
 	s_main.credits.color					= color_red;
 	s_main.credits.style					= style | UI_SMALLFONT;

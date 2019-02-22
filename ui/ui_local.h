@@ -68,8 +68,10 @@ extern vmCvar_t	ui_server16;
 extern vmCvar_t	ui_cdkey;
 extern vmCvar_t	ui_cdkeychecked;
 
-extern vmCvar_t uix_nomip;
+extern vmCvar_t	uix_nomip;
 extern vmCvar_t	uix_serverCache;
+extern vmCvar_t	uix_browserShowMplayer;
+extern vmCvar_t	uix_browserShowNettype;
 
 //
 // ui_qmenu.c
