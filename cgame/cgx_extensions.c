@@ -451,7 +451,7 @@ static void CGX_SetSkin(clientInfo_t *ci, char *skinName) {
 		CGX_SetCustomSkinShader(ci, &skinName[1], qfalse);
 	} else if (skinName[0] == '+') {
 		CGX_SetCustomSkinShader(ci, &skinName[1], qtrue);
-	} else if (!Q_stricmp(skinName, "fb") && !CGX_IsSkinExists(ci->modelName, skinName)) {
+	} else if (!Q_stricmp(skinName, "fb1") && !CGX_IsSkinExists(ci->modelName, skinName)) {
 		CGX_SetCustomSkinShader(ci, SS_BRIGHT, qtrue);
 	} else if (!Q_stricmp(skinName, "fb2") && !CGX_IsSkinExists(ci->modelName, skinName)) {
 		CGX_SetCustomSkinShader(ci, "xm_fb2", qfalse);
@@ -623,9 +623,6 @@ void CGX_AutoNetworkSettings(void) {
 			// if packets < 30 set it to 30
 			if (cl_maxpackets.integer < CGX_MIN_MAXPACKETS)
 				i = CGX_MIN_MAXPACKETS;
-			// set it litle more than sv_fps
-			if (cl_maxpackets.integer <= sv_fps.integer)
-				i = sv_fps.integer + 10;
 		} else if (cgx_networkAdjustments.integer == 2) {
 			k = 2;
 			minRate = 16000;			
@@ -647,6 +644,10 @@ void CGX_AutoNetworkSettings(void) {
 
 		// set packets first
 		if (i > 0) {
+			// set it litle more than sv_fps
+			if (i <= sv_fps.integer)
+				i = sv_fps.integer + 10;
+
 			if (i < CGX_MIN_MAXPACKETS) i = CGX_MIN_MAXPACKETS;
 			else if (i > CGX_MAX_MAXPACKETS) i = CGX_MAX_MAXPACKETS;
 
@@ -672,8 +673,7 @@ void CGX_AutoNetworkSettings(void) {
 		else if (i > CGX_MAX_RATE) // no point in more than 25k rate, just for beautiful adjust in playerlist
 			NET_Set("rate", CGX_MAX_RATE)
 
-		if (cgx_networkAdjustments.integer == 3)
-			NET_Set("cl_packetdup", 0)
+		NET_Set("cl_packetdup", cgx_networkAdjustments.integer == 1 ? 1 : 0)
 
 		// check time nudge & send hints
 		// if server delaged it's better off
