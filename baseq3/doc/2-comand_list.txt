@@ -1,69 +1,197 @@
-==========================================================================================================
-                                               Command list
-==========================================================================================================
+=============================================================================
+                                 Command list
+=============================================================================
 
-cg_wideScreenFix 0|1|2|3 - fix perspective for widescreen 0: no fixes 1: fix only icons 2: fix only fov 3: fix fov and icons
-cg_defaultWeapon 0-9 - default weapon when spawn 0: default 1: gauntlet ...
-cg_centerPrintAlpha 1.0-0 - center print transparency
-cg_crosshairColor 0-35 - crosshair color "" - default, 0: black 1: red 2: green etc. 
-		or words "green", "red", "yellow", "white", "cyan", "magenta", "blue", "black"
-cg_drawSpeed 0|1|2 - speedometer 0: off 1: top corner 2: center screen
-cg_deadBodyDarken 0|1|2|3 - pm skins becomes gray after death 0: off 1: Just grey 2: BT709 Greyscale 3: Y-Greyscale (PAL/NTSC)
+cg_wideScreenFix 0|1|2|3 - fix display on widescreens.
+  0: no fixes
+  1: fix icons
+  2: fix fov
+  3: fix fov and icons
+
+cg_defaultWeapon 0-9 - sets default weapon on respawn. (0: default)
+  use number to set specific weapon, see weaponlist for more info.
+
+cg_centerPrintAlpha 1.0-0 - center print transparency. you fragged... message
+
+cg_crosshairColor 0-39 - sets crosshair color. 
+  Use numbers from 0 to 39 or words. Known words:
+  "green", "red", "yellow", "white", "cyan", "magenta", "blue", "black".
+  "" - vanilla q3 default white.
+  To modify from menu: setup -> game options.
+
+cg_drawSpeed 0|1|2 - draw speedometer. 0: off 1: top corner 2: center screen.
+
+cg_deadBodyDarken 0|1|2|3 - pm skins becomes gray after death.
+  0: off 1: Just grey 2: BT709 Greyscale 3: Y-Greyscale (PAL/NTSC)
+
 cg_chatSound 0|1|2 - chat beep sound 0: off 1: on 2: only team
-cg_noTaunt 0|1 - enemy taunt sound
-cg_nomip -1|0 - if it's -1 all objects will have r_picmip 0 regardless of current r_picmip settings
-cg_drawGun 0|1|2 - 0: no gun 1: bobbing gun 2: static gun no bobbing
-cg_enemyModel "" - forcing enemy model "keel/pm", "thankjr" etc. if it's empty and cg_enemyModel_enabled = 1 then 
-		it will get pm skins for current player model eg. player model visor/blue it will make him visor/pm + specified colors
-cg_enemyColors "" - use "green", "red", "yellow", "white", "cyan", "magenta", "blue", "black" 
-		or following pattern "1234" 1-rail 2-head 3-torso 4-legs (colors from 0 to 7 or any letter for extended color table, 
-		special symbols ? - color depending on team (1 - red, 4 - blue, 2- ffa), 
-		! - same as ? but use specific rail color of client, * - random color 0-7, . - random extended color 0-35)
-cg_enemyModel_enabled 0|1 - enemy model on\off 0: off 1: on(spectators off, intermission on) 
-		2: on+spectators on+intermission on 
-		3: on+spectators off+intermission off 
-		4: on+spectators on+intermission off
+
+cg_noTaunt 0|1 - toggles enemy taunt sound
+
+cg_nomip -1|0 - if it's -1 all objects will have r_picmip 0 regardless
+  of current r_picmip settings.
+
+cg_drawGun 0|1|2 - sets draw gun style
+  0: no gun
+  1: bobbing gun (default)
+  2: static gun no bobbing
+  3: transparent
+
+cg_enemyModel "" - forcing enemy models to specified model/skin.
+  Examples:
+    "keel/pm": all keels with pm skin
+    "tankjr/pm": all tankjrs with pm skin
+    "*/pm": all have own models with pm skin
+    "*/*": all have own models and own skins (useful for cg_teamModel)
+    "": same as "*/pm"
+    (instead of skins can be specified fullbright shaders e.g. fb1 fb2 fb3)
+
+cg_enemyColors "" - sets color for enemy models if skin supports it.
+  Pattern: "1234" 1 - rail 2 - head 3 - torso 4 - legs.
+  Examples:
+    "2222": green rail, green head, green torso, green legs
+    "1352": red rail, yellow head, cyan torsom, green legs
+    "!222": client's own rail color, green head, green torso, green legs
+    "????": becomes 1111 if enemy in red team, 4444 if in - blue, 2222 in ffa
+    "11"  : becomes
+    "....": all random colors, just for fun
+    "green": same as 2222
+    (Colors from 0 to 7, use letters to get colors from extended table.)
+  Special symbols:
+    ? - color depending on team (1 - red, 4 - blue, 2 - ffa)
+    ! - same as ? but for rail it uses client's rail color
+    * - random color 0-7
+    . - random extended color 0-39
+  Known words for simplified setup:
+    "green", "red", "yellow", "white", "cyan", "magenta", "blue", "black"
+  Most short setup:
+    "6" : becomes "6666"
+    "25": becomes "pppp"
+
+cg_enemyModel_enabled 0|1 - toggles enemy model on\off
+  0: off
+  1: on(spectators off intermission on)
+  2: on(spectators on  intermission on)
+  3: on(spectators off intermission off)
+  4: on(spectators on  intermission off)
+
 cg_teamModel "" - same as cg_enemyModel but for team
+
 cg_teamColors "" - same as cg_enemyColors but for team
-cg_lagometer 0|1|2|3 - 0 :off 1: default 2: default + ping 3: only when packetloss
+
+cg_lagometer 0|1|2|3 - 0: off 1: default 2: default + ping 3: when packetloss
+
 cg_hitsounds 0|1|2 - 0: default 1: pro mode hi-low 2: low-hi hp hitsounds
-cg_autoNetworkSettings 0|1|2|3 - 0: off 1: min rate 8000 packets 30 or sv_fps+10 2: packets 40-60 rate min 16000 
-		3: packets 60-100 rate min 25000 packetdup off (snaps = sv_fps or min 40 in all cases if it's on)
-cg_drawScoreBox 0|1 - display score box in low right corner
-cg_scoreboard 0|1|2|3 - scoreboard type 0: default large-small 1: always small 2: quake 3 vanilla (no ids, no ping colors) 3: nemesis/osp
-cg_drawAccuracy 0|1 - total weapon accuracy
-cg_weaponEffects 0-1023 - 0: off 1: railbeam + spin 2: simple railbeam 
-		4: plasma 8: lightning 16: rocket explosion (all effects from 1.32) 
-		additive value eg. 10=rail+lg, 26=rail+lg+rocket etc. 
-		32: explosion sparks, 64: bullet sparks, 128: lg sparks, 256: rocket trail sparks, 512: plasma trail sparks. -1: All. 
-		To modify from menu -> game options -> advanced effects.
-cg_sharedConfig 0|1 - fixes problem with saving configs after game exit in 1.16n 
-		(0: off 1: automatically saves q3config.cfg to baseq3 folder after pressing 'leave arena' or 'exit game', 
-		to save manually use command \writesharedconfig)
-cg_chatFilter 0|1 - on/off fixes chat spoofing bug on client
-cg_enableBreath 0|1 - show breath puffs from players (freeze tag command, for ambiance)
-cg_killbeep 0-7 - plays a sound after kill 0: Off 1: Ting 2: Tink 3: Dramatic 4: Voosh 
-		5: Drum 6: Bang 7: Ding 8: ChaChing
-cg_drawCrosshairNames 0|1|2|3 - draw target name above crosshair (0: off 1: only names, 2: hp&armor as text, 3: hp&armor as bars)
-cg_winterEffects 0-7 - 1: snow, 2: footsteps, 4: breath, -1: all. Sum for effects.
+
+cg_autoNetworkSettings 0|1|2|3 - set network settings automatically
+  0: off
+  1: min rate 10000 packets 30-40 packetdup on
+  2: min rate 16000 packets 40-60 packetdup off
+  3: min rate 25000 packets 60-100 packetdup off
+  (snaps = sv_fps or min 40 in all cases if it's on)
+
+cg_drawScoreBox 0|1 - toggles display of score box in low right corner
+
+cg_scoreboard 0|1|2|3 - scoreboard type
+  0: default large-small
+  1: always small
+  2: quake 3 vanilla (no ids, no ping colors)
+  3: osp/nemesis
+
+cg_drawAccuracy 0|1 - draws total weapon accuracy
+
+cg_weaponEffects 0-1023 - sets weapon effects. Additive value.
+  Available effects:
+    0: off
+    1: railbeam + spin
+    2: simple railbeam
+    4: plasma
+    8: lightning
+    16: rocket explosion (all effects from 1.32)
+    32: explosion sparks
+    64: bullet sparks
+    128: lg sparks
+    256: rocket trail sparks
+    512: plasma trail sparks
+   -1: all
+  Examples:
+    10: rail + lg
+    26: rail + lg + rocket
+    96: explosion sparks + bullet sparks
+  To modify from menu: -> game options -> advanced effects.
+
+cg_sharedConfig 0|1 - toggles ability to save q3config.cfg to baseq3 folder
+  after game exit in 1.16n when it's on it automatically saves q3config.cfg
+  to baseq3 folder on arena leave or game exit.
+  (to save manually use command \writesharedconfig)
+
+cg_chatFilter 0|1 - toggles fix for chat spoofing bug on client
+
+cg_killbeep 0-8 - plays a sound after kill (quake live sounds)
+  0: Off 1: Ting 2: Tink 3: Dramatic 4: Voosh 
+  5: Drum 6: Bang 7: Ding 8: ChaChing
+
+cg_drawCrosshairNames 0|1|2|3 - draw target name above crosshair.
+  0: off
+  1: only names
+  2: hp&armor as text
+  3: hp&armor as bars
+
 cg_draw2D 1|2|3 - sets HUD (1: default, 2: compact, 3: vanilla Q3)
-writesharedconfig - writes q3config.cfg to baseq3 folder (command do the following 
-		"writeconfig ..\\baseq3\\q3config.cfg" - if playing on modded server,
-		"writeconfig q3config.cfg" - if playing on default quake 3 server)
-autorecord - start record demo (command do the following "g_syncronousClients 1; record <demoname>; g_syncronousClients 0") 
-		to stop record type \stoprecord to play type \demo <demoname>
-download - generates script in quake 3 game folder for specified map, 
-		run this script to download map from web
-colorlist - 0: black, 1: red, 2: green, 3: yellow, 4: blue  5: cyan, 6: magenta, 7: white
-chattokens - #n - your player name, 
-		#s - score, #t/#T - team, 
-		#h - health, #a/#A - armor, 
-		#i - last item you picked up, 
-		#l - last attacker, 
-		#x - name of player in crosshair, 
-		#k - name of killer, 
-		#L - location 
-		#u/#U - powerups (+flag)
-		(#T/#H/#A/#U - for colrful display)
+
+cg_winterEffects 0-7 - winter effects for ambiance. Additive value.
+  1: snow
+  2: footsteps
+  4: breath
+ -1: all.
+
+writesharedconfig - writes q3config.cfg to baseq3 folder.
+  Command do the following:
+    "writeconfig ..\\baseq3\\q3config.cfg" - if playing on modded server
+    "writeconfig q3config.cfg" - if playing on default quake 3 server
+
+autorecord <demoname> - start recording demo.
+  Command do the following:
+    "g_syncronousClients 1; record <demoname>; g_syncronousClients 0".
+    To stop record type \stoprecord to play demo type \demo <demoname>
+  Examples:
+    \autorecord mydemo1
+
+download <mapname> - generates script in quake 3 game folder for
+  specified map, run this script to download map from web.
+
+chattokens - available tokes:
+  #n - your player name, 
+  #s - score, #t/#T - team, 
+  #h - health, #a/#A - armor, 
+  #i - last item you picked up, 
+  #l - last attacker, 
+  #x - name of player in crosshair, 
+  #k - name of killer, 
+  #L - location 
+  #u/#U - powerups (+flag)
+  (#T/#H/#A/#U - for colrful display)
+
+colorlist - quake 3 color list.
+  0: black
+  1: red
+  2: green
+  3: yellow
+  4: blue
+  5: cyan
+  6: magenta
+  7: white
+
+weaponlist - quake 3 weapons list.
+  1: gauntlet
+  2: machinegun
+  3: shotgun
+  4: grenade launcher
+  5: rocket launcher
+  6: lightning gun
+  7: railgun
+  8: plasmagun
+  9: bfg
+
 xmod - quick info & help on mod commands, usage \xmod <command>
 

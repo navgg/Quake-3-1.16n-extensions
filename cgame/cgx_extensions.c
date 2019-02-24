@@ -1411,10 +1411,6 @@ void CGX_LoadWorldMap() {
 
 //small talk
 static char* CGX_XmodTalk(char *command) {
-	int i;
-	i = strlen(command);
-	command[i] = ' ';
-
 	if (stristr(command, "fuck") || stristr(command, "suck") || stristr(command, "shit")) {
 		return command;
 	} else if (stristr(command, "hi ") || stristr(command, "hello")) {
@@ -1433,9 +1429,12 @@ static char* CGX_XmodTalk(char *command) {
 		stristr(command, "how") || stristr(command, "who") || stristr(command, "which") || stristr(command, "why")) {
 		char *txt[] = { "I don't know", "how do I know", "idk", "the answer is... "CGX_BP_STRING };
 		return txt[rand() % ArrLen(txt)];
+	} else if (stristr(command, "haha") || stristr(command, "hehe") || stristr(command, "hehe") || stristr(command, "hhhh")) {
+		char *txt[] = { "haha", "hehe", "hhhh", ":)" };
+		return rand() % 1000 > 500 ? txt[rand() % ArrLen(txt)] : command;
+	} else if (!Q_stricmp(command, ":) ") || !Q_stricmp(command, ":D ") || !Q_stricmp(command, "xD ")) {
+		return command;
 	}
-
-	command[i] = 0;
 
 	return NULL;
 }
@@ -1448,93 +1447,149 @@ static void CGX_PrintLine(char c) {
 	trap_Print("\n");
 }
 
-//parse info from file
-//format: cmd1 - description1\r\n
-static void CGX_ShowHelp(char *filename, char *cmd) {
-	char			buf[1024 * 8];
-	static			qboolean exampleShown;
+// find cmd with params and description, or list all
+static int CGX_FindCmds(char *filename, char *cmd) {
+	int	i = 0;
+	char buf[1024 * 8];
+	char *c, *d, *p, *e;
+	char *ncmd;
+
+	if (!CGX_FReadAll(filename, buf, sizeof buf))
+		return 0;
 
 	//start parse command list if read succesful
-	if (CGX_FReadAll(filename, buf, sizeof(buf))) {
-		int i, j;
-		char *s, *t;
+	e = buf;
 
-		//shift \r\n+two tabs
-		for (i = 1; i < sizeof(buf) - 1; i++) {			
-			if (buf[i] == '\t' && buf[i - 1] == '\t') {
-				buf[i] = buf[i - 1] = buf[i - 2] = buf[i - 3] = ' ';
-				for (j = i - 4; buf[j] != 0; j++)
-					buf[j] = buf[j + 4];
+	//list all
+	if (!*cmd) {
+_next_cmd:
+		for (c = e; *c; c++) {
+			if (*c == '\n' && Q_isalpha(*(c + 1)))
+				break;
+		}
+		if (!*c) {
+			CG_Printf("\n");
+			return i;
+		}
+		c++;
+		p = strchr(c, ' ');
+		if (!*p) {
+			CG_Printf("\n");
+			return i;
+		}
+		*p = 0;
+		e = p + 1;
+
+		i++;
+		CG_Printf("%-25s", c);
+		goto _next_cmd;
+	}
+	
+	ncmd = va("\n%s", cmd);
+
+_find_next_cmd:
+	//find cmd
+	c = stristr(e, ncmd);
+
+	if (!*c)
+		return i;
+
+	c++;
+
+	//find params
+	for (p = c + 1; *p; p++) {
+		if (*p == ' ') {
+			if (*(p + 1) == '-' && *(p + 2) == ' ') {
+				p = "^"; //hack to remove one space
+
+				d = c + 1;
+			} else {
+				*p = 0;
+				p++;
+
+				d = p + 1;
+			}
+			break;
+		}
+	}
+
+	//find descr
+	for (; *d; d++)
+		if (*d == '-' && *(d - 1) == ' ')
+			break;
+
+	if (!*d)
+		return i;
+
+	*(d - 1) = 0;
+	d++;
+	d++;
+
+	//find end of descr
+	for (e = d + 1; *e; e++)
+		if (*e == '\n' && (Q_isalpha(*(e + 1)) || *(e + 1) == '\r'))
+			break;
+
+	if (!*e)
+		return i;
+
+	*(e - 1) = 0;
+
+	//colorize colorlist
+	if (!Q_stricmp(c, "colorlist")) {
+		char *x;
+		for (x = d; *x; x++) {
+			if (*x == ' ' && *(x + 1) == ' ') {
+				*x = '^';
+				*(x + 1) = *(x + 2);
 			}
 		}
+	}
 
-		//if no command show all 
-		if (!cmd[0]) {
-			//find first command in file
-			s = strchr(buf, 'c');
-			XMOD_ANSWER("known command list");
-			CGX_PrintLine(COLOR_YELLOW);
-			for (t = s; *t; t = s) {
-				if (!(s = strchr(s, ' ')))
-					break;
-				*s++ = 0;
-				//print found info
-				CG_Printf("%-25s", t);
-				if (!(s = strchr(s, '\n')))
-					break;
-				s++;
-			}			
-			trap_Print("\n");
-			CGX_PrintLine(COLOR_YELLOW);
-			XMOD_ANSWER("for detailed info: \\xmod <command>");
-			//show example
-			if (!exampleShown) {
-				XMOD_ANSWER("example: \\xmod cg_enemy"); 
-				XMOD_ANSWER("'Page Up','Page Down' - scroll 'Tab' - autocomplete\n'Up','Down' - input history");
-				exampleShown = qtrue; //19 - percent
-			}
-		} else {// find info abt command						
-			for (t = buf, i = 0; *t; t++) {
-				if (!(t = stristr(t, cmd)))
-					break;
-				if (*(t - 1) == '\n') {			
-					s = strchr(t, '-');
-					//if '-' in text find next
-					if (*(s + 1) != ' ' || *(s - 1) != ' ')
-						s = strchr(s + 1, '-');
-					//if '-' found
-					if (s)		
-					// if it's colorlist then paint numbers
-					if (!Q_stricmpn(t, "colorlist", 8)) {						
-						for (t = s; *t && *t != '\r'; t++)
-							if (*t >= '0' && *t <= '7') {
-								*(t - 2) = ' ';//replace ','
-								*(t - 1) = Q_COLOR_ESCAPE;//replace ' '
-								*(t + 1) = *t++;//replace next ' ' with num
-							}
-						t = s + 1;
-					} else { //otherwise just put white color
-						*(s) = COLOR_WHITE;
-						*(s - 1) = '^';
-					}	
-					//make end line
-					if (s = strchr(s, '\r'))
-						*s = 0;
-					//print found info
-					XMOD_ANSWER(va("^3%s", t));
-					i++;
-					t = s;
-				}				
-			}
+	i++;
+	CG_Printf("^3%s ^2%s ^7- ^5%s\n", c, p, d);
+	goto _find_next_cmd;
+}
+
+//parse info from file
+#define help_file1 "doc\\2-comand_list.txt"
+#define help_file2 "doc\\3-unlagged_commands.txt"
+static void CGX_ShowHelp(char *cmd) {
+	static qboolean exampleShown;
+	
+	//if no command show all 
+	if (!*cmd) {
+		//parse command list from file
+		XMOD_ANSWER("known command list");
+		CGX_PrintLine(COLOR_YELLOW);
+		CG_Printf("%-25s", "cg_delag");
+		CGX_FindCmds(help_file1, "");
+		CGX_PrintLine(COLOR_YELLOW);
+		XMOD_ANSWER("for detailed info type: \\xmod <command>");
+		//show example
+		if (!exampleShown) {
+			XMOD_ANSWER("example: \\xmod cg_enemy"); 
+			XMOD_ANSWER("'Page Up' 'Page Down' - scroll, 'Tab' - autocomplete");
+			XMOD_ANSWER("'Up' 'Down' - input history");
+			exampleShown = qtrue;
+		}
+	} else {
+		//find info abt command in files
+		int i = 0;
+
+		i += CGX_FindCmds(help_file1, cmd);
+		i += CGX_FindCmds(help_file2, cmd);
+
+		//zero matches
+		if (!i) {
+			char str[128]; char *s;
+			trap_Args(str, sizeof str);
 			
-			//zero matches
-			if (!i) {
-				if (s = CGX_XmodTalk(cmd))
-					XMOD_ANSWER(s)
-				else
-					XMOD_ANSWER(va("unknown cmd '%s'", cmd))
-			}
-		} 		
+			if (s = CGX_XmodTalk(str))
+				XMOD_ANSWER(s)
+			else
+				XMOD_ANSWER(va("unknown cmd '%s'", cmd))
+		}
 	}
 }
 
@@ -1577,7 +1632,7 @@ static void CGX_PrintClients() {
 //method to reload effects, used to call reload from UI
 static void CGX_ReloadEffects() {
 	char buf[32];
-	// get this cvar this way, in case if menu changed it and send command
+	// get cvar this way, in case if menu changed it and sent command
 	trap_Cvar_Get("cg_weaponEffects", buf);
 
 	if (atoi(buf) & WE_LG32)
@@ -1586,7 +1641,6 @@ static void CGX_ReloadEffects() {
 		trap_R_RegisterShaderCGXNomip(cgs.media.lightningShader, "lightningBolt")
 }
 
-#define help_file "doc\\2-comand_list.txt"
 #define cmd_is(x) !Q_stricmp(command, x)
 #define arg_is(x) !Q_stricmp(arg, x)
 static void CGX_PrintModelCache();
@@ -1609,7 +1663,7 @@ void CGX_Xmod() {
 	} 
 
 	i = strlen(command);
-	if (i && i < 3) {
+	if (i && i < 2) {
 		XMOD_ANSWER("too short cmd");		
 		return;
 	}
@@ -1664,7 +1718,7 @@ void CGX_Xmod() {
 	if (cmd_is("version")) {
 		XMOD_ANSWER(CGX_FULLVER" "CGX_DATE);
 	} else if (cmd_is("help")) {
-		CGX_ShowHelp(help_file, "");
+		CGX_ShowHelp("");
 	} else if (cmd_is("freemem")) {
 		CG_Printf("%i Mb\n", trap_MemoryRemaining() / 1024 / 1024);
 	} else if (cmd_is("models")) {
@@ -1698,7 +1752,7 @@ void CGX_Xmod() {
 	} else if (cmd_is("coin")) {
 		XMOD_ANSWER(rand() % 100 >= 50 ? "true": "false");
 	} else {
-		CGX_ShowHelp(help_file, command);
+		CGX_ShowHelp(command);
 	}
 }
 

@@ -11,7 +11,7 @@
 // X-MOD constants
 #define CGX_NAME		"X-Mod"
 #define CGX_VERSION		"0.95.2b"
-#define CGX_DATE		"19 Feb 2019" //__DATE__ not working with dd/mm/yyyy format
+#define CGX_DATE		__DATE__
 #define CGX_DEBUG		0
 #define	CGX_UNLAGGED	1
 #define CGX_FREEZE		1
