@@ -179,12 +179,15 @@ P.S. On noghost/nemesis/bma or any other servers with delag - no changes.
 cg_wideScreenFix by default set to 1
  just for compability with vanilla q3 cg_fov
 
-...
+0.95.2b
 
-stats show by tab key press in intermission
 mod works on 1.11 - 1.15c now
+reworked readme file
+stats show by tab key press in intermission
+server browser display longer hostnames
 
 added cg_drawGun 3 - transparent
 added followtarget on zoom in spect
 added fullbright skins, example: cg_enemyModel "keel/fb1" (fb1, fb2, fb3)
 
+hidden MPlayer menu (ui_browserShowMplayer 1|0)

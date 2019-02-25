@@ -1,11 +1,11 @@
 =============================================================================
-=======================Quake III X-Mod 1.16n 0.95.2b=========================
+========================Quake III X-Mod 1.16n 0.95.2b========================
 =============================================================================
 
 Custom extensions for patching Quake 3 1.11 - 1.16n (beta version)
 
 =============================================================================
-                        Installation & Requirements
+                         Installation & Requirements
 =============================================================================
 
 - requires quake 3 arena version 1.16n or 1.11 - 1.15c
@@ -15,7 +15,7 @@ Custom extensions for patching Quake 3 1.11 - 1.16n (beta version)
   (remove old pak2X.pk3 file if you have it)
 
 =============================================================================
-                                Features
+                                  Features
 =============================================================================
 
 - wide screen fix, icons not stretching, fov fix for widescreens
@@ -39,7 +39,7 @@ Custom extensions for patching Quake 3 1.11 - 1.16n (beta version)
 - improved server browser
 
 =============================================================================
-                                Buf fixes
+                                  Buf fixes
 =============================================================================
 
 - some big maps loading
