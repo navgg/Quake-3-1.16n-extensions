@@ -1345,19 +1345,19 @@ static void CGX_RememberBrokenMap() {
 	trap_Cvar_Set("cl_fixedmaps", buf);
 }
 
-qboolean CGX_IsPure() {
-	qboolean isPure;
-	char buf[4];
-
-	trap_Cvar_Get("sv_pure", buf);
-	isPure = atoi(buf);
-	if (cgs.localServer && isPure && cgx_networkAdjustments.integer) {
-		trap_Cvar_Set("sv_pure", "0");
-		return isPure;
-	} else {
-		return cgs.isPureServer;
-	}
-}
+//qboolean CGX_IsPure() {
+//	qboolean isPure;
+//	char buf[4];
+//
+//	trap_Cvar_Get("sv_pure", buf);
+//	isPure = atoi(buf);
+//	if (cgs.localServer && isPure && cgx_networkAdjustments.integer) {
+//		trap_Cvar_Set("sv_pure", "0");
+//		return isPure;
+//	} else {
+//		return cgs.isPureServer;
+//	}
+//}
 
 #define IsQ3Map(x) ((x[0] == 'q' || x[0] == 'Q') && x[1] == '3')
 //save mapname and try load aganin with fix
