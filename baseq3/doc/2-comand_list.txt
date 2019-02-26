@@ -68,12 +68,11 @@ cg_enemyColors "" - sets color for enemy models if skin supports it.
     "6" : becomes "6666"
     "25": becomes "pppp"
 
-cg_enemyModel_enabled 0|1 - toggles enemy model on\off
-  0: off
-  1: on(spectators off intermission on)
-  2: on(spectators on  intermission on)
-  3: on(spectators off intermission off)
-  4: on(spectators on  intermission off)
+cg_enemyModel_enabled 0|1 - toggles enemy model on\off.
+  Special flags:
+    2: sets enemy model for spectators
+    4: disables enemy models in intermission
+  Add values to 1 for special settings.
 
 cg_teamModel "" - same as cg_enemyModel but for team
 

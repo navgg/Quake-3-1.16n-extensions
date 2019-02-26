@@ -163,13 +163,6 @@ void CGX_Init_vScreen(void) {
 
 #pragma region Xmod enemy models
 
-// instead of modes 1 2 4 6 will be 1 2 3 4
-static qboolean EM_Check( int x ) {
-	int i = cgx_enemyModel_enabled.integer;
-	i = i == 3 ? i = 4 : i == 4 ? i = 6 : i;
-	return i & x;
-}
-
 static void CGX_ParseEnemyModelSetting(char *modelDest, char *skinDest, char *cvarStr) {
 	char modelStr[MAX_QPATH];
 	char *slash;	
@@ -281,7 +274,7 @@ static byte CGX_RGBToGray(byte *c) {
 static void CGX_SetColorInfo(clientInfo_t *info, const char *color, int clientNum) {
 	int i;
 
-	if (!*color || !cgx_enemyModel_enabled.integer || cgs.clientinfo[cg.clientNum].team == TEAM_SPECTATOR)
+	if (!*color || !cgx_enemyModel_enabled.integer || cgs.clientinfo[cg.clientNum].team == TEAM_SPECTATOR || info->team == TEAM_SPECTATOR)
 		color = "!!!!";
 	else if (i = QX_StringToColor(color))
 		color = va("%c%c%c%c", i, i, i, i);
@@ -482,7 +475,7 @@ static qboolean CGX_SetModelAndSkin(clientInfo_t *ci, qboolean isDeferred, int c
 	qboolean isSameTeam = qfalse;
 
 	if (cg.clientNum >= 0)
-		isSameTeam = cgs.gametype >= GT_TEAM && cgs.clientinfo[cg.clientNum].team == ci->team;
+		isSameTeam = cgs.clientinfo[cg.clientNum].team == ci->team && ci->team != TEAM_FREE && ci->team != TEAM_SPECTATOR;
 		
 	if (!isSameTeam) {
 		if (IsSameModel2(ci, cg.enemyModel, cg.enemySkin))
@@ -509,16 +502,18 @@ void CGX_CheckEnemyModel(clientInfo_t *ci, qboolean isDeferred, int clientNum) {
 	if (!ci->modelName[0] || !ci->skinName[0]) {
 		D_Printf(("^7Skip '%i' '%s' '%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->infoValid, ci->deferred));
 	} else {
-		qboolean isSpect = ci->team == TEAM_SPECTATOR && !EM_Check(EM_SPECT);
+		qboolean restoreInIntermission = cg.clientIntermission && (cgx_enemyModel_enabled.integer & EM_INTERMISSION);
+		qboolean restoreInSpect = !(cgx_enemyModel_enabled.integer & EM_SPECT);
+		qboolean isSpect = ci->team == TEAM_SPECTATOR && restoreInSpect;
 		qboolean isPlayer = qfalse;
 		qboolean isPlayerSpect = qfalse;
 
 		if (cg.clientNum >= 0) {		
-			isPlayerSpect = cgs.clientinfo[cg.clientNum].team == TEAM_SPECTATOR && !EM_Check(EM_SPECT);
+			isPlayerSpect = cgs.clientinfo[cg.clientNum].team == TEAM_SPECTATOR && restoreInSpect;
 			isPlayer = cg.clientNum == clientNum;
 		}
 
-		if (!cgx_enemyModel_enabled.integer || isSpect || isPlayerSpect || isPlayer || cg.clientIntermission) {
+		if (!cgx_enemyModel_enabled.integer || isPlayer || isSpect || isPlayerSpect || restoreInIntermission) {
 			if (CGX_RestoreModelAndSkin(ci, isDeferred)) {
 				D_Printf(("^3Restore '%i' '%s/%s' '%s/%s' '%i' '%i'\n", clientNum, ci->modelName, ci->skinName, ci->modelNameCopy, ci->skinNameCopy, ci->infoValid, ci->deferred));				
 			} else {
@@ -554,8 +549,7 @@ void CGX_TrackPlayerStateChanges() {
 		CGX_CheckEnemyModelAll(qfalse);
 		D_Printf(("^6TEAM CHANGED!\n"));
 	} //track intermission change
-	else if (cg.snap->ps.pm_type == PM_INTERMISSION && !cg.clientIntermission &&
-		EM_Check(EM_INTERMISSION)) {
+	else if (cg.snap->ps.pm_type == PM_INTERMISSION && !cg.clientIntermission) {
 		cg.clientIntermission = qtrue;
 
 		CGX_CheckEnemyModelAll(qfalse);

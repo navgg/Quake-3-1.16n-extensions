@@ -185,6 +185,7 @@ mod works on 1.11 - 1.15c now
 reworked readme file
 stats show by tab key press in intermission
 server browser display longer hostnames
+reworked cg_enemyModel_enabled
 
 added cg_drawGun 3 - transparent
 added followtarget on zoom in spect
