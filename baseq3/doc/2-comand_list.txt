@@ -22,7 +22,8 @@ cg_crosshairColor 0-39 - sets crosshair color.
 cg_drawSpeed 0|1|2 - draw speedometer. 0: off 1: top corner 2: center screen.
 
 cg_deadBodyDarken 0|1|2|3 - pm skins becomes gray after death.
-  0: off 1: Just grey 2: BT709 Greyscale 3: Y-Greyscale (PAL/NTSC)
+  0: off 1: just grey 2: BT709 Greyscale 3: Y-Greyscale (PAL/NTSC)
+  4-255: custom grey color intensity
 
 cg_chatSound 0|1|2 - chat beep sound 0: off 1: on 2: only team
 

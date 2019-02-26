@@ -265,9 +265,10 @@ static void CGX_ColorFromChar(char v, byte *color, clientInfo_t *info) {
 static byte CGX_RGBToGray(byte *c) {		
 	switch (cgx_deadBodyDarken.integer)
 	{		
+		case 1: return DARKEN_COLOR; //just grey
 		case 2:	return (0.2126f * c[0] + 0.7152f * c[1] + 0.0722f * c[2]) / 4; //BT709 Greyscale
 		case 3: return (0.2989f * c[0] + 0.5870f * c[1] + 0.1140f * c[2]) / 4; //Y-Greyscale (PAL/NTSC)
-		default: return DARKEN_COLOR; //just gray
+		default: return cgx_deadBodyDarken.integer;
 	}
 }
 
