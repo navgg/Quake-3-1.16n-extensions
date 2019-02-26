@@ -1,46 +1,44 @@
-# Quake III X-Mod 1.16n
-Custom extensions for patching Quake 3 1.16n (beta version)
+# Quake III X-Mod
+Custom extensions for patching Quake 3 1.11 - 1.16n (beta version)
 
 ###### Installation & Requirements
-- requires quake 3 arena version 1.16n
+- requires quake 3 arena version 1.16n or 1.11 - 1.15c
 - to install unzip {X-Mod}.pk3 to baseq3 folder of your quake 3 arena installation path
 
 ###### Features
-- wide screen fix, supports any ratio, icons not stretching, fov fix for widescreens
-- extended ingame ui with short description of many settings
+- wide screen fix, icons not stretching, fov fix for widescreens
+- extended game ui (display, network, controls menu and other)
+- improved server browser
 - added advanced settings menu with many hidden game settings
-- extended display menu, brightness options, fps selection, primitives etc.
-- extended network menu, rate options, added packets, snaps etc. (automatic or manual setting options)
-- misc controls added to menu, like kill, screenshot etc.
 - colored crossairs, 39 colors in total
-- bright cpm skins for enemies and team with custom coloring
-- cpm hitsounds based on damage dealt
-- draw gun with no bobbing like in cpm
+- bright cpm skins for enemies and team with custom colors
+- hitsounds based on damage dealt
+- draw gun with no bobbing or transparent
 - weapon auto swith after respawn settings
-- speedometer, extended lagometer + ping or display only when packetloss
-- display played id on scoreboard, useful for private chatting/following eg. \tell id \follow id
-- different scoreboards & huds
+- different huds & scoreboards with display of player id & referees
+- speedometer, extended lagometer
 - ability to disable chat beep or enemy taunt sounds
+- integrated unlagged 2.01 (`works with noghost\nemesis\bma servers`)
 - resolving favorite servers by domain name
-- integrated unlagged 2.01 (`client compatible with noghost\nemesis\bma servers`)
-- optimization: removed some debug info and other tweaks
 - shared q3config saving
+- optimization: removed some debug info
 
 ###### Buf fixes
 - some big maps loading fixed
-- rewards display fixed if it's more than 10
-- cinematics playback fixed for widescreens (only from cinematics menu and singleplayer games)
+- chat spoofing bug
+- cinematics playback fixed for widescreens
 - colored server names in server browser menu
 - sarge/default bug model in team games
 - scroll in serverinfo\driverinfo
-- couldn't load map error messages
-- chat spoofing bug
+- couldn't load map & other error messages
+- rewards display fixed if it's more than 10
+- display cg_shadow 1 when cg_marks 0
 - missing crash taunt
 - dead player fall sound
 - empty attacker icon when cg_draw3dicons 0
-- display cg_shadow 1 when cg_marks 0
 - flag draw with cg_drawIcons 0
-- lg when crounch and etc.
+- lg when crounch
+- other minor bugs
 
 ###### Author
 - X-Mod - (c) 2018-2019 NaViGaToR (322)
