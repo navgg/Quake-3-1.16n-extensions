@@ -17,7 +17,7 @@
 #define S_BRIGHT	"bright"
 
 //bright skin shader
-#define SS_BRIGHT	"xm_bright"
+#define SS_BRIGHT	"xm_fb1"
 
 //file i/o
 static int CGX_FCopy(char *filename, char *dest);

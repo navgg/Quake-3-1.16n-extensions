@@ -43,8 +43,11 @@ cg_enemyModel "" - forcing enemy models to specified model/skin.
     "tankjr/pm": all tankjrs with pm skin
     "*/pm": all have own models with pm skin
     "*/*": all have own models and own skins (useful for cg_teamModel)
-    "": same as "*/pm"
-    (instead of skins can be specified fullbright shaders e.g. fb1 fb2 fb3)
+    "": similar to "*/pm"
+  Instead of skins can be specified fullbright shaders - fb1 fb2 fb3.
+  Examples with shaders:
+    "keel/fb2": all keels with fb2 shader
+    "*/fb1": all have own model with fb1 shader
 
 cg_enemyColors "" - sets color for enemy models if skin supports it.
   Pattern: "1234" 1 - rail 2 - head 3 - torso 4 - legs.

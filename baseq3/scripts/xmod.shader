@@ -1,7 +1,7 @@
 //(c) 2019 Navigator (322)
 //bright models
 
-xm_bright
+xm_fb1
 {
 	{
 		map textures/sfx/snow.jpg
