@@ -39,15 +39,19 @@ Custom extensions for patching Quake 3 1.11 - 1.16n (beta version)
                                   Buf fixes
 =============================================================================
 
-- some big maps loading
+- some big maps loading fixed
 - chat spoofing bug
 - cinematics playback fixed for widescreens
-- colored server names in server browser
+- colored server names in server browser menu
 - sarge/default bug model in team games
-- display cg_shadow 1 when cg_marks 0
 - scroll in serverinfo\driverinfo
-- couldn't load map & other error messages processing
+- couldn't load map & other error messages
+- rewards display fixed if it's more than 10
+- display cg_shadow 1 when cg_marks 0
+- missing crash taunt
+- dead player fall sound
 - empty attacker icon when cg_draw3dicons 0
-- rewards display if it's more than 10
-- and other minor bugs fixed
+- flag draw with cg_drawIcons 0
+- lg when crounch
+- other minor bugs
 
