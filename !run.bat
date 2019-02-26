@@ -1,7 +1,8 @@
 @echo off
 rem 
 call compile_cgame.bat
-rem call compile_ui.bat
+rem 
+call compile_ui.bat
 
 rem set "gamedir=C:\Games\Quake 3 Arena 1.16n\"
 rem set "gamedir=C:\Games\Quake 3 Arena 1.16n clean\"
@@ -20,7 +21,7 @@ rem start /D "%gamedir%" "" quake3.exe +set sv_pure 0 +connect localhost:27960
 rem start /D "%gamedir%" "" quake3.exe +set sv_pure 0 +devmap 13box +set g_gametype 4 +addbot anarki 3 r +addbot bones b 3 +addbot mynx r 3 +addbot lucy 3 b
 rem start /D "%gamedir%" "" quake3.exe +set sv_pure 0 +devmap q3dm1 +set cg_debugEvents 1 +set cg_debugDelag 1 +set cg_showMiss 1 +set cg_drawBBox 1
 rem 
-start /D "%gamedir%" "" quake3.exe +set sv_pure 0 +devmap q3dm17
+start /D "%gamedir%" "" quake3.exe +set sv_pure 0 +devmap q3dm17 +set com_hunkmegs 112 +addbot anarki 1
 rem start /D "%gamedir%" "" quake3.exe
 rem start /D "%gamedir%" "" quake3.exe +connect sodmod.ml:27964 +set developer 1
 rem start /D "%gamedir%" "" quake3.exe +set sv_pure 0 +devmap 13box +set g_gametype 0

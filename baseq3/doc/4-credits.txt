@@ -1,5 +1,5 @@
 =============================================================================
-                                   Author
+                                  Author
 =============================================================================
 
 X-Mod - (c) 2018-2019 NaViGaToR (322)
@@ -8,6 +8,7 @@ X-Mod - (c) 2018-2019 NaViGaToR (322)
                                   Credits
 =============================================================================
 
+X-Mod - (c) 2018-2019 NaViGaToR (322)
 Unlagged 2.01 - (c) 2006 Neil “haste” Toronto
 Freeze Tag - (ñ) 1998, 2001, 2002 by Darrell Bircsak
 z-effects (c) 2001-2002 Randall "Ravenant" Piatek, Matt McChesney

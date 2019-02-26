@@ -192,3 +192,4 @@ added followtarget on zoom in spect
 added fullbright skins, example: cg_enemyModel "keel/fb2" (fb1, fb2, fb3)
 
 hidden MPlayer menu (ui_browserShowMplayer 1|0)
+

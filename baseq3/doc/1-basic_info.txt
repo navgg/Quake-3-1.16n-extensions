@@ -19,31 +19,28 @@ Custom extensions for patching Quake 3 1.11 - 1.16n (beta version)
 =============================================================================
 
 - wide screen fix, icons not stretching, fov fix for widescreens
-- extended ingame ui with short description of many settings
+- extended game ui (display, network, controls menu and other)
+- improved server browser
 - added advanced settings menu with many hidden game settings
-- extended display menu, brightness options, fps selection, primitives etc.
-- extended network menu, rate options, packets, snaps etc. (auto settings)
-- misc controls added to menu, like kill, screenshot etc.
 - colored crossairs, 39 colors in total
 - bright cpm skins for enemies and team with custom colors
-- cpm hitsounds based on damage dealt
-- draw gun with no bobbing like or transparent
+- hitsounds based on damage dealt
+- draw gun with no bobbing or transparent
 - weapon auto swith after respawn settings
-- speedometer options, extended lagometer + ping or display when packetloss
 - different huds & scoreboards with display of player id & referees
+- speedometer, extended lagometer
 - ability to disable chat beep or enemy taunt sounds
-- resolving favorite servers by domain name
 - integrated unlagged 2.01 (works with noghost\nemesis\bma servers)
-- optimization: removed some debug info
+- resolving favorite servers by domain name
 - shared q3config saving
-- improved server browser
+- optimization: removed some debug info
 
 =============================================================================
                                   Buf fixes
 =============================================================================
 
 - some big maps loading
-- rewards display fixed if it's more than 10
+- chat spoofing bug
 - cinematics playback fixed for widescreens
 - colored server names in server browser
 - sarge/default bug model in team games
@@ -51,6 +48,6 @@ Custom extensions for patching Quake 3 1.11 - 1.16n (beta version)
 - scroll in serverinfo\driverinfo
 - couldn't load map & other error messages processing
 - empty attacker icon when cg_draw3dicons 0
-- chat spoofing bug
+- rewards display if it's more than 10
 - and other minor bugs fixed
 
