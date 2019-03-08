@@ -8,9 +8,6 @@ scripts\*
 gfx\*
 levelshots\
 maps\
-win\
 sprites\*
 xm\
 default.cfg
-default_servercache.dat
-
