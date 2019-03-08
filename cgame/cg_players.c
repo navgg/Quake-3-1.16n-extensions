@@ -692,7 +692,7 @@ void CG_NewClientInfo( int clientNum ) {
 
 			if (lowMem || (cg_deferPlayers.integer && !cg_buildScript.integer && !cg.loading)) {
 				//if have some model then keep it until CG_LoadDeferredPlayers
-				if (*ci->modelName && *ci->skinName)
+				if (*ci->modelName && *ci->skinName && cg.clientNum == clientNum)
 					CG_CopyClientInfoModel(ci, &newInfo);
 				else
 					CGX_TryLoadModelFromCache(&newInfo, qtrue, qfalse);
