@@ -2306,7 +2306,6 @@ static void CG_DrawIntermission( void ) {
 	cg.scoreFadeTime = cg.time;
 	CG_DrawScoreboard();
 
-	stats.needprint = qtrue;
 	trap_Cvar_Update(&cgx_intermissionStats);
 	if (cgx_intermissionStats.integer) {
 		CG_statsWindow(WFX_FADEIN);

@@ -551,7 +551,7 @@ void CG_statsWindow( int weffects ) {
 			default: weaponName = "Unknown"; break;
 		}
 
-		if (stats.weaponHits[i] == 0)
+		if (stats.weaponShots[i] == 0)
 			j = 0;
 		else
 			j = stats.weaponHits[i] * 1000 / stats.weaponShots[i];
@@ -589,6 +589,8 @@ void CG_statsWindow( int weffects ) {
 
 	if (interMission) {
 		sw->y += hud.head_size;
+
+		stats.needprint = qtrue;
 	}
 }
 

@@ -196,3 +196,4 @@ hidden MPlayer menu (ui_browserShowMplayer 1|0)
 0.95.3b
 
 fixed model loading stuttering during gameplay
+fixed some random game crashes in intermission
