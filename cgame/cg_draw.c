@@ -1881,23 +1881,28 @@ static void CG_DrawLagometer( void ) {
 		}
 	}
 
-	trap_R_SetColor( NULL );
+	if (cg_lagometer.integer == 1) {
+		if ( cg_nopredict.integer || cg_syncronousClients.integer )
+			CG_DrawBigString2( x, y, "snc", 1.0 );
+	} else {
+		// X-MOD: draw ping in lagometer
+		 if (!cg.demoPlayback) {
+			char *pingStr;
 
-	if ( cg_nopredict.integer || cg_syncronousClients.integer ) {
-		CG_DrawBigString( ax, ay, "snc", 1.0 );
-	}
-	
-	// X-MOD: draw ping in lagometer
-	if (cg_lagometer.integer > 1 && !cg.demoPlayback) {
-		// draw ping packet loss and delayed rate if lag
-		if (cg.meanPing > 0) {
-			if (cg_lagometer.integer > 2)
-				CG_DrawStringExt(x + 1, y, va("%ims %i %i", cg.meanPing, cg.packetloss, cg.rateDelayed), g_color_table[ColorIndex(COLOR_WHITE)], qfalse, qfalse, hud.lagometer_fw, hud.lagometer_fh, 0);
-			else
-				CG_DrawStringExt(x + 1, y, va("%ims", cg.meanPing, cg.packetloss, cg.rateDelayed), g_color_table[ColorIndex(COLOR_WHITE)], qfalse, qfalse, hud.lagometer_fw, hud.lagometer_fh, 0);
-		} else {			
-			// draw if stats not calculated yet
-			CG_DrawStringExt(x + 1, y, "...", g_color_table[ColorIndex(COLOR_WHITE)], qfalse, qfalse, hud.lagometer_fw, hud.lagometer_fh, 0);
+			if (cg_nopredict.integer || cg_syncronousClients.integer) {
+				pingStr = "snc";
+			} else if (cg.meanPing > 0) {
+				// draw ping packet loss and delayed rate if lag
+				if (cg_lagometer.integer > 2)
+					pingStr = va("%ims %i %i", cg.meanPing, cg.packetloss, cg.rateDelayed);
+				else
+					pingStr = va("%ims", cg.meanPing);
+			} else {
+				// draw if stats not calculated yet
+				pingStr = "...";
+			}
+
+			CG_DrawStringExt(x + 1, y, pingStr, colorWhite, qfalse, qfalse, hud.lagometer_fw, hud.lagometer_fh, 0);
 		}
 	}
 	
