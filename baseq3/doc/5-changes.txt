@@ -203,3 +203,7 @@ fixed model loading stuttering during gameplay (with cg_modelCache 1)
 fixed some random game crashes in intermission
 
 minor optimizations
+
+...
+
+extended player model select menu from 4x4 to 5x5

@@ -29,8 +29,8 @@ static char* playermodel_artlist[] =
 	NULL
 };
 
-#define PLAYERGRID_COLS		4
-#define PLAYERGRID_ROWS		4
+#define PLAYERGRID_COLS		5//4
+#define PLAYERGRID_ROWS		5//4
 #define MAX_MODELSPERPAGE	(PLAYERGRID_ROWS*PLAYERGRID_COLS)
 
 #define MAX_PLAYERMODELS	256
@@ -79,6 +79,10 @@ typedef struct
 	int				numpages;
 	char			modelskin[64];
 	int				selectedmodel;
+	//xmod: varibles for extending player select menu from 4x4 to 5x5
+	menubitmap_s	ports_ex;
+	int				offs_arrows_x;
+	int				offs_arrows_y;
 } playermodel_t;
 
 static playermodel_t s_playermodel;
@@ -335,6 +339,15 @@ static void PlayerModel_PicEvent( void* ptr, int event )
 	}
 }
 
+static void PlayerModel_DrawPorts_Ex( void *self ) {
+	menubitmap_s* b = (menubitmap_s*) self;
+	qhandle_t shader = trap_R_RegisterShaderNoMip(MODEL_PORTS);
+	
+	UI_DrawHandlePic(b->generic.x + 64 + 6, b->generic.y + 64 + 6, -b->width, -b->height, shader);
+	UI_DrawHandlePic(b->generic.x + 64 + 6, b->generic.y, -b->width, b->height, shader);
+	UI_DrawHandlePic(b->generic.x, b->generic.y + 64 + 6, b->width, -b->height, shader);
+}
+
 /*
 =================
 PlayerModel_DrawPlayer
@@ -497,6 +510,14 @@ static void PlayerModel_MenuInit( void )
 
 	PlayerModel_Cache();
 
+	if (PLAYERGRID_COLS == 5 && PLAYERGRID_ROWS == 5) {
+		s_playermodel.offs_arrows_x = 64 + 7;
+		s_playermodel.offs_arrows_y = 64 + 2;
+	} else {
+		s_playermodel.offs_arrows_x = 0;
+		s_playermodel.offs_arrows_y = 0;
+	}
+
 	s_playermodel.menu.key        = PlayerModel_MenuKey;
 	s_playermodel.menu.wrapAround = qtrue;
 	s_playermodel.menu.fullscreen = qtrue;
@@ -602,8 +623,8 @@ static void PlayerModel_MenuInit( void )
 	s_playermodel.arrows.generic.type		= MTYPE_BITMAP;
 	s_playermodel.arrows.generic.name		= MODEL_ARROWS;
 	s_playermodel.arrows.generic.flags		= QMF_INACTIVE;
-	s_playermodel.arrows.generic.x			= 125;
-	s_playermodel.arrows.generic.y			= 340;
+	s_playermodel.arrows.generic.x			= 125 + s_playermodel.offs_arrows_x;
+	s_playermodel.arrows.generic.y			= 340 + s_playermodel.offs_arrows_y;
 	s_playermodel.arrows.width				= 128;
 	s_playermodel.arrows.height				= 32;
 
@@ -611,8 +632,8 @@ static void PlayerModel_MenuInit( void )
 	s_playermodel.left.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	s_playermodel.left.generic.callback		= PlayerModel_MenuEvent;
 	s_playermodel.left.generic.id			= ID_PREVPAGE;
-	s_playermodel.left.generic.x			= 125;
-	s_playermodel.left.generic.y			= 340;
+	s_playermodel.left.generic.x			= 125 + s_playermodel.offs_arrows_x;
+	s_playermodel.left.generic.y			= 340 + s_playermodel.offs_arrows_y;
 	s_playermodel.left.width  				= 64;
 	s_playermodel.left.height  				= 32;
 	s_playermodel.left.focuspic				= MODEL_ARROWSL;
@@ -621,8 +642,8 @@ static void PlayerModel_MenuInit( void )
 	s_playermodel.right.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	s_playermodel.right.generic.callback	= PlayerModel_MenuEvent;
 	s_playermodel.right.generic.id			= ID_NEXTPAGE;
-	s_playermodel.right.generic.x			= 125+61;
-	s_playermodel.right.generic.y			= 340;
+	s_playermodel.right.generic.x			= 125+61 + s_playermodel.offs_arrows_x;
+	s_playermodel.right.generic.y			= 340 + s_playermodel.offs_arrows_y;
 	s_playermodel.right.width  				= 64;
 	s_playermodel.right.height  		    = 32;
 	s_playermodel.right.focuspic			= MODEL_ARROWSR;
@@ -641,6 +662,20 @@ static void PlayerModel_MenuInit( void )
 	Menu_AddItem( &s_playermodel.menu,	&s_playermodel.banner );
 	Menu_AddItem( &s_playermodel.menu,	&s_playermodel.framel );
 	Menu_AddItem( &s_playermodel.menu,	&s_playermodel.framer );
+
+	if (s_playermodel.offs_arrows_x && s_playermodel.offs_arrows_y) {
+		s_playermodel.ports_ex.generic.type  = MTYPE_BITMAP;
+		s_playermodel.ports_ex.generic.name  = MODEL_PORTS;
+		s_playermodel.ports_ex.generic.flags = QMF_LEFT_JUSTIFY|QMF_INACTIVE;
+		s_playermodel.ports_ex.generic.x     = 50;
+		s_playermodel.ports_ex.generic.y     = 59;
+		s_playermodel.ports_ex.width         = 274;
+		s_playermodel.ports_ex.height        = 274;
+		s_playermodel.ports_ex.generic.ownerdraw = PlayerModel_DrawPorts_Ex;
+
+		Menu_AddItem( &s_playermodel.menu,	&s_playermodel.ports_ex );
+	}
+
 	Menu_AddItem( &s_playermodel.menu,	&s_playermodel.ports );
 	Menu_AddItem( &s_playermodel.menu,	&s_playermodel.playername );
 	Menu_AddItem( &s_playermodel.menu,	&s_playermodel.modelname );
