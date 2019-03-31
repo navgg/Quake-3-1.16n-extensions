@@ -193,7 +193,13 @@ added fullbright skins, example: cg_enemyModel "keel/fb2" (fb1, fb2, fb3)
 
 hidden MPlayer menu (ui_browserShowMplayer 1|0)
 
-0.95.3b
+0.95.3b (internal release)
 
 fixed model loading stuttering during gameplay
+
+0.95.4b
+
+fixed model loading stuttering during gameplay (with cg_modelCache 1)
 fixed some random game crashes in intermission
+
+minor optimizations
