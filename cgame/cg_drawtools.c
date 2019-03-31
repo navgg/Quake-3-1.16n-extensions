@@ -112,7 +112,7 @@ void CG_DrawStringExt( int x, int y, const char *string, const float *setColor,
 		qboolean forceColor, qboolean shadow, int charWidth, int charHeight, int maxChars ) {
 	vec4_t		color;
 	const char	*s;
-	int			xx;
+	int			xx, yy;
 	int			cnt;
 
 	if (maxChars <= 0)
@@ -126,14 +126,15 @@ void CG_DrawStringExt( int x, int y, const char *string, const float *setColor,
 		color[3] = setColor[3];
 		trap_R_SetColor( color );
 		s = string;
-		xx = x;
+		xx = x + shadowSize;
+		yy = y + shadowSize;
 		cnt = 0;
 		while ( *s && cnt < maxChars) {
 			if ( Q_IsColorString( s ) ) {
 				s += 2;
 				continue;
 			}
-			CG_DrawChar( xx + shadowSize, y + shadowSize, charWidth, charHeight, *s );
+			CG_DrawChar( xx, yy, charWidth, charHeight, *s );
 			cnt++;
 			xx += charWidth;
 			s++;
