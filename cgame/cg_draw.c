@@ -2302,6 +2302,7 @@ static void CG_DrawVote(void) {
 CG_DrawIntermission
 =================
 */
+extern vmCvar_t cgx_helpShowed;
 static void CG_DrawIntermission( void ) {
 	if ( cgs.gametype == GT_SINGLE_PLAYER ) {
 		CG_DrawCenterString();
@@ -2314,11 +2315,13 @@ static void CG_DrawIntermission( void ) {
 	trap_Cvar_Update(&cgx_intermissionStats);
 	if (cgx_intermissionStats.integer) {
 		CG_statsWindow(WFX_FADEIN);
-	} else if (!cg.statsWindow && cgs.clientinfo[cg.snap->ps.clientNum].team != TEAM_SPECTATOR) {
+	} else if (!cg.statsWindow && !(cgx_helpShowed.integer & 1) && cgs.clientinfo[cg.snap->ps.clientNum].team != TEAM_SPECTATOR) {
 		char key[32];
 		trap_Cvar_VariableStringBuffer("cgx_scores_key", key, sizeof key);
 		CG_DrawStringExt(8, SCREEN_HEIGHT - 8 - 8, va("Press %s to see your stats", *key ? key : "+scores key"), 
 			colorWhite, qfalse, qtrue, WINDOW_FONTWIDTH, WINDOW_FONTHEIGHT, 0);
+		if (cgx_helpShowed.integer == 0)
+			trap_Cvar_Set("cgx_help_showed", "1");
 	}
 }
 

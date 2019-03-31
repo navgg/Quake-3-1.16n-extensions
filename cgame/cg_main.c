@@ -400,6 +400,8 @@ vmCvar_t	cgx_dl_page;
 vmCvar_t	cgx_dl_dynb;
 vmCvar_t	cgx_dl_tobaseq3;
 
+vmCvar_t	cgx_helpShowed;
+
 cvarTable_t		cgx_cvarTable_temp[] = {
 	//handle map loading errors
 	{ &cgx_last_error, "cgx_last_error", "", CVAR_TEMP | CVAR_ROM },
@@ -411,6 +413,8 @@ cvarTable_t		cgx_cvarTable_temp[] = {
 	{ &cgx_fixedmaps, "cl_fixedmaps", "", CVAR_ROM | CVAR_ARCHIVE },
 	//mod version
 	{ &cgx_version, "cgx_version", CGX_FULLVER, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
+	//for help message showing in intermission
+	{ &cgx_helpShowed, "cgx_help_showed", "0", CVAR_TEMP },
 	//for model cahe
 	{ &cgx_modelCache, "cg_modelCache", "1", CVAR_TEMP | CVAR_LATCH },
 	//ops stats window in intermission
