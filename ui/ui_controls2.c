@@ -762,7 +762,7 @@ static void Controls_DrawPlayer( void *self ) {
 Controls_GetKeyAssignment
 =================
 */
-static void Controls_GetKeyAssignment (char *command, int *twokeys)
+void Controls_GetKeyAssignment (char *command, int *twokeys)
 {
 	int		count;
 	int		j;

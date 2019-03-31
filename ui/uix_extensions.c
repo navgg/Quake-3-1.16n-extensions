@@ -2,6 +2,8 @@
 
 #include "ui_local.h"
 
+extern void Controls_GetKeyAssignment(char *command, int *twokeys);
+
 /* X-MOD: commonstatusbar for quick infos */
 void UIX_CommonStatusBar(void *self, int min, int total, const char* info_messages[][2]) {
 	const char *infomsg, *infomsg2;

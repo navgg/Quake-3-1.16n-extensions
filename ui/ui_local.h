@@ -281,8 +281,6 @@ extern char	*ui_medalSounds[];
 // uix_extensions.c
 //
 
-extern void Controls_GetKeyAssignment(char *command, int *twokeys);
-
 extern void UIX_CommonStatusBar(void *self, int min, int total, const char* info_messages[][2]);
 
 extern void UIX_GetCDKey(char *buf, int buflen);
