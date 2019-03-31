@@ -1409,8 +1409,14 @@ static char* CGX_XmodTalk(char *command) {
 	if (stristr(command, "fuck") || stristr(command, "suck") || stristr(command, "shit")) {
 		return command;
 	} else if (stristr(command, "hi ") || stristr(command, "hello")) {
-		char *txt[] = { "hi! how are you?", "hello!", "hey" };
-		return txt[rand() % ArrLen(txt)];
+		char *txt[] = { "hi, %s! how are you?", "hello!", "hey", "hi, %s!" };
+		int num = rand() % ArrLen(txt);
+		if (stristr(txt[num], "%s")) {
+			char username[MAX_QPATH];
+			trap_Cvar_Get(rand() % 1000 > 500 ? "username" : "name", username);
+			return va(txt[num], username);
+		}
+		return txt[num];
 	} else if (stristr(command, "fine") || stristr(command, "good") || stristr(command, "ok ") || stristr(command, "awesome") || stristr(command, "great")) {
 		char *txt[] = { "good", "great", "okay", "awesome" };
 		return rand() % 1000 > 500 ? txt[rand() % ArrLen(txt)] : command;
