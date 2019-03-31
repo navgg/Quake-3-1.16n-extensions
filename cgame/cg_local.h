@@ -1196,7 +1196,9 @@ extern	vmCvar_t		cg_showmiss;
 
 extern	vmCvar_t		cg_addMarks;
 extern	vmCvar_t		cg_brassTime;
+#if CGX_DEBUG
 extern	vmCvar_t		cg_gun_frame;
+#endif
 extern	vmCvar_t		cg_gun_x;
 extern	vmCvar_t		cg_gun_y;
 extern	vmCvar_t		cg_gun_z;

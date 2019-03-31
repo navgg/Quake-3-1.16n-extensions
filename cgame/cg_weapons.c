@@ -1343,13 +1343,15 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 	VectorMA( hand.origin, (cg_gun_z.value+fovOffset), cg.refdef.viewaxis[2], hand.origin );
 
 	AnglesToAxis( angles, hand.axis );
-
+#if CGX_DEBUG
 	// map torso animations to weapon animations
 	if ( cg_gun_frame.integer ) {
 		// development tool
 		hand.frame = hand.oldframe = cg_gun_frame.integer;
 		hand.backlerp = 0;
-	} else {
+	} else 
+#endif
+	{
 		// get clientinfo for animation map
 		ci = &cgs.clientinfo[ cent->currentState.clientNum ];
 		hand.frame = CG_MapTorsoToWeaponFrame( ci, cent->pe.torso.frame );
