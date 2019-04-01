@@ -2192,6 +2192,7 @@ static void CG_DrawCrosshairNames( void ) {
 	char		*name;
 	float		w;
 	clientInfo_t *ci;
+	int			y0, i;
 
 	if ( !cg_drawCrosshair.integer ) {
 		return;
@@ -2215,7 +2216,15 @@ static void CG_DrawCrosshairNames( void ) {
 
 	ci = &cgs.clientinfo[cg.crosshairClientNum];
 
-	if (cg_drawCrosshairNames.integer & 32)
+	if (cg_drawCrosshairNames.integer > 0) {
+		y0 = 170;
+		i = cg_drawCrosshairNames.integer;
+	} else {
+		y0 = 310 - hud.big_char_w;
+		i = -cg_drawCrosshairNames.integer;
+	}
+
+	if (i & 32)
 		name = va("%s ^7%i", ci->name, cg.crosshairClientNum);
 	else
 		name = ci->name;
@@ -2225,17 +2234,18 @@ static void CG_DrawCrosshairNames( void ) {
 	w = CG_DrawStrlen(name) * hud.big_char_w;
 	CG_DrawBigString2(vScreen.hwidth - w / 2, 170, name, color[3]);
 
-	if (cg_drawCrosshairNames.integer > 1 && ci->health > 0 && !(cg.snap->ps.pm_flags & PMF_FOLLOW)) {
-		int startY = 170 + hud.big_char_w + 2;
+	if (i > 1 && ci->health > 0 && !(cg.snap->ps.pm_flags & PMF_FOLLOW)) {
 		clientInfo_t *pci = &cgs.clientinfo[cg.snap->ps.clientNum];
 
 		if (pci->team == ci->team && (pci->team == TEAM_RED || pci->team == TEAM_BLUE)) {
-			if (cg_drawCrosshairNames.integer == 2) {
+			int startY = y0 + hud.big_char_w + 2;
+
+			if (i == 2) {
 				// draw as text
 				char *s = va( "%i / %i", ci->health, ci->armor );
 				w = CG_DrawStrlen( s ) * TINYCHAR_WIDTH;
 				CG_DrawStringExt( vScreen.hwidth - w / 2, startY, s, color, qfalse, qtrue, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0 );
-			} else if (cg_drawCrosshairNames.integer == 3) {
+			} else if (i == 3) {
 				// draw as bars
 				CGX_DrawHPArmorBar( startY, ci->health, 100, color[3] );
 				CGX_DrawHPArmorBar( startY + 3, ci->armor, 100, color[3] );
