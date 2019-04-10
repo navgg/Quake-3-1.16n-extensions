@@ -209,3 +209,5 @@ minor optimizations
 extended player model select menu from 4x4 to 5x5
 
 added cg_drawCrosshairNames -1..-3 (draw target name below crosshair)
+
+minor optimizations

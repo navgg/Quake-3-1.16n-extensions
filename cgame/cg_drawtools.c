@@ -57,7 +57,12 @@ void CG_DrawPic( float x, float y, float width, float height, qhandle_t hShader 
 	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
 }
 
-
+const float drawchar_coords[] = {
+	 0.0625 *  0, 0.0625 *  1, 0.0625 *  2, 0.0625 *  3,
+	 0.0625 *  4, 0.0625 *  5, 0.0625 *  6, 0.0625 *  7,
+	 0.0625 *  8, 0.0625 *  9, 0.0625 * 10, 0.0625 * 11,
+	 0.0625 * 12, 0.0625 * 13, 0.0625 * 14, 0.0625 * 15,
+};
 
 /*
 ===============
@@ -87,8 +92,8 @@ void CG_DrawChar( int x, int y, int width, int height, int ch ) {
 	row = ch>>4;
 	col = ch&15;
 
-	frow = row*0.0625;
-	fcol = col*0.0625;
+	frow = drawchar_coords[row];
+	fcol = drawchar_coords[col];
 	size = 0.0625;
 
 	trap_R_DrawStretchPic( ax, ay, aw, ah,
