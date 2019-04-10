@@ -193,20 +193,38 @@ PARSING
 
 static	char	com_token[MAX_TOKEN_CHARS];
 static	int		com_lines;
+static	int		com_tokenline;
 
 void COM_BeginParseSession( void )
 {
-	com_lines = 0;
+	com_lines = 1;
+	com_tokenline = 0;
 }
 
 int COM_GetCurrentParseLine( void )
 {
+	if ( com_tokenline )
+	{
+		return com_tokenline;
+	}
+
 	return com_lines;
 }
 
 char *COM_Parse( char **data_p )
 {
 	return COM_ParseExt( data_p, qtrue );
+}
+
+//x-mod: peeks token, doesn't modifies it's pointer and line numbers
+char *COM_PeekParse( char **data_p )
+{
+	char *res, *d = *data_p;
+	int l = com_lines, tl = com_tokenline;
+	res = COM_ParseExt( &d, qtrue );
+	com_lines = l; 
+	com_tokenline = tl; 
+	return res;
 }
 
 
@@ -238,7 +256,7 @@ static char *SkipWhitespace( char *data, qboolean *hasNewLines ) {
 
 	return data;
 }
-
+//ported from ioquake3
 char *COM_ParseExt( char **data_p, qboolean allowLineBreaks )
 {
 	int c = 0, len;
@@ -248,6 +266,7 @@ char *COM_ParseExt( char **data_p, qboolean allowLineBreaks )
 	data = *data_p;
 	len = 0;
 	com_token[0] = 0;
+	com_tokenline = 0;
 
 	// make sure incoming data is valid
 	if ( !data )
@@ -276,14 +295,21 @@ char *COM_ParseExt( char **data_p, qboolean allowLineBreaks )
 		// skip double slash comments
 		if ( c == '/' && data[1] == '/' )
 		{
-			while (*data && *data != '\n')
+			data += 2;
+			while (*data && *data != '\n') {
 				data++;
+			}
 		}
 		// skip /* */ comments
 		else if ( c=='/' && data[1] == '*' ) 
 		{
+			data += 2;
 			while ( *data && ( *data != '*' || data[1] != '/' ) ) 
 			{
+				if ( *data == '\n' )
+				{
+					com_lines++;
+				}
 				data++;
 			}
 			if ( *data ) 
@@ -296,6 +322,9 @@ char *COM_ParseExt( char **data_p, qboolean allowLineBreaks )
 			break;
 		}
 	}
+
+	// token starts on this line
+	com_tokenline = com_lines;
 
 	// handle quoted strings
 	if (c == '\"')
@@ -310,7 +339,11 @@ char *COM_ParseExt( char **data_p, qboolean allowLineBreaks )
 				*data_p = ( char * ) data;
 				return com_token;
 			}
-			if (len < MAX_TOKEN_CHARS)
+			if ( c == '\n' )
+			{
+				com_lines++;
+			}
+			if (len < MAX_TOKEN_CHARS - 1)
 			{
 				com_token[len] = c;
 				len++;
@@ -321,22 +354,15 @@ char *COM_ParseExt( char **data_p, qboolean allowLineBreaks )
 	// parse a regular word
 	do
 	{
-		if (len < MAX_TOKEN_CHARS)
+		if (len < MAX_TOKEN_CHARS - 1)
 		{
 			com_token[len] = c;
 			len++;
 		}
 		data++;
 		c = *data;
-		if ( c == '\n' )
-			com_lines++;
 	} while (c>32);
 
-	if (len == MAX_TOKEN_CHARS)
-	{
-//		Com_Printf ("Token exceeded %i chars, discarded.\n", MAX_TOKEN_CHARS);
-		len = 0;
-	}
 	com_token[len] = 0;
 
 	*data_p = ( char * ) data;
