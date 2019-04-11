@@ -491,6 +491,19 @@ void CG_RegisterCvars( void ) {
 
 	//save current picmip
 	CGX_SavePicmip();
+
+	//modification counts should be initialized here
+	//TODO: make it initializing in loop, from -1 initial value
+	cgx_wideScreenFixmodificationCount = cgx_wideScreenFix.modificationCount;
+	cgx_enemyModelModificationCount = cgx_enemyModel.modificationCount;
+	cgx_teamModelModificationCount = cgx_teamModel.modificationCount;
+	cgx_enemyColorsModificationCount = cgx_enemyColors.modificationCount;
+	cgx_teamColorsModificationCount = cgx_teamColors.modificationCount;
+	cgx_deadBodyDarkenModificationCount = cgx_deadBodyDarken.modificationCount;
+	cgx_enemyModel_enabledModificationCount = cgx_enemyModel_enabled.modificationCount;
+	cgx_fps_modificationCount = cg_drawFPS.modificationCount;
+	cgx_sharedConfigModificationCount = cgx_sharedConfig.modificationCount;
+	cgx_draw2DModificationCount = cg_draw2D.modificationCount;
 }
 
 /*
@@ -1188,14 +1201,13 @@ void CG_Init( int serverMessageNum, int serverCommandSequence ) {
 	cgs.redflag = cgs.blueflag = -1; // For compatibily, default to unset for
 	// old servers
 
+	// get the rendering configuration from the client system
+	trap_GetGlconfig( &cgs.glconfig );
+
 	//X-MOD: reset clientnum and client oldteam, then init enemymodels and vScreen
 
 	cg.clientNum = -1;	
 	cg.oldTeam = -1;
-	
-	CGX_Init_enemyModels();
-	CGX_Init_vScreen();
-	CGX_ResetModelCache();
 
 	// get the gamestate from the client system
 	trap_GetGameState( &cgs.gameState );
@@ -1205,6 +1217,10 @@ void CG_Init( int serverMessageNum, int serverCommandSequence ) {
 	if ( strcmp( s, GAME_VERSION ) ) {
 		CG_Error( "Client/Server game mismatch: %s/%s", GAME_VERSION, s );
 	}
+
+	CGX_Init_enemyModels();
+	CGX_Init_vScreen();
+	CGX_ResetModelCache();
 
 	s = CG_ConfigString( CS_LEVEL_START_TIME );
 	cgs.levelStartTime = atoi( s );

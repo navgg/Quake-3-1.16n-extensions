@@ -133,8 +133,6 @@ static void CGX_Init_HUD(void) {
 void CGX_Init_vScreen(void) {
 	const float baseAspect = 0.75f; // 3/4
 	float aspect;
-	// get the rendering configuration from the client system
-	trap_GetGlconfig( &cgs.glconfig );
 
 	aspect = (float)cgs.glconfig.vidWidth / (float)cgs.glconfig.vidHeight;
 
