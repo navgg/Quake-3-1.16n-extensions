@@ -457,7 +457,7 @@ static void UI_Preferences_StatusBar( void *self ) {
 		{ "Toggles display of marks on walls", "Turning off may increase FPS in some cases" },
 		{ "Renders realtime dynamic lights", "Turning off may increase FPS on some PC" },
 		{ "Display target name above crosshair", "To show team info 'teamoverlay' must be enabled" },
-		{ "V-Sync (Vertical synchronization)", "Strongly recommended 'Off'" },
+		{ "Synchronization of rendered frames (Not V-Sync.)", "Engine will wait for GL calls to finish" },
 		{ "Forces all player models to be same", "All enemies in game will be using player's model" },
 		{ "Sets team overlay draw position", "" },
 		{ "Allows autodowloading content from pure servers", "" },
