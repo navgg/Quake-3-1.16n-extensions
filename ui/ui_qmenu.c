@@ -1105,7 +1105,7 @@ sfxHandle_t ScrollList_Key( menulist_s *l, int key )
 
 			if( c >= l->numitems ) {
 				//x-mod: select the last element (if we are at the bottom of before last column)
-				if (l->curvalue != l->numitems - 1 && l->curvalue / l->height < l->numitems / l->height)
+				if (l->curvalue != l->numitems - 1 && l->curvalue / l->height < (l->numitems - 1) / l->height)
 					c = l->numitems - 1;
 				else
 					return menu_buzz_sound;
