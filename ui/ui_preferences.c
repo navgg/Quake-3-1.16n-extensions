@@ -587,11 +587,11 @@ static const char *drawnames_items[] = {
 static void Preferences_SetMenuItems( void ) {
 	char buf[32];
 	
-	s_preferences.crosshair.curvalue		= (int)trap_Cvar_VariableValue( "cg_drawCrosshair" ) % NUM_CROSSHAIRS;
+	s_preferences.crosshair.curvalue		= abs((int)trap_Cvar_VariableValue( "cg_drawCrosshair" )) % NUM_CROSSHAIRS;
 	s_preferences.simpleitems.curvalue		= trap_Cvar_VariableValue( "cg_simpleItems" ) != 0;
 	s_preferences.brass.curvalue			= trap_Cvar_VariableValue( "cg_brassTime" ) != 0;
 	s_preferences.wallmarks.curvalue		= trap_Cvar_VariableValue( "cg_marks" ) != 0;
-	s_preferences.identifytarget.curvalue	= (int)trap_Cvar_VariableValue( "cg_drawCrosshairNames" ) % ArrLen(drawnames_items);
+	s_preferences.identifytarget.curvalue	= abs((int)trap_Cvar_VariableValue( "cg_drawCrosshairNames" )) % ArrLen(drawnames_items);
 	s_preferences.dynamiclights.curvalue	= trap_Cvar_VariableValue( "r_dynamiclight" ) != 0;
 	s_preferences.highqualitysky.curvalue	= trap_Cvar_VariableValue ( "r_fastsky" ) == 0;
 	s_preferences.synceveryframe.curvalue	= trap_Cvar_VariableValue( "r_finish" ) != 0;

@@ -641,7 +641,6 @@ static void GraphicsOptions_Event( void* ptr, int event ) {
 		break;
 
 	case ID_LIST:
-		trap_Print(va("%i\n", s_graphicsoptions.list.curvalue));
 		ivo = &s_ivo_templates[s_graphicsoptions.list.curvalue];
 
 		s_graphicsoptions.mode.curvalue        = ivo->mode;

@@ -232,8 +232,8 @@ static void Preferences2_SetMenuItems( void ) {
 	s_preferences2.lagometer.curvalue = abs((int)trap_Cvar_VariableValue("cg_lagometer") % ArrLen(lagometer_items));
 	s_preferences2.hitsounds.curvalue = abs((int)trap_Cvar_VariableValue("cg_hitsounds") % ArrLen(hitsounds_items));
 	
-	s_preferences2.centerprint.curvalue = (int)(trap_Cvar_VariableValue("cg_centerPrintAlpha") * 2) % 3;
-	s_preferences2.drawgun.curvalue = (int)trap_Cvar_VariableValue("cg_drawGun") % ArrLen(drawgun_items);
+	s_preferences2.centerprint.curvalue = abs((int)(trap_Cvar_VariableValue("cg_centerPrintAlpha")) * 2) % 3;
+	s_preferences2.drawgun.curvalue = abs((int)trap_Cvar_VariableValue("cg_drawGun")) % ArrLen(drawgun_items);
 
 	s_preferences2.scoreboard.curvalue = abs((int)trap_Cvar_VariableValue("cg_scoreboard") % ArrLen(scoreboar_items));
 	s_preferences2.accuracy.curvalue = trap_Cvar_VariableValue("cg_drawAccuracy") != 0;
