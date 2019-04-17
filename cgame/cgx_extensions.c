@@ -1082,16 +1082,16 @@ void CGX_SaveSharedConfig(qboolean forced) {
 		trap_Cvar_Get("fs_game", buf);
 
 		if (!buf[0]) {
-			trap_Print("Saving shared config... Mod: baseq3\n");
+			CG_Printf("Saving shared config... Mod: baseq3\n");
 			trap_SendConsoleCommand("writeconfig q3config.cfg\n");
 		}
 		else {
-			trap_Print(va("Saving shared config... Mod: %s\n", buf));
+			CG_Printf("Saving shared config... Mod: %s\n", buf);
 			trap_SendConsoleCommand("writeconfig ..\\baseq3\\q3config.cfg\n");
 		}
 	}
 	else {
-		trap_Print("Shared config saving is disabled (cg_sharedConfig)\n");
+		CG_Printf("Shared config saving is disabled (cg_sharedConfig)\n");
 	}
 }
 
@@ -1173,7 +1173,7 @@ void CGX_GenerateMapBat2(char *map) {
 			char	path[MAX_INFO_VALUE];
 			trap_Cvar_Get("fs_basepath", path);
 
-			trap_Print(CGX_MAPBAT" generated successfully\n");
+			CG_Printf(CGX_MAPBAT" generated successfully\n");
 			XMOD_ANSWER(va("Open folder %s", path));
 			XMOD_ANSWER("And start ^2"CGX_MAPBAT);
 		}
@@ -1186,7 +1186,7 @@ void CGX_GenerateMapBat(char *map) {
 	char	path[MAX_INFO_VALUE];
 	trap_Cvar_Get("fs_basepath", path);
 
-	trap_Print("Generating "CGX_MAPBAT"...\n");
+	CG_Printf("Generating "CGX_MAPBAT"...\n");
 
 	trap_FS_FOpenFile("..\\"CGX_MAPBAT, &f, FS_WRITE);
 
@@ -1204,7 +1204,7 @@ void CGX_GenerateMapBat(char *map) {
 
 		trap_FS_FCloseFile(f);
 
-		trap_Print(CGX_MAPBAT" generated successfully\n");
+		CG_Printf(CGX_MAPBAT" generated successfully\n");
 
 		if (answer) {			
 			XMOD_ANSWER(va("Open folder %s", path));
@@ -1212,7 +1212,7 @@ void CGX_GenerateMapBat(char *map) {
 		}
 	}
 	else {
-		trap_Print("^1Couldn't open a file "CGX_MAPBAT"\n");
+		CG_Printf("^1Couldn't open a file "CGX_MAPBAT"\n");
 	}
 }
 
@@ -1443,7 +1443,7 @@ static void CGX_PrintLine(char c) {
 	CG_Printf("^%c", c);
 	for(i = 0; i < 20*3/10; i++)
 		CG_Printf("^%c------------", c);
-	trap_Print("\n");
+	CG_Printf("\n");
 }
 
 // find cmd with params and description, or list all
@@ -1765,11 +1765,11 @@ static int CGX_FOpenFile(char *filename, fileHandle_t *f, fsMode_t mode, int max
 	len = trap_FS_FOpenFile( filename, f, mode );
 
 	if ( len <= 0 ) {
-		trap_Print( va( S_COLOR_YELLOW "File not found: %s\n", filename ) );
+		CG_Printf( S_COLOR_YELLOW "File not found: %s\n", filename );
 		return 0;
 	}
-	if ( len >= maxSize && maxSize != -1) {
-		trap_Print( va( S_COLOR_RED "File too large: %s is %i, max allowed is %i", filename, len, maxSize ) );
+	if ( len > maxSize && maxSize != -1) {
+		CG_Printf( S_COLOR_RED "File too large: %s is %i, max allowed is %i\n", filename, len, maxSize );
 		trap_FS_FCloseFile( *f );
 		return 0;
 	}
