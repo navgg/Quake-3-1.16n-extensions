@@ -27,6 +27,8 @@ INGAME MENU
 #define ID_RESUME				18
 #define ID_TEAMORDERS			19
 
+#define ID_HUDS					20
+
 
 typedef struct {
 	menuframework_s	menu;
@@ -42,6 +44,8 @@ typedef struct {
 	menutext_s		teamorders;
 	menutext_s		quit;
 	menutext_s		resume;
+
+	menutext_s		huds;
 } ingamemenu_t;
 
 static ingamemenu_t	s_ingame;
@@ -129,6 +133,10 @@ void InGame_Event( void *ptr, int notification ) {
 	case ID_RESUME:
 		UI_PopMenu();
 		break;
+
+	case ID_HUDS:
+		UI_HudsMenu(qfalse);
+		break;
 	}
 }
 
@@ -158,6 +166,18 @@ void InGame_MenuInit( void ) {
 	s_ingame.frame.generic.y			= 240-166;//118;
 	s_ingame.frame.width				= 466;//359;
 	s_ingame.frame.height				= 332;//256;
+
+	y = 36;
+
+	s_ingame.huds.generic.type			= MTYPE_PTEXT;
+	s_ingame.huds.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_ingame.huds.generic.x				= 320;
+	s_ingame.huds.generic.y				= y;
+	s_ingame.huds.generic.id			= ID_HUDS;
+	s_ingame.huds.generic.callback		= InGame_Event; 
+	s_ingame.huds.string				= "HUDS";
+	s_ingame.huds.color					= color_yellow;
+	s_ingame.huds.style					= UI_CENTER|UI_SMALLFONT;
 
 	y = 96;
 	s_ingame.team.generic.type			= MTYPE_PTEXT;
@@ -300,6 +320,8 @@ void InGame_MenuInit( void ) {
 	Menu_AddItem( &s_ingame.menu, &s_ingame.resume );
 	Menu_AddItem( &s_ingame.menu, &s_ingame.leave );
 	Menu_AddItem( &s_ingame.menu, &s_ingame.quit );
+
+	Menu_AddItem( &s_ingame.menu, &s_ingame.huds );
 }
 
 

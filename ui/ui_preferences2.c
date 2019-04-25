@@ -200,18 +200,34 @@ static const char *scoreboar_items[] = {
 	"always small",
 	"vanilla Q3",
 	"nemesis/osp",
+
+const char *basichud_items[] = {
+	"q3/large",
+	"q3/compact",
+	"q3/vanilla",
 	0
 };
 
 static const char *hud_items[] = {
-	"default",
-	"compact",
-	"vanilla Q3",
+	0,
 	0
 };
 
+void Preferences2_UpdateHudName() {
+	static char hudname[12];
+
+	trap_Cvar_VariableStringBuffer("hud", hudname, sizeof hudname);
+
+	if (*hudname)
+		hud_items[0] = hudname;
+	else
+		hud_items[0] = basichud_items[abs((int)trap_Cvar_VariableValue("cg_draw2D") - 1) % (ArrLen(basichud_items) - 1)];
+
+	s_preferences2.hud.generic.right = s_preferences2.hud.generic.left + 144;
+}
+
 static void Preferences2_SetMenuItems( void ) {
-	s_preferences2.hud.curvalue		= (int)trap_Cvar_VariableValue( "cg_draw2D" ) % ArrLen(hud_items) - 1;
+	Preferences2_UpdateHudName();
 
 	s_preferences2.rewards.curvalue		= trap_Cvar_VariableValue( "cg_drawRewards" ) != 0;
 	s_preferences2.timer.curvalue		= abs((int)trap_Cvar_VariableValue( "cg_drawTimer" ) % ArrLen(timer_items));
@@ -382,7 +398,8 @@ static void Preferences2_Event( void* ptr, int notification ) {
 		break;
 
 	case ID_HUD:
-		trap_Cvar_SetValue("cg_draw2D", s_preferences2.hud.curvalue + 1);
+		UI_HudsMenu(qtrue);
+		//trap_Cvar_SetValue("cg_draw2D", s_preferences2.hud.curvalue + 1);
 		break;
 
 	case ID_BACK:

@@ -1392,6 +1392,11 @@ void CG_DrawWeaponSelect( void ) {
 		return;
 	}
 
+	if (hud.file) {
+		CGX_DrawWeaponSelect();
+		return;
+	}
+
 	color = CG_FadeColor( cg.weaponSelectTime, WEAPON_SELECT_TIME );
 	if ( !color ) {
 		return;

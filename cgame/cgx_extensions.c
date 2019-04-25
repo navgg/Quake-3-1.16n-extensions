@@ -25,6 +25,7 @@ static qboolean CGX_FExists(char* filename);
 static int CGX_FSize(char *filename);
 static int CGX_FOpenFile(char *filename, fileHandle_t *f, fsMode_t mode, int maxSize);
 static int CGX_FReadAll(char *filename, char *buffer, int bufsize);
+static int CGX_FReadAllBinary(char *filename, void *buffer, int bufsize);
 static qboolean CGX_FWriteAll(char *filename, char *buffer, int bufsize);
 
 static void CGX_Delay( int msec ) {
@@ -39,8 +40,10 @@ static void CGX_Delay( int msec ) {
 #define XM_SMALLCHAR_WIDTH  6
 #define XM_BIGCHAR_WIDTH	12
 #define XM_GIANT_WIDTH		24
-#define	XM_CHAR_WIDTH		28
+#define	XM_CHAR_WIDTH		28 //this should be 24
 #define XM_ICON_SIZE		36
+
+static void CGX_LoadHUD(char *fileName);
 
 //init hud constant coords
 static void CGX_Init_HUD(void) {
@@ -55,7 +58,16 @@ static void CGX_Init_HUD(void) {
 	hud.width48 = vScreen.width - 48;
 	hud.width5 = vScreen.width - 5;
 
-	if (cg_draw2D.integer == HUD_COMPACT) {
+	hud.pickupTime = 3000;
+
+	CGX_LoadHUD(cgx_hud.string);
+
+	if (hud.file)
+		hud.type = HUD_COMPACT;
+	else
+		hud.type = cg_draw2D.integer;
+
+	if (hud.type == HUD_COMPACT) {
 		hud.icon_size = XM_ICON_SIZE;
 		hud.small_char_w = XM_SMALLCHAR_WIDTH;
 		hud.big_char_w = XM_BIGCHAR_WIDTH;
@@ -101,15 +113,15 @@ static void CGX_Init_HUD(void) {
 		hud.score_yofs_no_lagometer = ICON_SIZE / 2 + 4;
 	}
 
-	if (cg_draw2D.integer == HUD_VANILLAQ3) {
+	if (hud.type == HUD_VANILLAQ3) {
 		hud.head_size *= 1.25f;
 		hud.weap_y = 380;
 	} else {
 		int ox = 0;
 
-		if (cg_draw2D.integer == HUD_DEFAULT) {
+		if (hud.type == HUD_DEFAULT) {
 			ox = 7;
-		} else if (cg_draw2D.integer == HUD_COMPACT) {
+		} else if (hud.type == HUD_COMPACT) {
 			ox = 14;
 		}
 
@@ -127,6 +139,8 @@ static void CGX_Init_HUD(void) {
 
 	hud.lagometer_x = vScreen.width - hud.icon_size;
 	hud.lagometer_y = SCREEN_HEIGHT - hud.icon_size;
+
+	hud.sbheady = SCREEN_HEIGHT - hud.head_size;
 }
 
 //init virtual screen for widescreen or 4:3
@@ -152,9 +166,89 @@ void CGX_Init_vScreen(void) {
 	cgs.screenXScale = (float)cgs.glconfig.vidWidth / (float)vScreen.width;
 	cgs.screenYScale = (float)cgs.glconfig.vidHeight / (float)SCREEN_HEIGHT; 
 
+	cgs.screenXScale640 = (float)cgs.glconfig.vidWidth / (float)SCREEN_WIDTH;
+
 	CGX_Init_HUD();
 
 	D_Printf(("CGX_Init_vScreen %ix%i cgx_wideScreenFix %i\n", vScreen.width, SCREEN_HEIGHT, cgx_wideScreenFix.integer));	
+}
+
+static void CGX_CountAlive() {
+	static int last_time;
+	int i;
+	clientInfo_t *ci;
+
+	if (last_time > cg.time)
+		return;
+
+	last_time = cg.time + 500;
+
+	cgs.redAlive = 0;
+	cgs.blueAlive = 0;
+
+	if (cg.numScores)
+		for ( i = 0 ; i < cg.numScores; i++ ) {
+			score_t	*score = &cg.scores[i];
+			ci = &cgs.clientinfo[ score->client ];
+
+			if (ci->team == TEAM_BLUE && !Q_Isfreeze(score->client))
+				cgs.blueAlive++;
+			else if (ci->team == TEAM_RED && !Q_Isfreeze(score->client))
+				cgs.redAlive++;
+		}
+	else
+		for (i = 0; i < 32; i++) {
+			ci = &cgs.clientinfo[ i ];
+
+			if (ci->team == TEAM_BLUE && !Q_Isfreeze(i))
+				cgs.blueAlive++;
+			else if (ci->team == TEAM_RED && !Q_Isfreeze(i))
+				cgs.redAlive++;
+		}
+}
+
+float CGX_DrawTeamCounts(float y) {
+	CGX_CountAlive();
+
+	if (hud.file) {
+		CGX_DrawPic(XH_TeamIcon_OWN, hud.icon_own);
+		CGX_DrawPic(XH_TeamIcon_NME, hud.icon_nme);
+
+		if (cg.snap->ps.persistant[PERS_TEAM] == TEAM_BLUE) {
+			CGX_DrawString(XH_TeamCount_OWN, va("%i", cgs.blueAlive), 0);
+			CGX_DrawString(XH_TeamCount_NME, va("%i", cgs.redAlive), 0);
+		} else {
+			CGX_DrawString(XH_TeamCount_OWN, va("%i", cgs.redAlive), 0);
+			CGX_DrawString(XH_TeamCount_NME, va("%i", cgs.blueAlive), 0);
+		}
+
+		return y;
+	} else {
+		vec4_t color_b = { 0, 0, 1, 0.25 };
+		vec4_t color_r = { 1, 0, 0, 0.25 };
+		int x = vScreen.width;
+		int w;
+		char *s;
+
+		//y -= BIGCHAR_HEIGHT + 4;
+		y += 4;
+
+		s = va( "%2i", cgs.blueAlive );
+		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH + 8;
+		x -= w;
+
+		CG_FillRect( x, y, w, BIGCHAR_HEIGHT + 8, color_b );
+		CG_DrawBigString( x + 4, y + 4, s, 0.5F);
+
+		s = va( "%2i", cgs.redAlive );
+		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH + 8;
+		x -= w;
+
+		CG_FillRect( x, y, w, BIGCHAR_HEIGHT + 8, color_r );
+		CG_DrawBigString( x + 4, y + 4, s, 0.5F);
+
+		return y + BIGCHAR_HEIGHT + 8 + 4;
+	}
 }
 
 #pragma endregion
@@ -750,7 +844,10 @@ void CGX_SyncServerParams(const char *info) {
 
 		if (!Q_stricmp( cgs.gamename, "NoGhost" )) {
 			cgs.serverMod = SM_NOGHOST;
-			//cgs.isFreezTag = atoi( Info_ValueForKey( info, "g_gameMod" ) ) == 1;
+			if (cgs.gametype == GT_TEAM) {
+				int g_gamemod = atoi( Info_ValueForKey( info, "g_gameMod" ) );
+				cgs.countAlive = g_gamemod == 1 || g_gamemod == 3;
+			}
 		} else if (!Q_stricmp(cgs.gamename, "Nemesis")) {
 			cgs.serverMod = SM_NEMESIS;
 		} else if (!Q_stricmp(cgs.gamename, "Carnage")) {
@@ -1643,6 +1740,7 @@ static void CGX_ReloadEffects() {
 #define cmd_is(x) !Q_stricmp(command, x)
 #define arg_is(x) !Q_stricmp(arg, x)
 static void CGX_PrintModelCache();
+static void CGX_PrintFonts();
 //xmod command
 void CGX_Xmod() {
 	char command[MAX_QPATH], arg[MAX_QPATH];
@@ -1726,11 +1824,17 @@ void CGX_Xmod() {
 		CGX_PrintSkinCache();
 	} else if (cmd_is("clients")) {
 		CGX_PrintClients();
+	} else if (cmd_is("fonts")) {
+		CGX_PrintFonts();
 	} else if (cmd_is("modinfo")) {
 		CGX_SendModinfo(qtrue);
 	} else if (cmd_is("reload")) {
 		if (arg_is("effects"))
 			CGX_ReloadEffects();
+		else if (arg_is("hud"))
+			CGX_LoadHUD(cgx_hud.string);
+		else 
+			CG_Printf("usage: \\xmod reload <effects|hud>\n");
 	} else if (cmd_is("stats")) {
 		CG_statsWindowPrint();
 	} else if (cmd_is("gammafix")) {
@@ -1777,7 +1881,20 @@ static int CGX_FOpenFile(char *filename, fileHandle_t *f, fsMode_t mode, int max
 	return len;
 }
 
-//read all and close
+//read all binary data
+static int CGX_FReadAllBinary(char *filename, void *buffer, int bufsize) {
+	int len;
+	fileHandle_t	f;
+
+	if (len = CGX_FOpenFile(filename, &f, FS_READ, bufsize)) {
+		trap_FS_Read(buffer, len, f);
+		trap_FS_FCloseFile(f);
+	}
+
+	return len;
+}
+
+//read all text and close
 static int CGX_FReadAll(char *filename, char *buffer, int bufsize) {
 	int len;
 	fileHandle_t	f;
@@ -2147,6 +2264,2489 @@ void CGX_LoadClientInfo( clientInfo_t *ci ) {
 #else
 	CGX_CacheModel(ci);
 #endif
+}
+
+#pragma endregion
+
+#pragma region Xmod HUD
+
+//x-mod hud
+//inspired by aftershock, aftershock-xe & revolution quake source codes
+
+//just for info about this trap_R_SetColor( NULL ) on function exits - it's needed.
+//because if not doing this then when calling UI, it could start using
+//previously set color in cgame, and no way to reset it in UI.
+
+//TODO (not important): 
+//e+ outline
+//color fading
+
+static float	stored_scalex;
+static float	stored_scaley;
+static int		stored_3dicons;
+
+xhudElem_t *fi; //font info
+
+#define XH_Set3DIcons(x) stored_3dicons = cg_draw3dIcons.integer; cg_draw3dIcons.integer = x;
+#define XH_Restore3DIcons() cg_draw3dIcons.integer = stored_3dicons;
+
+#define XH_SetFont(e) fi = e
+#define XH_RestoreFont()
+
+#define XH_SetScale640() stored_scaley = cgs.screenYScale; stored_scalex = cgs.screenXScale; cgs.screenXScale = 1; cgs.screenYScale = 1;
+#define XH_RestoreScale() cgs.screenXScale = stored_scalex; cgs.screenYScale = stored_scaley;
+
+#define HUD_SYNTAX_CPMA 1
+#define HUD_SYNTAX_XP 2 << 0
+#define HUD_SYNTAX_AS 2 << 1
+//#define HUD_SYNTAX_NMS 2 << 3
+
+//textstyle
+#define TS_SHADOW 1
+#define TS_FORCECOLOR 2
+#define TS_LITE 4
+#define TS_OUTLINE 8
+
+#define XH_WEAPLIST_PAD 4 //weapon list pad
+
+static vmCvar_t cgx_hud_TEColors; //T E color values: "2417" FFA BLUE RED SPECT
+static vmCvar_t	cgx_hud_font16threshold; //font 16 threshold in pixels
+
+extern void CG_Draw3DModel(float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles);
+extern void CG_Draw3DModelColor(float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles, byte *color, qhandle_t shader);
+
+static int XH_IntLen(int i) {
+	int r = 0;
+	if (i < 0) { i *= -1; r++; }
+    if (i >= 1000) return r + 4;
+    if (i >= 100) return r + 3;
+    if (i >= 10) return r + 2;
+    return r + 1;
+}
+
+//anchors
+#define XA_TOP 1
+#define XA_RIGHT 2
+#define XA_BOT 4
+#define XA_LEFT 8
+
+#define AdjX640(x) x *= cgs.screenXScale640
+#define AdjY640(y) y *= cgs.screenYScale
+
+float FromX640(float x) { return x * cgs.screenXScale640; }
+float FromY640(float y) { return y * cgs.screenYScale; }
+
+float ToX640(float x) { return x / cgs.screenXScale640; }
+float ToY640(float y) { return y / cgs.screenYScale; }
+
+static void XH_FillRect( float x, float y, float w, float h, const float *color ) {
+	trap_R_SetColor( color );
+
+	if (w < 0) { w = -w; x -= w; }
+	if (h < 0) { h = -h; y -= h; }
+
+	trap_R_DrawStretchPic( x, y, w, h, 0, 0, 0, 0, cgs.media.whiteShader );
+
+	trap_R_SetColor( NULL );
+}
+
+static void XH_DrawRect(float x, float y, float w, float h, float lineWidth, const float *color) {
+	float xs = FromX640(lineWidth);
+	float ys = FromY640(lineWidth);
+
+	trap_R_SetColor(color);
+
+	if (w < 0) { w = -w; x -= w; }
+	if (h < 0) { h = -h; y -= h; }
+
+	trap_R_DrawStretchPic(x, y, xs, h, 0, 0, 0, 0, cgs.media.whiteShader);
+	trap_R_DrawStretchPic(x + w - xs, y, xs, h, 0, 0, 0, 0, cgs.media.whiteShader);
+
+	trap_R_DrawStretchPic(x, y, w, ys, 0, 0, 0, 0, cgs.media.whiteShader);
+	trap_R_DrawStretchPic(x, y + h - ys, w, ys, 0, 0, 0, 0, cgs.media.whiteShader);
+
+	trap_R_SetColor(NULL);
+}
+
+static char *xhudElemNames[] = {
+	"!DEFAULT",
+	"AmmoMessage",
+	"AttackerIcon",
+	"AttackerName",
+	"Chat1",
+	"Chat2",
+	"Chat3",
+	"Chat4",
+	"Chat5",
+	"Chat6",
+	"Chat7",
+	"Chat8",
+	"Console",
+	"FlagStatus_NME",
+	"FlagStatus_OWN",
+	"FollowMessage",
+	"FPS",
+	"FragMessage",
+	"GameTime",
+	"GameType",
+	"ItemPickup",
+	"ItemPickupIcon",
+	//"KeyDown_Back",
+	//"KeyDown_Crouch",
+	//"KeyDown_Forward",
+	//"KeyDown_Jump",
+	//"KeyDown_Left",
+	//"KeyDown_Right",
+	//"KeyUp_Back",
+	//"KeyUp_Crouch",
+	//"KeyUp_Forward",
+	//"KeyUp_Jump",
+	//"KeyUp_Left",
+	//"KeyUp_Right",
+	//"LocalTime",
+	//"MultiView",
+	"NetGraph",
+	"NetGraphPing",
+	"PlayerSpeed",
+	"PlayerAccuracy",
+	"StatusBar_Flag",
+	"PowerUp1_Icon",
+	"PowerUp2_Icon",
+	"PowerUp3_Icon",
+	"PowerUp4_Icon",
+	"PowerUp5_Icon",
+	"PowerUp6_Icon",
+	"PowerUp7_Icon",
+	"PowerUp8_Icon",
+	"PowerUp1_Time",
+	"PowerUp2_Time",
+	"PowerUp3_Time",
+	"PowerUp4_Time",
+	"PowerUp5_Time",
+	"PowerUp6_Time",
+	"PowerUp7_Time",
+	"PowerUp8_Time",
+	"RankMessage",
+	"Score_Limit",
+	"Score_NME",
+	"Score_OWN",
+	"SpecMessage",
+	"StatusBar_ArmorCount",
+	"StatusBar_ArmorIcon",
+	"StatusBar_AmmoCount",
+	"StatusBar_AmmoIcon",
+	"StatusBar_HealthCount",
+	"StatusBar_HealthIcon",
+	"TargetName",
+	"TargetStatus",
+	"TeamCount_NME",
+	"TeamCount_OWN",
+	"TeamIcon_NME",
+	"TeamIcon_OWN",
+	"Team1",
+	"Team2",
+	"Team3",
+	"Team4",
+	"Team5",
+	"Team6",
+	"Team7",
+	"Team8",
+	"VoteMessageArena", //VoteMessageArena added just to skip unknown element errors
+	"VoteMessageWorld",
+	"WarmupInfo",
+	"WeaponList",
+	"PreDecorate",
+	"PostDecorate",
+	"StatusBar_HealthBar",
+	"StatusBar_ArmorBar",
+	"StatusBar_AmmoBar",
+};
+
+//element redirects to CPMA syntax
+struct {
+	const char	*name;
+	int	elNum;
+} xhudExtraElems[] =  {
+	//aftershock
+	{ "ItemPickupName", XH_ItemPickup },
+	//{ "ItemPickupTime", 0 },
+	{ "VoteMessage", XH_VoteMessageWorld },
+	{ "TeamOverlay1", XH_Team1 },
+	{ "TeamOverlay2", XH_Team2 },
+	{ "TeamOverlay3", XH_Team3 },
+	{ "TeamOverlay4", XH_Team4 },
+	{ "TeamOverlay5", XH_Team5 },
+	{ "TeamOverlay6", XH_Team6 },
+	{ "TeamOverlay7", XH_Team7 },
+	{ "TeamOverlay8", XH_Team8 },
+#if HUD_SYNTAX_NMS
+	//nms
+	{ "AMMO_MESSAGE", XH_AmmoMessage },
+	{ "ARMOR", XH_StatusBar_ArmorCount },
+	{ "ARMOR_BAR", XH_StatusBar_ArmorBar },
+	{ "ATTACKER_NAME", XH_AttackerName },
+	//{ "CENTERPRINT",  },
+	{ "CHAT_1", XH_Chat1 },
+	{ "CHAT_2", XH_Chat2 },
+	{ "CHAT_3", XH_Chat3 },
+	{ "CHAT_4", XH_Chat4 },
+	{ "CHAT_5", XH_Chat5 },
+	{ "CHAT_6", XH_Chat6 },
+	{ "CHAT_7", XH_Chat7 },
+	{ "CHAT_8", XH_Chat8 },
+	//{ "CONNECTION_INTERRUPTED",  },
+	//{ "COUNTDOWN",  },
+	{ "CROSSHAIR_NAME", XH_TargetName },
+	//{ "ENEMY_COUNT",  },
+	//{ "FOLLOW_MESSAGE_1",  },
+	//{ "FOLLOW_MESSAGE_2",  },
+	//{ "FPS",  },
+	//{ "GAMETYPE",  },
+	{ "HEALTH", XH_StatusBar_HealthCount },
+	{ "HEALTH_BAR", XH_StatusBar_HealthBar },
+	//{ "HOLDABLE_ICON",  },
+	//{ "NAME",  },
+	{ "LAGOMETER", XH_NetGraph },
+	{ "PICKUP_ICON", XH_ItemPickupIcon },
+	{ "PICKUP_NAME", XH_ItemPickup },
+	{ "POWERUP_ICON_1", XH_PowerUp1_Icon },
+	{ "POWERUP_ICON_2", XH_PowerUp2_Icon },
+	{ "POWERUP_TIMER_1", XH_PowerUp1_Time },
+	{ "POWERUP_TIMER_2", XH_PowerUp2_Time },
+	//{ "SCORE_LIMIT",  },
+	{ "SCORE_TEAM", XH_Score_OWN },
+	{ "SCORE_ENEMY", XH_Score_NME },
+	{ "SPEED", XH_PlayerSpeed },
+	//{ "SPEED_BAR",  },
+	{ "TEAMOVERLAY_1", XH_Team1 },
+	{ "TEAMOVERLAY_2", XH_Team2 },
+	{ "TEAMOVERLAY_3", XH_Team3 },
+	{ "TEAMOVERLAY_4", XH_Team4 },
+	{ "TEAMOVERLAY_5", XH_Team5 },
+	{ "TEAMOVERLAY_6", XH_Team6 },
+	{ "TEAMOVERLAY_7", XH_Team7 },
+	{ "TEAMOVERLAY_8", XH_Team8 },
+	//{ "TEAM_COUNT",  },
+	{ "TIMER", XH_GameTime },
+	//{ "VERSUS_MESSAGE",  },
+	{ "VOTE_MESSAGE", XH_VoteMessageWorld },
+	//{ "WAITING_FOR_PLAYERS",  },
+	{ "WEAPON_AMMO", XH_StatusBar_AmmoCount },
+	//{ "WEAPON_AMMO_ICON", XH_StatusBar_AmmoIcon },
+	{ "WEAPON_ICON", XH_StatusBar_AmmoIcon },
+	{ "WEAPON_LIST", XH_WeaponList }
+#endif
+};
+
+//pool for strings
+//#define CGX_POOLSIZE 1024 * 2
+//
+//static char	memoryPool[CGX_POOLSIZE];
+//static int	allocPoint = 0, outOfMemory = qfalse;
+//
+//void *CGX_Alloc(int size) 
+//	char	*p;
+//
+//	if (allocPoint + size > CGX_POOLSIZE) {
+//		outOfMemory = qtrue;
+//		return NULL;
+//	}
+//
+//	p = &memoryPool[allocPoint];
+//
+//	allocPoint += (size + 31) & ~31;
+//
+//	return p;
+//}
+
+#define XH_ELEM_POOL_START XH_MAX_STATIC_HUD_ELEMS
+#define XH_ELEM_POOL_END XH_MAX_STATIC_HUD_ELEMS + XH_ELEM_POOL
+
+xhudElem_t xhud[XH_TOTAL_ELEMS]; //hud elements array
+
+static int elemsPoolNum = XH_ELEM_POOL_START;
+
+//allocating element in pool
+static xhudElem_t *XH_AllocElem(xhudElemType_t type) {
+	xhudElem_t *res;
+
+	if (type < XH_MAX_STATIC_HUD_ELEMS) {
+		res = &xhud[type];
+	} else {
+		if (elemsPoolNum == XH_ELEM_POOL_END)
+			elemsPoolNum = XH_ELEM_POOL_START;
+
+		res = &xhud[elemsPoolNum++];
+	}
+
+	if (type > 0)
+		memcpy(res, &xhud[0], sizeof xhud[0]);
+
+	res->type = type;
+
+	if (type == XH_StatusBar_HealthIcon)
+		res->flags |= XF_PLAYER_HEAD;
+
+	return res;
+}
+
+static cw_info_t cwi_pool[8]; //holds char width ratio & size_x for different fonts
+
+//register character width file and predefine character width ratio & size_x values
+static cw_info_t *XH_Register_CW(qhandle_t hFont, char *fontName) {
+	int i, j;
+	char cw[256], xp[520];
+	cw_info_t *cwi;
+	char *fontFile;
+	float w;
+	int registerFontType; //1 - cpma 2 - xp
+
+	if (!hFont)
+		return NULL;
+
+	for (i = 0, cwi = cwi_pool; i < ArrLen(cwi_pool); i++, cwi++)
+		if (cwi->font == hFont) {
+			//CG_Printf("XH_Register_CW fonud %s %i\n", fontName, i);
+			return cwi;
+		}
+
+	fontFile = va("fonts/%s.cw", fontName);
+	if (CGX_FExists(fontFile)) {
+		registerFontType = 1;
+	} else {
+		fontFile = va("fonts/%s.font", fontName);
+		if (CGX_FExists(fontFile)) {
+			registerFontType = 2;
+		} else {
+			return NULL;
+		}
+	}
+
+	for (i = 0, cwi = cwi_pool; i < ArrLen(cwi_pool); i++, cwi++)
+		if (!cwi->font)
+			if (registerFontType == 1) {
+				if (CGX_FReadAllBinary(fontFile, cw, sizeof cw)) {
+					Q_strncpyz(cwi->fontName, fontName, sizeof cwi->fontName);
+					cwi->font = hFont;
+					cwi->avg_cwr = 0;
+					for (j = 0; j < ArrLen(cw); j++) {
+						float f = cw[j];
+						cwi->cwr[j] = f / 32.0f;
+						cwi->szx[j] = f / 512.0f;
+
+						if (j < ArrLen(cw) / 2)
+							cwi->avg_cwr += cwi->cwr[j];
+					}
+					cwi->avg_cwr = cwi->avg_cwr / (ArrLen(cw) / 2);
+					//CG_Printf("XH_Register_CW registered %s %i\n", fontName, i);
+					break;
+				} else {
+					//unexpected error
+					return NULL;
+				}
+			} else if (registerFontType == 2) { //works not exatly like in e+, but fine
+				if (CGX_FReadAllBinary(fontFile, xp, sizeof xp)) {
+					Q_strncpyz(cwi->fontName, fontName, sizeof cwi->fontName);
+					cwi->font = hFont;
+					cwi->xp = qtrue;
+					cwi->avg_cwr = 0;
+					for (j = 0; j < ArrLen(cw); j++) {
+						float f = (float)xp[j * 2 + 8];
+						//float f2 = (float)xp[j * 2 + 9]; //for what this field - no idea
+						if (f >= 16) //space fix
+							f = 12;
+						cwi->cwr[j] = (16.0f - f) / 16.0f;
+						cwi->szx[j] = (f) / 512.0f;
+
+						if (j < ArrLen(cw) / 2)
+							cwi->avg_cwr += cwi->cwr[j];
+					}
+					cwi->avg_cwr = cwi->avg_cwr / (ArrLen(cw) / 2);
+					//CG_Printf("XH_Register_CW registered %s %i\n", fontName, i);
+					break;
+				} else {
+					//unexpected error
+					return NULL;
+				}
+			}
+
+	if (i == ArrLen(cwi_pool)) {
+		CG_Printf("XH_Register_CW pool reached max value\n");
+		return NULL;
+	}
+
+	return cwi;
+}
+
+static void CGX_PrintFonts() {
+	int i; cw_info_t *cwi;
+
+	for (i = 0, cwi = cwi_pool; i < ArrLen(cwi_pool); i++, cwi++)
+		if (*cwi->fontName)
+			CG_Printf("%i %s\n", i, cwi->fontName);
+}
+
+static void XH_Clear() {
+	memset(&xhud, 0, sizeof xhud);
+	memset(&cwi_pool, 0, sizeof cwi_pool);
+
+	elemsPoolNum = XH_ELEM_POOL_START;
+
+	hud.file = qfalse;
+
+	hud.chatHeight = hud.chatPos = hud.chatLastPos = 0;
+	hud.conHeight = hud.conPos = hud.conLastPos = 0;
+	hud.powerupsMaxNum = 0;
+	hud.overlayMaxNum = 0;
+	hud.oe = hud.ot = -1;
+
+	trap_Cvar_Set("con_notifytime", "3");
+}
+
+#if HUD_SYNTAX_NMS
+static void XH_DrawBorder(xhudElem_t *e) {
+	if (e->flags & XF_BORDER)
+		XH_DrawRect(e->x, e->y, e->w, e->h, e->border_w, e->bordercolor);
+}
+#else
+#define XH_DrawBorder(x)
+#endif
+
+//based on UI_DrawHandlePic
+static void XH_DrawHandlePic( float x, float y, float w, float h, qhandle_t hShader ) {
+	float	s0;
+	float	s1;
+	float	t0;
+	float	t1;
+
+	if( w < 0 ) {	// flip about vertical
+		w = -w;
+		x -= w;
+		s0 = 1;
+		s1 = 0;
+	}
+	else {
+		s0 = 0;
+		s1 = 1;
+	}
+
+	if( h < 0 ) {	// flip about horizontal
+		h = -h;
+		y -= h;
+		t0 = 1;
+		t1 = 0;
+	}
+	else {
+		t0 = 0;
+		t1 = 1;
+	}
+	
+	trap_R_DrawStretchPic( x, y, w, h, s0, t0, s1, t1, hShader );
+}
+
+//this method is brainfuck
+static void XH_DrawBarEx(float x, float y, float w, float h, int value, int maxValue, const float *color, xhudElem_t *e) {
+	qhandle_t shader = e->img;
+	qboolean reverse = e->textalign == 'R';
+	qboolean vertical = e->flags & XF_VERTICALBAR;
+	float s0, s1, t0, t1;
+	float fw, fh, rw, rh, r;
+	vec4_t finalColor;
+
+	r = (float)value / maxValue;
+
+	if (r > 1.0f)
+		r = 1.0f;
+
+	if( w < 0 ) {	// flip about vertical
+		w = -w;
+		x -= w;
+		s0 = 1;
+		s1 = 0;
+	} else {
+		s0 = 0;
+		s1 = 1;
+	}
+
+	if( h < 0 ) {	// flip about horizontal
+		h = -h;
+		y -= h;
+		t0 = 1;
+		t1 = 0;
+	} else {
+		t0 = 0;
+		t1 = 1;
+	}
+
+	fw = w; //final width & height
+	fh = h;
+
+	if (vertical) {
+		fh *= r;
+
+		rh = fh / h;
+		rw = fw / w;
+
+		if (!reverse)
+			y += h - fh;
+
+		if (y < h * 2) {
+			t0 *= rh;
+			t1 *= rh;
+		} else {
+			t0 = 1 - (1 - t0) * rh;
+			t1 = 1 - (1 - t1) * rh;
+		}
+	} else {
+		fw *= r;
+
+		rh = fh / h;
+		rw = fw / w;
+
+		if (reverse)
+			x += w - fw;
+
+		t0 *= rh;
+		t1 *= rh;
+	}
+
+	s0 *= rw;
+	s1 *= rw;
+
+	if (e->color[3]) {
+		color = e->color;
+	} else if (e->alpha) {
+		VectorCopy(color, finalColor);
+		finalColor[3] = e->alpha;
+		color = finalColor;
+	} else {
+		VectorCopy(color, finalColor);
+		finalColor[3] = 0.7f;
+		color = finalColor;
+	}
+
+	if (!shader) {
+		shader = cgs.media.whiteShader;
+#if 0
+		if (shadow) {
+			vec4_t shadowColor = { 0, 0, 0, 0 };
+			shadowColor[3] = color[3];
+			trap_R_SetColor(shadowColor);
+			trap_R_DrawStretchPic(x + 1.0f, y + 1.0f, fw, fh, s0, t0, s1, t1, shader);
+		}
+#endif
+	}
+
+	trap_R_SetColor(color);
+	trap_R_DrawStretchPic(x, y, fw, fh, s0, t0, s1, t1, shader);
+	trap_R_SetColor(NULL);
+}
+
+static void XH_DrawBar(xhudElem_t *e, int value, int maxValue, const float *color) {
+	if (e->flags & XF_DOUBLEBAR) {
+		int halfMax = maxValue / 2;
+		float hh = e->h / 2;
+		float pad = hud.bar_pad;
+
+		if (value > 0)
+			XH_DrawBarEx(e->x, e->y, e->w, hh - pad,
+				value, halfMax, color, e);
+		if (value > halfMax)
+			XH_DrawBarEx(e->x, e->y + hh + pad, e->w, hh - pad,
+				value - halfMax, halfMax, color, e);
+	} else {
+		XH_DrawBarEx(e->x, e->y, e->w, e->h, value, maxValue, color, e);
+	}
+
+	XH_DrawBorder(e);
+}
+
+void CGX_DrawBar(int elNum, int value, int maxValue, const float *color) {
+	int i;
+
+	if (value <= 0 || maxValue <= 0)
+		return;
+
+	if (elNum >= XH_StatusBar_HealthBar && elNum <= XH_StatusBar_AmmoBar) {
+		xhudElem_t *e = &xhud[XH_ELEM_POOL_START];
+		for (i = XH_ELEM_POOL_START; i < elemsPoolNum; i++, e++) {
+			if (e->type == elNum && e->inuse) {
+				if (e->flags & XF_PARAM_1) {
+					int halfMax = maxValue / 2;
+					if (value > halfMax)
+						XH_DrawBar(e, value - halfMax, halfMax, color);
+				} else if (e->flags & XF_PARAM_2) {
+					int halfMax = maxValue / 2;
+					if (value > 0)
+						XH_DrawBar(e, value, maxValue / 2, color);
+				} else {
+					XH_DrawBar(e, value, maxValue, color);
+				}
+			}
+		}
+	}
+}
+
+static void XH_DrawHead(xhudElem_t *e, int clientNum, vec_t *angles) {
+	trap_R_SetColor(NULL);
+	XH_SetScale640();
+	CG_DrawHead(e->x, e->y, e->w, e->h, clientNum, angles);
+	XH_RestoreScale();
+}
+
+static void XH_Draw3DModelColor(xhudElem_t *e, vec3_t offset, vec3_t angles, const float *rgba) {
+	byte color[4];
+	vec3_t mins, maxs, origin;
+	float len;
+	int i;
+
+	trap_R_ModelBounds( e->model, mins, maxs );
+
+	origin[2] = -0.5f * ( mins[2] + maxs[2] );
+	origin[1] = 0.5f * ( mins[1] + maxs[1] );
+
+	len = 0.7 * ( maxs[2] - mins[2] );		
+	origin[0] = len / 0.268f;
+
+	VectorAdd( origin, offset, origin );
+
+	for (i = 4; i--; )
+		color[i] = rgba[i] * 0xFF;
+
+	XH_Set3DIcons(1);
+	XH_SetScale640();
+	CG_Draw3DModelColor(e->x, e->y, e->w, e->h, e->model, e->img, origin, angles, color, 0);
+	XH_RestoreScale();
+	XH_Restore3DIcons();
+}
+
+void CGX_DrawHead(int elNum, int clientNum, vec_t *angles) {
+	xhudElem_t *e = &xhud[elNum];
+	
+	if (!e->inuse)
+		return;
+
+	XH_DrawHead(e, clientNum, angles);
+	XH_DrawBorder(e);
+}
+
+void CGX_DrawFlagModel(int elNum, int team) {
+	xhudElem_t *e = &xhud[elNum];
+
+	if (!e->inuse)
+		return;
+
+	XH_SetScale640();
+	CG_DrawFlagModel(e->x, e->y, e->w, e->h, team);
+	XH_RestoreScale();
+}
+
+static void XH_CalcAnglesRotation(xhudElem_t *e) {
+	if (e->angles[3] < 0)
+		e->angles[YAW] = (cg.time & 2047) * -e->angles[3] / 2048.0f;
+	else if (e->angles[3] > 0)
+		e->angles[YAW] = e->angles_initial[YAW] + e->angles[3] * sin(cg.time / 1000.0);
+}
+
+void CGX_Draw3DModel(int elNum, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles) {
+	xhudElem_t *e = &xhud[elNum];
+
+	if (!e->inuse)
+		return;
+
+	if (e->flags & XF_ANGLES) {
+		VectorCopy(e->angles, angles);
+		XH_CalcAnglesRotation(e);
+	}
+
+	XH_SetScale640();
+	XH_Set3DIcons(cg_draw3dIcons.integer || e->flags & XF_DRAW3D);
+	CG_Draw3DModel(e->x, e->y, e->w, e->h, model, skin, origin, angles);
+	XH_Restore3DIcons();
+	XH_RestoreScale();
+}
+
+extern const float drawchar_coords[];
+
+static float XH_DrawChar_Handle( float xx, float yy, float ww, float hh, qhandle_t curfont, char ch ) {
+	int row, col;
+	float frow, fcol;
+	float size_y, size_x;
+
+	if ( ch == ' ' ) {
+		if (fi->cwi != NULL && !(fi->flags & XF_MONOSPACE))
+			ww *= fi->cwi->cwr[ch];
+
+		return ww;
+	}
+
+	row = ch>>4;
+	col = ch&15;
+
+	frow = drawchar_coords[row];
+	fcol = drawchar_coords[col];
+	size_y = 0.0625;
+
+	if (fi->cwi != NULL) {
+		//cpma font letters adjusted to left of 32x32
+
+		size_x = fi->cwi->szx[ch];
+
+		if (fi->flags & XF_MONOSPACE) {
+			//adjust to center if cpma font
+			if (!fi->cwi->xp) {
+				float wo = ww * (1 - fi->cwi->cwr[ch]);
+				float xo = wo / 2;
+
+				trap_R_DrawStretchPic( xx + xo, yy, ww - wo, hh,
+					fcol, frow, 
+					fcol + size_x, frow + size_y, 
+					curfont );
+
+				return ww;
+			}
+		}
+
+		ww *= fi->cwi->cwr[ch];
+
+		//xp font letters in the middle of 32x32
+		if (fi->cwi->xp) {
+			frow -= 1.0f / 512.0f;//xp font's looks not very well vertically aligned without it...
+			if (frow < 0)
+				frow = 0;
+
+			fcol += size_x;
+			size_x = 0.0625 - size_x * 2;
+		}
+	} else {
+		size_x = 0.0625;
+	}
+
+	trap_R_DrawStretchPic( xx, yy, ww, hh,
+					fcol, frow, 
+					fcol + size_x, frow + size_y, 
+					curfont );
+
+	return ww;
+}
+
+static float XH_DrawChar_FieldFont( float xx, float yy, float ww, float hh, qhandle_t curfont, char ch ) {
+	int frame;
+
+	frame = ch >= '0' && ch <= '9' ? ch - '0' : STAT_MINUS;
+	trap_R_DrawStretchPic( xx, yy, ww, hh, 0, 0, 1, 1, cgs.media.numberShaders[frame] );
+
+	return ww;
+}
+
+static float(*XH_DrawChar)(float x, float y, float w, float h, qhandle_t curfont, char c) = &XH_DrawChar_Handle;
+
+static void XH_DrawStringExt( float x, float y, const char *string, const float *setColor, 
+		int textstyle, float shadowSize, int charWidth, int charHeight, int maxChars ) {
+	vec4_t		color;
+	const char	*s;
+	int			cnt;
+	float xx, yy, ww, hh;
+	qboolean forceColor = textstyle & TS_FORCECOLOR;
+	qhandle_t curfont;
+
+	if (maxChars <= 0)
+		maxChars = 32767; // do them all!
+
+	ww = charWidth;
+	hh = charHeight;
+
+	if (charHeight < cgx_hud_font16threshold.integer && charWidth < cgx_hud_font16threshold.integer) {
+		curfont = fi->font;
+	} else {
+		curfont = fi->font32;
+	}
+
+	// draw the drop shadow
+	if (shadowSize) {
+		float sw, sh, sb;
+		color[0] = color[1] = color[2] = 0;
+		color[3] = setColor[3];
+		trap_R_SetColor( color );
+		s = string;
+		xx = x + shadowSize;
+		yy = y + shadowSize;
+		cnt = 0;
+		while ( *s && cnt < maxChars) {
+			if ( Q_IsColorString( s ) ) {
+				s += 2;
+				continue;
+			}
+			cnt++;
+			xx += XH_DrawChar( xx, yy, ww, hh, curfont, *s );
+			s++;
+		}
+	}
+
+	// draw the colored text
+	s = string;
+	xx = x;
+	yy = y;
+	cnt = 0;
+	trap_R_SetColor( setColor );
+	while ( *s && cnt < maxChars) {
+		if ( Q_IsColorString( s ) ) {
+			if ( !forceColor ) {
+				memcpy( color, g_color_table[ColorIndex(*(s+1))], sizeof( color ) );
+				color[3] = setColor[3];
+				trap_R_SetColor( color );
+			}
+			s += 2;
+			continue;
+		}
+		xx += XH_DrawChar( xx, yy, ww, hh, curfont, *s );
+		cnt++;
+		s++;
+	}
+
+	trap_R_SetColor( NULL );
+}
+
+static int XH_DrawStrWidth(xhudElem_t *e, const char *str) {
+	const char *s = str;
+	int width = 0;
+
+	if (e->cwi == NULL || e->flags & XF_MONOSPACE) {
+		while ( *s ) {
+			if ( Q_IsColorString( s ) ) {
+				s += 2;
+			} else {
+				width += e->font_w;
+				s++;
+			}
+		}
+	} else {
+		while ( *s ) {
+			if ( Q_IsColorString( s ) ) {
+				s += 2;
+			} else {
+				width += e->font_w * e->cwi->cwr[*s];
+				s++;
+			}
+		}
+	}
+
+	return width;
+}
+
+static float XH_GetAlignedXDrawStr(xhudElem_t *e, const char *s) {
+	switch (e->textalign) {
+		default:
+		case 'L': return e->x;
+		case 'R': return e->x + e->w - XH_DrawStrWidth(e, s);
+		case 'C': return e->x + (e->w - XH_DrawStrWidth(e, s)) / 2;
+	}
+}
+
+static float XH_GetAlignedYDrawStr(xhudElem_t *e) {
+	switch (e->valign) {
+		default:
+		case 'T': return e->y;
+		case 'B': return e->y + e->h - e->font_h;
+		case 'C': return e->y + (e->h - e->font_h) / 2;
+	}
+}
+
+//some weird fill logic
+static qboolean XH_DrawFill(xhudElem_t *e) {
+	if (!e->bgcolor[3])
+		return qfalse;
+
+	if (e->flags & XF_FILL) {
+		if (e->flags & XF_E_COLOR || e->flags & XF_T_COLOR) {
+			vec4_t fill_c;
+			VectorCopy(e->color, fill_c);
+			fill_c[3] = e->bgcolor[3];
+			XH_FillRect(e->x, e->y, e->w, e->h, fill_c);
+
+			return qtrue;
+		}
+
+		XH_FillRect(e->x, e->y, e->w, e->h, e->bgcolor);
+
+		return qtrue;
+	}
+
+	return qfalse;
+}
+
+static void XH_DrawString(xhudElem_t *e, const char *s, const float *rgba) {
+	int x, y;
+	qboolean f;
+	vec4_t col;
+
+	if (XH_DrawFill(e))
+		rgba = colorWhite;
+
+	x = XH_GetAlignedXDrawStr(e, s);
+	y = XH_GetAlignedYDrawStr(e);
+
+	XH_SetFont(e);
+
+	if (e->flags & XF_FIELDFONT) {
+		XH_DrawChar = &XH_DrawChar_FieldFont;
+		XH_DrawStringExt( x, y, s, rgba, e->textstyle, e->shadowsize, e->font_w, e->font_h, 0 );
+		XH_DrawChar = &XH_DrawChar_Handle;
+	} else {
+		XH_DrawStringExt(x, y, s, rgba, e->textstyle, e->shadowsize, e->font_w, e->font_h, 0);
+	}
+
+	XH_RestoreFont();
+}
+
+void CGX_DrawString( int elNum, const char *s, float alpha ) {
+	xhudElem_t *e = &xhud[elNum];
+	vec4_t color;
+	float *col;
+
+	if (!e->inuse)
+		return;
+
+	if (alpha) {
+		Vector4Copy(e->color, color);
+		color[3] = alpha;
+		col = color;
+	} else {
+		col = e->color;
+	}
+
+	XH_DrawString(e, s, col);
+	XH_DrawBorder(e);
+}
+
+#if 0
+float *CGX_FadeColor( int startMsec, int totalMsec, float *rgba ) {
+	static vec4_t		color;
+	int			t;
+
+	if ( startMsec == 0 ) {
+		return NULL;
+	}
+
+	t = cg.time - startMsec;
+
+	if ( t >= totalMsec ) {
+		return NULL;
+	}
+
+	// fade out
+	if ( totalMsec - t < FADE_TIME ) {
+		color[3] = ( totalMsec - t ) * 1.0/FADE_TIME;
+	} else {
+		color[3] = rgba[3];
+	}
+	VectorCopy(rgba, color);
+
+	return color;
+}
+
+void CGX_DrawStringRgba(int elNum, const char *s, float *rgba) {
+	xhudElem_t *e = &xhud[elNum];
+	float *col;
+
+	if (!e->inuse)
+		return;
+
+	if (rgba) {
+		col = rgba;
+	} else {
+		col = e->color;
+	}
+
+	XH_DrawString(e, s, col);
+	XH_DrawBorder(e);
+}
+#endif
+
+extern void CG_DrawStatusBarHead( float x, float y, float w, float h ) ;
+
+static void XH_DrawStatusBarHead(xhudElem_t *e) {
+	//if have image or model then, reset flag
+	if (e->img || e->model) {
+		e->flags &= ~(XF_PLAYER_HEAD);
+		return;
+	}
+
+	trap_R_SetColor(NULL);
+
+	XH_SetScale640();
+	XH_Set3DIcons(cg_draw3dIcons.integer || e->flags & XF_DRAW3D);
+
+	if (e->flags & XF_ANGLES) {
+		XH_CalcAnglesRotation(e);
+
+		CG_DrawHead(e->x, e->y, e->w, e->h, cg.snap->ps.clientNum, e->angles);
+	} else {
+		CG_DrawStatusBarHead(e->x, e->y, e->w, e->h);
+	}
+
+	XH_Restore3DIcons();
+	XH_RestoreScale();
+}
+
+static void XH_DrawPic(xhudElem_t *e, qhandle_t hShader) {
+	if (e->flags & XF_PLAYER_HEAD) {
+		XH_DrawStatusBarHead(e);
+	} else if (e->model) {
+		XH_Draw3DModelColor(e, e->offset, e->angles, e->color);
+	} else  {
+		XH_DrawFill(e);
+
+		if (!hShader)
+			hShader = e->img;
+
+		if (hShader) {
+			trap_R_SetColor(e->color);
+			XH_DrawHandlePic(e->x, e->y, e->w, e->h, hShader);
+			trap_R_SetColor(NULL);
+		}
+	}
+}
+
+void CGX_DrawFlagStatus(int elNum, int flag) {
+	xhudElem_t *e = &xhud[elNum];
+	qhandle_t shader;
+	qhandle_t *flagShader;
+	int flagStatus;
+
+	if (flag == PW_REDFLAG) {
+		flagStatus = cgs.redflag;
+		flagShader = (qhandle_t*)&cgs.media.redFlagShader;
+	} else if (flag == PW_BLUEFLAG) {
+		flagStatus = cgs.blueflag;
+		flagShader = (qhandle_t*)&cgs.media.blueFlagShader;
+	}
+
+	//pm flag, cpma style, looks weird
+#if 0
+	if (e->color[3]) {
+		static qhandle_t pmFlagShader[3];
+		trap_R_LazyRegisterShader(pmFlagShader[flagStatus], va("xm/icons/flag_pm%i.tga", flagStatus));
+		shader = pmFlagShader[flagStatus];
+	} else
+#endif
+		shader = flagShader[flagStatus];
+
+	trap_R_SetColor(NULL);
+	XH_DrawHandlePic(e->x, e->y, e->w, e->h, shader);
+
+	XH_DrawBorder(e);
+}
+
+void CGX_DrawPic( int elNum, qhandle_t hShader ) {
+	xhudElem_t *e = &xhud[elNum];
+
+	if (!e->inuse)
+		return;
+
+	XH_DrawPic(e, hShader);
+
+	XH_DrawBorder(e);
+}
+
+void CGX_DrawLagometer(int elNum, float *ax, float *ay, float *aw, float *ah, qhandle_t hShader) {
+	xhudElem_t *e = &xhud[elNum];
+
+	if (!e->inuse) {
+		*aw = 0;
+		return;
+	}
+
+	*ax = e->x; *ay = e->y; *aw = e->w; *ah = e->h;
+
+	CGX_DrawPic(elNum, hShader);
+
+	//it's needed
+	*ax -= 0.5f;
+	*aw -= 0.5f;
+}
+
+void CGX_DrawField(int elNum, int value, const float *rgba) {
+	xhudElem_t *e = &xhud[elNum];
+	char num[16];
+
+	if (!e->inuse)
+		return;
+
+	if (value > 999)
+		value = 999;
+	else if (value < -99)
+		value = -99;
+
+	Com_sprintf (num, sizeof(num), "%i", value);
+
+	XH_DrawString(e, num, rgba);
+
+	XH_DrawBorder(e);
+}
+
+void CGX_DrawWeaponSelect(void) {
+	int bits, count;
+	int	i;
+	float x, y, h, w;
+	int xstart;
+	float *color;
+	float pady, padx;
+	float text_pad_top;
+	float icon_pad_top;
+	float icon_w, icon_h;
+	int limits;
+	qboolean horizontal;
+	qboolean fill;
+	xhudElem_t *e = &xhud[XH_WeaponList];
+
+	color = e->time ?
+		//CGX_FadeColor(cg.weaponSelectTime, e->time, e->fade) :
+		CG_FadeColor(cg.weaponSelectTime, e->time) :
+		colorWhite;
+
+	if (!color)
+		return;
+
+	// showing weapon select clears pickup item display, but not the blend blob
+	// in xhud not needed
+	//cg.itemPickupTime = 0;
+
+	bits = cg.snap->ps.stats[STAT_WEAPONS];
+
+	fill = e->flags & XF_FILL;
+
+	w = e->w;
+	h = e->h;
+
+	horizontal = e->textalign == 'C';
+
+	padx = hud.weplist_padx;
+	pady = hud.weplist_pady;
+	icon_w = icon_h = e->font_h > e->font_w ? e->font_w : e->font_h;
+	text_pad_top = (h - e->font_h) / 2;
+	icon_pad_top = (h - icon_h) / 2;
+
+	if (horizontal) {
+		// count the number of weapons owned
+		count = 0;
+		for (i = 1; i < WP_NUM_WEAPONS - 1; i++)
+			if (bits & (1 << i) || (fill && cg.snap->ps.ammo[i] > 0))
+				count++;
+
+		xstart = (hud.screen_width - count * (w + padx)) / 2;
+		limits = hud.screen_width - w * 2 - padx;
+	} else {
+		xstart = e->x;
+		limits = hud.screen_height - h * 2 - pady;
+	}
+
+	y = e->y;
+	x = xstart;
+
+	XH_SetFont(e);
+
+	for (i = 1; i < WP_NUM_WEAPONS - 1; i++) {
+		int ammo;
+		int hasWeapon = (bits & (1 << i));
+		float *wcolor;
+		int icon_y;
+
+		if (!hasWeapon && !(fill && cg.snap->ps.ammo[i] > 0))
+			continue;
+
+		ammo = cg.snap->ps.ammo[i];
+
+		CG_RegisterWeapon(i);
+
+		wcolor = i == cg.weaponSelect ?
+			e->color :
+			e->bgcolor;
+
+		XH_FillRect(x, y, w, h, wcolor);
+
+		//if (e->flags & XF_BORDER)
+		//	XH_DrawRect(x, y, w, h, e->border_w, e->bordercolor);
+
+		icon_y = y + icon_pad_top;
+
+		// draw weapon icon
+		XH_DrawHandlePic(x, icon_y, icon_w, icon_h, cg_weapons[i].weaponIcon);
+
+		// draw selection marker
+		//if (i == cg.weaponSelect) {
+		//	CG_DrawPic(x - pad, y - pad, szpad, szpad, cgs.media.selectShader);
+		//}
+
+		// no ammo cross on top
+		if (!ammo || !hasWeapon) {
+			XH_DrawHandlePic(x, icon_y, icon_w, icon_h, cgs.media.noammoShader);
+		}
+
+		else if ((unsigned int)ammo > 999 && i != WP_GAUNTLET)
+			ammo = 999;
+
+		if (ammo >= 0) {
+			char *s = va("%i", ammo);
+			int xx;
+			//if (horizontal)
+			//	xx = x + (icon_w + w - XH_DrawStrWidth(e, s)) / 2;
+			//else
+				xx = x + icon_w;
+			XH_DrawStringExt(xx, y + text_pad_top, s, color, TS_FORCECOLOR, e->shadowsize, e->font_w, e->font_h, 3);
+		}
+
+		if (horizontal) {
+			if ((int)x > limits) {
+				x = xstart;
+				y += h + pady;
+			} else {
+				x += w + padx;
+			}
+		} else {
+			if ((int)y > limits) {
+				y = e->y;
+				x += w + padx;
+			} else {
+				y += h + pady;
+			}
+		}
+	}
+
+	XH_RestoreFont();
+
+	//TODO: style selected name maybe
+
+	// draw the selected name
+	//if ( cg_weapons[ cg.weaponSelect ].item ) {
+	//	name = cg_weapons[ cg.weaponSelect ].item->pickup_name;
+	//	if ( name ) {
+	//		w = CG_DrawStrlen( name ) * hud.big_char_w;
+	//		x = ( vScreen.width - w ) / 2;
+	//		CG_DrawBigStringColor2(x, y - hud.weap_text_y, name, color);
+	//	}
+	//}
+}
+
+extern int numSortedTeamPlayers;
+
+void CGX_DrawTeamOverlay(int pwidth, int lwidth) {
+	int x, w, xx;
+	float yy, fwa;
+	int i, j, len;
+	const char *p;
+	vec4_t hcolor;
+	char st[16];
+	clientInfo_t *ci;
+
+	qboolean right;
+
+	if (cg.scoreBoardShowing)
+		return;
+
+	if (numSortedTeamPlayers > hud.overlayMaxNum)
+		numSortedTeamPlayers = hud.overlayMaxNum;
+
+	//TODO: add settings for max player name len, max location len (not important)
+
+	for (i = 0; i < numSortedTeamPlayers; i++) {
+		xhudElem_t *e = &xhud[XH_Team1 + i];
+		if (!e->inuse)
+			continue;
+
+		fwa = e->flags & XF_MONOSPACE || e->cwi == NULL ? e->font_w : e->cwi->avg_cwr * e->font_w;
+
+		ci = cgs.clientinfo + sortedTeamPlayers[i];
+
+		hcolor[0] = hcolor[1] = hcolor[2] = hcolor[3] = 1.0;
+
+		right = e->textalign == 'R';
+
+		w = (pwidth + lwidth + 3 + 3) * fwa + e->font_w * 5;
+
+		yy = XH_GetAlignedYDrawStr(e);
+
+		if ( right ) {
+			x = hud.screen_width - w;
+		} else {
+			x = e->x;
+		}
+
+		if (e->img)
+			XH_DrawHandlePic(x, yy, w, e->h, e->img);
+		else
+			XH_FillRect(x, yy, w, e->h, e->bgcolor);
+
+		xx = x + e->font_w;
+
+		XH_SetFont(e);
+
+		XH_DrawStringExt( xx, yy,
+			ci->name, hcolor, 0, e->shadowsize,
+			e->font_w, e->font_h, TEAM_OVERLAY_MAXNAME_WIDTH);
+
+		if (lwidth) {
+			p = CG_ConfigString(CS_LOCATIONS + ci->location);
+			if (!p || !*p)
+				p = "unknown";
+
+			xx = x + e->font_w * 2 + fwa * pwidth;
+			XH_DrawStringExt( xx, yy,
+				p, hcolor, 0, e->shadowsize, e->font_w, e->font_h,
+				TEAM_OVERLAY_MAXLOCATION_WIDTH);
+		}
+
+		CG_GetColorForHealth( ci->health, ci->armor, hcolor );
+
+		// draw hp
+		Com_sprintf (st, sizeof(st), "%3i", ci->health);
+
+		xx = x + w - fwa * 6 - e->font_w * 2;
+
+		XH_DrawStringExt( xx, yy,
+			st, hcolor, 0, e->shadowsize,
+			e->font_w, e->font_h, 0 );
+
+		// draw weapon icon
+		xx += fwa * 3;
+
+		if ( cg_weapons[ci->curWeapon].weaponIcon ) {
+			XH_DrawHandlePic( xx, yy, e->font_w, e->font_h, 
+				cg_weapons[ci->curWeapon].weaponIcon );
+		} else {
+			XH_DrawHandlePic( xx, yy, e->font_w, e->font_h, 
+				cgs.media.deferShader );
+		}
+
+		// draw armor
+		Com_sprintf (st, sizeof(st), "%3i", ci->armor);
+
+		xx += e->font_w;
+
+		XH_DrawStringExt( xx, yy,
+			st, hcolor, 0, e->shadowsize,
+			e->font_w, e->font_h, 0 );
+
+		// Draw powerup icons
+		if (right) {
+			xx = x;
+		} else {
+			xx = x + w - e->font_w;
+		}
+		for (j = 0; j < PW_NUM_POWERUPS; j++) {
+#if CGX_FREEZE//freeze
+			if ( Q_Isfreeze( ci - cgs.clientinfo ) ) {
+				XH_DrawHandlePic( xx, yy, e->font_w, e->font_h, cgs.media.noammoShader );
+				break;
+			}
+#endif//freeze
+			if (ci->powerups & (1 << j)) {
+				gitem_t	*item;
+
+				item = BG_FindItemForPowerup( j );
+
+				XH_DrawHandlePic( xx, yy, e->font_w, e->font_h, 
+					trap_R_RegisterShader( item->icon ) );
+				if (right) {
+					xx -= e->font_w;
+				} else {
+					xx += e->font_w;
+				}
+			}
+		}
+
+		XH_RestoreFont();
+	}
+}
+
+void CGX_DrawChat( void ) {
+	if (hud.chatHeight <= 0)
+		return;
+
+	if (hud.chatLastPos != hud.chatPos) {
+		int i = hud.chatLastPos % hud.chatHeight;
+		if (cg.time - hud.chatMsgTimes[i] > xhud[XH_Chat1 + i].time) {
+			hud.chatLastPos++;
+		}
+
+		for (i = hud.chatLastPos; i < hud.chatPos; i++) {
+			xhudElem_t *e = &xhud[XH_Chat1 + hud.chatPos - i - 1];
+			//float *color = e->flags & XF_FADE ? CGX_FadeColor(hud.conMsgTimes[index], e->time, e->fade) : colorWhite;
+			//qboolean forceColor = e->textstyle & TS_FORCECOLOR;
+			//float *color = forceColor ? e->color : colorWhite;
+			XH_SetFont(e);
+			XH_DrawStringExt(e->x, e->y, 
+				hud.chatMsgs[i % hud.chatHeight], 
+				colorWhite, e->textstyle, e->shadowsize,
+				e->font_w, e->font_h, 0);
+			XH_RestoreFont();
+		}
+	}
+}
+
+void CGX_DrawConsole( void ) {
+	int i;
+
+	if (hud.conHeight <= 0)
+		return;
+
+	if (hud.conLastPos != hud.conPos) {
+		xhudElem_t *con = &xhud[XH_Console];
+		//qboolean fade = con->flags & XF_FADE;
+		//qboolean forceColor = con->textstyle & TS_FORCECOLOR;
+		//float *color = forceColor ? con->color : colorWhite;
+
+		if (cg.time - hud.conMsgTimes[hud.conLastPos % hud.conHeight] > con->time) {
+			hud.conLastPos++;
+		}
+
+		XH_SetFont(con);
+		for (i = hud.conPos - 1; i >= hud.conLastPos; i--) {
+			int index = i % hud.conHeight;
+			char *s = hud.conMsgs[index];
+			//float *color = fade ? CGX_FadeColor(hud.conMsgTimes[index], con->time, con->fade) : colorWhite;
+			int x = XH_GetAlignedXDrawStr(con, s);
+
+			XH_DrawStringExt(x, con->y + (i - hud.conLastPos)*con->font_h,
+				s, colorWhite, con->textstyle, con->shadowsize,
+				con->font_w, con->font_h, 0);
+		}
+		XH_RestoreFont();
+
+		XH_DrawBorder(con);
+	}
+}
+
+static void XH_GetSpecialColors() {
+	int i;
+	char t, e;
+	clientInfo_t *ci = &cgs.clientinfo[cg.snap->ps.clientNum];
+	xhudElem_t *el;
+	float *col;
+	char *teColors = cgx_hud_TEColors.string;
+
+	if (cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR) {
+		if (cgs.gametype >= GT_TEAM) {
+			t = teColors[2];
+			e = teColors[1];
+		} else {
+			t = teColors[3];
+			e = teColors[3];
+		}
+	} else if (cgx_enemyModel_enabled.integer && cgs.gametype < GT_TEAM) {
+		t = cgx_teamColors.string[2] ? 
+			cgx_teamColors.string[2] :
+			teColors[(ArrLen(teColors) - 1) - ci->team % ArrLen(teColors)];
+
+		e = cgx_enemyColors.string[2] ? 
+			cgx_enemyColors.string[2] :
+			teColors[ci->team % ArrLen(teColors)];
+	} else {
+		i = ci->team % ArrLen(teColors);
+		t = teColors[(ArrLen(teColors) - 1) - i];
+		e = teColors[i];
+	}
+
+	if (hud.oe != e) {
+		hud.oe = e;
+		i = (e - '0') % ArrLen(g_color_table_ex);
+		col = g_color_table_ex[i];
+		for (i = 0, el = xhud; i < XH_TOTAL_ELEMS; i++, el++) {
+			if (el->flags & XF_E_COLOR)
+				Vector4Copy(col, el->color);
+			if (el->flags & XF_E_BGCOLOR)
+				Vector4Copy(col, el->bgcolor);
+		}
+	}
+	
+	if (hud.ot != t) {
+		hud.ot = t;
+		i = (t - '0') % ArrLen(g_color_table_ex);
+		col = g_color_table_ex[i];
+		for (i = 0, el = xhud; i < XH_TOTAL_ELEMS; i++, el++) {
+			if (el->flags & XF_T_COLOR)
+				Vector4Copy(col, el->color);
+			if (el->flags & XF_T_BGCOLOR)
+				Vector4Copy(col, el->bgcolor);
+		}
+	}
+}
+
+static void XH_GetTeamIcons() {
+	static int oldTeam = -1;
+	static int oldClientNum = -1;
+	int clientNum = cg.snap->ps.clientNum;
+	int i, team = cgs.clientinfo[clientNum].team;
+
+	if (!cgs.countAlive || (oldTeam == team && oldClientNum == clientNum))
+		return;
+
+	oldTeam = team;
+	oldClientNum = clientNum;
+
+	if (team == TEAM_SPECTATOR) {
+		team = TEAM_RED;
+
+		for (i = 0; i < MAX_CLIENTS; i++) {
+			clientInfo_t *ci = &cgs.clientinfo[i];
+
+			if (ci->team == team && ci->team != TEAM_SPECTATOR && ci->modelIcon) {
+				hud.icon_own = ci->modelIcon;
+				break;
+			}
+		}
+
+		if (i == MAX_CLIENTS)
+			hud.icon_own = trap_R_RegisterShaderNoMip(va("models/players/%s/icon_%s.tga", DEFAULT_MODEL, "red"));
+	} else {
+		hud.icon_own = cgs.clientinfo[clientNum].modelIcon;
+	}
+
+	for (i = 0; i < MAX_CLIENTS; i++) {
+		clientInfo_t *ci = &cgs.clientinfo[i];
+
+		if (ci->team != team && ci->team != TEAM_SPECTATOR && ci->modelIcon) {
+			hud.icon_nme = ci->modelIcon;
+			break;
+		}
+	}
+
+	if (i == MAX_CLIENTS)
+		hud.icon_nme = trap_R_RegisterShaderNoMip(va("models/players/%s/icon_%s.tga", DEFAULT_MODEL, team == TEAM_RED ? "blue" : "red"));
+}
+
+void CGX_DrawHUDLayer(int layerNum) {
+	if (!hud.file)
+		return;
+
+	if (layerNum < 0) {
+		XH_GetSpecialColors();
+		XH_GetTeamIcons();
+
+		CGX_DrawConsole();
+		CGX_DrawChat();
+	} else {
+		int i = XH_ELEM_POOL_START;
+		xhudElem_t *e = &xhud[XH_ELEM_POOL_START];
+		for (; i < elemsPoolNum; i++, e++)
+			if (e->type == layerNum && e->inuse)
+				XH_DrawPic(e, 0);
+	}
+}
+
+static void XH_Error(char *err) {
+	CG_Printf("^3xhud: line %i, %s\n", COM_GetCurrentParseLine(), err);
+}
+
+#define xhud_err(x) XH_Error(x)
+
+extern char *COM_PeekParse( char **data_p );
+
+static qboolean NextToken_IsNum(char **data_p) {
+	char *t = COM_PeekParse(data_p);
+	return (*t >= '0' && *t <= '9') || (*t == '-' && *(t + 1) >= '0' && *(t + 1) <= '9');
+}
+
+static qboolean NextToken_IsBracket(char **data_p) {
+	char *t = COM_PeekParse(data_p);
+	return !Q_stricmp(t, "{");
+}
+
+static char* Parse_Str(char **data_p) {
+	char *y = COM_Parse(data_p);
+	if (!*y) {
+		xhud_err("unexpected end of file");
+		return NULL;
+	} else {
+		return y;
+	}
+}
+
+static float Parse_Float(char **data_p) {
+	char *s = Parse_Str(data_p);
+	return *s ? atof(s) : 0;
+}
+
+static int Parse_Int(char **data_p) {
+	char *s = Parse_Str(data_p);
+	return *s ? atoi(s) : 0;
+}
+
+static void Parse_Flag(xhudElem_t *e, int flag, char **data_p) {
+	e->flags |= flag; 
+	
+	if (NextToken_IsNum(data_p) && !Parse_Int(data_p)) 
+		e->flags &= ~(flag);
+}
+
+static void Parse_Rect(xhudElem_t *e, char **data_p) {
+	e->x = Parse_Float(data_p);
+	e->y = Parse_Float(data_p);
+	e->w = Parse_Float(data_p);
+	e->h = Parse_Float(data_p);
+}
+
+static void Parse_ColorArgs(xhudElem_t *e, float *color, char **data_p, int flag_t, int flag_e) {
+	e->flags &= ~(flag_e | flag_t);
+
+	if (NextToken_IsNum(data_p)) {
+		color[0] = Parse_Float(data_p);
+		color[1] = Parse_Float(data_p);
+		color[2] = Parse_Float(data_p);
+		color[3] = Parse_Float(data_p);
+	} else {
+		char *t = Parse_Str(data_p);
+		char c = toupper(*t);
+
+		if (c == 'T') {
+			e->flags |= flag_t;
+		} else if (c == 'E') {
+			e->flags |= flag_e;
+		} else {
+			int i = ColorIndex(QX_StringToColor(t));
+			Vector4Copy(g_color_table_ex[i], e->color);
+		}
+	}
+}
+
+static void Parse_Bgcolor(xhudElem_t *e, char **data_p) {
+	Parse_ColorArgs(e, e->bgcolor, data_p, XF_T_BGCOLOR, XF_E_BGCOLOR);
+}
+
+static void Parse_Color(xhudElem_t *e, char **data_p) {
+	Parse_ColorArgs(e, e->color, data_p, XF_T_COLOR, XF_E_COLOR);
+}
+
+static void Parse_FontSize(xhudElem_t *e, char **data_p) {
+	e->font_w = Parse_Int(data_p);
+
+	if (NextToken_IsNum(data_p)) {
+		e->font_h = Parse_Int(data_p);
+	} else {
+		e->font_h = e->font_w;
+	}
+}
+
+#define CGX_MAX_FONTSIZE 1050000 //big files crashes quake3
+
+//check file size and register shader
+static qhandle_t XH_Register_FontShader(char *fontFile) {
+	int fsize;
+	if ((fsize = CGX_FSize(fontFile)) <= CGX_MAX_FONTSIZE)
+		return trap_R_RegisterShaderNoMip(fontFile);
+
+	CG_Printf("^3%s file size is too large %i, max allowed %i bytes, 1024x1024 pixels.\n", fontFile, fsize, CGX_MAX_FONTSIZE);
+	return 0;
+}
+
+//register font 16 & 32 shaders, .cw or .font file if it's exists
+static void XH_Register_Font(xhudElem_t *e, char *fontName) {
+	char *fontFile, *fontFile32;
+	qhandle_t fontShader;
+
+	e->cwi = NULL;
+	e->font = cgs.media.charsetShader;
+	e->font32 = cgs.media.charsetShader32;
+	e->flags &= ~(XF_FIELDFONT);
+
+	if (!Q_stricmp(fontName, "$default"))
+		return;
+
+	fontFile = va("fonts/%s.tga", fontName);
+
+	if (!CGX_FExists(fontFile)) {
+		if (Q_stricmp(fontName, "numbers"))
+			fontFile = va("fonts/%s_16.tga", fontName);
+	}
+
+	if (!CGX_FExists(fontFile)) {
+		if (!Q_stricmp(fontName, "idblock") || !Q_stricmp(fontName, "numbers")) {
+			e->flags |= XF_FIELDFONT;
+		} else {
+			xhud_err(va("font %s not found", fontName));
+		}
+		return;
+	}
+
+	fontShader = XH_Register_FontShader(fontFile);
+
+	if (fontShader) {
+		e->font = e->font32 = fontShader;
+
+		e->cwi = XH_Register_CW(e->font, fontName);
+
+		fontFile32 = va("fonts/%s_32.tga", fontName);
+
+		if (CGX_FExists(fontFile32))
+			if (fontShader = XH_Register_FontShader(fontFile32))
+				e->font32 = fontShader;
+	}
+}
+
+//take registered font and register lite font with it's name if possible, e+ stuff
+static void XH_Register_Lite_Font(xhudElem_t *e) {
+	int i; cw_info_t *cwi;
+	char fontName[MAX_QPATH];
+
+	for (i = 0, cwi = cwi_pool; i < ArrLen(cwi_pool); i++, cwi++)
+		if (cwi->font == e->font) {
+			Com_sprintf(fontName, sizeof fontName, "%s_l", cwi->fontName);
+			XH_Register_Font(e, fontName);
+			return;
+		}
+}
+
+static void Parse_Font(xhudElem_t *e, char **data_p) {
+	char *fontName = Parse_Str(data_p);
+	XH_Register_Font(e, fontName);
+}
+
+static void Parse_TextAlign(xhudElem_t *e, char **data_p) {
+	char *t = Parse_Str(data_p);
+	e->textalign = toupper(*t);
+}
+
+static void Parse_Time(xhudElem_t *e, char **data_p) {
+	e->time = Parse_Int(data_p);
+}
+
+static void Parse_Image(xhudElem_t *e, char **data_p) {
+	char *name = Parse_Str(data_p);
+
+	if (stristr(name, ".skin")) {
+		e->img = trap_R_RegisterSkin(name);
+	} else if (!Q_stricmp(name, "$lagometer")) {
+		e->img = cgs.media.lagometerShader;
+	} else if (!Q_stricmp(name, "none")) {
+		e->img = 0;
+	} else {
+		e->img = trap_R_RegisterShaderNoMip(name);
+	}
+}
+
+static void Parse_Model(xhudElem_t *e, char **data_p) {
+	char *name = Parse_Str(data_p);
+	e->model = trap_R_RegisterModel(name);
+}
+
+static void Parse_Angles(xhudElem_t *e, char **data_p) {
+	e->angles[0] = Parse_Float(data_p);
+	e->angles[1] = Parse_Float(data_p);
+	e->angles[2] = Parse_Float(data_p);
+	e->angles[3] = NextToken_IsNum(data_p) ? Parse_Float(data_p) : 0;
+	e->flags |= XF_ANGLES;
+	VectorCopy(e->angles, e->angles_initial);
+}
+
+static void Parse_Offset(xhudElem_t *e, char **data_p) {
+	e->offset[0] = Parse_Float(data_p);
+	e->offset[1] = Parse_Float(data_p);
+	e->offset[2] = Parse_Float(data_p);
+	e->flags |= XF_OFFSET;
+}
+
+static void Parse_Alignv(xhudElem_t *e, char **data_p) {
+	char *t = Parse_Str(data_p);
+	e->valign = toupper(*t);
+}
+
+static void Parse_TextStyle(xhudElem_t *e, char **data_p) {
+	e->textstyle = Parse_Int(data_p);
+}
+
+static void Parse_Fade(xhudElem_t *e, char **data_p) {
+	Parse_Float(data_p);
+	Parse_Float(data_p);
+	Parse_Float(data_p);
+	Parse_Float(data_p);
+	//e->fade[0] = Parse_Float(data_p);
+	//e->fade[1] = Parse_Float(data_p);
+	//e->fade[2] = Parse_Float(data_p);
+	//e->fade[3] = Parse_Float(data_p);
+	//e->flags |= XF_FADE;
+}
+
+static void Parse_Fill(xhudElem_t *e, char **data_p) {
+	Parse_Flag(e, XF_FILL, data_p);
+}
+
+static void Parse_Monospace(xhudElem_t *e, char **data_p) {
+	Parse_Flag(e, XF_MONOSPACE, data_p);
+}
+
+static void Parse_Doublebar(xhudElem_t *e, char **data_p) {
+	Parse_Flag(e, XF_DOUBLEBAR, data_p);
+}
+
+static void Parse_Verticalbar(xhudElem_t *e, char **data_p) {
+	Parse_Flag(e, XF_VERTICALBAR, data_p);
+}
+
+//xp
+static void Parse_Anchors(xhudElem_t *e, char **data_p) {
+	e->anchors = Parse_Int(data_p);
+}
+
+static void Parse_Param(xhudElem_t *e, char **data_p) {
+	int param = Parse_Int(data_p);
+	if (param == 1)
+		e->flags |= XF_PARAM_1;
+	else if (param == 2)
+		e->flags |= XF_PARAM_2;
+}
+
+static void Parse_Draw3D(xhudElem_t *e, char **data_p) {
+	Parse_Flag(e, XF_DRAW3D, data_p);
+}
+
+//my
+static void Parse_Alpha(xhudElem_t *e, char **data_p) {
+	e->alpha = Parse_Float(data_p);
+}
+
+static void Parse_ShadowSize(xhudElem_t *e, char **data_p) {
+	e->shadowsize = Parse_Float(data_p);
+}
+#if HUD_SYNTAX_NMS
+static void Parse_Border(xhudElem_t *e, char **data_p) {
+	e->border_w = Parse_Float(data_p);
+	if (NextToken_IsNum(data_p)) {//nms has 4 border widths, don't think it's important..
+		e->border_w = Parse_Float(data_p);
+		e->border_w = Parse_Float(data_p);
+		e->border_w = Parse_Float(data_p);
+	}
+	if (e->border_w)
+		e->flags |= XF_BORDER;
+	else
+		e->flags &= ~(XF_BORDER);
+}
+
+static void Parse_BorderColor(xhudElem_t *e, char **data_p) {
+	Parse_ColorArgs(e, e->bordercolor, data_p, 0, 0);
+}
+
+//nms
+static void Parse_FontHorizontal(xhudElem_t *e, char **data_p) {
+	char *t = Parse_Str(data_p);
+
+	if (!Q_stricmp(t, "CENTER"))
+		e->textalign = 'C';
+	else if (!Q_stricmp(t, "RIGHT"))
+		e->textalign = 'R';
+	else
+		e->textalign = 'L';
+}
+
+static void Parse_FontVertical(xhudElem_t *e, char **data_p) {
+	char *t = Parse_Str(data_p);
+
+	if (!Q_stricmp(t, "MIDDLE"))
+		e->valign = 'C';
+	else if (!Q_stricmp(t, "BOTTOM"))
+		e->valign = 'B';
+	else
+		e->valign = 'T';
+}
+
+static void Parse_Extra(xhudElem_t *e, char **data_p) {
+	int i = Parse_Int(data_p);
+
+	if (i & 1) e->flags |= XF_EXTRA_1;
+	if (i & 2) e->flags |= XF_EXTRA_2;
+}
+#endif
+
+struct {
+	const char	*name;
+	void 		(*parseFunc)(xhudElem_t *e, char **arg);
+} xhudElemProps[] = {
+	//cpma
+	{ "rect", Parse_Rect },
+	{ "bgcolor", Parse_Bgcolor },
+	{ "color", Parse_Color },
+	{ "image", Parse_Image },
+	{ "model", Parse_Model },
+	{ "fontsize", Parse_FontSize },
+	{ "textalign", Parse_TextAlign },
+	{ "textstyle", Parse_TextStyle },
+	{ "time", Parse_Time },
+	{ "font", Parse_Font },
+	{ "fade", Parse_Fade },
+	{ "fill", Parse_Fill },
+	{ "monospace", Parse_Monospace },
+	{ "doublebar", Parse_Doublebar },
+	{ "verticalbar", Parse_Verticalbar },
+	{ "angles", Parse_Angles },
+	{ "offset", Parse_Offset },
+	{ "alignv", Parse_Alignv },
+	//xp
+	{ "anchors", Parse_Anchors },
+	{ "draw3d", Parse_Draw3D },
+	{ "param", Parse_Param },
+	//my
+	{ "alpha", Parse_Alpha },
+	{ "shadowsize", Parse_ShadowSize },
+	//nms
+#if HUD_SYNTAX_NMS
+	{ "border", Parse_Border },
+	{ "borderColor", Parse_BorderColor },
+	{ "fontHorizontal", Parse_FontHorizontal },
+	{ "fontVertical", Parse_FontVertical },
+	{ "fontShadow", Parse_ShadowSize },
+	{ "backgroundColor", Parse_Bgcolor },
+	{ "extra", Parse_Extra }
+#endif
+};
+
+static qboolean NextElement(char **t, char **data_p) {
+	*t = COM_Parse(data_p); 
+	return **t != 0;
+}
+
+static qboolean NextToken(char **t, char **data_p) {
+	*t = COM_Parse(data_p);
+	if (!**t) {
+		xhud_err("unexpected end of file");
+		return qfalse;
+	}
+	return qtrue;
+}
+
+static void SkipElem(char **data_p) {
+	char *t;
+	while (NextToken(&t, data_p))
+		if (!Q_stricmp(t, "}"))
+			break;
+}
+
+static qboolean ParseProperties(int elNum, char **data_p) {
+	xhudElem_t *el;
+	char *token;
+	int i, k = 0;
+
+	if (!NextToken(&token, data_p))
+		return qfalse;
+
+	if (Q_stricmp(token, "{")) { 
+		xhud_err("{ is missing"); 
+		SkipElem(data_p);
+		return qfalse;
+	}
+
+	el = XH_AllocElem(elNum);
+
+	while (NextToken(&token, data_p)) {
+		if (!Q_stricmp(token, "}"))
+			break;
+
+		for (i = 0; i < ArrLen(xhudElemProps); i++)
+			if (!Q_stricmp(token, xhudElemProps[i].name)) {
+				xhudElemProps[i].parseFunc(el, data_p);
+				el->inuse = qtrue;
+				break;
+			}
+
+		if (i == ArrLen(xhudElemProps)) {
+			xhud_err(va("unknown property %s", token));
+			//skip property
+			do {
+				char *t = COM_PeekParse(data_p);
+				if (Q_isalpha(*t) || !Q_stricmp(t, "}"))
+					break;
+			} while (NextToken(&token, data_p));
+		}
+	}
+
+	return qtrue;
+}
+
+static int XH_Parse(char *file, int *syntax) {
+	char	buf[16 * 1024];
+	char	*token;
+	char	*p;
+	int		i, k;
+	int		totalParsed = 0;
+
+	if (!CGX_FReadAll(file, buf, sizeof buf))
+		return 0;
+
+	//prepare buffer, replace ; and #
+	for (p = buf; *p; p++) {
+		if (*p == ';')
+			*p = ' ';
+		else if (*p == '#')
+			while (*p && *p != '\n')
+				*p++ = ' ';
+	}
+
+	p = buf;
+
+	COM_BeginParseSession();
+
+	*syntax |= HUD_SYNTAX_CPMA;
+
+	while (NextElement(&token, &p)) {
+		//CG_Printf("%i %s\n", COM_GetCurrentParseLine(), token);
+
+		//check basic known elements
+		for (i = 0; i < ArrLen(xhudElemNames); i++)
+			if (!Q_stricmp(token, xhudElemNames[i])) {
+				if (ParseProperties(i, &p))
+					totalParsed++;
+				break;
+			}
+
+		if (i < ArrLen(xhudElemNames))
+			continue;
+
+		//check extra known elements
+		for (i = 0; i < ArrLen(xhudExtraElems); i++)
+			if (!Q_stricmp(token, xhudExtraElems[i].name)) {
+				if (ParseProperties(xhudExtraElems[i].elNum, &p))
+					totalParsed++;
+#if HUD_SYNTAX_NMS
+				if (i >= 10) *syntax |= HUD_SYNTAX_NMS;
+				else 
+#endif
+				*syntax |= HUD_SYNTAX_AS;
+
+				break;
+			}
+
+		//if we checked all known elements
+		if (i == ArrLen(xhudExtraElems)) {
+			if (!Q_stricmp(token, "{")) {
+				xhud_err("found { withount element name specified");
+				SkipElem(&p);
+			} else if (!Q_stricmp(token, "}")) {
+				xhud_err("found } before {");
+			} else {
+				xhud_err(va("unknown element %s", token));
+				if (NextToken_IsBracket(&p))
+					SkipElem(&p);
+			}
+		}
+	}
+
+	return totalParsed;
+}
+
+//#define XH_Set_Rect(e, xx, yy, ww, hh) e->x = xx; e->y = yy; e->w = ww; e->h = hh;
+//#define XH_Set_Color(e, r, g, b, a) e->color[0] = r; e->color[1] = g; e->color[2] = b; e->color[3] = a;
+//#define XH_Set_Font(e, fnt16, fnt32, w, h) e->font = fnt16; e->font32 = fnt32; e->font_w = w; e->font_h = h;
+//#define XH_Set_TextStyle(e, textStyle, textAlign) e->textstyle = textStyle; e->textalign = textAlign;
+//#define XH_Set_Inuse(e, use) e->inuse = use;
+
+static int Vector4Compare( const vec4_t v1, const vec4_t v2 ) {
+	return !(v1[0] != v2[0] || v1[1] != v2[1] || v1[2] != v2[2] || v1[3] != v2[3]);
+}
+
+static void XH_WeaponListWidthHeight(xhudElem_t *e, float *w, float *h) {
+	if (e->type != XH_WeaponList)
+		return;
+	if (e->textalign == 'C')
+		*w = (e->w + XH_WEAPLIST_PAD) * 8;
+	else
+		*h = (e->h + XH_WEAPLIST_PAD) * 8;
+}
+
+static qboolean XH_Intersect(xhudElem_t *a, xhudElem_t *b) {
+	float aw = a->w, ah = a->h;
+	float bw = b->w, bh = b->h;
+	XH_WeaponListWidthHeight(a, &aw, &ah);
+	XH_WeaponListWidthHeight(b, &bw, &bh);
+	if (b->x < a->x + aw && a->x < b->x + bw && b->y < a->y + ah)
+		return a->y < b->y + bh;
+	else
+		return qfalse;
+}
+
+//loads hud from file
+static void CGX_LoadHUD(char *fileName) {
+	int		i;
+	int		totalParsed;
+	int		syntax = 0;
+	char	fileNameCopy[2048];
+
+	if (!*fileName) {
+		if (hud.file)
+			XH_Clear();
+		return;
+	}
+
+	if (!strchr(fileName, '.'))
+		fileName = va("%s.cfg", fileName);
+
+	if (!CGX_FExists(fileName) && Q_stricmpn(fileName, "hud/", 4))
+		fileName = va("hud/%s", fileName);
+
+	if (!CGX_FSize(fileName)) {
+		XH_Clear();
+		return;
+	}
+
+	if (!cgs.media.charsetShader32) {
+		if (!(cgs.media.charsetShader32 = trap_R_RegisterShaderNoMip("gfx/2d/bigchars_32")))
+			cgs.media.charsetShader32 = cgs.media.charsetShader;
+		trap_Cvar_Register(&cgx_hud_TEColors, "cgx_hud_TEColors", "2417" , CVAR_TEMP);
+		trap_Cvar_Register(&cgx_hud_font16threshold, "cgx_hud_font16threshold", "24" , CVAR_TEMP);
+	}
+
+	trap_Cvar_Update(&cgx_hud_TEColors);
+	trap_Cvar_Update(&cgx_hud_font16threshold);
+
+	XH_Clear();
+
+	if (ArrLen(xhudElemNames) != XH_MAX_STATIC_HUD_ELEMS + XH_MAX_POOLED_HUD_ELEMTYPES) {
+		CG_Error("xhudElemNames count is different from xhudElemType_t count\n");
+	}
+
+	{//some default values
+		Vector4Copy(colorWhite, xhud[0].color);
+		xhud[0].font_h = 16;
+		xhud[0].font_w = 16;
+		xhud[0].textalign = 'L';
+		xhud[0].font = cgs.media.charsetShader;
+		xhud[0].font32 = cgs.media.charsetShader32;
+		xhud[0].cwi = NULL;
+		xhud[0].shadowsize = 1.0f;
+		//Vector4Copy(colorWhite, xhud[0].fade);
+#if HUD_SYNTAX_NMS
+		xhud[0].border_w = 0.5f;
+		Vector4Copy(colorMagenta, xhud[0].bordercolor);
+		//xhud[0].flags |= XF_BORDER;
+#endif
+	}
+	
+	//other calls of va method will modify file name, so saving copy here
+	Q_strncpyz(fileNameCopy, fileName, sizeof fileNameCopy);
+
+	totalParsed = XH_Parse(fileName, &syntax);
+
+	//adjustments after parse
+	if (syntax)
+	{
+		const float xr = (float)SCREEN_WIDTH / vScreen.width;
+		const float ox = FromX640((vScreen.width - SCREEN_WIDTH) / 2.0f * xr);
+		xhudElem_t *wl = &xhud[XH_WeaponList];
+
+		hud.file = qtrue;
+
+		hud.screen_width = FromX640(SCREEN_WIDTH);
+		hud.screen_height = FromY640(SCREEN_HEIGHT);
+		hud.weplist_padx = FromX640(XH_WEAPLIST_PAD);
+		hud.weplist_pady = FromY640(XH_WEAPLIST_PAD);
+		hud.bar_pad = FromY640(3);
+
+		//check for open arena weapon list style (where width and height is total values)
+		if (wl->w > SCREEN_WIDTH / 8 || wl->h > SCREEN_HEIGHT / 8) {
+			//horizontal
+			if (wl->h < wl->w)
+				wl->textalign = 'C';
+			if (wl->w > SCREEN_WIDTH / 8)
+				wl->w /= 8;
+			if (wl->h > SCREEN_HEIGHT / 8)
+				wl->h /= 8;
+		}
+
+		//stick PlayerAccuracy, because most of huds will not have it
+		if (!xhud[XH_PlayerAccuracy].inuse) {
+			xhudElem_t *pa = &xhud[XH_PlayerAccuracy];
+			int k = 0;
+			pa->y = 4;
+			pa->w = XM_BIGCHAR_WIDTH * 10;
+			pa->h = BIGCHAR_HEIGHT;
+			pa->x = SCREEN_WIDTH - pa->w;
+			for (i = 0; i < XH_TOTAL_ELEMS && k < 10000; i++, k++) {
+				xhudElem_t *e = &xhud[i];
+				if (e->inuse && XH_Intersect(e, pa)) {
+					int h = e->type == XH_WeaponList ? e->h * 8 : e->h;
+					pa->y = e->y + h + 4;
+					i = 0;
+				}
+			}
+			if (pa->y < SCREEN_HEIGHT - BIGCHAR_HEIGHT) {
+				pa->inuse = qtrue;
+				pa->font = cgs.media.charsetShader;
+				pa->font32 = cgs.media.charsetShader32;
+				pa->font_w = XM_BIGCHAR_WIDTH;
+				pa->font_h = XM_BIGCHAR_WIDTH;
+				pa->anchors = XA_RIGHT;
+				pa->flags = 0;
+				Vector4Copy(colorWhite, pa->color);
+				pa->textalign = 'R';
+				pa->shadowsize = 1.0f;
+				pa->textstyle = TS_SHADOW;
+			}
+		}
+
+		//final preparations
+		for (i = 0; i < ArrLen(xhud); i++) {
+			xhudElem_t *e = &xhud[i];
+
+			if (!(e->textstyle & TS_SHADOW))
+				e->shadowsize = 0;
+			if (e->textstyle & TS_LITE)
+				XH_Register_Lite_Font(e);
+			//vertical align for team overlay
+			if (!e->valign)
+				e->valign = e->type >= XH_Team1 && e->type <= XH_Team8 ? 'C' : 'T';
+
+			//adjust coordinates & sizes
+			{
+				AdjX640(e->x);
+				AdjX640(e->w);
+
+				AdjY640(e->y);
+				AdjY640(e->h);
+
+				AdjX640(e->font_w);
+				AdjY640(e->font_h);
+				
+				AdjY640(e->shadowsize);
+			}
+
+			//adjust anchors
+			if (cgx_wideScreenFix.integer & CGX_WFIX_SCREEN) {
+				if (e->anchors) {
+					float x = e->x, y = e->y, w = e->w, h = e->h;
+
+					e->w = w * xr;
+					e->font_w *= xr;
+					e->x = x * xr + ox;
+
+					if (e->anchors & XA_LEFT && e->anchors & XA_RIGHT) {
+						e->w = w;
+						e->x = x;
+					} else {
+						if (e->anchors & XA_LEFT) {
+							e->x = x * xr;
+						} else if (e->anchors & XA_RIGHT) {
+							e->x = x * xr + ox * 2;
+						}
+					}
+				}
+			}
+		}
+
+		if (!(xhud[XH_StatusBar_AmmoIcon].flags & XF_ANGLES)) {
+			xhud[XH_StatusBar_AmmoIcon].angles[3] = 20;
+			xhud[XH_StatusBar_AmmoIcon].angles_initial[YAW] = 90;
+			xhud[XH_StatusBar_AmmoIcon].flags |= XF_ANGLES;
+		}
+
+		if (!(xhud[XH_StatusBar_ArmorIcon].flags & XF_ANGLES)) {
+			xhud[XH_StatusBar_ArmorIcon].angles[3] = -360;
+			xhud[XH_StatusBar_ArmorIcon].flags |= XF_ANGLES;
+		}
+
+		for (i = XH_Team1; i <= XH_Team8; i++) {
+			if (xhud[i].inuse)
+				hud.overlayMaxNum++;
+		}
+
+		for (i = XH_Chat1; i <= XH_Chat8; i++) {
+			if (xhud[i].inuse)
+				hud.chatHeight++;
+			else
+				break;
+		}
+
+		for (i = 0; i <= XH_PowerUp8_Icon - XH_PowerUp1_Icon; i++) {
+			xhudElem_t *icon = &xhud[XH_PowerUp1_Icon + i];
+			xhudElem_t *time = &xhud[XH_PowerUp1_Time + i];
+
+			//remove any E T colors from powerup icons
+			icon->flags &= ~(XF_E_COLOR | XF_T_COLOR);
+			Vector4Copy(colorWhite, icon->color);
+
+			if (icon->inuse && time->inuse)
+				hud.powerupsMaxNum++;
+			else
+				break;
+		}
+
+		if (xhud[XH_Console].inuse) {
+			hud.conHeight = 3;
+
+			trap_Cvar_Set("con_notifytime", "-1");
+		}
+
+		{//pickup time
+			xhudElem_t *pIcon = &xhud[XH_ItemPickupIcon];
+			xhudElem_t *pName = &xhud[XH_ItemPickup];
+			if (pIcon->inuse || pName->inuse)
+				hud.pickupTime = pIcon->time > pName->time ? pIcon->time : pName->time;
+		}
+
+		if (syntax & HUD_SYNTAX_AS) {
+			//CG_Printf("Aftershock syntax found\n");
+			if (Vector4Compare(xhud[XH_WeaponList].color, colorWhite))
+				xhud[XH_WeaponList].color[3] = 0.25f;
+
+			for (i = XH_Team1; i <= XH_Team8; i++)
+				if (xhud[i].x > SCREEN_WIDTH / 2)
+					xhud[i].textalign = 'R';
+		}
+#if HUD_SYNTAX_NMS
+		else if (syntax & HUD_SYNTAX_NMS) {
+#define NMS_WEP_PAD 5
+			xhudElem_t *wl = &xhud[XH_WeaponList];
+			hud.weplist_padx = FromX640(NMS_WEP_PAD);
+			hud.weplist_pady = FromY640(NMS_WEP_PAD);
+
+			//CG_Printf("Nms syntax found\n");
+			//nms
+			if (wl->flags & XF_EXTRA_1) {
+				wl->textalign = 'C';
+			} else {
+				wl->y = wl->y - (wl->h * 8 + NMS_WEP_PAD * 8) / 2;
+				wl->x = wl->x - wl->w / 2;
+			}
+
+			if (!wl->time)
+				wl->time = WEAPON_SELECT_TIME;
+
+			for (i = XH_Chat1; i <= XH_Chat8; i++)
+				if (!xhud[i].time)
+					xhud[i].time = 3000;
+
+			for (i = XH_Team1; i <= XH_Team8; i++)
+				if (xhud[i].x > SCREEN_WIDTH / 2)
+					xhud[i].textalign = 'R';
+		}
+#endif
+	}
+
+	CG_Printf("loaded %s, elements %i\n", fileNameCopy, totalParsed);
+	//TODO: sort pooled elems
+}
+
+qboolean CGX_AddToChat( const char *str ) {
+	int len;
+	char *p, *ls;
+	int lastcolor;
+
+	if (hud.chatHeight <= 0)
+		return qfalse;
+
+	//print to console for history
+	trap_Print(va("%s\n", str));
+
+	len = 0;
+
+	p = hud.chatMsgs[hud.chatPos % hud.chatHeight];
+	*p = 0;
+
+	lastcolor = '7';
+
+	ls = NULL;
+	while (*str) {
+		if (len > TEAMCHAT_WIDTH - 1) {
+			if (ls) {
+				str -= (p - ls);
+				str++;
+				p -= (p - ls);
+			}
+			*p = 0;
+
+			hud.chatMsgTimes[hud.chatPos % hud.chatHeight] = cg.time;
+
+			hud.chatPos++;
+			p = hud.chatMsgs[hud.chatPos % hud.chatHeight];
+			*p = 0;
+			*p++ = Q_COLOR_ESCAPE;
+			*p++ = lastcolor;
+			len = 0;
+			ls = NULL;
+		}
+
+		if ( Q_IsColorString( str ) ) {
+			*p++ = *str++;
+			lastcolor = *str;
+			*p++ = *str++;
+			continue;
+		}
+		if (*str == ' ') {
+			ls = p;
+		}
+		*p = *str++;
+		if (*p == '\n')
+			*p = ' ';
+		p++;
+
+		len++;
+	}
+	*p = 0;
+
+	hud.chatMsgTimes[hud.chatPos % hud.chatHeight] = cg.time;
+	hud.chatPos++;
+
+	if (hud.chatPos - hud.chatLastPos > hud.chatHeight)
+		hud.chatLastPos = hud.chatPos - hud.chatHeight;
+
+	return qtrue;
+}
+
+void CGX_AddToConsole( const char *str ) {
+	int len;
+	char *p, *ls;
+	int lastcolor;
+
+	if (hud.conHeight <= 0)
+		return;
+
+	len = 0;
+
+	p = hud.conMsgs[hud.conPos % hud.conHeight];
+	*p = 0;
+
+	lastcolor = '7';
+
+	ls = NULL;
+	while (*str) {
+		if (len > TEAMCHAT_WIDTH - 1) {
+			if (ls) {
+				str -= (p - ls);
+				str++;
+				p -= (p - ls);
+			}
+			*p = 0;
+
+			hud.conMsgTimes[hud.conPos % hud.conHeight] = cg.time;
+
+			hud.conPos++;
+			p = hud.conMsgs[hud.conPos % hud.conHeight];
+			*p = 0;
+			*p++ = Q_COLOR_ESCAPE;
+			*p++ = lastcolor;
+			len = 0;
+			ls = NULL;
+		}
+
+		if ( Q_IsColorString( str ) ) {
+			*p++ = *str++;
+			lastcolor = *str;
+			*p++ = *str++;
+			continue;
+		}
+		if (*str == ' ') {
+			ls = p;
+		}
+		*p = *str++;
+		if (*p == '\n')
+			*p = ' ';
+		p++;
+
+		len++;
+	}
+	*p = 0;
+
+	hud.conMsgTimes[hud.conPos % hud.conHeight] = cg.time;
+	hud.conPos++;
+
+	if (hud.conPos - hud.conLastPos > hud.conHeight)
+		hud.conLastPos = hud.conPos - hud.conHeight;
 }
 
 #pragma endregion

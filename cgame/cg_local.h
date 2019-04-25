@@ -59,6 +59,9 @@
 
 #define	DEFAULT_MODEL		"sarge"
 
+#define TEAM_OVERLAY_MAXNAME_WIDTH	12
+#define TEAM_OVERLAY_MAXLOCATION_WIDTH	16
+
 //X-MOD: limits
 #define CGX_MIN_MAXPACKETS 30
 #define CGX_MAX_MAXPACKETS 125
@@ -197,6 +200,175 @@ typedef struct {
 } clientStats_t;
 
 //OSP end
+
+//x-mod: known hud elements
+
+#define XH_ELEM_POOL 64 + 16 //for decor and bars
+
+typedef enum {
+	XH_DEFAULT,
+	XH_AmmoMessage, //	Low ammo/Out of ammo. The audio feedback "click" can be toggled using cg_ammoWarning.
+	XH_AttackerIcon, //	Who attacked you last.
+	XH_AttackerName, //	Who attacked you last.
+	XH_Chat1, //	Chat area. If you want the order of the messages reversed then reverse the Y coordinates.
+	XH_Chat2,
+	XH_Chat3,
+	XH_Chat4,
+	XH_Chat5,
+	XH_Chat6,
+	XH_Chat7,
+	XH_Chat8,
+	XH_Console, //	Replacement for id's console. Use with con_notifyTime -1.
+	XH_FlagStatus_NME, //	Status of enemy flag. To get old RED/BLUE, use color T and color E, plus bgcolor. Check hud/old.cfg.
+	XH_FlagStatus_OWN, //	Status of your flag. To get old RED/BLUE, use color T and color E, plus bgcolor. Check hud/old.cfg.
+	XH_FollowMessage, //	Following <Player>.
+	XH_FPS, //	FPS (Frames Per Second) counter.
+	XH_FragMessage, //	You fragged <Player>.
+	XH_GameTime, //	Game Clock.
+	XH_GameType, //	Game Type - warmup only. Cannot be omitted. To hide place at off-screen x,y coordinates or set alpha 0.
+	XH_ItemPickup, //	Text string of whatever item you pick up.
+	XH_ItemPickupIcon, //	Icon of whatever item you pick up.
+	//XH_KeyDown_Back, //	Shown when the +back key is pressed. See ch_drawKeys.
+	//XH_KeyDown_Crouch, //	Shown when the +movedown key is pressed. See ch_drawKeys.
+	//XH_KeyDown_Forward, //	Shown when the +forward key is pressed. See ch_drawKeys.
+	//XH_KeyDown_Jump, //	Shown when the +moveup key is presse. See ch_drawKeys.
+	//XH_KeyDown_Left, //	Shown when the +moveleft key is pressed. See ch_drawKeys.
+	//XH_KeyDown_Right, //	Shown when the +moveright key is pressed. See ch_drawKeys.
+	//XH_KeyUp_Back, //	Shown when the +back key is released. See ch_drawKeys.
+	//XH_KeyUp_Crouch, //	Shown when the +movedown key is released. See ch_drawKeys.
+	//XH_KeyUp_Forward, //	Shown when the +forward key is released. See ch_drawKeys.
+	//XH_KeyUp_Jump, //	Shown when the +moveup key is released. See ch_drawKeys.
+	//XH_KeyUp_Left, //	Shown when the +moveleft key is released. See ch_drawKeys.
+	//XH_KeyUp_Right, //	Shown when the +moveright key is released. See ch_drawKeys.
+	//XH_LocalTime, //	Local time in the "hh:mm" format.
+	//XH_MultiView, //	Only visible when following a player "full-screen" with multi-view enabled.
+	XH_NetGraph, //	Lagometer.
+	XH_NetGraphPing, //	Ping.
+	XH_PlayerSpeed, //	Units Per Second.
+	XH_PlayerAccuracy, //xmod cg_drawAccuracy
+	XH_StatusBar_Flag, //xmod & oa statusbar flag icon
+	XH_PowerUp1_Icon, // to PowerUp8Icon	Powerup Icons. PowerUp1_Icon is also used for the O/D indicator in CTFS - and also for FLAG.
+	XH_PowerUp2_Icon,
+	XH_PowerUp3_Icon,
+	XH_PowerUp4_Icon,
+	XH_PowerUp5_Icon,
+	XH_PowerUp6_Icon,
+	XH_PowerUp7_Icon,
+	XH_PowerUp8_Icon,
+	XH_PowerUp1_Time, // to PowerUp8Time	Powerup Time remaining.
+	XH_PowerUp2_Time,
+	XH_PowerUp3_Time,
+	XH_PowerUp4_Time,
+	XH_PowerUp5_Time,
+	XH_PowerUp6_Time,
+	XH_PowerUp7_Time,
+	XH_PowerUp8_Time,
+	XH_RankMessage, //	Placed 1st with 30 frags.
+	XH_Score_Limit, //	Frag/Cap/Round limit - if set. Cannot be omitted. To hide place at off-screen x,y coordinates or set alpha 0.
+	XH_Score_NME, //	Enemy score. Cannot be omitted. To hide place at off-screen x,y coordinates or set alpha 0. To get old RED/BLUE use color T and color E, plus bgcolor. Check hud/old.cfg.
+	XH_Score_OWN, //	Your score. Cannot be omitted. To hide place at off-screen x,y coordinates or set alpha 0. To get old RED/BLUE use color T and color E, plus bgcolor. Check hud/old.cfg.
+	XH_SpecMessage, //	SPECTATOR, FRAGGED (in CA/CTFS/FT.)
+	XH_StatusBar_ArmorCount, //	Armor level in number form.
+	XH_StatusBar_ArmorIcon, //	Type of armor - essential in CPM but irrelevant in VQ3.
+	XH_StatusBar_AmmoCount, //	Ammo level in number form.
+	XH_StatusBar_AmmoIcon, //	Current weapon ammo icon.
+	XH_StatusBar_HealthCount, //	Health level in number form.
+	XH_StatusBar_HealthIcon, //	Defaults to Mynx icon but can be any model, image or shader found in pk3s (provided that the pk3 is on the pure server you join).
+	XH_TargetName, //	Current target's playername - see cg_drawCrosshairNames.
+	XH_TargetStatus, //	Current friendly target's health/armor level - see cg_drawCrosshairNames.
+	XH_TeamCount_NME, //	Players alive on enemy team (CA/CTFS/FT).
+	XH_TeamCount_OWN, //	Players alive on your team (CA/CTFS/FT).
+	XH_TeamIcon_NME, //	Defaults to Sarge icon but can be any model, image or shader found in pk3s (provided that the pk3 is on the pure server you join).
+	XH_TeamIcon_OWN, //	Defaults to Mynx icon but can be any model, image or shader found in pk3s (provided that the pk3 is on the pure server you join).
+	XH_Team1, // Teamoverlay.
+	XH_Team2,
+	XH_Team3,
+	XH_Team4,
+	XH_Team5,
+	XH_Team6,
+	XH_Team7,
+	XH_Team8,
+	XH_VoteMessageArena, //	Multiarena, ra3maps.
+	XH_VoteMessageWorld, //	Normal votes.
+	XH_WarmupInfo, //	10sec countdown, Waiting for players, etc. Cannot be omitted. To hide place at off-screen x,y coordinates or set alpha 0.
+	XH_WeaponList, //	The WeaponList has to get a little funky to be able to handle all the legacy HUD tricks: W and H are the size of each weapon, not the total. For the horizontal weapon list (textalign C), X is the point to center around. Use fill to show ammo for weapons you do not have (useful for TDM). WeaponList wraps at the bottom of the screen, so you can sneak a multi-column one in. textalign R can be used to mirror each entry (icon to the far right and ammo count right to its left).
+
+	XH_MAX_STATIC_HUD_ELEMS,
+
+	XH_PreDecorate = XH_MAX_STATIC_HUD_ELEMS, // and PostDecorate	Elements that can be used to draw separator bars etc. Limit 64 total.
+	XH_PostDecorate,
+	//put dynamic elements here
+	XH_StatusBar_HealthBar, //	Health level in bar form. Use textalign L/C/R for filling the bar left-to right/bottom-to-top/right-to-left respectively.
+	XH_StatusBar_ArmorBar, //	Armor level in bar form. Use textalign L/C/R for filling the bar left-to right/bottom-to-top/right-to-left respectively.
+	XH_StatusBar_AmmoBar, //	Ammo level in bar form. Use textalign L/C/R for filling the bar left-to right/bottom-to-top/right-to-left respectively.
+
+	XH_MAX_POOLED_HUD_ELEMTYPES = XH_StatusBar_AmmoBar - XH_PreDecorate + 1
+} xhudElemType_t;
+
+#define XH_TOTAL_ELEMS XH_MAX_STATIC_HUD_ELEMS + XH_ELEM_POOL
+
+typedef struct {
+	qhandle_t font;
+	qboolean xp;//e+ font or no
+	float avg_cwr;//average character width ratio in table
+	float cwr[256];//character width ratio
+	float szx[256];//size_x for XH_DrawChar
+	char fontName[MAX_QPATH];
+} cw_info_t;
+
+typedef struct {
+	xhudElemType_t type;
+	qboolean inuse;
+	float x;
+	float y;
+	float h;
+	float w;
+	float border_w;
+	vec4_t bordercolor;
+	//vec4_t fade;
+	vec4_t color;
+	vec4_t bgcolor;
+	vec4_t angles;
+	vec3_t angles_initial;
+	vec3_t offset;
+	qhandle_t img;
+	qhandle_t model;
+	qhandle_t font;
+	qhandle_t font32;
+	cw_info_t *cwi; //character width info
+	int font_h;
+	int font_w;
+	int textstyle;
+	char textalign;
+	char valign;
+	int time;
+	int anchors;
+	int flags;
+	float alpha;
+	float shadowsize;
+} xhudElem_t;
+
+extern xhudElem_t xhud[XH_TOTAL_ELEMS];
+
+#define XF_FILL 1
+#define XF_MONOSPACE 2 << 0
+#define XF_DOUBLEBAR 2 << 1
+#define XF_FIELDFONT 2 << 2
+#define XF_ANGLES 2 << 3
+#define XF_OFFSET 2 << 4
+#define XF_E_COLOR 2 << 5
+#define XF_T_COLOR 2 << 6
+#define XF_E_BGCOLOR 2 << 7
+#define XF_T_BGCOLOR 2 << 8
+#define XF_PLAYER_HEAD 2 << 9
+#define XF_VERTICALBAR 2 << 10
+#define XF_DRAW3D 2 << 11
+#define XF_BORDER 2 << 12
+#define XF_PARAM_1 2 << 13
+#define XF_PARAM_2 2 << 14
+#define XF_EXTRA_1 2 << 15
+#define XF_EXTRA_2 2 << 16
+#define XF_FADE 2 << 17
 
 //X-mod: known server mods
 typedef enum {
@@ -618,6 +790,7 @@ typedef struct {
 	int			teamScores[2];
 	score_t		scores[MAX_CLIENTS];
 	qboolean	showScores;
+	qboolean	scoreBoardShowing;
 	int			scoreFadeTime;
 	char		killerName[MAX_NAME_LENGTH];
 
@@ -748,6 +921,7 @@ typedef struct {
 // stored in the clientInfo_t, itemInfo_t, weaponInfo_t, and powerupInfo_t
 typedef struct {
 	qhandle_t	charsetShader;
+	qhandle_t	charsetShader32;
 	qhandle_t	charsetProp;
 	qhandle_t	charsetPropGlow;
 	qhandle_t	charsetPropB;
@@ -996,6 +1170,8 @@ typedef struct {
 	int				scores1, scores2;		// from configstrings
 	int				redflag, blueflag;		// flag status from configstrings
 
+	int				redAlive, blueAlive; //x-mod: red & blue alive counts for freezetag & CA
+
 	//
 	// locally derived information from gamestate
 	//
@@ -1022,7 +1198,9 @@ typedef struct {
 	//int				sv_maxrate;
 	char			gamename[MAX_QPATH];
 	cgxServerMod_t	serverMod;
+	qboolean		countAlive;
 	qboolean		sv_floodProtect;
+	float			screenXScale640;
 
 	//unlagged - client options
 	// this will be set to the server's g_delagHitscan
@@ -1043,6 +1221,7 @@ typedef struct {
 //X-Mod: hud constant coords storage
 typedef struct {
 	int				sbheadx;
+	int				sbheady;
 	int				sbarmorx;
 	int				sbammox;
 	int				sbflagx;
@@ -1083,6 +1262,49 @@ typedef struct {
 	int				minshadow;
 	int				lagometer_fw;
 	int				lagometer_fh;
+	
+	int				pickupTime;
+
+	qboolean		file;
+	hudType_t		type;
+	//xhud: some variables
+
+	float			screen_width; //real screen width
+	float			screen_height; //real screen height
+
+	int				ot;//old team color index
+	int				oe;//old enemy color index
+
+	qhandle_t		icon_nme;//team icon nme
+	qhandle_t		icon_own;//team icon own
+
+	float			weplist_padx;//weapon list padding x
+	float			weplist_pady;//weapon list padding y
+	float			bar_pad;//hp/armor bar padding
+
+	int				overlayMaxNum;//inuse team overlay element count
+	int				powerupsMaxNum;//inuse powerup elements count
+
+	char			fragMessage[128];
+	int				fragTime;
+	char			rankMessage[128];
+	int				rankTime;
+
+	//xhud: chat & console, based on teamchat code
+
+	char			chatMsgs[TEAMCHAT_HEIGHT][TEAMCHAT_WIDTH*3+1];
+	int				chatMsgTimes[TEAMCHAT_HEIGHT];
+	int				chatPos;
+	int				chatLastPos;
+
+	int				chatHeight;
+
+	char			conMsgs[TEAMCHAT_HEIGHT][TEAMCHAT_WIDTH*3+1];
+	int				conMsgTimes[TEAMCHAT_HEIGHT];
+	int				conPos;
+	int				conLastPos;
+
+	int				conHeight;
 } xhud_t;
 
 //==============================================================================
@@ -1127,6 +1349,7 @@ extern	vmCvar_t		cgx_killBeep;
 extern	vmCvar_t		cgx_winterEffects;
 extern	vmCvar_t		cgx_modelCache;
 extern	vmCvar_t		cgx_intermissionStats;
+extern	vmCvar_t		cgx_hud;
 
 extern	vmCvar_t		com_maxfps;
 extern	vmCvar_t		cl_maxpackets;
@@ -1300,6 +1523,25 @@ void CG_ParticleExplosionZE( vec3_t origin );
 // cgx_extensions.c
 //
 
+//float *CGX_FadeColor(int startMsec, int totalMsec, float *rgba);
+void CGX_Draw3DModel(int elNum, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles);
+void CGX_DrawPic(int elNum, qhandle_t hShader);
+void CGX_DrawHead(int elNum, int clientNum, vec_t *angles);
+void CGX_DrawString(int elNum, const char *s, float alpha);
+void CGX_DrawStringRgba(int elNum, const char *s, float *rgba);
+void CGX_DrawField(int elNum, int value, const float *rgba);
+void CGX_DrawBar(int elNum, int value, int maxValue, const float *color);
+void CGX_DrawLagometer(int elNum, float *ax, float *ay, float *aw, float *ah, qhandle_t hShader);
+void CGX_DrawFlagModel(int elNum, int team);
+void CGX_DrawFlagStatus(int elNum, int flag);
+float CGX_DrawTeamCounts(float y);
+void CGX_DrawWeaponSelect();
+void CGX_DrawHUDLayer(int layerNum);
+
+qboolean CGX_AddToChat( const char *str );
+void CGX_AddToConsole( const char *str );
+
+
 void CG_LoadClientInfo( clientInfo_t *ci );
 void CGX_SendClientCommand ( char *command );
 
@@ -1307,6 +1549,7 @@ void CGX_ResetModelCache();
 qboolean CGX_TryLoadModelFromCache(clientInfo_t *ci, qboolean tryAny, qboolean trySkinLoads);
 
 qboolean CGX_IsPure();
+//qboolean CGX_IsPure();
 qboolean CGX_CheckModInfo(const char *str);
 void CGX_CheckChat(const char *str, qboolean tchat);
 void CGX_AutoNetworkSettings(void);

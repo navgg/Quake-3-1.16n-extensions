@@ -406,6 +406,12 @@ extern void UI_Preferences2Menu( void );
 extern void Preferences2_Cache( void );
 
 //
+// ui_huds.c
+//
+extern void UI_HudsMenu( qboolean fullscreen );
+extern void Huds_Cache( void );
+
+//
 // ui_specifyserver.c
 //
 extern void UI_SpecifyServerMenu( void );

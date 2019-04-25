@@ -380,7 +380,8 @@ static void CG_ServerCommand( void ) {
 			trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
 		// X-MOD: check chat message for special commands or filter
 		CGX_CheckChat( str, qfalse );
-		CG_Printf( "%s\n", str );
+		if (!CGX_AddToChat( str ))
+			CG_Printf( "%s\n", str );
 		return;
 	}
 
@@ -391,7 +392,8 @@ static void CG_ServerCommand( void ) {
 		// x-mod: tchat check
 		CGX_CheckChat(str, qtrue);
 		CG_AddToTeamChat( str );
-		CG_Printf( "%s\n", str );
+		if (!CGX_AddToChat( str ))
+			CG_Printf( "%s\n", str );
 		return;
 	}
 

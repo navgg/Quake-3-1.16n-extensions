@@ -183,14 +183,25 @@ static void CG_Obituary( entityState_t *ent ) {
 	if ( attacker == cg.snap->ps.clientNum ) {
 		char	*s;
 
-		if ( cgs.gametype < GT_TEAM ) {
-			s = va("You fragged %s\n%s place with %i", targetName, 
-				CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
-				cg.snap->ps.persistant[PERS_SCORE] );
+		if (hud.file/*xhud[XH_FragMessage].inuse && xhud[XH_RankMessage].inuse*/) {
+			Com_sprintf(hud.fragMessage, sizeof( hud.fragMessage ) ,"You fragged ^7%s", targetName );
+			hud.fragTime = cg.time;
+			if ( cgs.gametype < GT_TEAM ) {
+				Com_sprintf(hud.rankMessage, sizeof( hud.rankMessage ) ,"%s place with %i", 
+					CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
+					cg.snap->ps.persistant[PERS_SCORE] );
+				hud.rankTime = cg.time;
+			}
 		} else {
-			s = va("You fragged %s", targetName );
+			if ( cgs.gametype < GT_TEAM ) {
+				s = va("You fragged %s\n%s place with %i", targetName, 
+					CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
+					cg.snap->ps.persistant[PERS_SCORE] );
+			} else {
+				s = va("You fragged %s", targetName );
+			}
+			CG_CenterPrint( s, SCREEN_HEIGHT * 0.25, BIGCHAR_WIDTH );
 		}
-		CG_CenterPrint( s, SCREEN_HEIGHT * 0.25, BIGCHAR_WIDTH );
 		// print the text message as well
 		// X-mod: play QL kill sound
 		if (cgx_killBeep.integer)

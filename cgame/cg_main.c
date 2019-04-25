@@ -78,6 +78,7 @@ vmCvar_t	cgx_killBeep;
 vmCvar_t	cgx_winterEffects;
 vmCvar_t	cgx_modelCache;
 vmCvar_t	cgx_intermissionStats;
+vmCvar_t	cgx_hud;
 
 vmCvar_t	com_maxfps;
 vmCvar_t	cl_maxpackets;
@@ -317,6 +318,8 @@ cvarTable_t		cvarTable[] = {
 
 	{ &cgx_winterEffects, "cg_winterEffects", "0", CVAR_TEMP },
 
+	{ &cgx_hud, "hud", "", CVAR_ARCHIVE },
+
 	//unlagged - client options
 	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},
 	{ &cg_cmdTimeNudge, "cg_delag_cmdTimeNudge", "0", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE },
@@ -382,6 +385,7 @@ int		cgx_enemyModel_enabledModificationCount = 1;
 int		cgx_fps_modificationCount = 1;
 int		cgx_sharedConfigModificationCount = 1;
 int		cgx_draw2DModificationCount = 1;
+int		cgx_hudModificationCount = 1;
 
 // some temp info
 vmCvar_t	cgx_version;
@@ -504,6 +508,7 @@ void CG_RegisterCvars( void ) {
 	cgx_fps_modificationCount = cg_drawFPS.modificationCount;
 	cgx_sharedConfigModificationCount = cgx_sharedConfig.modificationCount;
 	cgx_draw2DModificationCount = cg_draw2D.modificationCount;
+	cgx_hudModificationCount = cgx_hud.modificationCount;
 }
 
 /*
@@ -561,9 +566,11 @@ void CG_UpdateCvars( void ) {
 	// check for modications here
 	// X-MOD: reinit vScreen if value changed
 	if (cgx_wideScreenFixmodificationCount != cgx_wideScreenFix.modificationCount ||
-		cgx_draw2DModificationCount != cg_draw2D.modificationCount) {
+		cgx_draw2DModificationCount != cg_draw2D.modificationCount ||
+		cgx_hudModificationCount != cgx_hud.modificationCount) {
 		cgx_wideScreenFixmodificationCount = cgx_wideScreenFix.modificationCount;
 		cgx_draw2DModificationCount = cg_draw2D.modificationCount;
+		cgx_hudModificationCount = cgx_hud.modificationCount;
 		CGX_Init_vScreen();
 		D_Printf(("^6CG_UpdateCvars value changed\n"));
 	}
@@ -651,6 +658,8 @@ void QDECL CG_Printf( const char *msg, ... ) {
 	va_start (argptr, msg);
 	vsprintf (text, msg, argptr);
 	va_end (argptr);
+
+	CGX_AddToConsole(text);
 
 	trap_Print( text );
 }
@@ -1181,6 +1190,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence ) {
 	
 	memset( &vScreen, 0, sizeof( vScreen ) );
 	memset( &hud, 0, sizeof( hud ) );
+	memset( &xhud, 0, sizeof( xhud ));
 
 	cgs.processedSnapshotNum = serverMessageNum;
 	cgs.serverCommandSequence = serverCommandSequence;

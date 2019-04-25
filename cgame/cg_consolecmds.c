@@ -228,6 +228,15 @@ static void CGX_Followtarget_f(void) {
 		CGX_SendClientCommand(va("follow %i\n", clientNum));
 }
 
+static void CGX_Echo_f(void) {
+	char message[128];
+	char *res;
+
+	trap_Args( message, 128 );
+
+	CG_Printf("%s\n", message);
+}
+
 typedef struct {
 	char	*cmd;
 	void	(*function)(void);
@@ -266,6 +275,7 @@ static consoleCommand_t	commands[] = {
 	{ "follownext", CGX_Follownext_f },
 	{ "followprev", CGX_Followprev_f },
 	{ "followtarget", CGX_Followtarget_f },
+	{ "echox", CGX_Echo_f },
 
 #if CGX_FREEZE//freeze
 	{ "drop", CG_Drop_f },

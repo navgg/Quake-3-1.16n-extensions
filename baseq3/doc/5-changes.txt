@@ -208,8 +208,14 @@ minor optimizations
 
 extended player model select menu from 4x4 to 5x5
 
-added cg_drawCrosshairNames -1..-3 (draw target name below crosshair)
+added hud loading from file, works with CPMA & E+ huds.
+ use "hud" variable to load file or press ESC -> HUDS,
+ examples: hud "xp/hud1", hud "cpma/hud7", available files hud1...hud7
+added echox command, same as echo, prints text to console, but also
+ prints to custom console loaded with hud variable
+added cg_drawCrosshairNames -1..-3
+ draws target name below crosshair, for default huds only
 
-fixed background for sides of ingame ui on widescreens
+fixed black background for sides of ingame ui on widescreens
 
 minor optimizations

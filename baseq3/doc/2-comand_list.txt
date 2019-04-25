@@ -148,6 +148,19 @@ cg_winterEffects 0-7 - winter effects for ambiance. Additive value.
   4: breath
  -1: all.
 
+hud <file> - loads hud from specified file. Works with CPMA & E+ syntax.
+  File must be placed in "hud" folder of "baseq3".
+  Examples:
+    hud "xp/hud1"
+    hud "cpma/hud1"
+  Available files from hud1 to hud7.
+  Special values:
+    hud "" - sets default hud
+  Alternative way to load - press in game ESC -> HUDS.
+
+echox <text> - Prints text to console, same as echo command, but also
+ prints text to custom console loaded with hud command.
+
 writesharedconfig - writes q3config.cfg to baseq3 folder.
   Command do the following:
     "writeconfig ..\\baseq3\\q3config.cfg" - if playing on modded server

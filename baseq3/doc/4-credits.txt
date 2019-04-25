@@ -14,6 +14,7 @@ z-effects (c) 2001-2002 Randall "Ravenant" Piatek, Matt McChesney
 OSP - (c) 2003 Jason "Rhea" Keimig and Team
 CPMA - (c) 2000-2010 Challenge World, (c) 2016-2018 The ProMode Team
 13box - (c) 2009 sst13
+E+ HUDs - (c) 2010 Broken 
 Nemesis - (c) 2005 Cyrus and Wonkey
 Quake 3 Arena - (c) 1999-2005 Id Software
 

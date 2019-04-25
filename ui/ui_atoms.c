@@ -893,6 +893,7 @@ void UI_Cache_f( void ) {
 	UI_ModsMenu_Cache();
 
 	Preferences2_Cache();
+	Huds_Cache();
 }
 
 
@@ -956,6 +957,11 @@ qboolean UI_ConsoleCommand( void ) {
 
 	if ( Q_stricmp (cmd, "ui_cdkey") == 0 ) {
 		UI_CDKeyMenu_f();
+		return qtrue;
+	}
+
+	if ( Q_stricmp(cmd, "ui_huds") == 0 ) {
+		UI_HudsMenu(qfalse);
 		return qtrue;
 	}
 

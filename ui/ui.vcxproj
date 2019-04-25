@@ -166,6 +166,7 @@
     <ClCompile Include="ui_demo2.c" />
     <ClCompile Include="ui_display.c" />
     <ClCompile Include="ui_gameinfo.c" />
+    <ClCompile Include="ui_huds.c" />
     <ClCompile Include="ui_ingame.c" />
     <ClCompile Include="ui_loadconfig.c" />
     <ClCompile Include="ui_main.c" />
