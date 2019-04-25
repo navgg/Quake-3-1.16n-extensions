@@ -29,7 +29,7 @@ START SERVER MENU *****
 
 #define MAX_MAPROWS		2
 #define MAX_MAPCOLS		2
-#define MAX_MAPSPERPAGE	4
+#define MAX_MAPSPERPAGE	(MAX_MAPROWS * MAX_MAPCOLS)
 
 #define	MAX_SERVERSTEXT	8192
 
@@ -359,7 +359,7 @@ StartServer_MenuInit
 =================
 */
 static void StartServer_MenuInit( void ) {
-	int	i;
+	int	i, j, k;
 	int	x;
 	int	y;
 	static char mapnamebuffer[64];
@@ -404,35 +404,43 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.gametype.generic.y		= 368;
 	s_startserver.gametype.itemnames		= gametype_items;
 
-	for (i=0; i<MAX_MAPSPERPAGE; i++)
+	//for (i = 0, k = 0; k < MAX_MAPROWS; k++)
 	{
-		x =	(i % MAX_MAPCOLS) * (128+8) + 188;
-		y = (i / MAX_MAPROWS) * (128+8) + 96;
+		//y = (k) * (128 + 8) + 96;
 
-		s_startserver.mappics[i].generic.type   = MTYPE_BITMAP;
-		s_startserver.mappics[i].generic.flags  = QMF_LEFT_JUSTIFY|QMF_INACTIVE;
-		s_startserver.mappics[i].generic.x	    = x;
-		s_startserver.mappics[i].generic.y	    = y;
-		s_startserver.mappics[i].generic.id		= ID_PICTURES+i;
-		s_startserver.mappics[i].width  		= 128;
-		s_startserver.mappics[i].height  	    = 96;
-		s_startserver.mappics[i].focuspic       = GAMESERVER_SELECTED;
-		s_startserver.mappics[i].errorpic       = GAMESERVER_UNKNOWNMAP;
-		s_startserver.mappics[i].generic.ownerdraw = StartServer_LevelshotDraw;
+		//for (j = 0; j < MAX_MAPCOLS; j++, i++) {
+		//	x = (j) * (128 + 8) + (SCREEN_WIDTH - MAX_MAPCOLS * (128 + 8)) / 2;
 
-		s_startserver.mapbuttons[i].generic.type     = MTYPE_BITMAP;
-		s_startserver.mapbuttons[i].generic.flags    = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_NODEFAULTINIT;
-		s_startserver.mapbuttons[i].generic.id       = ID_PICTURES+i;
-		s_startserver.mapbuttons[i].generic.callback = StartServer_MapEvent;
-		s_startserver.mapbuttons[i].generic.x	     = x - 30;
-		s_startserver.mapbuttons[i].generic.y	     = y - 32;
-		s_startserver.mapbuttons[i].width  		     = 256;
-		s_startserver.mapbuttons[i].height  	     = 248;
-		s_startserver.mapbuttons[i].generic.left     = x;
-		s_startserver.mapbuttons[i].generic.top  	 = y;
-		s_startserver.mapbuttons[i].generic.right    = x + 128;
-		s_startserver.mapbuttons[i].generic.bottom   = y + 128;
-		s_startserver.mapbuttons[i].focuspic         = GAMESERVER_SELECT;
+		for (i=0; i<MAX_MAPSPERPAGE; i++)
+		{
+			x =	(i % MAX_MAPCOLS) * (128+8) + 188;
+			y = (i / MAX_MAPROWS) * (128+8) + 96;
+
+			s_startserver.mappics[i].generic.type = MTYPE_BITMAP;
+			s_startserver.mappics[i].generic.flags = QMF_LEFT_JUSTIFY | QMF_INACTIVE;
+			s_startserver.mappics[i].generic.x = x;
+			s_startserver.mappics[i].generic.y = y;
+			s_startserver.mappics[i].generic.id = ID_PICTURES + i;
+			s_startserver.mappics[i].width = 128;
+			s_startserver.mappics[i].height = 96;
+			s_startserver.mappics[i].focuspic = GAMESERVER_SELECTED;
+			s_startserver.mappics[i].errorpic = GAMESERVER_UNKNOWNMAP;
+			s_startserver.mappics[i].generic.ownerdraw = StartServer_LevelshotDraw;
+
+			s_startserver.mapbuttons[i].generic.type = MTYPE_BITMAP;
+			s_startserver.mapbuttons[i].generic.flags = QMF_LEFT_JUSTIFY | QMF_PULSEIFFOCUS | QMF_NODEFAULTINIT;
+			s_startserver.mapbuttons[i].generic.id = ID_PICTURES + i;
+			s_startserver.mapbuttons[i].generic.callback = StartServer_MapEvent;
+			s_startserver.mapbuttons[i].generic.x = x - 30;
+			s_startserver.mapbuttons[i].generic.y = y - 32;
+			s_startserver.mapbuttons[i].width = 256;
+			s_startserver.mapbuttons[i].height = 248;
+			s_startserver.mapbuttons[i].generic.left = x;
+			s_startserver.mapbuttons[i].generic.top = y;
+			s_startserver.mapbuttons[i].generic.right = x + 128;
+			s_startserver.mapbuttons[i].generic.bottom = y + 128;
+			s_startserver.mapbuttons[i].focuspic = GAMESERVER_SELECT;
+		}
 	}
 
 	s_startserver.arrows.generic.type  = MTYPE_BITMAP;
