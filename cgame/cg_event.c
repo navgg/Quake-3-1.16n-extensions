@@ -63,8 +63,8 @@ static void CG_Obituary( entityState_t *ent ) {
 	char		*message2;
 	const char	*targetInfo;
 	const char	*attackerInfo;
-	char		targetName[32];
-	char		attackerName[32];
+	char		targetName[64];
+	char		attackerName[64];
 	gender_t	gender;
 	clientInfo_t	*ci;
 
