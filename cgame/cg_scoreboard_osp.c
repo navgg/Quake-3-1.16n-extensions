@@ -513,8 +513,7 @@ qboolean CG_DrawOSPScoreboard( void ) {
 	} else if ( cgs.gametype == GT_TOURNAMENT ) {
 		CG_DrawOSPTourneyScoreboard();
 	} else {
-		//CG_DrawOSPFFAScoreboard();
-		CG_DrawNormalScoreboard();
+		CG_DrawOSPFFAScoreboard();
 	}
 
 	// load any models that have been deferred
