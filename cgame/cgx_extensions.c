@@ -3322,6 +3322,9 @@ void CGX_DrawFlagStatus(int elNum, int flag) {
 		flagShader = (qhandle_t*)&cgs.media.blueFlagShader;
 	}
 
+	if (flagStatus < 0 || flagStatus > 2)
+		return;
+
 	//pm flag, cpma style, looks weird
 #if 0
 	if (e->color[3]) {
