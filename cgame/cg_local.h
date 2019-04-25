@@ -1004,13 +1004,6 @@ typedef struct {
 	// z-effects
 	qhandle_t	blueSpark;
 
-	// Nemesis -  New media 
-	//qhandle_t	teamIconRed;
-	//qhandle_t	teamIconBlue;
-	qhandle_t	scoreBarRed;
-	qhandle_t	scoreBarBlue;
-	// End
-
 	// powerup shaders
 	qhandle_t	quadShader;
 	qhandle_t	redQuadShader;
@@ -1548,7 +1541,6 @@ void CGX_SendClientCommand ( char *command );
 void CGX_ResetModelCache();
 qboolean CGX_TryLoadModelFromCache(clientInfo_t *ci, qboolean tryAny, qboolean trySkinLoads);
 
-qboolean CGX_IsPure();
 //qboolean CGX_IsPure();
 qboolean CGX_CheckModInfo(const char *str);
 void CGX_CheckChat(const char *str, qboolean tchat);

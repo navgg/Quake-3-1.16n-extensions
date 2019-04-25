@@ -199,7 +199,9 @@ static const char *scoreboar_items[] = {
 	"default",
 	"always small",
 	"vanilla Q3",
-	"nemesis/osp",
+	"compact/osp-nms",
+	0
+};
 
 const char *basichud_items[] = {
 	"q3/large",

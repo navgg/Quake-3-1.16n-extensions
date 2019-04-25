@@ -3,12 +3,12 @@
 #include "cg_local.h"
 
 // screen is 640 x 480
-#define OSP_SB_TOP				50			// vertical distance to start of scoreboard
-#define OSP_SB_HEADER			100			// vertical distance to start of player lines (header end)
+#define OSP_SB_TOP				64			// vertical distance to start of scoreboard
+#define OSP_SB_HEADER			108			// vertical distance to start of player lines (header end)
 
 #define OSP_SB_RED_XMIN			10			// LHS limit for red team area
-#define OSP_SB_RED_XMAX			310			// RHS limit for red team area
-#define OSP_SB_BLUE_XMIN		330			// LHS limit for blue team area
+#define OSP_SB_RED_XMAX			315			// RHS limit for red team area
+#define OSP_SB_BLUE_XMIN		325			// LHS limit for blue team area
 #define OSP_SB_BLUE_XMAX		630			// RHS limit for blue team area
 #define OSP_SB_FREE_XMIN		170			// LHS limit for free team area
 #define OSP_SB_FREE_XMAX		470			// RHS limit for free team area
@@ -22,12 +22,12 @@
 #define OSP_SB_TCHAR_WIDTH		8			// width of characters used for team info 
 #define OSP_SB_TCHAR_HEIGHT		12			// height of characters used for team info 
 
-#define OSP_SB_FLAG_OFFSET		5			// distance into player line to draw flag
-#define OSP_SB_MODEL_OFFSET		10			// distance into player line to draw head model
+#define OSP_SB_FLAG_OFFSET		0			// distance into player line to draw flag
+#define OSP_SB_MODEL_OFFSET		12			// distance into player line to draw head model
 #define OSP_SB_SCORE_OFFSET		45			// distance into player line to draw score
 #define OSP_SB_PING_OFFSET		80			// distance into player line to draw ping
-#define OSP_SB_TIME_OFFSET		115			// distance into player line to draw time
-#define OSP_SB_NAME_OFFSET		150			// distance into player line to draw name
+#define OSP_SB_TIME_OFFSET		117			// distance into player line to draw time
+#define OSP_SB_NAME_OFFSET		155			// distance into player line to draw name
 
 #define OSP_SB_CHAR_WIDTH		10			// width of characters used for player 
 #define OSP_SB_CHAR_HEIGHT		12			// height of characters used for player 
@@ -74,79 +74,7 @@ void CG_DrawTeamBackground2( int x, int y, int w, int h, float alpha, int team )
 	CG_FillRect( x, y, w, h, hcolor );
 }
 
-/*
-==============
-CG_DrawField2
-Draws large numbers for status bar and powerups
-==============
-*/
-// Nemesis - Made more precise & modified for adjustability, can change indentation, change char sizes.
-
-// Left indentation -
-// qtrue  = add to the left
-// qfalse = add to the right
-
-int CG_DrawField2( int x, int y, int width, int chrWidth, int chrHeight, int value, qboolean leftIndent ) {
-	char	num[16], *ptr;
-	int		l;
-	int		frame;
-	int		startx;
-
-	if (width < 1) {
-		return 0;
-	}
-
-	// draw number string
-	if (width > 5) {
-		width = 5;
-	}
-
-	switch (width) {
-	case 1:
-		value = value > 9 ? 9 : value;
-		value = value < 0 ? 0 : value;
-		break;
-	case 2:
-		value = value > 99 ? 99 : value;
-		value = value < -9 ? -9 : value;
-		break;
-	case 3:
-		value = value > 999 ? 999 : value;
-		value = value < -99 ? -99 : value;
-		break;
-	case 4:
-		value = value > 9999 ? 9999 : value;
-		value = value < -999 ? -999 : value;
-		break;
-	}
-
-	Com_sprintf( num, sizeof( num ), "%i", value );
-	l = strlen( num );
-	if (l > width)
-		l = width;
-
-	if (!leftIndent) {
-		x -= 2 + chrWidth;
-	}
-
-	startx = x;
-
-	ptr = num;
-	while (*ptr && l) {
-		if (*ptr == '-')
-			frame = STAT_MINUS;
-		else
-			frame = *ptr - '0';
-
-		CG_DrawPic( x, y, chrWidth, chrHeight, cgs.media.numberShaders[frame] );
-
-		x += chrWidth;
-		ptr++;
-		l--;
-	}
-
-	return startx;
-}
+extern void CG_DrawFieldEx(int x, int y, int width, int value, float *rgba, int charWidth, int charHeight);
 
 /*
 =============
@@ -155,10 +83,11 @@ Draws labels for score, ping, time and name
 =============
 */
 void CG_DrawLabels( int x, float *color ) {
-	CG_DrawStringExt( x + 35, OSP_SB_HEADER - 10, "Score", color, qtrue, qtrue, 8, 10, 0 );
-	CG_DrawStringExt( x + 80, OSP_SB_HEADER - 10, "Ping", color, qtrue, qtrue, 8, 10, 0 );
-	CG_DrawStringExt( x + 120, OSP_SB_HEADER - 10, "Min", color, qtrue, qtrue, 8, 10, 0 );
-	CG_DrawStringExt( x + 150, OSP_SB_HEADER - 10, "Name", color, qtrue, qtrue, 8, 10, 0 );
+#define OSP_SB_LABEL_HEIGHT 14
+	CG_DrawStringExt( x + 35, OSP_SB_HEADER + 2 - OSP_SB_LABEL_HEIGHT, "Score", color, qtrue, qtrue, 8, 10, 0 );
+	CG_DrawStringExt( x + OSP_SB_PING_OFFSET, OSP_SB_HEADER + 2 - OSP_SB_LABEL_HEIGHT, "Ping", color, qtrue, qtrue, 8, 10, 0 );
+	CG_DrawStringExt( x + OSP_SB_TIME_OFFSET, OSP_SB_HEADER + 2 - OSP_SB_LABEL_HEIGHT, "Time", color, qtrue, qtrue, 8, 10, 0 );
+	CG_DrawStringExt( x + OSP_SB_NAME_OFFSET, OSP_SB_HEADER + 2 - OSP_SB_LABEL_HEIGHT, "Name", color, qtrue, qtrue, 8, 10, 0 );
 }
 
 
@@ -181,21 +110,14 @@ void CG_DrawOSPClientScore( int x, int y, clientInfo_t *ci, score_t *score ) {
 		return;
 	}
 
-	// flag or bot skill
-	if ( ci->powerups & ( 1 << PW_REDFLAG ) && ci->team == TEAM_RED ) {
-		CG_DrawFlagModel( x + OSP_SB_FLAG_OFFSET, y, 
-						  OSP_SB_CHAR_HEIGHT, OSP_SB_CHAR_HEIGHT, TEAM_RED );
-
-	} else if ( ci->powerups & ( 1 << PW_BLUEFLAG ) && ci->team == TEAM_BLUE ) {
-		CG_DrawFlagModel( x + OSP_SB_FLAG_OFFSET, y, 
-						  OSP_SB_CHAR_HEIGHT, OSP_SB_CHAR_HEIGHT, TEAM_BLUE );
-
-/*	} else if ( ci->botSkill > 0 && ci->botSkill <= 5 && cg_drawIcons.integer ) {
-		CG_DrawPic( x + OSP_SB_FLAG_OFFSET, y, 
-					OSP_SB_CHAR_HEIGHT, OSP_SB_CHAR_HEIGHT, cgs.media.botSkillShaders[ ci->botSkill - 1 ] );*/
+	//x-mod: highlight player
+	if (score->client == cg.snap->ps.clientNum && cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR) {
+		float	hcolor[4] = { 0.7, 0.7, 0.7, 0.25 };
+		CG_FillRect( x, y - 4, 
+			OSP_SB_RED_XMAX - OSP_SB_RED_XMIN, OSP_SB_LINE_HEIGHT, hcolor );
 	}
 
-	// 2nd flag (rtf) or headmodel
+	// flag or bot skill
 	if ( ci->powerups & ( 1 << PW_REDFLAG ) && ci->team == TEAM_BLUE ) {
 		CG_DrawFlagModel( x + OSP_SB_FLAG_OFFSET, y, 
 						  OSP_SB_CHAR_HEIGHT, OSP_SB_CHAR_HEIGHT, TEAM_RED );
@@ -204,6 +126,19 @@ void CG_DrawOSPClientScore( int x, int y, clientInfo_t *ci, score_t *score ) {
 		CG_DrawFlagModel( x + OSP_SB_FLAG_OFFSET, y, 
 						  OSP_SB_CHAR_HEIGHT, OSP_SB_CHAR_HEIGHT, TEAM_BLUE );
 
+	} else if ( ci->botSkill > 0 && ci->botSkill <= 5 && cg_drawIcons.integer ) {
+		CG_DrawPic( x + OSP_SB_FLAG_OFFSET, y, 
+					OSP_SB_CHAR_HEIGHT, OSP_SB_CHAR_HEIGHT, cgs.media.botSkillShaders[ ci->botSkill - 1 ] );
+	}
+
+	// 2nd flag (rtf) or headmodel
+	if ( ci->powerups & ( 1 << PW_REDFLAG ) && ci->team == TEAM_RED ) {
+		CG_DrawFlagModel( x + OSP_SB_MODEL_OFFSET, y, 
+						  OSP_SB_CHAR_HEIGHT, OSP_SB_CHAR_HEIGHT, TEAM_RED );
+
+	} else if ( ci->powerups & ( 1 << PW_BLUEFLAG ) && ci->team == TEAM_BLUE ) {
+		CG_DrawFlagModel( x + OSP_SB_MODEL_OFFSET, y, 
+						  OSP_SB_CHAR_HEIGHT, OSP_SB_CHAR_HEIGHT, TEAM_BLUE );
 	} else {
 		vec3_t headAngles;
 		VectorClear( headAngles );
@@ -226,20 +161,27 @@ void CG_DrawOSPClientScore( int x, int y, clientInfo_t *ci, score_t *score ) {
 						  OSP_SB_CHAR_WIDTH, OSP_SB_CHAR_HEIGHT, 0 );
 
 	} else {
-		Com_sprintf( string, sizeof(string), "%i", score->score );
-		CG_DrawStringExt( x + OSP_SB_SCORE_OFFSET - 10, y, string, colorYellow, 
+		Com_sprintf( string, sizeof(string), "%4i", score->score );
+		CG_DrawStringExt( x + OSP_SB_SCORE_OFFSET - 9, y, string, colorYellow, 
 					      qfalse, qtrue,
 						  OSP_SB_CHAR_WIDTH, OSP_SB_CHAR_HEIGHT, 0 );
 
-		Com_sprintf( string, sizeof(string), "%i", score->ping );
-		CG_DrawStringExt( x + OSP_SB_PING_OFFSET, y, string, color, 
+		Com_sprintf( string, sizeof(string), "%3i", score->ping );
+		CG_DrawStringExt( x + OSP_SB_PING_OFFSET + 3, y, string, color, 
 					      qfalse, qtrue,
 						  OSP_SB_CHAR_WIDTH, OSP_SB_CHAR_HEIGHT, 0 );
 
-		Com_sprintf( string, sizeof(string), "%i", score->time );
-		CG_DrawStringExt( x + OSP_SB_TIME_OFFSET + 5, y, string, color, 
+		Com_sprintf( string, sizeof(string), "%3i", score->time );
+		CG_DrawStringExt( x + OSP_SB_TIME_OFFSET + 3, y, string, color, 
 					      qfalse, qtrue,
 						  OSP_SB_CHAR_WIDTH, OSP_SB_CHAR_HEIGHT, 0 );
+
+		//Com_sprintf( string, sizeof(string),
+		//	"%3i ^7%3i ^7%3i", score->score, score->ping, score->time);
+
+		//CG_DrawStringExt( x + OSP_SB_SCORE_OFFSET, y, string, colorYellow, 
+		//			qfalse, qtrue,
+		//			OSP_SB_CHAR_WIDTH, OSP_SB_CHAR_HEIGHT, 0 );
 	}
 
 	// name
@@ -255,19 +197,20 @@ void CG_DrawOSPClientScore( int x, int y, clientInfo_t *ci, score_t *score ) {
 					  OSP_SB_CHAR_WIDTH, OSP_SB_CHAR_HEIGHT, OSP_SB_NAME_MAX_CHARS );
 	}
 
-
 	// highlight players in the ready state
 	if ( cg.snap->ps.stats[ STAT_CLIENTS_READY ] & ( 1 << score->client ) ) {
 		// Lets change "READY" to "FROZEN" for freeze mode
 #if CGX_FREEZE
-		if ( Q_Isfreeze(score->client) ) {
-			CG_DrawStringExt( x, y + 2, "FROZE", colorYellow, 
-						  qfalse, qfalse, 
-						  OSP_SB_CHAR_WIDTH - 4, OSP_SB_CHAR_HEIGHT - 4, 0 );
-		} else
+		//if ( Q_Isfreeze(score->client) ) {
+		//	CG_DrawStringExt( x, y + 2, "FROZE", colorYellow, 
+		//				  qfalse, qfalse, 
+		//				  OSP_SB_CHAR_WIDTH - 4, OSP_SB_CHAR_HEIGHT - 4, 0 );
+		//} else
+		//x-mod: let's use deferred icon
+		if ( !Q_Isfreeze( score->client ) )
 #endif
 		{
-			CG_DrawStringExt( x + OSP_SB_FLAG_OFFSET, y + 2, "READY", colorYellow, 
+			CG_DrawStringExt( x, y + 2, "READY", colorYellow, 
 						  qfalse, qfalse, 
 						  OSP_SB_CHAR_WIDTH - 4, OSP_SB_CHAR_HEIGHT - 4, 0 );
 		}
@@ -319,46 +262,35 @@ void CG_DrawOSPTeamScoreboard( void ) {
 	}
 
 	// red header
-	CG_DrawPic( ox + 86, OSP_SB_TOP - 14, 225, 15, cgs.media.scoreBarRed );
+	//CG_DrawPic( ox + 86, OSP_SB_TOP - 14, 225, 15, cgs.media.scoreBarRed );
 
 	CG_DrawTeamBackground2( ox + OSP_SB_RED_XMIN, OSP_SB_TOP,
 						   OSP_SB_RED_XMAX - OSP_SB_RED_XMIN,
 						   OSP_SB_HEADER - OSP_SB_TOP,
-						   0.25f,
+						   0.2f,
 						   TEAM_RED );
 
-	//if( cg_useTeamIcons.integer ) {
-		//CG_DrawPic( ox + OSP_SB_RED_XMAX - 50, OSP_SB_TOP, 50, 50, cgs.media.teamIconRed);
-	//}
-
 	// red players
-	CG_DrawTeamBackground2( ox + OSP_SB_RED_XMIN, OSP_SB_HEADER,
+	CG_DrawTeamBackground2( ox + OSP_SB_RED_XMIN, OSP_SB_HEADER - OSP_SB_LABEL_HEIGHT,
 						   OSP_SB_RED_XMAX - OSP_SB_RED_XMIN,
-						   redTotal * OSP_SB_LINE_HEIGHT,
+						   redTotal * OSP_SB_LINE_HEIGHT + OSP_SB_LABEL_HEIGHT,
 						   0.15f,
 						   TEAM_RED );
 
 	CG_DrawLabels( ox + OSP_SB_RED_XMIN, colorRed );
 
-
-	// blue header
-	CG_DrawPic( ox + 406, OSP_SB_TOP - 14, 225, 15, cgs.media.scoreBarBlue );
-
 	CG_DrawTeamBackground2( ox + OSP_SB_BLUE_XMIN, OSP_SB_TOP,
 						   OSP_SB_BLUE_XMAX - OSP_SB_BLUE_XMIN,
 						   OSP_SB_HEADER - OSP_SB_TOP,
-						   0.25f,
+						   0.2f,
 						   TEAM_BLUE );
 
-	//if( cg_useTeamIcons.integer ) {
-		//CG_DrawPic( ox + OSP_SB_BLUE_XMAX - 50, OSP_SB_TOP, 50, 50, cgs.media.teamIconBlue);
-	//}
 	CG_DrawLabels( ox + OSP_SB_BLUE_XMIN, colorBlue );
 
 	// blue players
-	CG_DrawTeamBackground2( ox + OSP_SB_BLUE_XMIN, OSP_SB_HEADER,
+	CG_DrawTeamBackground2( ox + OSP_SB_BLUE_XMIN, OSP_SB_HEADER - OSP_SB_LABEL_HEIGHT,
 						   OSP_SB_BLUE_XMAX - OSP_SB_BLUE_XMIN,
-						   blueTotal * OSP_SB_LINE_HEIGHT,
+						   blueTotal * OSP_SB_LINE_HEIGHT + OSP_SB_LABEL_HEIGHT,
 						   0.15f,
 						   TEAM_BLUE );
 	
@@ -367,7 +299,7 @@ void CG_DrawOSPTeamScoreboard( void ) {
 	if ( specTotal > 0 ) {
 		specTotal++;
 		// added spectator string since its in OSP
-		CG_DrawStringExt( ox + OSP_SB_SPEC_XMIN + 256, OSP_SB_HEADER + ( highTotal * OSP_SB_LINE_HEIGHT ) + 8,
+		CG_DrawStringExt( ox + OSP_SB_SPEC_XMIN + 256, OSP_SB_HEADER + ( highTotal * OSP_SB_LINE_HEIGHT ) + 8 - 2,
 			"Spectator", colorYellow, qtrue, qtrue, 12, 12, 0 );
 
 		CG_DrawTeamBackground2( ox + OSP_SB_SPEC_XMIN, OSP_SB_HEADER + ( highTotal * OSP_SB_LINE_HEIGHT ) + 20,
@@ -377,58 +309,35 @@ void CG_DrawOSPTeamScoreboard( void ) {
 							   TEAM_SPECTATOR );
 	}
 
-
+#define OSB_HEADER_PADX 3
 	// team score
-	CG_DrawField2( ox + OSP_SB_RED_XMIN + 40, OSP_SB_TOP + 2, 3, 30, 36, cg.teamScores[ 0 ], qfalse );
-	CG_DrawField2( ox + OSP_SB_BLUE_XMIN + 40, OSP_SB_TOP + 2, 3, 30, 36, cg.teamScores[ 1 ], qfalse );
+	CG_DrawFieldEx( ox + OSP_SB_RED_XMAX - 20 * 5 - OSB_HEADER_PADX, OSP_SB_TOP + 2, 5, cg.teamScores[ 0 ], colorWhite, 20, 26 );
+	CG_DrawFieldEx( ox + OSP_SB_BLUE_XMIN + OSB_HEADER_PADX, OSP_SB_TOP + 2, -5, cg.teamScores[ 1 ], colorWhite, 20, 26 );
 
 	// work out appropiate size of labels
-	tmp = CG_DrawStrlen( "Av. Ping" ) * OSP_SB_TCHAR_WIDTH + 10;  // "Av. Ping" is longest string
-
+#define OSP_SB_COUNT_OFFS 2
 	// player count
-	CG_DrawStringExt( ox + OSP_SB_RED_XMIN + OSP_SB_TSTAT_OFFSET - tmp,
-					  OSP_SB_TOP - 10,// + OSP_SB_TSTAT_INSET,
-					  "PLAYERS", colorWhite, 
-					  qtrue, qtrue, OSP_SB_TCHAR_WIDTH, OSP_SB_TCHAR_WIDTH, 0 );
-	string = va( "%i", redTotal );
-	CG_DrawStringExt( ox + OSP_SB_TSTAT_OFFSET,
-					  OSP_SB_TOP - 10,// + OSP_SB_TSTAT_INSET,
-					  string, colorWhite, 
-					  qtrue, qtrue, OSP_SB_TCHAR_WIDTH, OSP_SB_TCHAR_WIDTH, 0 );
+	y = OSP_SB_TOP + OSP_SB_COUNT_OFFS - 1;// + OSP_SB_TSTAT_INSET,
+	x = OSP_SB_RED_XMIN + ox + OSB_HEADER_PADX;
+	string = va("Players %3i", redTotal);
+	CG_DrawStringExt( x, y, string, colorWhite, 
+					  qtrue, qtrue, OSP_SB_CHAR_WIDTH, OSP_SB_CHAR_HEIGHT, 0 );
 
-	CG_DrawStringExt( ox + OSP_SB_BLUE_XMIN + OSP_SB_TSTAT_OFFSET - tmp,
-					  OSP_SB_TOP - 10, // + OSP_SB_TSTAT_INSET,
-					  "PLAYERS", colorWhite, 
-					  qtrue, qtrue, OSP_SB_TCHAR_WIDTH, OSP_SB_TCHAR_WIDTH, 0 );
-	string = va( "%i", blueTotal );
-	CG_DrawStringExt( ox + OSP_SB_BLUE_XMIN + OSP_SB_TSTAT_OFFSET - 10, OSP_SB_TOP - 10,// + OSP_SB_TSTAT_INSET,
-					  string, colorWhite, 
-					  qtrue, qtrue, OSP_SB_TCHAR_WIDTH, OSP_SB_TCHAR_WIDTH, 0 );
+	y += OSP_SB_CHAR_HEIGHT + 2;
+	string = va("Av.Ping %3i", redTotal ? redPingTotal / redTotal : 0);
+	CG_DrawStringExt( x, y, string, colorWhite, 
+					  qtrue, qtrue, OSP_SB_CHAR_WIDTH, OSP_SB_CHAR_HEIGHT, 0 );
 
-	// average pings
-	CG_DrawStringExt( ox + OSP_SB_RED_XMIN + OSP_SB_TSTAT_OFFSET + 100 - tmp,
-					  OSP_SB_TOP - 10, 
-					  "AV.PING", colorWhite, 
-					  qtrue, qtrue, OSP_SB_TCHAR_WIDTH, OSP_SB_TCHAR_WIDTH, 0 );
-	if ( redTotal > 0 ) {
-		string = va( "%i", (int)( redPingTotal / redTotal) );
-		CG_DrawStringExt( ox + OSP_SB_TSTAT_OFFSET + 100,
-						  OSP_SB_TOP - 10,
-						  string, colorWhite, 
-						  qtrue, qtrue, OSP_SB_TCHAR_WIDTH, OSP_SB_TCHAR_WIDTH, 0 );
-	}
+	y = OSP_SB_TOP + OSP_SB_COUNT_OFFS - 1;// + OSP_SB_TSTAT_INSET,
+	x = OSP_SB_BLUE_XMAX + ox - OSB_HEADER_PADX - CG_DrawStrlen( "Players %3i" ) * OSP_SB_CHAR_WIDTH;
+	string = va("Players %3i", blueTotal);
+	CG_DrawStringExt( x, y, string, colorWhite, 
+					  qtrue, qtrue, OSP_SB_CHAR_WIDTH, OSP_SB_CHAR_HEIGHT, 0 );
 
-	CG_DrawStringExt( ox + OSP_SB_BLUE_XMIN + OSP_SB_TSTAT_OFFSET + 100 - tmp,
-					  OSP_SB_TOP - 10,
-					  "AV.PING", colorWhite, 
-					  qtrue, qtrue, OSP_SB_TCHAR_WIDTH, OSP_SB_TCHAR_WIDTH, 0 );
-	if ( blueTotal > 0 ) {
-		string = va( "%i", (int)(bluePingTotal / blueTotal ) );
-		CG_DrawStringExt( ox + OSP_SB_BLUE_XMIN + OSP_SB_TSTAT_OFFSET + 90,
-						  OSP_SB_TOP - 10,
-						  string, colorWhite, 
-						  qtrue, qtrue, OSP_SB_TCHAR_WIDTH, OSP_SB_TCHAR_WIDTH, 0 );
-	}
+	y += OSP_SB_CHAR_HEIGHT + 2;
+	string = va("Av.Ping %3i", blueTotal ? bluePingTotal / blueTotal : 0);
+	CG_DrawStringExt( x, y, string, colorWhite, 
+					  qtrue, qtrue, OSP_SB_CHAR_WIDTH, OSP_SB_CHAR_HEIGHT, 0 );
 
 	// player scores
 	redCount = 0;
@@ -592,8 +501,8 @@ qboolean CG_DrawOSPScoreboard( void ) {
 		s = va("Fragged by %s", cg.killerName );
 		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 		x = ( vScreen.width - w ) / 2;
-		y = 40;
-		CG_DrawBigString( x, 40, s, fade );
+		y = OSP_SB_TOP - BIGCHAR_HEIGHT - 4;
+		CG_DrawBigString( x, y, s, fade );
 	}
 
 	// draw gfx icons
@@ -635,52 +544,58 @@ void CG_DrawOSPTourneyPlayerScore(clientInfo_t *ci, score_t *score, qboolean isL
 	int ox = vScreen.offsetx;
 
 	// head - size and movement speed is based on difference in scores
-	if (oppScore == NULL) {
-		headSize = 32;
-		loopSpeed = 16;
-	} else {
-		int scoreDiff = score->score - oppScore->score;
-		if (scoreDiff >= 4) {
-			headSize = 48;
-			loopSpeed = 8;
-		} else if (scoreDiff >= 2) {
-			headSize = 40;
-			loopSpeed = 12;
-		} else if (scoreDiff >= -1) {
-			headSize = 32;
-			loopSpeed = 16;
-		} else if (scoreDiff >= -3) {
-			headSize = 24;
-			loopSpeed = 20;
-		} else {
-			headSize = 16;
-			loopSpeed = 24;
-		}
-	}
+	//if (oppScore == NULL) {
+	//	headSize = 32;
+	//	loopSpeed = 16;
+	//} else {
+	//	int scoreDiff = score->score - oppScore->score;
+	//	if (scoreDiff >= 4) {
+	//		headSize = 48;
+	//		loopSpeed = 8;
+	//	} else if (scoreDiff >= 2) {
+	//		headSize = 40;
+	//		loopSpeed = 12;
+	//	} else if (scoreDiff >= -1) {
+	//		headSize = 32;
+	//		loopSpeed = 16;
+	//	} else if (scoreDiff >= -3) {
+	//		headSize = 24;
+	//		loopSpeed = 20;
+	//	} else {
+	//		headSize = 16;
+	//		loopSpeed = 24;
+	//	}
+	//}
+	//x-mod: static
+	headSize = 36;
+	loopSpeed = 16;
 
 	if (isLeft) {
 		x = OSP_SB_RED_XMIN + 26 - (headSize/2);
-		y = OSP_SB_TOP + (48 - headSize)/2;
+		y = OSP_SB_TOP + (OSP_SB_HEADER - OSP_SB_TOP - headSize)/2;
 	} else {
 		x = OSP_SB_BLUE_XMAX - 26 - (headSize/2);
-		y = OSP_SB_TOP + (48 - headSize)/2;
+		y = OSP_SB_TOP + (OSP_SB_HEADER - OSP_SB_TOP - headSize)/2;
 	}
 	VectorClear( headAngles );
 
-	split = 10;
-	frames = (loopSpeed * 1000) / split;
-	midPoint = (int)(frames / 2);
+	//split = 10;
+	//frames = (loopSpeed * 1000) / split;
+	//midPoint = (int)(frames / 2);
 
-	tmp = (int)(cg.time / split);  // how many time intervals
-	tmp = (tmp % frames) + 1;  // which frame we are in (1 to frames)
+	//tmp = (int)(cg.time / split);  // how many time intervals
+	//tmp = (tmp % frames) + 1;  // which frame we are in (1 to frames)
 
-	if (tmp > midPoint) {
-		// moving right to left
-		headAngles[YAW] = 270 - (int)(180.0f/midPoint * (tmp-midPoint));
-	} else {
-		// moving left to right
-		headAngles[YAW] = 90 + (int)(180.0f/midPoint * tmp);
-	}
+	//if (tmp > midPoint) {
+	//	// moving right to left
+	//	headAngles[YAW] = 270 - (int)(180.0f/midPoint * (tmp-midPoint));
+	//} else {
+	//	// moving left to right
+	//	headAngles[YAW] = 90 + (int)(180.0f/midPoint * tmp);
+	//}
+
+	//x-mod: static
+	headAngles[YAW] = 180;
 
 	CG_DrawHead(ox + x, y, headSize, headSize, score->client, headAngles);
 
@@ -688,18 +603,21 @@ void CG_DrawOSPTourneyPlayerScore(clientInfo_t *ci, score_t *score, qboolean isL
 		CG_DrawStringExt(ox + x, y + (int)(headSize/2) - 4, "READY", colorYellow, qfalse, qfalse, 8, 8, 0);
 	}
 
+	Q_strncpyz(nameString, ci->name, sizeof(nameString));
+
 	// name
 	if (isLeft) {
 		x = OSP_SB_RED_XMIN + 50 + 2;
-		y = OSP_SB_TOP + 2;
-		Q_strncpyz(nameString, ci->name, sizeof(nameString));
+		y = OSP_SB_TOP + 4;
 	} else {
 		// FIXME: we should right align this name, but it is a pain working out the printable
 		// characters as ^ mess up %17s alignment.
-
-		x = OSP_SB_BLUE_XMIN + 2 + 60 + 2;
-		y = OSP_SB_TOP + 2;
-		Q_strncpyz(nameString, ci->name, sizeof(nameString));
+		// x-mod: fixed.
+		int w = CG_DrawStrlen(nameString);
+		if (w > 18)
+			w = 18;
+		x = OSP_SB_BLUE_XMIN + 60 + (18 - w) * 10;
+		y = OSP_SB_TOP + 4;
 	}
 	CG_DrawStringExt(ox + x, y, nameString, colorWhite, qfalse, qtrue, 10, 12, 18);
 
@@ -716,16 +634,13 @@ void CG_DrawOSPTourneyPlayerScore(clientInfo_t *ci, score_t *score, qboolean isL
 		va("^2%3i    ^1%3i   ^7%3i   %3i", ci->wins, ci->losses, score->ping, score->time),
 		colorWhite, qfalse, qtrue, 8, 8, 50 );
 
+	y = OSP_SB_TOP + 2 + 2;
+
 	// score
 	if (isLeft) {
-		// if double figures or negative, adjust left
-		if ((int)(score->score / 10) || score->score < 0) {
-			CG_DrawField2(ox + OSP_SB_RED_XMAX - 2 - 30, OSP_SB_TOP + 2 + 5, 3, 30, 36, score->score, qfalse);
-		} else {
-			CG_DrawField2(ox + OSP_SB_RED_XMAX - 2, OSP_SB_TOP + 2 + 5, 3, 30, 36, score->score, qfalse);
-		}
+		CG_DrawFieldEx(ox + OSP_SB_RED_XMAX - 4 - 30 * 3, y, 3, score->score, colorWhite, 30, 36);
 	} else {
-		CG_DrawField2(ox + OSP_SB_BLUE_XMIN + 2 + 30 + 2, OSP_SB_TOP + 2 + 5, 3, 30, 36, score->score, qfalse);
+		CG_DrawFieldEx(ox + OSP_SB_BLUE_XMIN + 4, y, -3, score->score, colorWhite, 30, 36);
 	}
 }
 
@@ -763,12 +678,13 @@ void CG_DrawOSPTourneyScoreboard( void ) {
 	int specTotal, specCount;
 	score_t *score, *s1, *s2;
 	clientInfo_t *ci;
-	vec4_t hcolor;
+	vec4_t hcolor, hcolor2;
 	int ox = vScreen.offsetx;
 
 	s1 = NULL;
 	s2 = NULL;
 	specTotal = 0;
+
 	for (i = 0 ; i < cg.numScores ; i++) {
 		score = &cg.scores[i];
 		ci = &cgs.clientinfo[score->client];
@@ -786,10 +702,13 @@ void CG_DrawOSPTourneyScoreboard( void ) {
 	}
 
 	// yellow backing
-	hcolor[0] = 0.75f;
-	hcolor[1] = 0.75f;
-	hcolor[2] = 0.75f;
+	hcolor[0] = 0.45f;
+	hcolor[1] = 0.45f;
+	hcolor[2] = 0.45f;
 	hcolor[3] = 0.2f;
+	
+	VectorCopy(colorBlack, hcolor2);
+	hcolor2[3] = 0.7f;
 
 	if (s1) {
 		// player one layout
@@ -800,14 +719,13 @@ void CG_DrawOSPTourneyScoreboard( void ) {
 			OSP_SB_RED_XMAX - OSP_SB_RED_XMIN, 
 			OSP_SB_HEADER - OSP_SB_TOP, 
 			hcolor);
-		hcolor[3] = 0.4f;
 		CG_DrawBorder(
 			ox + OSP_SB_RED_XMIN,
 			OSP_SB_TOP, 
 			OSP_SB_RED_XMAX - OSP_SB_RED_XMIN, 
 			OSP_SB_HEADER - OSP_SB_TOP,
 			1,
-			hcolor);
+			hcolor2);
 
 		ci = &cgs.clientinfo[s1->client];
 		CG_DrawOSPTourneyPlayerScore(ci, s1, qtrue, s2);
@@ -815,21 +733,19 @@ void CG_DrawOSPTourneyScoreboard( void ) {
 
 	if (s2) {
 		// player two layout
-		hcolor[3] = 0.2f;
 		CG_FillRect(
 			ox + OSP_SB_BLUE_XMIN,
 			OSP_SB_TOP, 
 			OSP_SB_BLUE_XMAX - OSP_SB_BLUE_XMIN,
 			OSP_SB_HEADER - OSP_SB_TOP,
 			hcolor);
-		hcolor[3] = 0.4f;
 		CG_DrawBorder(
 			ox + OSP_SB_BLUE_XMIN,
 			OSP_SB_TOP, 
 			OSP_SB_BLUE_XMAX - OSP_SB_BLUE_XMIN,
 			OSP_SB_HEADER - OSP_SB_TOP,
 			1,
-			hcolor);
+			hcolor2);
 
 		ci = &cgs.clientinfo[s2->client];
 		CG_DrawOSPTourneyPlayerScore(ci, s2, qfalse, s1);
@@ -839,7 +755,7 @@ void CG_DrawOSPTourneyScoreboard( void ) {
 	if ( specTotal > 0 ) {
 		specTotal++;
 
-		CG_DrawStringExt( ox + OSP_SB_SPEC_XMIN + 256, OSP_SB_HEADER + OSP_SB_LINE_HEIGHT + 8,
+		CG_DrawStringExt( ox + OSP_SB_SPEC_XMIN + 256, OSP_SB_HEADER + OSP_SB_LINE_HEIGHT + 8 - 2,
 			"Spectator", colorYellow, qtrue, qtrue, 12, 12, 0 );
 
 		CG_DrawTeamBackground2( ox + OSP_SB_SPEC_XMIN, OSP_SB_HEADER + OSP_SB_LINE_HEIGHT + 20,

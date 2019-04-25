@@ -207,6 +207,7 @@ minor optimizations
 ...
 
 extended player model select menu from 4x4 to 5x5
+reworked scoreboards
 
 added hud loading from file, works with CPMA & E+ huds.
  use "hud" variable to load file or press ESC -> HUDS,

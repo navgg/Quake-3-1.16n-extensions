@@ -232,7 +232,7 @@ void CG_DrawHead( float x, float y, float w, float h, int clientNum, vec3_t head
 		CG_DrawPic( x, y, w, h, cgs.media.deferShader );
 	} 
 #if CGX_FREEZE
-	else if ( Q_Isfreeze(clientNum) && cgx_scoreboard.integer != 3 ) {
+	else if ( Q_Isfreeze(clientNum)/* && cgx_scoreboard.integer != 3 */) {
 		CG_DrawPic(x, y, w, h, cgs.media.noammoShader);
 	}
 #endif//freeze
