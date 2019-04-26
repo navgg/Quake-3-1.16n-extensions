@@ -1197,6 +1197,8 @@ void CG_Init( int serverMessageNum, int serverCommandSequence ) {
 
 	// load a few needed things before we do any screen updates
 	cgs.media.charsetShader = trap_R_RegisterShader( "gfx/2d/bigchars" );
+	if (!(cgs.media.charsetShader32 = trap_R_RegisterShaderNoMip("gfx/2d/bigchars_32")))
+		cgs.media.charsetShader32 = cgs.media.charsetShader;
 	cgs.media.whiteShader = trap_R_RegisterShader( "white" );
 	cgs.media.charsetProp		= trap_R_RegisterShaderNoMip( "menu/art/font1_prop.tga" );
 	cgs.media.charsetPropGlow	= trap_R_RegisterShaderNoMip( "menu/art/font1_prop_glo.tga" );

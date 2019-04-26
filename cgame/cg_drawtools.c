@@ -71,7 +71,7 @@ CG_DrawChar
 Coordinates and size in 640*480 virtual screen size
 ===============
 */
-void CG_DrawChar( int x, int y, int width, int height, int ch ) {
+void CG_DrawChar( int x, int y, int width, int height, int ch, qhandle_t charset ) {
 	int row, col;
 	float frow, fcol;
 	float size;
@@ -99,7 +99,7 @@ void CG_DrawChar( int x, int y, int width, int height, int ch ) {
 	trap_R_DrawStretchPic( ax, ay, aw, ah,
 					   fcol, frow, 
 					   fcol + size, frow + size, 
-					   cgs.media.charsetShader );
+					   charset );
 }
 
 
@@ -111,6 +111,8 @@ Draws a multi-colored string with a drop shadow, optionally forcing
 to a fixed color.
 
 Coordinates are at 640 by 480 virtual resolution
+
+x-mod: maxChars = -1 uses charsetShader32
 ==================
 */
 void CG_DrawStringExt( int x, int y, const char *string, const float *setColor, 
@@ -119,6 +121,7 @@ void CG_DrawStringExt( int x, int y, const char *string, const float *setColor,
 	const char	*s;
 	int			xx, yy;
 	int			cnt;
+	qhandle_t	charset = charHeight > 32 || maxChars < 0 ? cgs.media.charsetShader32 : cgs.media.charsetShader;
 
 	if (maxChars <= 0)
 		maxChars = 32767; // do them all!
@@ -139,7 +142,7 @@ void CG_DrawStringExt( int x, int y, const char *string, const float *setColor,
 				s += 2;
 				continue;
 			}
-			CG_DrawChar( xx, yy, charWidth, charHeight, *s );
+			CG_DrawChar( xx, yy, charWidth, charHeight, *s, charset );
 			cnt++;
 			xx += charWidth;
 			s++;
@@ -161,7 +164,7 @@ void CG_DrawStringExt( int x, int y, const char *string, const float *setColor,
 			s += 2;
 			continue;
 		}
-		CG_DrawChar( xx, y, charWidth, charHeight, *s );
+		CG_DrawChar( xx, y, charWidth, charHeight, *s, charset );
 		xx += charWidth;
 		cnt++;
 		s++;

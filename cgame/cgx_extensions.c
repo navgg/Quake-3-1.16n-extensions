@@ -4388,9 +4388,7 @@ static void CGX_LoadHUD(char *fileName) {
 		return;
 	}
 
-	if (!cgs.media.charsetShader32) {
-		if (!(cgs.media.charsetShader32 = trap_R_RegisterShaderNoMip("gfx/2d/bigchars_32")))
-			cgs.media.charsetShader32 = cgs.media.charsetShader;
+	if (!cgx_hud_TEColors.handle) {
 		trap_Cvar_Register(&cgx_hud_TEColors, "cgx_hud_TEColors", "2417" , CVAR_TEMP);
 		trap_Cvar_Register(&cgx_hud_font16threshold, "cgx_hud_font16threshold", "24" , CVAR_TEMP);
 	}

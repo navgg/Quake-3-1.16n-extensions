@@ -2793,7 +2793,7 @@ static void CG_DrawWarmup( void ) {
 	
 	w = CG_DrawStrlen( s );
 	CG_DrawStringExt( vScreen.hwidth - w * cw/2, i, s, colorWhite, 
-			qfalse, qtrue, cw, (int)(cw * 1.5f), 0 );
+			qfalse, qtrue, cw, (int)(cw * 1.5f), -1 );
 }
 
 //==================================================================================
