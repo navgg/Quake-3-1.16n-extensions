@@ -84,6 +84,7 @@ Draws labels for score, ping, time and name
 */
 void CG_DrawLabels( int x, float *color ) {
 #define OSP_SB_LABEL_HEIGHT 14
+	//CG_DrawStringExt( x, OSP_SB_HEADER + 2 + 1 - OSP_SB_LABEL_HEIGHT, "Id", color, qtrue, qtrue, 6, 8, 0 );
 	CG_DrawStringExt( x + 35, OSP_SB_HEADER + 2 - OSP_SB_LABEL_HEIGHT, "Score", color, qtrue, qtrue, 8, 10, 0 );
 	CG_DrawStringExt( x + OSP_SB_PING_OFFSET, OSP_SB_HEADER + 2 - OSP_SB_LABEL_HEIGHT, "Ping", color, qtrue, qtrue, 8, 10, 0 );
 	CG_DrawStringExt( x + OSP_SB_TIME_OFFSET, OSP_SB_HEADER + 2 - OSP_SB_LABEL_HEIGHT, "Time", color, qtrue, qtrue, 8, 10, 0 );
@@ -148,9 +149,21 @@ void CG_DrawOSPClientScore( int x, int y, clientInfo_t *ci, score_t *score ) {
 	}
 
 	if ( score->isReferee ) {
-		CG_DrawStringExt( x + OSP_SB_MODEL_OFFSET + 12, y, "^2R", color,
+		CG_DrawStringExt( x + OSP_SB_MODEL_OFFSET + OSP_SB_CHAR_HEIGHT, y, "^2R", color,
 			qfalse, qtrue,
 			OSP_SB_CHAR_WIDTH, OSP_SB_CHAR_HEIGHT, 0 );
+	}
+
+	//x-mod: player's id
+	{
+		vec4_t idcolor = { 1, 1, 1, 0.66 };
+		int char_h = OSP_SB_CHAR_HEIGHT * 16 / 12 / 2;
+		int char_w = OSP_SB_CHAR_HEIGHT / 2;
+		Com_sprintf(string, sizeof(string), "%i", score->client);
+		CG_DrawStringExt(x + OSP_SB_FLAG_OFFSET + (2 - CG_DrawStrlen(string)) * char_w / 2, 
+			y + (OSP_SB_CHAR_HEIGHT - char_h) / 2, 
+			string, idcolor, qfalse, qfalse,
+			char_w, char_h, 2);
 	}
 
 	// score/ping/time
