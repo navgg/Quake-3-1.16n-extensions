@@ -1320,6 +1320,9 @@ void CG_PredictPlayerState32( void ) {
 	usercmd_t	latestCmd;
 	//unlagged - optimized prediction
 	int stateIndex, predictCmd;
+	// x-mod: prediction with pmove_accurate still generates a lot of prediction
+	// errors, so let's use default prediction if pmove_accurate is enabled
+	qboolean optimized = cg_optimizePrediction.integer && !pmove_accurate.integer;
 #if CGX_DEBUG
 	int numPredicted = 0, numPlayedBack = 0; // debug code
 #endif
@@ -1441,7 +1444,7 @@ void CG_PredictPlayerState32( void ) {
 
 	// we check for cg_latentCmds because it'll mess up the optimization
 	// FIXME: make cg_latentCmds work with cg_optimizePrediction?
-	if ( cg_optimizePrediction.integer
+	if ( optimized
 #if CGX_DEBUG
 		&& !cg_latentCmds.integer 
 #endif
@@ -1609,7 +1612,7 @@ void CG_PredictPlayerState32( void ) {
 
 		//unlagged - optimized prediction
 		// we check for cg_latentCmds because it'll mess up the optimization
-		if ( cg_optimizePrediction.integer 
+		if ( optimized
 #if CGX_DEBUG
 			&& !cg_latentCmds.integer 
 #endif
