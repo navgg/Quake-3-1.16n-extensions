@@ -1102,7 +1102,7 @@ qboolean CGX_CheckModInfo(const char *str) {
 
 // send modinfo if gamename nemesis or bma
 void CGX_SendModinfo(qboolean force) {
-	if (cgx_modinfosend <= cg.time || cg.snap->ps.pm_type == PM_INTERMISSION)
+	if (cg.snap->ps.pm_type == PM_INTERMISSION || cgx_modinfosend > cg.time)
 		return;
 
 	D_Printf(("gamename %s\n", cgs.gamename));

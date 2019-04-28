@@ -220,3 +220,7 @@ reworked scoreboards
 
 fixed hunter/pm feathers, sorlag/pm torso, uriel/pm wings
 fixed black background of ingame ui on widescreens
+
+...
+
+fixed unlagged init on nemesis servers
