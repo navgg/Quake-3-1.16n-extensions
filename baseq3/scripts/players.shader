@@ -247,7 +247,7 @@ models/players/hunter/pmh
 		rgbGen identity
 	}
 }
-
+/*
 models/players/hunter/pmf
 {
 	nopicmip
@@ -263,6 +263,17 @@ models/players/hunter/pmf
 		alphaFunc LT128
 		rgbGen identity
 	}
+}*/
+models/players/hunter/pmf
+{
+     deformVertexes wave 100 sin 0 .3 0 .2
+     cull disable
+        {
+                map models/players/hunter/red_f.tga
+                alphaFunc GE128
+		depthWrite
+		rgbGen identity
+        }
 }
 
 
