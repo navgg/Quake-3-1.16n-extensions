@@ -462,7 +462,7 @@ Draw specified scoreboard
 =================
 */
 qboolean CG_DrawScoreboard( void ) {
-	if (cgx_scoreboard.integer == 3 && cgs.gametype != GT_FFA) {
+	if (cgx_scoreboard.integer == 3 && cgs.gametype != GT_FFA && cgs.gametype != GT_SINGLE_PLAYER) {
 		return CG_DrawOSPScoreboard();
 	} else {
 		return CG_DrawNormalScoreboard();

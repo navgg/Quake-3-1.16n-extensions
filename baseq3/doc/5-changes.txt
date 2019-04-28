@@ -224,3 +224,4 @@ fixed black background of ingame ui on widescreens
 ...
 
 fixed unlagged init on nemesis servers
+fixed cg_scoreboard 3 in single player
