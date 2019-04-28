@@ -28,7 +28,7 @@ Custom extensions for patching Quake 3 1.11 - 1.16n (beta version)
 - hitsounds based on damage dealt
 - draw gun with no bobbing or transparent
 - weapon auto swith after respawn settings
-- different huds & scoreboards with display of player id & referees
+- different scoreboards with display of player id & referees
 - speedometer, extended lagometer
 - ability to disable chat beep or enemy taunt sounds
 - integrated unlagged 2.01 (works with noghost\nemesis\bma servers)
