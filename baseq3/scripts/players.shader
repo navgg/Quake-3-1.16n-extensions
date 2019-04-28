@@ -658,6 +658,23 @@ models/players/sorlag/pm
 	}
 }
 
+models/players/sorlag/pmt
+{
+	nopicmip
+	{
+		map models/players/sorlag/color_t.tga
+		blendFunc GL_ONE GL_ZERO
+		alphaFunc GE128
+		rgbGen entity
+	}
+	{
+		map models/players/sorlag/color_t.tga
+		blendFunc GL_ONE GL_ZERO
+		alphaFunc LT128
+		rgbGen identity
+	}
+}
+
 
 models/players/tankjr/pm
 {
