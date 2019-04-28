@@ -12,10 +12,11 @@ Custom extensions for patching Quake 3 1.11 - 1.16n (beta version)
 - added advanced settings menu with many hidden game settings
 - colored crossairs, 39 colors in total
 - bright cpm skins for enemies and team with custom colors
+- custom HUDs, works with CPMA & E+ hud files
 - hitsounds based on damage dealt
 - draw gun with no bobbing or transparent
 - weapon auto swith after respawn settings
-- different huds & scoreboards with display of player id & referees
+- different scoreboards with display of player id & referees
 - speedometer, extended lagometer
 - ability to disable chat beep or enemy taunt sounds
 - integrated unlagged 2.01 (`works with noghost\nemesis\bma servers`)
@@ -50,5 +51,6 @@ Custom extensions for patching Quake 3 1.11 - 1.16n (beta version)
 - OSP - (c) 2003 Jason "Rhea" Keimig and Team
 - CPMA - (c) 2000-2010 Challenge World, (c) 2016-2018 The ProMode Team
 - 13box - (c) 2009 sst13
+- E+ HUDs - (c) 2010 Broken
 - Nemesis - (c) 2005 Cyrus and Wonkey
 - Quake 3 Arena - (c) 1999-2005 Id Software
