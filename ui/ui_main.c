@@ -171,6 +171,7 @@ vmCvar_t	uix_drawrewards;
 vmCvar_t	uix_draw3dicons;
 vmCvar_t	uix_gibs;
 vmCvar_t	uix_draw2D;
+vmCvar_t	uix_railTrailTime;
 
 #if CGX_UNLAGGED
 vmCvar_t	cg_delag;
@@ -265,6 +266,7 @@ cvarTable_t		cvarTable[] = {
 	{ &uix_gibs, "cg_gibs", "1", CVAR_ARCHIVE },	
 	{ &uix_crosshairSize, "cg_crosshairSize", "24", CVAR_ARCHIVE },
 	{ &uix_lagometer, "cg_lagometer", "1", CVAR_ARCHIVE },
+	{ &uix_railTrailTime, "cg_railTrailTime", "400", CVAR_ARCHIVE  },
 
 	{ &ui_server1, "server1", "", CVAR_ARCHIVE },
 	{ &ui_server2, "server2", "", CVAR_ARCHIVE },

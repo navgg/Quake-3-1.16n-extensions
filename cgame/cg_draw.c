@@ -2717,7 +2717,7 @@ static void CG_DrawWarmup( void ) {
 					cw = hud.giant_char_w;
 				}
 				CG_DrawStringExt(vScreen.hwidth - w * cw / 2, 20, s, colorWhite,
-					qfalse, qtrue, cw, (int)(cw * 1.5f), 0);
+					qfalse, qtrue, cw, (int)(cw * 1.5f), -1);
 			}
 		}
 	} else {

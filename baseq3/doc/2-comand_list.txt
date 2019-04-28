@@ -57,7 +57,7 @@ cg_enemyColors "" - sets color for enemy models if skin supports it.
     "1352": red rail, yellow head, cyan torsom, green legs
     "!222": client's own rail color, green head, green torso, green legs
     "????": becomes 1111 if enemy in red team, 4444 if in - blue, 2222 in ffa
-    "11"  : becomes
+    "10"  : becomes aaaa, 11 - bbbb, 12 - cccc and so on
     "....": all random colors, just for fun
     "green": same as 2222
     (Colors from 0 to 7, use letters to get colors from extended table.)
@@ -88,7 +88,7 @@ cg_hitsounds 0|1|2 - 0: default 1: pro mode hi-low 2: low-hi hp hitsounds
 
 cg_autoNetworkSettings 0|1|2|3 - set network settings automatically
   0: off
-  1: min rate 10000 packets 30-40 packetdup on
+  1: min rate 8000 packets 30-40 packetdup on
   2: min rate 16000 packets 40-60 packetdup off
   3: min rate 25000 packets 60-100 packetdup off
   (snaps = sv_fps or min 40 in all cases if it's on)
@@ -99,7 +99,7 @@ cg_scoreboard 0|1|2|3 - scoreboard type
   0: default large-small
   1: always small
   2: quake 3 vanilla (no ids, no ping colors)
-  3: osp/nemesis
+  3: compact (like in osp-nemesis)
 
 cg_drawAccuracy 0|1 - draws total weapon accuracy
 
@@ -158,7 +158,7 @@ hud <file> - loads hud from specified file. Works with CPMA & E+ syntax.
     hud "" - sets default hud
   Alternative way to load - press in game ESC -> HUDS.
 
-echox <text> - Prints text to console, same as echo command, but also
+echox <text> - prints text to console, same as echo command, but also
  prints text to custom console loaded with hud command.
 
 writesharedconfig - writes q3config.cfg to baseq3 folder.

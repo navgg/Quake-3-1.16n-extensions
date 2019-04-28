@@ -383,6 +383,7 @@ static void UI_CreditMenu2_Draw( void ) {
 	DRAW_WSTEP1("q3nightmare")
 	DRAW_WSTEP1("Clan PAR")
 	DRAW_WSTEP1("///hmn")
+	DRAW_WSTEP1("Spawn")
 	DRAW_WSTEP1("Gpe community")
 	DRAW_WSTEP1("Bma team")
 	DRAW_WSTEP1("Cyrus & Wonkey")
@@ -394,7 +395,7 @@ static void UI_CreditMenu2_Draw( void ) {
 	DRAW_WSTEP1("And other people")
 	DRAW_WSTEP1("Who love quake")
 
-	DRAW_WSTEP1("")
+	//DRAW_WSTEP1("")
 	//DRAW_WSTEP1("")
 	DRAW_WSTEP1("")
 	DRAW_WSTEP1("")

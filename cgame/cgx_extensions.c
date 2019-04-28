@@ -705,7 +705,7 @@ void CGX_AutoNetworkSettings(void) {
 		i = 0;		
 
 		if (cgx_networkAdjustments.integer == 1) {			
-			minRate = 10000;
+			minRate = 8000;
 		
 			// if packets < 30 set it to 30
 			if (cl_maxpackets.integer < CGX_MIN_MAXPACKETS)

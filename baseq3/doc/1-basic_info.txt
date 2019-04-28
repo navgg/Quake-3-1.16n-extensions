@@ -1,5 +1,5 @@
 =============================================================================
-========================Quake III X-Mod 1.16n 0.95.4b========================
+========================Quake III X-Mod 1.16n 0.95.5b========================
 =============================================================================
 
 Custom extensions for patching Quake 3 1.11 - 1.16n (beta version)
@@ -24,6 +24,7 @@ Custom extensions for patching Quake 3 1.11 - 1.16n (beta version)
 - added advanced settings menu with many hidden game settings
 - colored crossairs, 39 colors in total
 - bright cpm skins for enemies and team with custom colors
+- custom HUDs, works with CPMA & E+ hud files
 - hitsounds based on damage dealt
 - draw gun with no bobbing or transparent
 - weapon auto swith after respawn settings

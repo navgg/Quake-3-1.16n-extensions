@@ -223,7 +223,7 @@ void CG_DrawOSPClientScore( int x, int y, clientInfo_t *ci, score_t *score ) {
 		if ( !Q_Isfreeze( score->client ) )
 #endif
 		{
-			CG_DrawStringExt( x, y + 2, "READY", colorYellow, 
+			CG_DrawStringExt( x + 2, y + 2, "READY", colorYellow, 
 						  qfalse, qfalse, 
 						  OSP_SB_CHAR_WIDTH - 4, OSP_SB_CHAR_HEIGHT - 4, 0 );
 		}

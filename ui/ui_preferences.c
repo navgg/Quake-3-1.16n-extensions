@@ -171,7 +171,8 @@ static void AdvancedEffects_SaveChanges() {
 
 	trap_Cvar_SetValue( "cg_weaponEffects", i );
 
-	trap_Cmd_ExecuteText( EXEC_APPEND, "xmod reload effects\n" );
+	if( trap_Cvar_VariableValue( "cl_paused" ) )
+		trap_Cmd_ExecuteText( EXEC_APPEND, "xmod reload effects\n" );
 }
 
 /*
