@@ -220,4 +220,4 @@ added cg_drawCrosshairNames -1..-3
 fixed black background for sides of ingame ui on widescreens
 
 minor optimizations
-fixed hunter/pm feathers, sorlag/pm torso
+fixed hunter/pm feathers, sorlag/pm torso, uriel/pm wings

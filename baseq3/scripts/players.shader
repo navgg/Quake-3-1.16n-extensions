@@ -266,14 +266,15 @@ models/players/hunter/pmf
 }*/
 models/players/hunter/pmf
 {
-     deformVertexes wave 100 sin 0 .3 0 .2
-     cull disable
-        {
-                map models/players/hunter/red_f.tga
-                alphaFunc GE128
+    deformVertexes wave 100 sin 0 .3 0 .2
+    cull disable
+	nopicmip
+	{
+        map models/players/hunter/red_f.tga
+        alphaFunc GE128
 		depthWrite
 		rgbGen identity
-        }
+	}
 }
 
 
@@ -732,6 +733,14 @@ models/players/uriel/pmh
 models/players/uriel/pmw
 {
 	nopicmip
+	deformVertexes wave 100 sin 0 .5 0 .2
+	{
+		map models/players/uriel/uriel_w.tga
+		alphaFunc GE128
+		depthWrite
+		rgbGen identity
+	}
+	/*	
 	{
 		map models/players/uriel/color_x.tga
 		blendFunc GL_ONE GL_ZERO
@@ -743,7 +752,7 @@ models/players/uriel/pmw
 		blendFunc GL_ONE GL_ZERO
 		alphaFunc LT128
 		rgbGen identity
-	}
+	}*/
 }
 
 
