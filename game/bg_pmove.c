@@ -1852,7 +1852,8 @@ Pmove
 Can be called by either the server or the client
 ================
 */
-void Pmove (pmove_t *pmove) {
+
+void Pmove16 (pmove_t *pmove) {
 	int			finalTime;
 
 	finalTime = pmove->cmd.serverTime;
@@ -1910,9 +1911,9 @@ void Pmove32 (pmove_t *pmove) {
 
 		msec = finalTime - pmove->ps->commandTime;
 
-		if ( pmove->pmove_fixed ) {
-			if ( msec > pmove->pmove_msec ) {
-				msec = pmove->pmove_msec;
+		if ( *pmove->pmove_fixed ) {
+			if ( msec > *pmove->pmove_msec ) {
+				msec = *pmove->pmove_msec;
 			}
 		}
 		else {

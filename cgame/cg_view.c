@@ -767,10 +767,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	cg.clientFrame++;
 
 	// update cg.predictedPlayerState
-	if (cgs.serverMod == SM_NOGHOST)
-		CG_PredictPlayerState32();
-	else
-		CG_PredictPlayerState();
+	CG_PredictPlayerState();
 
 	// decide on third person view
 	cg.renderingThirdPerson = cg_thirdPerson.integer || (cg.snap->ps.stats[STAT_HEALTH] <= 0);
