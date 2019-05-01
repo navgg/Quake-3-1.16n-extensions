@@ -784,8 +784,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	if ( !cg.hyperspace ) {
 		CG_AddPacketEntities();			// adter calcViewValues, so predicted player state is correct
 		CG_AddMarks();
-		if (cgx_winterEffects.integer & CGX_WINTER_SNOW || cgx_weaponEffects.integer & WE_ROCKET32)
-			CG_AddParticles2();
+		CG_AddParticles2();
 		CG_AddLocalEntities();
 	}
 	CG_AddViewWeapon( &cg.predictedPlayerState );

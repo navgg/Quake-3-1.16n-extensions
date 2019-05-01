@@ -581,6 +581,9 @@ void CG_AddParticles2( void ) {
 	int				i;
 	static qboolean	animInit = qfalse;
 
+	if (!(cgx_winterEffects.integer & CGX_WINTER_SNOW || cgx_weaponEffects.integer & WE_ROCKET32))
+		return;
+
 	if (!initparticles)
 		CG_ClearParticles();
 
