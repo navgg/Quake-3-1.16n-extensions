@@ -1772,7 +1772,10 @@ static void CGX_UpdateNetworkStats(snapshot_t *snap) {
 	if (oldSnapshotCount > lagometer.snapshotCount)
 		return;
 
-	D_Printf(("CGX_UpdateNetworkStats %i %i %i\n", cg.meanPing, lagometer.packetloss, lagometer.rateDelayed));
+#if CGX_DEBUG
+	if (cgx_debug.integer & 2)
+		D_Printf(("CGX_UpdateNetworkStats %i %i %i\n", cg.meanPing, lagometer.packetloss, lagometer.rateDelayed));
+#endif
 
 	oldSnapshotCount = lagometer.snapshotCount + LAG_SAMPLES;
 
