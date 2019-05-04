@@ -223,5 +223,7 @@ fixed black background of ingame ui on widescreens
 
 ...
 
-fixed unlagged init on nemesis servers
+fixed unlagged init on nemesis/bma servers
 fixed cg_scoreboard 3 in single player
+fixed shotgun spread pattern sync
+

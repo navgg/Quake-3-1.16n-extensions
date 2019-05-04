@@ -1921,11 +1921,12 @@ CG_ShotgunPattern
 
 Perform the same traces the server did to locate the
 hit splashes (FIXME: ranom seed isn't synce anymore)
+x-mod: seed sync fixed
 ================
 */
 //unlagged - attack prediction
 // made this non-static for access from cg_unlagged.c
-void CG_ShotgunPattern( vec3_t origin, vec3_t origin2, int otherEntNum ) {
+void CG_ShotgunPattern( vec3_t origin, vec3_t origin2, int seed, int otherEntNum ) {
 	int			i;
 	float		r, u;
 	vec3_t		end;
@@ -1939,8 +1940,8 @@ void CG_ShotgunPattern( vec3_t origin, vec3_t origin2, int otherEntNum ) {
 
 	// generate the "random" spread pattern
 	for ( i = 0 ; i < DEFAULT_SHOTGUN_COUNT ; i++ ) {
-		r = crandom() * DEFAULT_SHOTGUN_SPREAD;
-		u = crandom() * DEFAULT_SHOTGUN_SPREAD;
+		r = Q_crandom( &seed ) * DEFAULT_SHOTGUN_SPREAD;
+		u = Q_crandom( &seed ) * DEFAULT_SHOTGUN_SPREAD;
 		VectorMA( origin, 8192, forward, end);
 		VectorMA (end, r, right, end);
 		VectorMA (end, u, up, end);
@@ -1972,7 +1973,7 @@ void CG_ShotgunFire( entityState_t *es ) {
 			CG_SmokePuff( v, up, 32, 1, 1, 1, 0.33, 900, cg.time, LEF_PUFF_DONT_SCALE, cgs.media.shotgunSmokePuffShader );
 		}
 	}
-	CG_ShotgunPattern( es->pos.trBase, es->origin2, es->otherEntityNum );
+	CG_ShotgunPattern( es->pos.trBase, es->origin2, es->eventParm, es->otherEntityNum );
 }
 
 /*
