@@ -1558,6 +1558,9 @@ static void PM_Weapon( void ) {
 		addTime = 1500;
 		break;
 	case WP_BFG:
+	// accuracy
+	PM_AccuracyShots( pm );
+
 //		addTime = 100;
 		addTime = 200;
 		break;

@@ -832,6 +832,16 @@ void CGX_SyncServer_sv_fps(const char *info) {
 	}
 }
 
+//accuracy shots prediction
+void PM_AccuracyShots(pmove_t *pm) {
+	if (cg.q3version == 32)
+		return;
+
+	if( pm->ps->weapon != WP_GRAPPLING_HOOK && pm->ps->weapon != WP_GAUNTLET ) {
+		pm->ps->persistant[PERS_ACCURACY_SHOTS]++;
+	}
+}
+
 void CGX_SyncServerParams(const char *info) {
 	CGX_SyncServer_sv_fps( info );
 
