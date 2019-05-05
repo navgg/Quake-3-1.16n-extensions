@@ -457,19 +457,9 @@ static void CG_DrawStatusBar( void ) {
 			//trap_R_SetColor( colors[color] );
 			if (hud.file) {
 				if (xhud[XH_StatusBar_AmmoBar].inuse) {
-					int maxValue;
-					switch (cent->currentState.weapon) {
-						case WP_GAUNTLET: maxValue = -1; break;
-						case WP_MACHINEGUN:
-						case WP_LIGHTNING:
-						case WP_PLASMAGUN:
-						default: maxValue = 200; break;
-						case WP_SHOTGUN: maxValue = 50; break;
-						case WP_RAILGUN: maxValue = 50; break;
-						case WP_BFG: maxValue = 50; break;
-						case WP_GRENADE_LAUNCHER:
-						case WP_ROCKET_LAUNCHER: maxValue = 50; break;
-					}
+					static int maxValues[WP_NUM_WEAPONS] = { -1, -1, 200, 50, 50, 50, 200, 50, 200, 50, 200 };
+					int maxValue = maxValues[cent->currentState.weapon];
+
 					CGX_DrawBar(XH_StatusBar_AmmoBar, value, maxValue, colors[0]);
 				}
 				CGX_DrawField(XH_StatusBar_AmmoCount, value, colors[color]);
