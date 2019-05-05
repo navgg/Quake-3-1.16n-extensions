@@ -374,6 +374,7 @@ extern xhudElem_t xhud[XH_TOTAL_ELEMS];
 typedef enum {
 	SM_UNDEFINED,
 	SM_DEFAULT,
+	SM_SODMOD,
 	SM_NOGHOST,
 	SM_NEMESIS,
 	SM_CARNAGE,

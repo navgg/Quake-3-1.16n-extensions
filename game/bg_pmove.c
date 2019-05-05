@@ -1415,7 +1415,6 @@ static void PM_TorsoAnimation( void ) {
 	}
 }
 
-
 /*
 ==============
 PM_Weapon
@@ -1531,43 +1530,45 @@ static void PM_Weapon( void ) {
 	// fire weapon
 	PM_AddEvent( EV_FIRE_WEAPON );
 
-	switch( pm->ps->weapon ) {
-	default:
-	case WP_GAUNTLET:
-		addTime = 400;
-		break;
-	case WP_LIGHTNING:
-		addTime = 50;
-		break;
-	case WP_SHOTGUN:
-		addTime = 1000;
-		break;
-	case WP_MACHINEGUN:
-		addTime = 100;
-		break;
-	case WP_GRENADE_LAUNCHER:
-		addTime = 800;
-		break;
-	case WP_ROCKET_LAUNCHER:
-		addTime = 800;
-		break;
-	case WP_PLASMAGUN:
-		addTime = 100;
-		break;
-	case WP_RAILGUN:
-		addTime = 1500;
-		break;
-	case WP_BFG:
 	// accuracy
 	PM_AccuracyShots( pm );
 
+	addTime = addTimes[pm->ps->weapon];
+	//Com_Printf("%i\n", addTime);
+//	switch( pm->ps->weapon ) {
+//	default:
+//	case WP_GAUNTLET:
+//		addTime = 400;
+//		break;
+//	case WP_LIGHTNING:
+//		addTime = 50;
+//		break;
+//	case WP_SHOTGUN:
+//		addTime = 1000;
+//		break;
+//	case WP_MACHINEGUN:
 //		addTime = 100;
-		addTime = 200;
-		break;
-	case WP_GRAPPLING_HOOK:
-		addTime = 400;
-		break;
-	}
+//		break;
+//	case WP_GRENADE_LAUNCHER:
+//		addTime = 800;
+//		break;
+//	case WP_ROCKET_LAUNCHER:
+//		addTime = 800;
+//		break;
+//	case WP_PLASMAGUN:
+//		addTime = 100;
+//		break;
+//	case WP_RAILGUN:
+//		addTime = 1500;
+//		break;
+//	case WP_BFG:
+////		addTime = 100;
+//		addTime = 200;
+//		break;
+//	case WP_GRAPPLING_HOOK:
+//		addTime = 400;
+//		break;
+//	}
 
 	if ( pm->ps->powerups[PW_HASTE] ) {
 		addTime /= 1.3;

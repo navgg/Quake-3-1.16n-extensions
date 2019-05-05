@@ -256,6 +256,13 @@ typedef enum {
 	WP_NUM_WEAPONS
 } weapon_t;
 
+//x-mod: weapon times
+typedef enum {
+	WT_DEFAULT,
+	WT_SODMOD
+} weaponTime_t;
+
+extern int *addTimes;
 
 // reward sounds
 typedef enum {

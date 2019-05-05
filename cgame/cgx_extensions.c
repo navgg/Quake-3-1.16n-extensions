@@ -842,6 +842,16 @@ void PM_AccuracyShots(pmove_t *pm) {
 	}
 }
 
+//none, gaunt, mg, sg, gren, rocket, lg, rail, plasm, rail, bfg, hook
+static int addTimesArr[][WP_NUM_WEAPONS] = {
+	{ 0, 400, 100, 1000, 800, 800, 50, 1500, 100, 200, 400 },
+	{ 0, 400,  50,  500, 400, 400, 50,  100, 100, 800, 400 }
+};
+
+
+//fire weapon addTimes
+int *addTimes = &addTimesArr[WT_DEFAULT][0];
+
 void CGX_SyncServerParams(const char *info) {
 	CGX_SyncServer_sv_fps( info );
 
@@ -852,7 +862,10 @@ void CGX_SyncServerParams(const char *info) {
 
 		Q_strncpyz( cgs.gamename, Info_ValueForKey( info, "gamename" ), sizeof( cgs.gamename ) );
 
-		if (!Q_stricmp( cgs.gamename, "NoGhost" )) {
+		if (!Q_stricmp( cgs.gamename, "SoDMoD 1.01n" ) || !Q_stricmp( cgs.gamename, "Sod Mod 1.01" )) {
+			cgs.serverMod = SM_SODMOD;
+			addTimes = &addTimesArr[WT_SODMOD][0];
+		} else if (!Q_stricmp( cgs.gamename, "NoGhost" )) {
 			cgs.serverMod = SM_NOGHOST;
 			if (cgs.gametype == GT_TEAM) {
 				int g_gamemod = atoi( Info_ValueForKey( info, "g_gameMod" ) );
