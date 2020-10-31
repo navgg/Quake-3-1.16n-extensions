@@ -845,6 +845,15 @@ char QX_StringToColor(const char *s) {
 	return 0;
 }
 
+// check if string is a number
+int QX_isnumber(const char *s) {
+	int i;
+	for (i = 0; s[i]; i++)
+		if (s[i] < '0' || s[i] > '9')
+			return 0;
+	return 1;
+}
+
 void QDECL Com_sprintf( char *dest, int size, const char *fmt, ...) {
 	int		len;
 	va_list		argptr;

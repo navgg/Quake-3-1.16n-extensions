@@ -365,16 +365,23 @@ static byte CGX_RGBToGray(byte *c) {
 }
 
 static void CGX_SetColorInfo(clientInfo_t *info, const char *color, int clientNum) {
-	int i;
+	int i, j;
+	char tmp[5];
 
 	if (!*color || !cgx_enemyModel_enabled.integer || cgs.clientinfo[cg.clientNum].team == TEAM_SPECTATOR || info->team == TEAM_SPECTATOR)
 		color = "!!!!";
 	else if (i = QX_StringToColor(color))
 		color = va("%c%c%c%c", i, i, i, i);
-		
-	if (strlen(color) < 4) {
-		i = (atoi( color ) + '0' + ArrLen( g_color_table_ex )) % 255;
-		color = va( "%c%c%c%c", (char)i, (char)i, (char)i, (char)i );
+	else if (strlen(color) < 4) {
+		if (QX_isnumber(color)) {
+			i = (atoi(color) + '0' + ArrLen(g_color_table_ex)) % 255;
+			color = va("%c%c%c%c", (char)i, (char)i, (char)i, (char)i);
+		} else {
+			for (i = 0; color[i]; tmp[i] = color[i], i++);
+			for (j = i - 1; i < 4; tmp[i] = color[j], i++);
+			tmp[i] = 0;
+			color = tmp;
+		}
 	}
 
 	D_Printf(("CGX_SetColorInfo %s\n", color));

@@ -620,9 +620,10 @@ void	Q_strncpyz( char *dest, const char *src, int destsize );
 void	Q_strcat( char *dest, int size, const char *src );
 
 // X-MOD: externsions
-char *QX_trim(char *str);
-char QX_StringToColor(const char *s);
-char* QX_GetHostnameSpacesFix(char *string);
+int		QX_isnumber(const char *s);
+char	*QX_trim(char *str);
+char	QX_StringToColor(const char *s);
+char	*QX_GetHostnameSpacesFix(char *string);
 //char *QX_CleanStrHostnameFix(const char *string);
 //moved from ai_dmq3.h
 //strstr but case insensitive
