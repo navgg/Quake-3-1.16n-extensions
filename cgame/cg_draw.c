@@ -614,7 +614,7 @@ static float CG_DrawAttacker( float y ) {
 	} else {
 
 		size = hud.head_size;
-
+		trap_R_SetColor(NULL);
 		CG_DrawHead(vScreen.width - size, y, size, size, clientNum, angles);
 		y += size;
 		CG_DrawBigString2(vScreen.width - (Q_PrintStrlen(name) * hud.big_char_w), y, name, 0.5);
