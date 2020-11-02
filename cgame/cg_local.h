@@ -1196,6 +1196,8 @@ typedef struct {
 	qboolean		sv_floodProtect;
 	float			screenXScale640;
 
+	vmCvar_t		mod_build;
+
 	//unlagged - client options
 	// this will be set to the server's g_delagHitscan
 	int				delagHitscan;

@@ -896,8 +896,8 @@ void CGX_SyncServerParams(const char *info) {
 			trap_AddCommand("players");
 		} else if (cgs.serverMod == SM_NOGHOST) {
 			//for ref info receiving in scores
-			static vmCvar_t	mod_build;
-			trap_Cvar_Register(&mod_build, "Mod_Build", "155XM", CVAR_INIT | CVAR_ROM | CVAR_TEMP | CVAR_USERINFO);
+			if (atoi(Info_ValueForKey(info, "Mod_Build")) >= 894)
+				trap_Cvar_Register(&cgs.mod_build, "Mod_Build", "155XM", CVAR_INIT | CVAR_ROM | CVAR_TEMP | CVAR_USERINFO);
 
 			trap_AddCommand("playerlist");
 			trap_AddCommand("setref");

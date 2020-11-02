@@ -25,7 +25,7 @@ static void CG_ParseScores( void ) {
 	cg.teamScores[0] = atoi( CG_Argv( 2 ) );
 	cg.teamScores[1] = atoi( CG_Argv( 3 ) );
 
-	argc = cgs.serverMod == SM_NOGHOST ? 7 : 6;
+	argc = cgs.serverMod == SM_NOGHOST && cgs.mod_build.integer ? 7 : 6;
 	memset( cg.scores, 0, sizeof( cg.scores ) );
 	for ( i = 0 ; i < cg.numScores ; i++ ) {
 		cg.scores[i].client = atoi( CG_Argv( i * argc + 4 ) );
