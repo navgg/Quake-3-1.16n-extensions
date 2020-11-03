@@ -1277,7 +1277,7 @@ Called before every level change or subsystem restart
 =================
 */
 void CG_Shutdown( void ) {		
-	char cgx_last_error[MAX_QPATH];
+	char cgx_last_error[MAX_QPATH], var[MAX_QPATH];
 
 	D_Printf(("CG_Shutdown\n"));
 
@@ -1298,6 +1298,13 @@ void CG_Shutdown( void ) {
 
 	if (stats.needprint)
 		CG_statsWindowPrint();
+
+	trap_Cvar_VariableStringBuffer("cgx_com_maxfps", var, sizeof var);
+	if (*var) {
+		D_Printf(("Restore com_maxfps %s\n", var));
+		trap_Cvar_Set("com_maxfps", var);
+		trap_Cvar_Set("cgx_com_maxfps", "");
+	}
 
 	// some mods may need to do cleanup work here,
 	// like closing files or archiving session data

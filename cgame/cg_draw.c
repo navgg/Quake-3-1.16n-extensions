@@ -1775,23 +1775,46 @@ static void CGX_UpdateNetworkStats(snapshot_t *snap) {
 	cg.packetlossTotal += lagometer.packetloss;
 	cg.rateDelayedTotal += lagometer.rateDelayed;	
 
-	// FIXME: in intermission sometimes triggers, skip in intermission probably, need to check later
-	//if (cgx_networkAdjustments.integer && cg.meanPing > 150) {		
-	//	if (cg.meanPing > 350 && cgx_maxfps.integer > 125) {
-	//		trap_Cvar_Set("com_maxfps", "125");
-	//		trap_Print("^3WARNING: Fps was set to 125 because of high ping");
-	//	} else if (cgx_maxfps.integer > 200) {
-	//		trap_Cvar_Set("com_maxfps", "200");
-	//		trap_Print("^3WARNING: Fps was set to 200 because of high ping");
-	//	} 
-	//}
-
 	//reset counters for next time interval
 
 	pingTotal = 0;
 	pingCount = 0;
 	lagometer.packetloss = 0;
 	lagometer.rateDelayed = 0;
+}
+
+// auto adjust fps after 250ms of "connection interrupted"
+static void CGX_CheckFps() {
+	if (cgx_networkAdjustments.integer) {
+		static int checktime;
+		int ping;
+		checktime += cg.frametime;
+
+		if (checktime < 250)
+			return;
+
+		ping = cg.nextSnap->ping;
+
+		D_Printf(("CGX_CheckFps time %d ping %d\n", checktime, ping));
+
+		checktime = 0;
+
+		if (com_maxfps.integer > 125 && ping > 150 && ping != 999) {
+			char buf[MAX_QPATH];
+
+			trap_Cvar_VariableStringBuffer("cgx_com_maxfps", buf, sizeof(buf));
+			if (!*buf)
+				trap_Cvar_Set("cgx_com_maxfps", com_maxfps.string);
+			
+			if (com_maxfps.integer > 200 && ping <= 200) {
+				trap_Cvar_Set("com_maxfps", "200");
+				trap_Print("^3WARNING: Fps was set to 200 because of high ping\n");
+			} else {
+				trap_Cvar_Set("com_maxfps", "125");
+				trap_Print("^3WARNING: Fps was set to 125 because of high ping\n");
+			}
+		}
+	}
 }
 
 #if CGX_DEBUG
@@ -1957,14 +1980,17 @@ static void CG_DrawDisconnect( void ) {
 
 	if (cg.snap->ps.pm_flags & PMF_FOLLOW)
 		return;
-
+#if CGX_DEBUG
 	// X-MOD: count connection interrupteds	
-	cg.connectionInterrupteds++;	
+	cg.connectionInterrupteds++;
+#endif
 
 	// also add text in center of screen
 	s = "Connection Interrupted";
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 	CG_DrawBigString( vScreen.hwidth - w/2, 100, s, 1.0F);
+
+	CGX_CheckFps();
 
 	// blink the icon
 	if ( ( cg.time >> 9 ) & 1 ) {

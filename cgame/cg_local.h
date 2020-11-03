@@ -886,9 +886,10 @@ typedef struct {
 	int			rateDelayed;
 	int			rateDelayedTotal;	
 	
-	int			connectionInterrupteds;
 	// x-mod: debug info
 #if CGX_DEBUG
+	int			connectionInterrupteds;
+
 	int			entities;
 	int			predictionErrors;
 	int			predictionMisses;
