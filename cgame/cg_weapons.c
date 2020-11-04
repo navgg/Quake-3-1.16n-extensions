@@ -954,6 +954,7 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin ) {
 	refEntity_t		beam;
 	vec3_t			forward;
 	vec3_t			muzzlePoint, endPoint;
+	qboolean		delag;
 
 	if ( cent->currentState.weapon != WP_LIGHTNING ) {
 		return;
@@ -961,10 +962,11 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin ) {
 
 	memset( &beam, 0, sizeof( beam ) );
 
+	delag = (cent->currentState.number == cg.predictedPlayerState.clientNum) && cgs.delagHitscan;
+
 	//unlagged - attack prediction #1
 	// if the entity is us, unlagged is on server-side, and we've got it on for the lightning gun
-	if ( (cent->currentState.number == cg.predictedPlayerState.clientNum) && cgs.delagHitscan &&
-		( cg_delag.integer & 1 || cg_delag.integer & 8 ) ) {
+	if ( delag && ( cg_delag.integer & 1 || cg_delag.integer & 8 ) ) {
 		// always shoot straight forward from our current position
 		AngleVectors( cg.predictedPlayerState.viewangles, forward, NULL, NULL );
 		VectorCopy( cg.predictedPlayerState.origin, muzzlePoint );
@@ -1027,6 +1029,24 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin ) {
 
 		if (cgx_weaponEffects.integer & WE_Z_LG_SPARKS)
 			CG_LightningSpark(beam.origin, dir);
+		
+		// not best way of prediction, mark positions little different from what on server
+		// and it doesn't count non standart lg reloading time
+#if 0
+		//x-mod: predict impact mark, sound will be played with event
+		if ( delag && ( cg_delag.integer & 32 ) ) {
+			if ( !(trace.surfaceFlags & SURF_NOIMPACT) ) {
+				static int hit_time;
+				if ( hit_time < cg.time ) {
+					//int oldTime = cg.time;
+					//cg.time = cg.time - 9000;
+					CG_ImpactMark( cgs.media.holeMarkShader, trace.endpos, trace.plane.normal, random()*360, 1,1,1,1, qfalse, 12, qfalse );
+					//cg.time = oldTime;
+					hit_time = cg.time + addTimes[WP_LIGHTNING];
+				}
+			}
+		}
+#endif
 	}
 }
 
