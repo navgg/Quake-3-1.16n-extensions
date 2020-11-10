@@ -1672,10 +1672,11 @@ PmoveSingle
 */
 void PmoveSingle (pmove_t *pmove) {
 	pm = pmove;
-
+#if CGX_DEBUG
 	// this counter lets us debug movement problems with a journal
 	// by setting a conditional breakpoint fot the previous frame
 	c_pmove++;
+#endif
 
 	// clear results
 	pm->numtouch = 0;

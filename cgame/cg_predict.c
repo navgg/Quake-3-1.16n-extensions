@@ -436,6 +436,8 @@ static int IsUnacceptableError( playerState_t *ps, playerState_t *pps ) {
 	for ( i = 0; i < MAX_PS_EVENTS; i++ ) {
 		if ( pps->events[i] != ps->events[i] ||
 			pps->eventParms[i] != ps->eventParms[i] ) {
+			//CG_Printf("%i %i\n", pps->eventParms[i], ps->eventParms[i]);
+			//CG_Printf("%i %i\n", pps->events[i], ps->events[i]);
 			return 9;
 		}
 	}
@@ -477,6 +479,16 @@ static int IsUnacceptableError( playerState_t *ps, playerState_t *pps ) {
 
 	for ( i = 0; i < MAX_PERSISTANT; i++ ) {
 		if ( pps->persistant[i] != ps->persistant[i] ) {
+#if CGX_DEBUG
+			//if (cg_showmiss.integer & 2) {
+			//	for (i = 0; i < MAX_PERSISTANT; i++)
+			//		CG_Printf("%i ", pps->persistant[i]);
+			//	CG_Printf("\n");
+			//	for (i = 0; i < MAX_PERSISTANT; i++)
+			//		CG_Printf("%i ", ps->persistant[i]);
+			//	CG_Printf("\n");
+			//}
+#endif
 			return 16;
 		}
 	}
@@ -568,10 +580,17 @@ void CG_PredictPlayerState( void ) {
 		cg_pmove.pmove_msec = &pmove_msec.integer;
 		cg_pmove.pmove_accurate = &pmove_accurate.integer;
 
-		if (cgs.serverMod == SM_NOGHOST || cg.q3version > 16)
+		if (cgs.serverMod == SM_NOGHOST || cg.q3version == 32) {
 			Pmove = Pmove32;
-		else
+			D_Printf(("Pmove32 Initialized\n"));
+		} else {
 			Pmove = Pmove16;
+			D_Printf(("Pmove16 Initialized\n"));
+		}
+
+		D_Printf(("pmove_fixed %d\n", *cg_pmove.pmove_fixed));
+		D_Printf(("pmove_msec %d\n", *cg_pmove.pmove_msec));
+		D_Printf(("pmove_accurate %d\n", *cg_pmove.pmove_accurate));
 	}
 
 
