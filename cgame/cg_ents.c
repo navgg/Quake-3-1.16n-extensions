@@ -708,6 +708,7 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 	// if it's a missile but not a grappling hook
 	if ( cent->currentState.eType == ET_MISSILE && cent->currentState.weapon != WP_GRAPPLING_HOOK ) {
 		// if it's one of ours
+		//CG_Printf("%d", cent->currentState.otherEntityNum);
 		// x-mod: on default servers we have this parameter always 0, so it's better not to come here and call CG_CalcEntityLerpPositions116
 		if ( cent->currentState.otherEntityNum == cg.clientNum ) {
 			// extrapolate one server frame's worth - this will correct for tiny
@@ -863,7 +864,10 @@ void CG_AddPacketEntities( void ) {
 	}
 #else
 	// X-Mod: if server has no delag or it's default server don't use early transitioning and CG_CalcEntityLerpPositions from 1.32
-	cg.useCalcEntityLerpPositions116 = (!cgs.delagHitscan || cgs.serverMod == SM_DEFAULT) || !cg_delag_interp32.integer;
+	cg.useCalcEntityLerpPositions116 = (!cgs.delagHitscan 
+		|| cgs.serverMod == SM_DEFAULT 
+		|| cgs.serverMod == SM_BMA) 
+		|| !cg_delag_interp32.integer;
 
 	CG_AddCEntity(&cg.predictedPlayerEntity);
 
