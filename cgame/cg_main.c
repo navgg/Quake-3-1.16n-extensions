@@ -79,6 +79,7 @@ vmCvar_t	cgx_winterEffects;
 vmCvar_t	cgx_modelCache;
 vmCvar_t	cgx_intermissionStats;
 vmCvar_t	cgx_hud;
+vmCvar_t	cgx_predictWeaponTime;
 
 vmCvar_t	com_maxfps;
 vmCvar_t	cl_maxpackets;
@@ -319,6 +320,8 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_winterEffects, "cg_winterEffects", "0", CVAR_TEMP },
 
 	{ &cgx_hud, "hud", "", CVAR_ARCHIVE },
+
+	{ &cgx_predictWeaponTime, "cg_predictWeaponTime", "0", CVAR_TEMP },
 
 	//unlagged - client options
 	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},

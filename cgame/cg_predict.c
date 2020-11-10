@@ -369,6 +369,89 @@ static void CG_TouchTriggerPrediction( void ) {
 	}
 }
 
+extern int addTimesArr[][WP_NUM_WEAPONS];
+// x-mod: attempt to fix weaponTime errors (reloading when firing)
+// doesn't work well with noghost and small weapontimes, for example for lg = 10.
+static void CGX_FixWeaponTimeError(playerState_t *ps, playerState_t *pps) {
+// fixing for 10 sec, if any error after this interval, then fix again.
+#define CGX_FIXWEAPONTIME 10000
+	static int fixed[WP_NUM_WEAPONS];
+	int t1, t2, f, t, d;
+	int i;
+	//int fixtime = addTimes[i] - pps->weaponTime + ps->weaponTime;
+
+	if (fixed[ps->weapon] > cg.time) {
+		D_Printf(("time %d\n", addTimes[ps->weapon]));
+		return;
+	}
+
+	if (ps->weapon != pps->weapon) {
+		D_Printf(("weapon\n"));
+		return;
+	}
+
+	if (ps->weaponstate != WEAPON_FIRING && pps->weaponstate != WEAPON_FIRING) {
+		D_Printf(("state\n"));
+		return;
+	}
+
+	t1 = ps->weaponTime;
+	t2 = pps->weaponTime;
+
+	if (t1 == 0 || t2 == 0) {
+		D_Printf(("t1 = %d || t2 = %d\n", t1, t2));
+		return;
+	}
+
+	i = ps->weapon;
+	t = addTimesArr[WT_DEFAULT][i];
+	d = t1 - t2;
+
+	//noghsot has some operations with time
+	//d = ((d + pmove_msec.integer-1) / pmove_msec.integer) * pmove_msec.integer;
+
+	if (d > 0 && d < t)
+		f = d;
+	else
+		f = t + d;
+
+	//if delta was very small, count it as error, and use current weapontime
+	if (f < 10) {
+		D_Printf(("f < 10\n"));
+		fixed[i] = cg.time + CGX_FIXWEAPONTIME;
+		return;
+	}
+
+#if 1
+	addTimes[i] = f;
+	fixed[i] = cg.time + CGX_FIXWEAPONTIME;
+	D_Printf(("final %d\n", addTimes[i]));
+#else
+	// fix time after calibration, even more experimental feature
+	// somehow gives little worse results, for weapons with small weaponTime
+	{
+		static struct {
+			int fix;
+			int cnt;
+		} wp[WP_NUM_WEAPONS];
+
+		if (wp[i].cnt < 10) {
+			wp[i].fix += f;
+			wp[i].cnt++;
+		} else {
+			f = wp[i].fix;
+			f = (f + (wp[i].cnt - 1)) / wp[i].cnt;
+			addTimes[i] = f;
+			fixed[i] = cg.time + CGX_FIXWEAPONTIME * 60 * 10;
+			D_Printf(("final %d %d/%d\n", addTimes[i], wp[i].fix, wp[i].cnt));
+			memset(&wp[i], 0, sizeof wp[0]);
+		}
+	}
+#endif
+
+	D_Printf(("t:%4i f:%4i t1:%4i t2:%4i d:%4i\n", t, f, t1, t2, d));
+}
+
 #if CGX_UNLAGGED
 //unlagged - optimized prediction
 #define ABS(x) ((x) < 0 ? (-(x)) : (x))
@@ -591,6 +674,7 @@ void CG_PredictPlayerState( void ) {
 		D_Printf(("pmove_fixed %d\n", *cg_pmove.pmove_fixed));
 		D_Printf(("pmove_msec %d\n", *cg_pmove.pmove_msec));
 		D_Printf(("pmove_accurate %d\n", *cg_pmove.pmove_accurate));
+		D_Printf(("cg_predictWeaponTime %d\n", cgx_predictWeaponTime.integer));
 	}
 
 
@@ -813,6 +897,12 @@ void CG_PredictPlayerState( void ) {
 					}
 				}
 #endif
+				// x-mod: weponTime fix experimental technology
+				if (cgx_predictWeaponTime.integer &&
+					cg.predictedPlayerState.weaponTime != oldPlayerState.weaponTime) {
+					CGX_FixWeaponTimeError(&cg.predictedPlayerState, &oldPlayerState);
+				}
+
 				VectorSubtract( oldPlayerState.origin, adjusted, delta );
 				len = VectorLength( delta );
 				if ( len > 0.1 ) {

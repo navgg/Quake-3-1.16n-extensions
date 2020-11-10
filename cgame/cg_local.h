@@ -1347,6 +1347,7 @@ extern	vmCvar_t		cgx_winterEffects;
 extern	vmCvar_t		cgx_modelCache;
 extern	vmCvar_t		cgx_intermissionStats;
 extern	vmCvar_t		cgx_hud;
+extern	vmCvar_t		cgx_predictWeaponTime;
 
 extern	vmCvar_t		com_maxfps;
 extern	vmCvar_t		cl_maxpackets;
