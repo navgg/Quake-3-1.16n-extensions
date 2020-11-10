@@ -1433,7 +1433,7 @@ static qboolean CGX_IsRememberedMap() {
 	char buf[MAX_INFO_VALUE];
 	char *s, *t;
 
-	trap_Cvar_Get("cl_fixedmaps", buf);
+	trap_Cvar_Get("cg_fixedmaps", buf);
 
 	for (t = s = buf; *t; t = s ) {
 		s = strchr(s, ' ');
@@ -1457,12 +1457,12 @@ static void CGX_RememberBrokenMap() {
 	if (CGX_IsRememberedMap())
 		return;	
 
-	trap_Cvar_Get("cl_fixedmaps", buf);
+	trap_Cvar_Get("cg_fixedmaps", buf);
 
 	i = strlen(buf);
 	Com_sprintf(buf + i, sizeof(buf) - i, "%s ", cgs.mapname_clean);
 
-	trap_Cvar_Set("cl_fixedmaps", buf);
+	trap_Cvar_Set("cg_fixedmaps", buf);
 }
 
 //qboolean CGX_IsPure() {

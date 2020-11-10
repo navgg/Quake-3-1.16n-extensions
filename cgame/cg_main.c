@@ -419,7 +419,8 @@ cvarTable_t		cgx_cvarTable_temp[] = {
 	// X-MOD: fixes loading of some big maps 0: default 1: r_vertexLight 1 loading
 	{ &cgx_maploadingfix, "cgx_fix_mapload", "0", CVAR_TEMP | CVAR_ROM },
 	// stored fixed maplist, so if it once was fixed nextime will just read from this list
-	{ &cgx_fixedmaps, "cl_fixedmaps", "", CVAR_ROM | CVAR_ARCHIVE },
+	//{ &cgx_fixedmaps, "cl_fixedmaps", "", CVAR_ROM | CVAR_ARCHIVE },
+	{ &cgx_fixedmaps, "cg_fixedmaps", "", CVAR_TEMP | CVAR_ROM },
 	//mod version
 	{ &cgx_version, "cgx_version", CGX_FULLVER, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
 	//for help message showing in intermission
