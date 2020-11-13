@@ -40,6 +40,9 @@ cg_drawGun 0|1|2 - sets draw gun style
 
 cg_kickScale 0-1.0 - camera shake effect when hit (default 1)
 
+cg_playerLean 0-1.0 - sets player lean effect, this effect 
+  can be seen on nemesis servers or in 1.32 (default 1)
+
 cg_enemyModel "" - forcing enemy models to specified model/skin.
   Examples:
     "keel/pm": all keels with pm skin

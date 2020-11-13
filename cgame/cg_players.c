@@ -1118,8 +1118,11 @@ static void CG_PlayerAngles( centity_t *cent, vec3_t legs[3], vec3_t torso[3], v
 	if ( speed ) {
 		vec3_t	axis[3];
 		float	side;
+		float	v = cgx_playerLean.value < 0 ? 0 : 
+					cgx_playerLean.value > 1 ? 1 : 
+					cgx_playerLean.value;
 
-		speed *= 0.05;
+		speed *= v * 0.05;
 
 		AnglesToAxis( legsAngles, axis );
 		side = speed * DotProduct( velocity, axis[1] );
