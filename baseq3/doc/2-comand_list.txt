@@ -38,6 +38,8 @@ cg_drawGun 0|1|2 - sets draw gun style
   2: static gun no bobbing
   3: transparent
 
+cg_kickScale 0-1.0 - camera shake effect when hit (default 1)
+
 cg_enemyModel "" - forcing enemy models to specified model/skin.
   Examples:
     "keel/pm": all keels with pm skin

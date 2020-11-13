@@ -224,11 +224,12 @@ fixed black background of ingame ui on widescreens
 ...
 
 added missing bitterman drown sound
-added cg_predictWeaponTime 1|0 experimental technology,
-  attempt to predict weapon sound effects on client for better sound 
-  and effects synchronization on crazy shottie like severs, by default - 0
+added cg_kickScale 0-1.0 camera shake effect when hit (default 1)
+added cg_predictWeaponTime 0|1 experimental technology,
+ attempt to predict weapon sound effects on client for better sound 
+ and effects synchronization on crazy shottie like severs (default  0)
 
-improved sound effects synchronization on sodmod (prediction of weaponTime)
+improved sound effects synchronization on SodMod
 improved cg_autoNetworkSettings for ping over 150
 
 fixed unlagged init on nemesis/bma servers

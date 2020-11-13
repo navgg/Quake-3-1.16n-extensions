@@ -125,6 +125,16 @@ void CG_DamageFeedback( int yawByte, int pitchByte, int damage ) {
 		
 		cg.v_dmg_pitch = -kick * front;
 
+		// x-mod: kick scale
+		{
+			float v =
+				cgx_kickScale.value < 0 ? 0 : 
+				cgx_kickScale.value > 1 ? 1 : 
+				cgx_kickScale.value;
+			cg.v_dmg_roll *= v;
+			cg.v_dmg_pitch *= v;
+		}
+
 		if ( front <= 0.1 ) {
 			front = 0.1;
 		}
