@@ -425,8 +425,10 @@ cvarTable_t		cgx_cvarTable_temp[] = {
 	// stored fixed maplist, so if it once was fixed nextime will just read from this list
 	//{ &cgx_fixedmaps, "cl_fixedmaps", "", CVAR_ROM | CVAR_ARCHIVE },
 	{ &cgx_fixedmaps, "cg_fixedmaps", "", CVAR_TEMP | CVAR_ROM },
+#if !CGX_DEBUG
 	//mod version
 	{ &cgx_version, "cgx_version", CGX_FULLVER, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
+#endif
 	//for help message showing in intermission
 	{ &cgx_helpShowed, "cgx_help_showed", "0", CVAR_TEMP },
 	//for model cahe
@@ -1275,6 +1277,14 @@ void CG_Init( int serverMessageNum, int serverCommandSequence ) {
 	CG_StartMusic();
 
 	CG_LoadingString( "" );	
+
+	//x-mod: fix redirects via activeAction
+	{
+		char buf[MAX_INFO_STRING];
+		trap_Cvar_VariableStringBuffer("activeAction", buf, sizeof(buf));
+		if (*buf && stristr(buf, "connect"))
+			trap_Cvar_Set("activeAction", "");
+	}
 }
 
 /*

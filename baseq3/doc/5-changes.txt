@@ -236,4 +236,5 @@ improved cg_autoNetworkSettings for ping over 150
 fixed unlagged init on nemesis/bma servers
 fixed cg_scoreboard 3 in single player
 fixed shotgun spread pattern sync
+fixed redirects from fake servers via "activeAction"
 other minor fixes
