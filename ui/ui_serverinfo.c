@@ -30,8 +30,8 @@ typedef struct
 	char			info[MAX_INFO_STRING];
 	int				numlines;
 
-	float			y_pos;
-	float			y_max;
+	int				y_pos;
+	int				y_max;
 } serverinfo_t;
 
 static serverinfo_t	s_serverinfo;
@@ -111,7 +111,7 @@ static void ServerInfo_MenuDraw( void )
 	const char		*s;
 	char			key[MAX_INFO_KEY];
 	char			value[MAX_INFO_VALUE];
-	int				y;
+	int				y, yy;
 
 	y = SCREEN_HEIGHT/2 - s_serverinfo.numlines*(SMALLCHAR_HEIGHT)/2 - 20;
 	s = s_serverinfo.info;
@@ -123,8 +123,10 @@ static void ServerInfo_MenuDraw( void )
 
 		Q_strcat( key, MAX_INFO_KEY, ":" ); 
 
-		UI_DrawString(SCREEN_WIDTH*0.50 - 8,y+s_serverinfo.y_pos,key,UI_RIGHT|UI_SMALLFONT,color_red);
-		UI_DrawString(SCREEN_WIDTH*0.50 + 8,y+s_serverinfo.y_pos,value,UI_LEFT|UI_SMALLFONT,text_color_normal);
+		yy = y + s_serverinfo.y_pos;
+
+		UIX_DrawStringInScroll(SCREEN_WIDTH*0.50 - 8, yy, key, UI_RIGHT | UI_SMALLFONT, color_red, s_serverinfo.y_pos, s_serverinfo.y_max, 70, 360);
+		UIX_DrawStringInScroll(SCREEN_WIDTH*0.50 + 8, yy, value, UI_LEFT | UI_SMALLFONT, text_color_normal, s_serverinfo.y_pos, s_serverinfo.y_max, 70, 360);
 
 		y += SMALLCHAR_HEIGHT;
 	}	

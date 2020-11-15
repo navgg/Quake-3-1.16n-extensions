@@ -28,6 +28,17 @@ void UIX_CommonStatusBar(void *self, int min, int total, const char* info_messag
 	}
 }
 
+void UIX_DrawStringInScroll( int x, int y, const char* str, int style, vec4_t color, int y_pos, int y_max, int y1, int y2 ) {
+	if (y >= y1 && y <= y2) {
+		vec4_t c1;
+		Vector4Copy(color, c1);
+		if ((y_pos < 0 && y <= y1 + SMALLCHAR_HEIGHT) ||
+			(y_pos > y_max && y >= y2 - SMALLCHAR_HEIGHT))
+			c1[3] = 0.66f;
+		UI_DrawString(x, y, str, style, c1);
+	}
+}
+
 //gets picmip and save its value
 int UIX_GetPicmip() {	
 	static int val = -1;

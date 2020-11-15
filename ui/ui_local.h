@@ -282,6 +282,7 @@ extern char	*ui_medalSounds[];
 //
 
 extern void UIX_CommonStatusBar(void *self, int min, int total, const char* info_messages[][2]);
+extern void UIX_DrawStringInScroll(int x, int y, const char* str, int style, vec4_t color, int y_pos, int y_max, int y1, int y2);
 
 extern void UIX_GetCDKey(char *buf, int buflen);
 extern void UIX_SetCDKey(char *buf);

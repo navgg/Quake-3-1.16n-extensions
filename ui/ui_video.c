@@ -41,8 +41,8 @@ typedef struct
 	char*			strings[64];
 	int				numstrings;
 
-	float			y_pos;
-	float			y_max;
+	int				y_pos;
+	int				y_max;
 } driverinfo_t;
 
 static driverinfo_t	s_driverinfo;
@@ -77,25 +77,25 @@ static void DriverInfo_MenuDraw( void )
 
 	Menu_Draw( &s_driverinfo.menu );
 
-	UI_DrawString( 320, 80+s_driverinfo.y_pos, "VENDOR", UI_CENTER|UI_SMALLFONT, color_red );
-	UI_DrawString( 320, 152+s_driverinfo.y_pos, "PIXELFORMAT", UI_CENTER|UI_SMALLFONT, color_red );
-	UI_DrawString( 320, 192+s_driverinfo.y_pos, "EXTENSIONS", UI_CENTER|UI_SMALLFONT, color_red );
+	UIX_DrawStringInScroll( 320, 80+s_driverinfo.y_pos, "VENDOR", UI_CENTER|UI_SMALLFONT, color_red, s_driverinfo.y_pos, s_driverinfo.y_max, 79, 380 );
+	UIX_DrawStringInScroll( 320, 152+s_driverinfo.y_pos, "PIXELFORMAT", UI_CENTER|UI_SMALLFONT, color_red, s_driverinfo.y_pos, s_driverinfo.y_max, 79, 380 );
+	UIX_DrawStringInScroll( 320, 192+s_driverinfo.y_pos, "EXTENSIONS", UI_CENTER|UI_SMALLFONT, color_red, s_driverinfo.y_pos, s_driverinfo.y_max, 79, 380 );
 
-	UI_DrawString( 320, 80+16+s_driverinfo.y_pos, uis.glconfig.vendor_string, UI_CENTER|UI_SMALLFONT, text_color_normal );
-	UI_DrawString( 320, 96+16+s_driverinfo.y_pos, uis.glconfig.version_string, UI_CENTER|UI_SMALLFONT, text_color_normal );
-	UI_DrawString( 320, 112+16+s_driverinfo.y_pos, uis.glconfig.renderer_string, UI_CENTER|UI_SMALLFONT, text_color_normal );
-	UI_DrawString( 320, 152+16+s_driverinfo.y_pos, va ("color(%d-bits) Z(%d-bits) stencil(%d-bits)", uis.glconfig.colorBits, uis.glconfig.depthBits, uis.glconfig.stencilBits), UI_CENTER|UI_SMALLFONT, text_color_normal );
+	UIX_DrawStringInScroll( 320, 80+16+s_driverinfo.y_pos, uis.glconfig.vendor_string, UI_CENTER|UI_SMALLFONT, text_color_normal, s_driverinfo.y_pos, s_driverinfo.y_max, 79, 380 );
+	UIX_DrawStringInScroll( 320, 96+16+s_driverinfo.y_pos, uis.glconfig.version_string, UI_CENTER|UI_SMALLFONT, text_color_normal, s_driverinfo.y_pos, s_driverinfo.y_max, 79, 380 );
+	UIX_DrawStringInScroll( 320, 112+16+s_driverinfo.y_pos, uis.glconfig.renderer_string, UI_CENTER|UI_SMALLFONT, text_color_normal, s_driverinfo.y_pos, s_driverinfo.y_max, 79, 380 );
+	UIX_DrawStringInScroll( 320, 152+16+s_driverinfo.y_pos, va ("color(%d-bits) Z(%d-bits) stencil(%d-bits)", uis.glconfig.colorBits, uis.glconfig.depthBits, uis.glconfig.stencilBits), UI_CENTER|UI_SMALLFONT, text_color_normal, s_driverinfo.y_pos, s_driverinfo.y_max, 79, 380 );
 
 	// double column
 	y = 192+16+s_driverinfo.y_pos;
 	for (i=0; i<s_driverinfo.numstrings/2; i++) {
-		UI_DrawString( 320-4, y, s_driverinfo.strings[i*2], UI_RIGHT|UI_SMALLFONT, text_color_normal );
-		UI_DrawString( 320+4, y, s_driverinfo.strings[i*2+1], UI_LEFT|UI_SMALLFONT, text_color_normal );
+		UIX_DrawStringInScroll( 320-4, y, s_driverinfo.strings[i*2], UI_RIGHT|UI_SMALLFONT, text_color_normal, s_driverinfo.y_pos, s_driverinfo.y_max, 79, 380 );
+		UIX_DrawStringInScroll( 320+4, y, s_driverinfo.strings[i*2+1], UI_LEFT|UI_SMALLFONT, text_color_normal, s_driverinfo.y_pos, s_driverinfo.y_max, 79, 380 );
 		y += SMALLCHAR_HEIGHT;
 	}
 
 	if (s_driverinfo.numstrings & 1)
-		UI_DrawString( 320, y, s_driverinfo.strings[s_driverinfo.numstrings-1], UI_CENTER|UI_SMALLFONT, text_color_normal );
+		UIX_DrawStringInScroll( 320, y, s_driverinfo.strings[s_driverinfo.numstrings-1], UI_CENTER|UI_SMALLFONT, text_color_normal, s_driverinfo.y_pos, s_driverinfo.y_max, 79, 380 );
 }
 
 /*
