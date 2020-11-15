@@ -849,6 +849,9 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	case EV_GENERAL_SOUND:
 		DEBUGNAME("EV_GENERAL_SOUND");
+		if ( !s_ambient.integer && cent->currentState.eType == ET_SPEAKER ) {
+			break;
+		}
 		if ( cgs.gameSounds[ es->eventParm ] ) {
 			trap_S_StartSound (NULL, es->number, CHAN_VOICE, cgs.gameSounds[ es->eventParm ] );
 		} else {
@@ -859,6 +862,9 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	case EV_GLOBAL_SOUND:	// play from the player's head so it never diminishes
 		DEBUGNAME("EV_GLOBAL_SOUND");
+		if ( !s_ambient.integer && cent->currentState.eType == ET_SPEAKER ) {
+			break;
+		}
 		if ( cgs.gameSounds[ es->eventParm ] ) {
 			trap_S_StartSound (NULL, cg.snap->ps.clientNum, CHAN_AUTO, cgs.gameSounds[ es->eventParm ] );
 		} else {

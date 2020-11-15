@@ -1351,6 +1351,8 @@ extern	vmCvar_t		cgx_predictWeaponTime;
 extern	vmCvar_t		cgx_kickScale;
 extern	vmCvar_t		cgx_playerLean;
 
+extern	vmCvar_t		s_ambient;
+
 extern	vmCvar_t		com_maxfps;
 extern	vmCvar_t		cl_maxpackets;
 

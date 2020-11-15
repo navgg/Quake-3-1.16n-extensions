@@ -83,6 +83,8 @@ vmCvar_t	cgx_predictWeaponTime;
 vmCvar_t	cgx_kickScale;
 vmCvar_t	cgx_playerLean;
 
+vmCvar_t	s_ambient;
+
 vmCvar_t	com_maxfps;
 vmCvar_t	cl_maxpackets;
 vmCvar_t	cl_timeNudge;
@@ -326,6 +328,7 @@ cvarTable_t		cvarTable[] = {
 	{ &cgx_predictWeaponTime, "cg_predictWeaponTime", "0", CVAR_TEMP },
 	{ &cgx_kickScale, "cg_kickScale", "1", CVAR_ARCHIVE },
 	{ &cgx_playerLean, "cg_playerLean", "1", CVAR_ARCHIVE },
+	{ &s_ambient, "s_ambient", "1", CVAR_ARCHIVE },
 
 	//unlagged - client options
 	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE | CGX_NOGHOST_COMPATIBLE},

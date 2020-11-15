@@ -109,6 +109,7 @@ static void CG_EntityEffects( centity_t *cent ) {
 
 	// add loop sound
 	if ( cent->currentState.loopSound ) {
+		if ( !( !s_ambient.integer && cent->currentState.eType == ET_SPEAKER ) )
 		trap_S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, vec3_origin, 
 			cgs.gameSounds[ cent->currentState.loopSound ] );
 	}
@@ -184,6 +185,10 @@ static void CG_Speaker( centity_t *cent ) {
 	}
 
 	if ( cg.time < cent->miscTime ) {
+		return;
+	}
+
+	if ( !s_ambient.integer ) {
 		return;
 	}
 

@@ -224,6 +224,7 @@ fixed black background of ingame ui on widescreens
 ...
 
 added missing bitterman drown sound
+added s_ambient 1|0 toggles ambient sound effects (default 1)
 added cg_kickScale 0-1.0 camera shake effect when hit (default 1)
 added cg_playerLean 0-1.0 player lean effect (default 1)
 added cg_predictWeaponTime 0|1 experimental technology,
