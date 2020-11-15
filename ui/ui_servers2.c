@@ -185,6 +185,11 @@ typedef struct {
 	int					numfavoriteaddresses;
 	//X-mod: server cache
 	qboolean			refreshFromCache; // refreshing from cache or no
+//#define BLOCK_IPS ""
+#ifdef BLOCK_IPS
+	int					numblocked;
+#endif
+
 } arenaservers_t;
 
 static arenaservers_t	g_arenaservers;
@@ -350,6 +355,9 @@ static void ArenaServers_UpdateMenu( void ) {
 				g_arenaservers.currentping, g_arenaservers.numqueriedservers, g_arenaservers.refreshFromCache ? " Loaded from cache." : "");
 			g_arenaservers.statusbar.string  = "Press SPACE to stop";
 			qsort( g_arenaservers.serverlist, *g_arenaservers.numservers, sizeof( servernode_t ), ArenaServers_Compare);
+#ifdef BLOCK_IPS
+			Q_strcat(g_arenaservers.status.string, MAX_STATUSLENGTH, va(" Blocked %d.", g_arenaservers.numblocked));
+#endif
 		}
 		else {
 			// all servers pinged - enable controls
@@ -570,6 +578,20 @@ static void ArenaServers_Remove( void )
 	g_arenaservers.currentping       = g_arenaservers.numfavoriteaddresses;
 }
 
+#ifdef BLOCK_IPS
+qboolean UIX_IsIPBlocked( const char *adrstr ) {
+	char tmp[22], *c;
+
+	Q_strncpyz(tmp, adrstr, sizeof(tmp));
+	if ( ( c = strchr( tmp, ':' ) ) != NULL) {
+		*c = 0;
+		return strstr(BLOCK_IPS, tmp) != NULL;
+	}
+
+	return qfalse;
+}
+#endif
+
 /*
 =================
 ArenaServers_Insert
@@ -580,7 +602,13 @@ static void ArenaServers_Insert( char* adrstr, char* info, int pingtime )
 	servernode_t*	servernodeptr;
 	char*			s;
 	int				i;
-
+#ifdef BLOCK_IPS
+	if ( UIX_IsIPBlocked( adrstr ) ) {
+		trap_Print(va("blocked %s\n", adrstr));
+		g_arenaservers.numblocked++;
+		return;
+	}
+#endif
 	if ((pingtime >= ArenaServers_MaxPing()) && (g_servertype != AS_FAVORITES))
 	{
 		// slow global or local servers do not get entered
