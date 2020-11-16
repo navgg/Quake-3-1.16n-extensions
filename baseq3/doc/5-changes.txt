@@ -231,6 +231,7 @@ added cg_predictWeaponTime 0|1 experimental technology,
  attempt to predict weapon sound effects on client for better sound 
  and effects synchronization on crazy shottie like severs (default  0)
 
+improved cg_chatFilter shows spoofed message to all
 improved sound effects synchronization on SodMod
 improved cg_autoNetworkSettings for ping over 150
 

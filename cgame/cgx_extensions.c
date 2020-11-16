@@ -958,13 +958,26 @@ void CGX_CheckChatCommand(const char *str) {
 }
 
 //fiter chat
+//1 - show filtered msg to all, 2 - show filtered msg to current client
 void CGX_ChatFilter(char *str) {
 	char *c;
+	int k;
 
-	if (cgx_chatFilter.integer & 1)
-	//fix \r bug in chat
-	for (c = str; *c; c++)
-		if (*c == '\r') *c = '.';
+	if (!cgx_chatFilter.integer)
+		return;
+
+	for (c = str, k = 0; *c; c++)
+		if (*c == '\r') {
+			*c = '.';
+			k++;
+		}
+
+	if (cgx_chatFilter.integer != 2 && k > 0) {
+		if (cg.scoresRequestTime + 1000 < cg.time) { // prevent spam and hanging
+			trap_SendClientCommand(va("say ^3Spoofed message from ^7%s", str));
+			cg.scoresRequestTime = cg.time;
+		}
+	}
 }
 
 //check chat string
@@ -1839,7 +1852,7 @@ void CGX_Xmod() {
 			const char *cs = CG_ConfigString(CS_PLAYERS + i);
 			if (*cs) CG_Printf("%i %s\n", i, cs);
 		}
-	} else 
+	} else
 #endif
 
 	if (cmd_is("version")) {
