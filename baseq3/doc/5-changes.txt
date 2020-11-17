@@ -239,4 +239,5 @@ fixed unlagged init on nemesis/bma servers
 fixed cg_scoreboard 3 in single player
 fixed shotgun spread pattern sync
 fixed redirects from fake servers via "activeAction"
+fixed insert and overstrike modes in UI
 other minor fixes
