@@ -173,6 +173,8 @@ vmCvar_t	uix_gibs;
 vmCvar_t	uix_draw2D;
 vmCvar_t	uix_railTrailTime;
 
+vmCvar_t	s_ambient;
+
 #if CGX_UNLAGGED
 vmCvar_t	cg_delag;
 vmCvar_t	cg_projectileNudge;
@@ -250,6 +252,8 @@ cvarTable_t		cvarTable[] = {
 	{ &uix_nomip, "cg_nomip", "-1", CVAR_ARCHIVE | CVAR_LATCH },
 	{ &uix_weaponEffects, "cg_weaponEffects", "8", CVAR_ARCHIVE },
 	{ &uix_draw2D, "cg_draw2D", "1", CVAR_ARCHIVE },
+
+	{ &s_ambient, "s_ambient", "1", CVAR_ARCHIVE },
 
 #if CGX_UNLAGGED
 	{ &cg_delag, "cg_delag", "1", CVAR_ARCHIVE },	

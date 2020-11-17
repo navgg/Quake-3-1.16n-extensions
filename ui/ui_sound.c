@@ -28,21 +28,22 @@ SOUND OPTIONS MENU
 #define ID_QUALITY			16
 #define ID_A3D				17
 #define ID_COMPRESSION		18
-#define ID_KILLBEEP			19
-#define ID_BACK				20
+#define ID_AMBIENT			19
+#define ID_KILLBEEP			20
+#define ID_BACK				21
 
-#define MAX_INFO_MESSAGES	6
 static void UI_Sound_StatusBar( void *self ) {	
-	static const char *info_messages[MAX_INFO_MESSAGES][2] = {
+	static const char *info_messages[][2] = {
 		{ "Controls sound effects volume", "" },
 		{ "Controls ingame music volume", "" },
 		{ "Sets sound quality, recommended 'High'", "" },
 		{ "This setting removed in latest Quake 3", "Recommended 'Off'" },
 		{ "Sound 8bit compression", "Removed in latest Quake 3, Recommended 'Off'" },
+		{ "Toggles ambient sounds", "" },
 		{ "Sets sound beep after killing an enemy", "" }
 	};
 
-	UIX_CommonStatusBar(self, ID_EFFECTSVOLUME, MAX_INFO_MESSAGES, info_messages);
+	UIX_CommonStatusBar(self, ID_EFFECTSVOLUME, ArrLen(info_messages), info_messages);
 }
 
 static const char *quality_items[] = {
@@ -79,6 +80,7 @@ typedef struct {
 	menulist_s			quality;
 	menuradiobutton_s	compression;
 	menuradiobutton_s	a3d;
+	menuradiobutton_s	ambient;
 	menulist_s			killbeep;
 	int					killpeep_initial;
 
@@ -155,6 +157,11 @@ static void UI_SoundOptionsMenu_Event( void* ptr, int event ) {
 	case ID_COMPRESSION:
 		trap_Cvar_SetValue( s_compression, soundOptionsInfo.compression.curvalue );
 		soundOptionsInfo.quality.curvalue = !trap_Cvar_VariableValue( s_compression ) && trap_Cvar_VariableValue( "s_khz" ) >= 22;
+		break;
+
+	case ID_AMBIENT:
+		trap_Cvar_SetValue( "s_ambient", soundOptionsInfo.ambient.curvalue );
+		soundOptionsInfo.ambient.curvalue = (int)trap_Cvar_VariableValue( "s_ambient" );
 		break;
 
 	case ID_KILLBEEP:
@@ -327,6 +334,16 @@ static void UI_SoundOptionsMenu_Init( void ) {
 	}
 
 	y += BIGCHAR_HEIGHT+2;
+	soundOptionsInfo.ambient.generic.type		= MTYPE_RADIOBUTTON;
+	soundOptionsInfo.ambient.generic.name		= "Ambient:";
+	soundOptionsInfo.ambient.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	soundOptionsInfo.ambient.generic.callback	= UI_SoundOptionsMenu_Event;
+	soundOptionsInfo.ambient.generic.id			= ID_AMBIENT;
+	soundOptionsInfo.ambient.generic.x			= 400;
+	soundOptionsInfo.ambient.generic.y			= y;
+	soundOptionsInfo.ambient.generic.statusbar	= UI_Sound_StatusBar;
+
+	y += BIGCHAR_HEIGHT+2;
 	soundOptionsInfo.killbeep.generic.type		= MTYPE_SPINCONTROL;
 	soundOptionsInfo.killbeep.generic.name		= "Kill beep:";
 	soundOptionsInfo.killbeep.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
@@ -372,6 +389,7 @@ static void UI_SoundOptionsMenu_Init( void ) {
 		Menu_AddItem( &soundOptionsInfo.menu, ( void * ) &soundOptionsInfo.a3d );
 		Menu_AddItem( &soundOptionsInfo.menu, ( void * ) &soundOptionsInfo.compression );
 	}
+	Menu_AddItem( &soundOptionsInfo.menu, ( void * ) &soundOptionsInfo.ambient );
 	Menu_AddItem( &soundOptionsInfo.menu, ( void * ) &soundOptionsInfo.killbeep );
 	Menu_AddItem( &soundOptionsInfo.menu, ( void * ) &soundOptionsInfo.back );
 	Menu_AddItem( &soundOptionsInfo.menu, ( void * ) &soundOptionsInfo.apply );
@@ -381,6 +399,7 @@ static void UI_SoundOptionsMenu_Init( void ) {
 	soundOptionsInfo.quality.curvalue = !trap_Cvar_VariableValue( s_compression ) && trap_Cvar_VariableValue( "s_khz" ) >= 22;
 	soundOptionsInfo.compression.curvalue = trap_Cvar_VariableValue( s_compression );
 	soundOptionsInfo.a3d.curvalue = (int)trap_Cvar_VariableValue( "s_usingA3D" );
+	soundOptionsInfo.ambient.curvalue = trap_Cvar_VariableValue( "s_ambient" );
 	soundOptionsInfo.killbeep.curvalue = (int)trap_Cvar_VariableValue( "cg_killBeep" ) % 9;
 	soundOptionsInfo.killpeep_initial = soundOptionsInfo.killbeep.curvalue;
 }
