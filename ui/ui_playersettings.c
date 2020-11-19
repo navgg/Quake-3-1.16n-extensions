@@ -143,6 +143,7 @@ static void PlayerSettings_DrawName( void *self ) {
 		style |= UI_BLINK;
 
 		UI_DrawChar( basex + f->field.cursor * SMALLCHAR_WIDTH, y, c, style, color_white );
+		UI_DrawString( SCREEN_WIDTH * 0.50, SCREEN_HEIGHT * 0.82, "Your ingame name", UI_SMALLFONT | UI_CENTER, colorWhite );
 	}
 
 	// draw at bottom also using proportional font
@@ -171,9 +172,10 @@ static void PlayerSettings_DrawHandicap( void *self ) {
 	if( focus ) {
 		style |= UI_PULSE;
 		color = text_color_highlight;
+		UI_DrawString( SCREEN_WIDTH * 0.50, SCREEN_HEIGHT * 0.82, "Max hp & damage", UI_SMALLFONT | UI_CENTER, colorWhite );
 	}
 
-	UI_DrawProportionalString( item->generic.x, item->generic.y, "Handicap (max hp)", style, color );
+	UI_DrawProportionalString( item->generic.x, item->generic.y, "Handicap", style, color );
 	UI_DrawProportionalString( item->generic.x + 64, item->generic.y + PROP_HEIGHT, handicap_items[item->curvalue], style, color );
 }
 
@@ -197,9 +199,10 @@ static void PlayerSettings_DrawEffects( void *self ) {
 	if( focus ) {
 		style |= UI_PULSE;
 		color = text_color_highlight;
+		UI_DrawString( SCREEN_WIDTH * 0.50, SCREEN_HEIGHT * 0.82, "Rail color", UI_SMALLFONT | UI_CENTER, colorWhite );
 	}
 
-	UI_DrawProportionalString( item->generic.x, item->generic.y, "Effects (Rail color)", style, color );
+	UI_DrawProportionalString( item->generic.x, item->generic.y, "Effects", style, color );
 
 	UI_DrawHandlePic( item->generic.x + 64, item->generic.y + PROP_HEIGHT + 8, 128, 8, s_playersettings.fxBasePic );
 	UI_DrawHandlePic( item->generic.x + 64 + item->curvalue * 16 + 8, item->generic.y + PROP_HEIGHT + 6, 16, 12, s_playersettings.fxPic[item->curvalue] );
@@ -248,13 +251,18 @@ static void PlayerSettings_SaveChanges( void ) {
 	trap_Cvar_SetValue( "color", uitogamecode[s_playersettings.effects.curvalue] );
 }
 
-
+static qboolean handicap_locked = qtrue;
 /*
 =================
 PlayerSettings_MenuKey
 =================
 */
 static sfxHandle_t PlayerSettings_MenuKey( int key ) {
+	if (handicap_locked) {
+		int h;
+		h = Com_Clamp( 5, 100, trap_Cvar_VariableValue("handicap") );
+		s_playersettings.handicap.curvalue = 20 - h / 5;
+	}
 	if( key == K_MOUSE2 || key == K_ESCAPE ) {
 		PlayerSettings_SaveChanges();
 	}
@@ -298,8 +306,6 @@ static void PlayerSettings_SetMenuItems( void ) {
 }
 
 //X-MOD: lock handicap
-static qboolean handicap_locked = qtrue;
-
 static void UI_Handicap_Action( qboolean result ) {
 	if (!result) {
 		int h;
@@ -312,7 +318,7 @@ static void UI_Handicap_Action( qboolean result ) {
 }
 
 static void UI_Handicap_Draw( void ) {
-	UI_DrawProportionalString( SCREEN_WIDTH/2, 356 + PROP_HEIGHT * 0, "WARNING: This will decrease your max hp & damage", UI_CENTER|UI_SMALLFONT, color_yellow );
+	UI_DrawProportionalString( SCREEN_WIDTH/2, 356 + PROP_HEIGHT * 0, "WARNING: This will decrease your hp & damage", UI_CENTER|UI_SMALLFONT, color_yellow );
 	UI_DrawProportionalString( SCREEN_WIDTH/2, 356 + PROP_HEIGHT * 1, "change it if you know what you are doing.", UI_CENTER|UI_SMALLFONT, color_yellow );
 }
 

@@ -23,7 +23,7 @@ void UIX_CommonStatusBar(void *self, int min, int total, const char* info_messag
 	if (!infomsg2[0]) {
 		UI_DrawString(SCREEN_WIDTH * 0.50, SCREEN_HEIGHT * 0.94, infomsg, UI_SMALLFONT | UI_CENTER, colorWhite);
 	} else {
-		UI_DrawString(SCREEN_WIDTH * 0.50, SCREEN_HEIGHT * 0.92, infomsg, UI_SMALLFONT|UI_CENTER, colorWhite );
+		UI_DrawString(SCREEN_WIDTH * 0.50, SCREEN_HEIGHT * 0.92, infomsg, UI_SMALLFONT | UI_CENTER, colorWhite);
 		UI_DrawString(SCREEN_WIDTH * 0.50, SCREEN_HEIGHT * 0.96, infomsg2, UI_SMALLFONT | UI_CENTER, colorWhite);
 	}
 }

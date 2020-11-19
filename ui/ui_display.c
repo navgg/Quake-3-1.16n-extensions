@@ -101,13 +101,18 @@ static displayOptionsInfo_t	displayOptionsInfo;
 //X-MOD: lock screensize slider
 static qboolean screensize_locked = qtrue;
 
+static sfxHandle_t DisplaySettings_MenuKey( int key ) {
+	if (screensize_locked)
+		displayOptionsInfo.screensize.curvalue = trap_Cvar_VariableValue("cg_viewsize") / 10;
+
+	return Menu_DefaultKey( &displayOptionsInfo.menu, key );
+}
+
 static void UI_ViewSize_Action( qboolean result ) {
 	if (!result) {
 		displayOptionsInfo.screensize.curvalue = trap_Cvar_VariableValue("cg_viewsize") / 10;
 		return;
 	}
-
-	trap_Cvar_SetValue("cg_viewsize", displayOptionsInfo.screensize.curvalue * 10);
 	screensize_locked = qfalse;	
 }
 
@@ -151,10 +156,10 @@ static void UI_DisplayOptionsMenu_Event( void* ptr, int event ) {
 		break;
 	
 	case ID_SCREENSIZE:
-		if (displayOptionsInfo.screensize.curvalue < trap_Cvar_VariableValue( "cg_viewsize") / 10 && screensize_locked)
-			UI_ConfirmMenu("ARE YOU SURE?", UI_ViewSize_Draw, UI_ViewSize_Action);
+		if ( displayOptionsInfo.screensize.curvalue < trap_Cvar_VariableValue( "cg_viewsize" ) / 10 && screensize_locked )
+			UI_ConfirmMenu( "ARE YOU SURE?", UI_ViewSize_Draw, UI_ViewSize_Action );
 		else
-			UI_ViewSize_Action(qtrue);
+			trap_Cvar_SetValue( "cg_viewsize", displayOptionsInfo.screensize.curvalue * 10 );
 		break;
 
 	case ID_OVERBRIGHT_BITS:
@@ -210,6 +215,8 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	memset( &displayOptionsInfo, 0, sizeof(displayOptionsInfo) );
 
 	UI_DisplayOptionsMenu_Cache();
+
+	displayOptionsInfo.menu.key        = DisplaySettings_MenuKey;
 	displayOptionsInfo.menu.wrapAround = qtrue;
 	displayOptionsInfo.menu.fullscreen = qtrue;	
 
