@@ -477,7 +477,7 @@ void CG_RegisterCvars( void ) {
 	cg.q3version = atoi(&var[5]);
 
 	//vanilla defaults
-	if (cg.q3version != 16 && var[6] != 'x') {
+	if (cg.q3version != 16 || var[7] != 'x') {
 		for (i = 0, cv = cvarTable; i < cvarTableSize; i++, cv++)
 			if (cv->vmCvar == &cl_maxpackets)
 				cv->defaultString = "30";
