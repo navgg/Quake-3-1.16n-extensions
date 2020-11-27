@@ -959,6 +959,8 @@ void CGX_CheckChatCommand(const char *str) {
 
 //fiter chat
 //1 - show filtered msg to all, 2 - show filtered msg to current client
+//-1, -2 - profanity filter off
+//+4 - replace with *, otherwise swap letters
 void CGX_ChatFilter(char *str) {
 	char *c;
 	int k;
@@ -972,10 +974,83 @@ void CGX_ChatFilter(char *str) {
 			k++;
 		}
 
-	if (cgx_chatFilter.integer != 2 && k > 0) {
+	if ((cgx_chatFilter.integer & 1) && k > 0) {
 		if (cg.scoresRequestTime + 1000 < cg.time) { // prevent spam and hanging
 			trap_SendClientCommand(va("say ^3Spoofed message from ^7%s", str));
 			cg.scoresRequestTime = cg.time;
+		}
+	}
+
+	if (*cgx_profanity.string && cgx_chatFilter.integer > 0) {
+		char *p, *t;
+
+		str = strchr(str, ':') + 1;
+
+		while (*str) {
+			//CG_Printf("S: '%s'\n", s);
+			if (Q_IsColorString(str)) {
+				str += 2;
+				continue;
+			}
+			if (!Q_isalpha(*str)) {
+				str++;
+				continue;
+			}
+			p = cgx_profanity.string;
+			//CG_Printf("C: '%s' '%s'\n", str, p);
+		_nextword:
+			t = str;
+
+			//str cmp
+			while (*t && Q_isalpha(*p)) {
+				if (Q_IsColorString(t)) {
+					t += 2;
+					continue;
+				}
+				if (tolower(*t) != *p) {
+					break;
+				}
+				p++;
+				t++;
+			}
+
+			//! match whole word
+			//. match if word starts with
+			//match if current *p is a space
+			if (*p == ' ' ||
+				*p == '!' && !Q_isalpha(*t) && !Q_isalpha(*(str - 1)) || 
+				*p == '.' && !Q_isalpha(*(str - 1)) ||
+				!*p) {
+				//CG_Printf("M: '%s' '%s' %i\n", str, p, t - str);
+				//swap or replace
+				if (cgx_chatFilter.integer & 4)
+					for (c = str + 1; c < t - 1; c += 2) {
+						char b = *c;
+						*c = *(c + 1);
+						*(c + 1) = b;
+					}
+				else
+					for (c = str + 1; c < t - 1; c++) {
+						if (Q_IsColorString(c)) {
+							c++;
+						} else {
+							*c = '*';
+						}
+					}
+				str = t;
+			} else {
+				//next word
+				for (; *p; p++)
+					if (!Q_isalpha(*p)) {
+						p++;
+						if (*p)
+							goto _nextword;
+					}
+				//CG_Printf("no more words\n");
+				//no more words
+				//next letter in input str
+				str++;
+			}
 		}
 	}
 }

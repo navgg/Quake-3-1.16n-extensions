@@ -1364,6 +1364,7 @@ extern	vmCvar_t		cgx_last_error;
 
 extern	vmCvar_t		cgx_maploadingfix;
 extern	vmCvar_t		cgx_r_picmip;
+extern	vmCvar_t		cgx_profanity;
 
 extern	vmCvar_t		r_vertexLight;
 extern	vmCvar_t		r_picmip;
@@ -1982,3 +1983,6 @@ void		testPrintInt( char *string, int i );
 void		testPrintFloat( char *string, float f );
 
 int			trap_MemoryRemaining( void );
+
+#define CGX_PROFANITY ""
+//#define CGX_PROFANITY "fuck dick.cunt.pizd pezd pidar.pidor.pedo.pedi.suka.blya.blia.hui.huy.hue.ohu.huya huia ebu!ebi!zaeb vieb doeb ebli ebly ebal!ebet!eban ebat!ebla eblo eblu uebu ueba uebo uebk dolbae gando gondo muda mudo kurwa"

@@ -403,6 +403,7 @@ vmCvar_t	cgx_last_error;
 vmCvar_t	cgx_maploadingfix;
 vmCvar_t	cgx_fixedmaps;
 vmCvar_t	cgx_r_picmip;
+vmCvar_t	cgx_profanity;
 
 vmCvar_t	r_vertexLight;
 vmCvar_t	r_picmip;
@@ -428,6 +429,7 @@ cvarTable_t		cgx_cvarTable_temp[] = {
 	// stored fixed maplist, so if it once was fixed nextime will just read from this list
 	//{ &cgx_fixedmaps, "cl_fixedmaps", "", CVAR_ROM | CVAR_ARCHIVE },
 	{ &cgx_fixedmaps, "cg_fixedmaps", "", CVAR_TEMP | CVAR_ROM },
+	{ &cgx_profanity, "cg_profanity", CGX_PROFANITY, CVAR_TEMP | CVAR_LATCH },
 #if !CGX_DEBUG
 	//mod version
 	{ &cgx_version, "cgx_version", CGX_FULLVER, CVAR_ROM | CVAR_TEMP | CVAR_USERINFO },
