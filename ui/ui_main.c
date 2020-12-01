@@ -140,7 +140,7 @@ vmCvar_t	ui_cdkeychecked;
 vmCvar_t	uix_serverCache;
 vmCvar_t	uix_browserShowMplayer;
 vmCvar_t	uix_browserShowNettype;
-vmCvar_t	uix_browserBlockedIPs;
+vmCvar_t	uix_blockedIPs;
 
 vmCvar_t	uix_wideScreenFix;
 vmCvar_t	uix_defaultWeapon;
@@ -226,7 +226,7 @@ cvarTable_t		cvarTable[] = {
 	{ &uix_serverCache, "ui_serverCache", "1", CVAR_TEMP },
 	{ &uix_browserShowMplayer, "ui_browserShowMplayer", "0", CVAR_TEMP },
 	{ &uix_browserShowNettype, "ui_browserShowNettype", "1", CVAR_TEMP },
-	{ &uix_browserBlockedIPs, "ui_browserBlockedIPs", "78.141.221.220 62.35.11.0", CVAR_TEMP },
+	{ &uix_blockedIPs, "ui_blockedIPs", "78.141.221.220 62.35.11.0", CVAR_TEMP },
 
 	// X-MOD: default parameters
 	{ &uix_wideScreenFix, "cg_wideScreenFix", "1", CVAR_ARCHIVE },

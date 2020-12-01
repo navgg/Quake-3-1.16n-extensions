@@ -583,13 +583,13 @@ static void ArenaServers_Remove( void )
 qboolean UIX_IsIPBlocked( const char *adrstr ) {
 	char tmp[22], *c;
 
-	if (!*uix_browserBlockedIPs.string)
+	if (!*uix_blockedIPs.string)
 		return qfalse;
 
 	Q_strncpyz(tmp, adrstr, sizeof(tmp));
 	if ( ( c = strchr( tmp, ':' ) ) != NULL) {
 		*c = 0;
-		return strstr(uix_browserBlockedIPs.string, tmp) != NULL;
+		return strstr(uix_blockedIPs.string, tmp) != NULL;
 	}
 
 	return qfalse;
@@ -606,6 +606,13 @@ static void ArenaServers_Insert( char* adrstr, char* info, int pingtime )
 	servernode_t*	servernodeptr;
 	char*			s;
 	int				i;
+
+	if ((pingtime >= ArenaServers_MaxPing()) && (g_servertype != AS_FAVORITES))
+	{
+		// slow global or local servers do not get entered
+		return;
+	}
+
 #ifdef BLOCK_IPS
 	if ( UIX_IsIPBlocked( adrstr ) ) {
 		trap_Print(va("blocked %s\n", adrstr));
@@ -613,11 +620,6 @@ static void ArenaServers_Insert( char* adrstr, char* info, int pingtime )
 		return;
 	}
 #endif
-	if ((pingtime >= ArenaServers_MaxPing()) && (g_servertype != AS_FAVORITES))
-	{
-		// slow global or local servers do not get entered
-		return;
-	}
 
 	if (*g_arenaservers.numservers >= g_arenaservers.maxservers) {
 		// list full;
