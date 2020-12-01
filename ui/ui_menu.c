@@ -190,7 +190,7 @@ static void Main_MenuDraw( void ) {
 		UI_DrawProportionalString( 320, 372, "DEMO      FOR MATURE AUDIENCES      DEMO", UI_CENTER|UI_SMALLFONT, color );
 		UI_DrawString( 320, 400, "Quake III Arena(c) 1999-2000, Id Software, Inc.  All Rights Reserved", UI_CENTER|UI_SMALLFONT, color );						
 	} else {	*/		
-		UI_DrawString( 320, 422, va("Quake III "CGX_NAME" %s (c) 2018-2019 NaViGaToR (322)", CGX_VERSION), UI_CENTER|UI_SMALLFONT, cgx_color );
+		UI_DrawString( 320, 422, va("Quake III "CGX_NAME" %s (c) 2018-2020 NaViGaToR (322)", CGX_VERSION), UI_CENTER|UI_SMALLFONT, cgx_color );
 		
 		UI_DrawString( 320, 450, "Quake III Arena(c) 1999-2000, Id Software, Inc.  All Rights Reserved", UI_CENTER|UI_SMALLFONT, color );
 	//}	
@@ -199,7 +199,7 @@ static void Main_MenuDraw( void ) {
 static void UI_Menu_Credits(void *self) {
 	vec4_t			cgx_color2 = { 0.5, 0.2, 0.2, 0.5 };
 
-	UI_DrawString( 320, 422, va("Quake III "CGX_NAME" %s (c) 2018-2019 NaViGaToR (322)", CGX_VERSION), UI_CENTER|UI_SMALLFONT|UI_PULSE, cgx_color2 );
+	UI_DrawString( 320, 422, va("Quake III "CGX_NAME" %s (c) 2018-2020 NaViGaToR (322)", CGX_VERSION), UI_CENTER|UI_SMALLFONT|UI_PULSE, cgx_color2 );
 }
 
 static char* mapName;
@@ -365,7 +365,7 @@ void UI_MainMenu( void ) {
 
 	s_main.credits.generic.type				= MTYPE_PTEXT;
 	s_main.credits.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS|QMF_SMALLFONT|isHidden;
-	s_main.credits.generic.x				= 320-SMALLCHAR_WIDTH*2-5;
+	s_main.credits.generic.x				= 320-SMALLCHAR_WIDTH-4;
 	s_main.credits.generic.y				= 420;
 	s_main.credits.generic.id				= ID_CREDITS;
 	s_main.credits.generic.callback			= Main_MenuEvent; 

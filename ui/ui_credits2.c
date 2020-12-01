@@ -12,15 +12,18 @@ X-MOD CREDITS
 #include "ui_local.h"
 
 static char *sodmodgaNames[] = {
-	"1488mp",	
+	"1488mp",
 	"777",
 	"Abdel Morocco",
 	"Agi",
 	"Alex",
+	"Andromeda",
+	"BlindGunner",
 	"BOND",
 	"Comrade",
 	"Danger",
 	"DEADPOOL",
+	"ERTOGRUL",
 	"Fish",
 	"GRAZ1",
 	"It",
@@ -33,25 +36,31 @@ static char *sodmodgaNames[] = {
 	"///Kit",	
 	"[RU]*Leon*",
 	"Mongrel",
-	"MORDA",	
+	"MORDA",
+	"Moldovan",
 	"Mucha",
 	"Mustang",
 	"MYSECRET",
 	"NaGiBaToR",
-	"P",
 	"Poseidon",
 	"Pika Pika",
+	"ProETcontra",
 	"REDNECK (UK)",
 	"Roens",
 	"Scout",
+	"shymaa",
+	"Skipidaupaupau",
 	"SplinDay",
 	"Stalker Mechenniy",
+	"S_T_E_R_V_A",
 	"SVETLOV",
+	"SWE*RUN",
 	"Tanya",
 	"tvinsen",
 	"Ukraine",
 	"Ukrop",
-	"WineUbuntu",
+	"Vanya",
+	"VladLamp",
 	"yMka",
 	"Yuri_semko",
 	"zazo",
@@ -167,7 +176,7 @@ static char *aimnames[] = {
 #define RAILCTFNAMES_SIZE sizeof(railctfnames) / sizeof(railctfnames[0])
 #define AIMNAMES_SIZE sizeof(aimnames) / sizeof(aimnames[0])
 
-#define CGX_CREDITS_END 6879
+#define CGX_CREDITS_END 7180
 #define DEFAULT_YSTEP 0.406f
 
 typedef struct {

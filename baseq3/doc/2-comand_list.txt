@@ -154,6 +154,8 @@ cg_winterEffects 0-7 - winter effects for ambiance. Additive value.
   4: breath
  -1: all.
 
+s_ambient 0|1 - toggles ambient sound effects.
+
 hud <file> - loads hud from specified file. Works with CPMA & E+ syntax.
   File must be placed in "hud" folder of "baseq3".
   Examples:

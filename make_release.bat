@@ -2,7 +2,7 @@ call build_all_release.bat
 call make_readme.bat
 
 set /p version=<%cd%\baseq3\version.txt
-set "zipname=X-Mod-v%version:~0,-1%-beta.zip"
+set "zipname=X-Mod-v%version%.zip"
 
 (
 echo {X-Mod}.pk3
