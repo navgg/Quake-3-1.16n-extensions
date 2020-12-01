@@ -72,6 +72,7 @@ extern vmCvar_t	uix_nomip;
 extern vmCvar_t	uix_serverCache;
 extern vmCvar_t	uix_browserShowMplayer;
 extern vmCvar_t	uix_browserShowNettype;
+extern vmCvar_t	uix_browserBlockedIPs;
 
 extern vmCvar_t	s_ambient;
 

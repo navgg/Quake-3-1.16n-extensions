@@ -230,6 +230,8 @@ added cg_playerLean 0-1.0 player lean effect (default 1)
 added cg_predictWeaponTime 0|1 experimental technology,
  attempt to predict weapon sound effects on client for better sound 
  and effects synchronization on crazy shottie like severs (default  0)
+added ui_browserBlockedIPs to block specified IPs in server browser
+ (format: "X.X.X.X X.X.X.X")
 
 improved cg_chatFilter shows spoofed message to all
 improved sound effects synchronization on SodMod

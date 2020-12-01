@@ -185,7 +185,7 @@ typedef struct {
 	int					numfavoriteaddresses;
 	//X-mod: server cache
 	qboolean			refreshFromCache; // refreshing from cache or no
-//#define BLOCK_IPS ""
+#define BLOCK_IPS 1
 #ifdef BLOCK_IPS
 	int					numblocked;
 #endif
@@ -356,7 +356,8 @@ static void ArenaServers_UpdateMenu( void ) {
 			g_arenaservers.statusbar.string  = "Press SPACE to stop";
 			qsort( g_arenaservers.serverlist, *g_arenaservers.numservers, sizeof( servernode_t ), ArenaServers_Compare);
 #ifdef BLOCK_IPS
-			Q_strcat(g_arenaservers.status.string, MAX_STATUSLENGTH, va(" Blocked %d.", g_arenaservers.numblocked));
+			if (g_arenaservers.numblocked)
+				Q_strcat(g_arenaservers.status.string, MAX_STATUSLENGTH, va(" Blocked %d.", g_arenaservers.numblocked));
 #endif
 		}
 		else {
@@ -582,10 +583,13 @@ static void ArenaServers_Remove( void )
 qboolean UIX_IsIPBlocked( const char *adrstr ) {
 	char tmp[22], *c;
 
+	if (!*uix_browserBlockedIPs.string)
+		return qfalse;
+
 	Q_strncpyz(tmp, adrstr, sizeof(tmp));
 	if ( ( c = strchr( tmp, ':' ) ) != NULL) {
 		*c = 0;
-		return strstr(BLOCK_IPS, tmp) != NULL;
+		return strstr(uix_browserBlockedIPs.string, tmp) != NULL;
 	}
 
 	return qfalse;
@@ -1035,6 +1039,7 @@ static void ArenaServers_StartRefresh( void )
 	g_arenaservers.nextpingtime      = 0;
 	*g_arenaservers.numservers       = 0;
 	g_arenaservers.numqueriedservers = 0;
+	g_arenaservers.numblocked        = 0;
 
 	// allow max 5 seconds for responses
 	g_arenaservers.refreshtime = uis.realtime + 5000;
